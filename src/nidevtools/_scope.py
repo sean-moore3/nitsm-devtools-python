@@ -229,9 +229,7 @@ def _ssc_scope_obtain_trigger_path(tsm: TSMScope, trigger_source: str, setup_typ
     trigger_paths: typing.List[str] = []
     if setup_type == "STSM1":
         for ssc in tsm.ssc:
-            chassis_string = re.match(
-                r"_C[1-4]_", ssc.session.io_resource_descriptor
-            ).group()
+            chassis_string = re.match(r"_C[1-4]_", ssc.session.io_resource_descriptor).group()
             timing_card = "SYNC_6674T_C{}_S10".format(chassis_string[2])
             trigger_path = "/" + timing_card + "/" + "PFI0"
             trigger_paths.append(trigger_path)
@@ -308,15 +306,13 @@ def _pin_query_context_to_channel_list(
             pin_types_return,
         ):
             if pin_type.value == 1:
-                pins_array_for_session_input[
-                    per_pin_transposed_channel_group_index
-                ].Pins[per_pin_transposed_channel_index] = pin
+                pins_array_for_session_input[per_pin_transposed_channel_group_index].Pins[
+                    per_pin_transposed_channel_index
+                ] = pin
             else:
-                pins_array_for_session_input[
-                    per_pin_transposed_channel_group_index
-                ].Pins[per_pin_transposed_channel_index] = "Site{}/{}".format(
-                    site_number, pin
-                )
+                pins_array_for_session_input[per_pin_transposed_channel_group_index].Pins[
+                    per_pin_transposed_channel_index
+                ] = "Site{}/{}".format(site_number, pin)
     for pins_array_for_session in pins_array_for_session_input:
         channel_list = ",".join(pins_array_for_session.Pins)
         channel_list_per_session += (channel_list,)
@@ -329,9 +325,9 @@ def _check_for_pin_group(
 ):
     pins_types, pin_group_found = _identify_pin_types(tsm_context, pins_or_pins_group)
     if pin_group_found == True:
-        pins: typing.Union[
-            str, typing.Sequence[str]
-        ] = tsm_context.get_pins_in_pin_group(pins_or_pins_group)
+        pins: typing.Union[str, typing.Sequence[str]] = tsm_context.get_pins_in_pin_group(
+            pins_or_pins_group
+        )
         pins_types, _ = _identify_pin_types(tsm_context, pins)
     else:
         pins = pins_or_pins_group
@@ -432,12 +428,8 @@ def tsm_ssc_scope_pins_to_sessions(
     site_numbers_out, channel_list_per_session = _pin_query_context_to_channel_list(
         [], site_numbers, pin_query_context, tsm_context
     )
-    for session, channel, channel_list in zip(
-        sessions, channels, channel_list_per_session
-    ):
-        ssc.append(
-            SSCScope(session=session, channels=channel, channel_list=channel_list)
-        )
+    for session, channel, channel_list in zip(sessions, channels, channel_list_per_session):
+        ssc.append(SSCScope(session=session, channels=channel, channel_list=channel_list))
     return TSMScope(pin_query_context, site_numbers_out, ssc)
 
 
@@ -446,9 +438,7 @@ def tsm_ssc_scope_pins_to_sessions(
 
 def configure_impedance(tsm: TSMScope, input_impedance: float):
     for ssc in tsm.ssc:
-        ssc.session.channels[ssc.channels].configure_chan_characteristics(
-            input_impedance, -1.0
-        )
+        ssc.session.channels[ssc.channels].configure_chan_characteristics(input_impedance, -1.0)
     return tsm
 
 
@@ -525,9 +515,7 @@ def configure_vertical_per_channel(
     vertical_coupling_out = _expand_to_requested_array_size(
         vertical_coupling, len(scope_ssc_per_channel)
     )
-    vertical_range_out = _expand_to_requested_array_size(
-        vertical_range, len(scope_ssc_per_channel)
-    )
+    vertical_range_out = _expand_to_requested_array_size(vertical_range, len(scope_ssc_per_channel))
     vertical_offset_out = _expand_to_requested_array_size(
         vertical_offset, len(scope_ssc_per_channel)
     )
@@ -581,7 +569,7 @@ def initiate(tsm: TSMScope):
 
 def abort(tsm: TSMScope):
     for ssc in tsm.ssc:
-        ssc.session.abort
+        ssc.session.abort()
     return tsm
 
 
@@ -700,9 +688,7 @@ def tsm_ssc_scope_export_start_triggers(tsm: TSMScope, output_terminal: str):
                 ssc.session.configure_trigger_immediate()
                 ssc.session.exported_start_trigger_output_terminal = output_terminal
                 ssc.session.commit()
-                start_trigger = (
-                    "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
-                )
+                start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
             else:
                 ssc.session.configure_trigger_digital(
                     start_trigger,
@@ -768,9 +754,7 @@ def scope_measure_statistics(
         )
         ssc.session.initiate()
         measurement_stats.append(
-            ssc.session.channels[ssc.channels].fetch_measurement_stats(
-                scalar_meas_function
-            )
+            ssc.session.channels[ssc.channels].fetch_measurement_stats(scalar_meas_function)
         )
     return tsm, measurement_stats
 
@@ -800,14 +784,10 @@ def tsm_ssc_scope_fetch_meas_stats_per_channel(
 # Open session
 
 
-def tsm_scope_initialize_sessions(
-    tsm_context: SemiconductorModuleContext, options_input: str
-):
+def tsm_scope_initialize_sessions(tsm_context: SemiconductorModuleContext, options_input: str):
     instrument_names = tsm_context.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
-        session = niscope.Session(
-            instrument_name, reset_device=True, options=options_input
-        )
+        session = niscope.Session(instrument_name, reset_device=True, options=options_input)
         try:
             session.commit()
         except:

@@ -60,15 +60,11 @@ class LevelTypeToSet(Enum):
 
 class HRAM_Configuration:
     finite_samples: bool = True
-    cycles_to_acquire: enums.HistoryRAMCyclesToAcquire = (
-        enums.HistoryRAMCyclesToAcquire.FAILED
-    )
+    cycles_to_acquire: enums.HistoryRAMCyclesToAcquire = enums.HistoryRAMCyclesToAcquire.FAILED
     max_samples_to_acquire_per_site: int = 8191
     buffer_size_per_site: int = 32000
     pretrigger_samples: int = 0
-    trigger_type: enums.HistoryRAMTriggerType = (
-        enums.HistoryRAMTriggerType.FIRST_FAILURE
-    )
+    trigger_type: enums.HistoryRAMTriggerType = enums.HistoryRAMTriggerType.FIRST_FAILURE
     cycle_number: int = 0
     pattern_label: str = ""
     vector_offset: int = 0
@@ -167,27 +163,21 @@ def tsm_ssc_export_opcode_trigger_signal(
 
 
 # Frequency Measurement #
-def tsm_ssc_frequency_counter_configure_measurement_time(
-    tsm: TSMDigital, measurement_time: float
-):
+def tsm_ssc_frequency_counter_configure_measurement_time(tsm: TSMDigital, measurement_time: float):
     _ssc_frequency_counter_configure_measurement_time(tsm.ssc, measurement_time)
     return tsm
 
 
 def tsm_ssc_frequency_counter_measure_frequency(tsm: TSMDigital):
     initialized_array = [[0.0 for _ in tsm.pins] for _ in tsm.site_numbers]
-    per_instrument_to_per_site_per_pin_lut = (
-        _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
-            tsm.ssc, tsm.site_numbers, tsm.pins
-        )
+    per_instrument_to_per_site_per_pin_lut = _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
+        tsm.ssc, tsm.site_numbers, tsm.pins
     )
     _, per_instrument_frequencies = _ssc_frequency_counter_measure_frequency(tsm.ssc)
-    per_site_per_pin_frequency_measurements = (
-        _apply_lut_per_instrument_to_per_site_per_pin(
-            initialized_array,
-            per_instrument_to_per_site_per_pin_lut,
-            per_instrument_frequencies,
-        )
+    per_site_per_pin_frequency_measurements = _apply_lut_per_instrument_to_per_site_per_pin(
+        initialized_array,
+        per_instrument_to_per_site_per_pin_lut,
+        per_instrument_frequencies,
     )
     return tsm, per_site_per_pin_frequency_measurements
 
@@ -267,15 +257,10 @@ def tsm_ssc_log_hram_results(
         os.mkdir(destination_dir)
     os.chdir(destination_dir)
     files_generated: typing.List[str] = []
-    for cycle_informations, site_number in zip(
-        per_site_cycle_information, tsm.site_numbers
-    ):
+    for cycle_informations, site_number in zip(per_site_cycle_information, tsm.site_numbers):
         results: typing.List[typing.List[typing.Any]] = []
         if not cycle_informations or all(
-            [
-                not cycle_information.per_pin_pass_fail
-                for cycle_information in cycle_informations
-            ]
+            [not cycle_information.per_pin_pass_fail for cycle_information in cycle_informations]
         ):
             results.append(["PATTERN PASSED - NO FAILURES"])
         else:
@@ -301,20 +286,10 @@ def tsm_ssc_log_hram_results(
                         )
                         + "}",
                         "{"
-                        + ",".join(
-                            [
-                                str(value)
-                                for value in cycle_information.expected_pin_states
-                            ]
-                        )
+                        + ",".join([str(value) for value in cycle_information.expected_pin_states])
                         + "}",
                         "{"
-                        + ",".join(
-                            [
-                                str(value)
-                                for value in cycle_information.actual_pin_states
-                            ]
-                        )
+                        + ",".join([str(value) for value in cycle_information.actual_pin_states])
                         + "}",
                     ]
                 )
@@ -356,13 +331,10 @@ def tsm_ssc_stream_hram_results(tsm: TSMDigital):
         number_of_samples,
     ) = _ssc_stream_hram_results(tsm.ssc)
     per_instrument_per_site_to_per_site_lut = (
-        _ssc_calculate_per_instrument_per_site_to_per_site_lut(
-            tsm.ssc, tsm.site_numbers
-        )
+        _ssc_calculate_per_instrument_per_site_to_per_site_lut(tsm.ssc, tsm.site_numbers)
     )
     per_site_cycle_information = [
-        [HistoryRAMCycleInformation() for _ in range(number_of_samples)]
-        for _ in tsm.site_numbers
+        [HistoryRAMCycleInformation() for _ in range(number_of_samples)] for _ in tsm.site_numbers
     ]
     for lut, cycle_information in zip(
         per_instrument_per_site_to_per_site_lut,
@@ -408,18 +380,14 @@ def tsm_ssc_burst_pattern(
     timeout: float = 10,
     wait_until_done: bool = True,
 ):
-    _ssc_burst_pattern(
-        tsm.ssc, start_label, select_digital_function, timeout, wait_until_done
-    )
+    _ssc_burst_pattern(tsm.ssc, start_label, select_digital_function, timeout, wait_until_done)
     return tsm
 
 
 def tsm_ssc_get_fail_count(tsm: TSMDigital):
     initialized_array = [[0 for _ in tsm.pins] for _ in tsm.site_numbers]
-    per_instrument_to_per_site_per_pin_lut = (
-        _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
-            tsm.ssc, tsm.site_numbers, tsm.pins
-        )
+    per_instrument_to_per_site_per_pin_lut = _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
+        tsm.ssc, tsm.site_numbers, tsm.pins
     )
     _, per_instrument_failure_counts = _ssc_get_fail_count(tsm.ssc)
     per_site_per_pin_fail_counts = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -451,9 +419,7 @@ def tsm_ssc_wait_until_done(tsm: TSMDigital, timeout: float = 10):
 
 
 # Pin Levels and Timing #
-def tsm_ssc_apply_levels_and_timing(
-    tsm: TSMDigital, levels_sheet: str, timing_sheet: str
-):
+def tsm_ssc_apply_levels_and_timing(tsm: TSMDigital, levels_sheet: str, timing_sheet: str):
     _ssc_apply_levels_and_timing(tsm.ssc, levels_sheet, timing_sheet)
     return tsm
 
@@ -465,9 +431,7 @@ def tsm_ssc_apply_tdr_offsets_per_site_per_pin(
         per_site_per_pin_to_per_instrument_lut,
         instrument_count,
         max_sites_on_instrument,
-    ) = _ssc_calculate_per_site_per_pin_to_per_instrument_lut(
-        tsm.ssc, tsm.site_numbers, tsm.pins
-    )
+    ) = _ssc_calculate_per_site_per_pin_to_per_instrument_lut(tsm.ssc, tsm.site_numbers, tsm.pins)
     initialized_array = [
         [0.0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
     ]
@@ -507,9 +471,7 @@ def tsm_ssc_configure_single_level_per_site(
     per_instrument_value = _apply_lut_per_site_to_per_instrument(
         initialized_array, per_site_to_per_instrument_lut, per_site_value
     )
-    _ssc_configure_single_level_per_site(
-        tsm.ssc, level_type_to_set, per_instrument_value
-    )
+    _ssc_configure_single_level_per_site(tsm.ssc, level_type_to_set, per_instrument_value)
     return tsm
 
 
@@ -520,9 +482,7 @@ def tsm_ssc_configure_single_level(
     return tsm
 
 
-def tsm_ssc_configure_termination_mode(
-    tsm: TSMDigital, termination_mode: enums.TerminationMode
-):
+def tsm_ssc_configure_termination_mode(tsm: TSMDigital, termination_mode: enums.TerminationMode):
     _ssc_configure_termination_mode(tsm.ssc, termination_mode)
     return tsm
 
@@ -536,9 +496,7 @@ def tsm_ssc_configure_time_set_compare_edge_per_site_per_pin(
         per_site_per_pin_to_per_instrument_lut,
         instrument_count,
         max_sites_on_instrument,
-    ) = _ssc_calculate_per_site_per_pin_to_per_instrument_lut(
-        tsm.ssc, tsm.site_numbers, tsm.pins
-    )
+    ) = _ssc_calculate_per_site_per_pin_to_per_instrument_lut(tsm.ssc, tsm.site_numbers, tsm.pins)
     initialized_array = [
         [0.0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
     ]
@@ -567,15 +525,11 @@ def tsm_ssc_configure_time_set_compare_edge_per_site(
     per_instrument_compare_strobe = _apply_lut_per_site_to_per_instrument(
         initialized_array, per_site_to_per_instrument_lut, per_site_compare_strobe
     )
-    _ssc_configure_time_set_compare_edge_per_site(
-        tsm.ssc, time_set, per_instrument_compare_strobe
-    )
+    _ssc_configure_time_set_compare_edge_per_site(tsm.ssc, time_set, per_instrument_compare_strobe)
     return tsm
 
 
-def tsm_ssc_configure_time_set_compare_edge(
-    tsm: TSMDigital, time_set: str, compare_strobe: float
-):
+def tsm_ssc_configure_time_set_compare_edge(tsm: TSMDigital, time_set: str, compare_strobe: float):
     _ssc_configure_time_set_compare_edge(tsm.ssc, time_set, compare_strobe)
     return tsm
 
@@ -601,9 +555,7 @@ def tsm_ssc_ppmu_configure_aperture_time(tsm: TSMDigital, aperture_time: float):
     return tsm
 
 
-def tsm_ssc_ppmu_configure_current_limit_range(
-    tsm: TSMDigital, current_limit_range: float
-):
+def tsm_ssc_ppmu_configure_current_limit_range(tsm: TSMDigital, current_limit_range: float):
     _ssc_ppmu_configure_current_limit_range(tsm.ssc, current_limit_range)
     return tsm
 
@@ -617,14 +569,10 @@ def tsm_ssc_ppmu_configure_voltage_limits(
 
 def tsm_ssc_ppmu_measure_current(tsm: TSMDigital):
     initialized_array = [[0.0 for _ in tsm.pins] for _ in tsm.site_numbers]
-    per_instrument_to_per_site_per_pin_lut = (
-        _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
-            tsm.ssc, tsm.site_numbers, tsm.pins
-        )
+    per_instrument_to_per_site_per_pin_lut = _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
+        tsm.ssc, tsm.site_numbers, tsm.pins
     )
-    _, per_instrument_measurements = _ssc_ppmu_measure(
-        tsm.ssc, enums.PPMUMeasurementType.CURRENT
-    )
+    _, per_instrument_measurements = _ssc_ppmu_measure(tsm.ssc, enums.PPMUMeasurementType.CURRENT)
     per_site_per_pin_measurements = _apply_lut_per_instrument_to_per_site_per_pin(
         initialized_array,
         per_instrument_to_per_site_per_pin_lut,
@@ -635,14 +583,10 @@ def tsm_ssc_ppmu_measure_current(tsm: TSMDigital):
 
 def tsm_ssc_ppmu_measure_voltage(tsm: TSMDigital):
     initialized_array = [[0.0 for _ in tsm.pins] for _ in tsm.site_numbers]
-    per_instrument_to_per_site_per_pin_lut = (
-        _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
-            tsm.ssc, tsm.site_numbers, tsm.pins
-        )
+    per_instrument_to_per_site_per_pin_lut = _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
+        tsm.ssc, tsm.site_numbers, tsm.pins
     )
-    _, per_instrument_measurements = _ssc_ppmu_measure(
-        tsm.ssc, enums.PPMUMeasurementType.VOLTAGE
-    )
+    _, per_instrument_measurements = _ssc_ppmu_measure(tsm.ssc, enums.PPMUMeasurementType.VOLTAGE)
     per_site_per_pin_measurements = _apply_lut_per_instrument_to_per_site_per_pin(
         initialized_array,
         per_instrument_to_per_site_per_pin_lut,
@@ -667,9 +611,7 @@ def tsm_ssc_ppmu_source_voltage_per_site_per_pin(
         per_site_per_pin_to_per_instrument_lut,
         instrument_count,
         max_sites_on_instrument,
-    ) = _ssc_calculate_per_site_per_pin_to_per_instrument_lut(
-        tsm.ssc, tsm.site_numbers, tsm.pins
-    )
+    ) = _ssc_calculate_per_site_per_pin_to_per_instrument_lut(tsm.ssc, tsm.site_numbers, tsm.pins)
     initialized_array = [
         [0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
     ]
@@ -700,15 +642,11 @@ def tsm_ssc_ppmu_source_voltage_per_site(
     per_instrument_source_voltages = _apply_lut_per_site_to_per_instrument(
         initialized_array, per_site_to_per_instrument_lut, per_site_source_voltages
     )
-    _ssc_ppmu_source_voltage_per_site(
-        tsm.ssc, current_limit_range, per_instrument_source_voltages
-    )
+    _ssc_ppmu_source_voltage_per_site(tsm.ssc, current_limit_range, per_instrument_source_voltages)
     return tsm
 
 
-def tsm_ssc_ppmu_source_voltage(
-    tsm: TSMDigital, voltage_level: float, current_limit_range: float
-):
+def tsm_ssc_ppmu_source_voltage(tsm: TSMDigital, voltage_level: float, current_limit_range: float):
     _ssc_ppmu_source_voltage(tsm.ssc, voltage_level, current_limit_range)
     return tsm
 
@@ -727,12 +665,8 @@ def tsm_ssc_read_sequencer_flag(tsm: TSMDigital, sequencer_flag: enums.Sequencer
     return tsm, per_instrument_state
 
 
-def tsm_ssc_read_sequencer_register(
-    tsm: TSMDigital, sequencer_register: enums.SequencerRegister
-):
-    _, per_instrument_register_values = _ssc_read_sequencer_register(
-        tsm.ssc, sequencer_register
-    )
+def tsm_ssc_read_sequencer_register(tsm: TSMDigital, sequencer_register: enums.SequencerRegister):
+    _, per_instrument_register_values = _ssc_read_sequencer_register(tsm.ssc, sequencer_register)
     return tsm, per_instrument_register_values
 
 
@@ -769,9 +703,7 @@ def tsm_ssc_get_properties(tsm: TSMDigital):  # checked _
                 _ssc.session.channels[_ssc.channel_list].vih,
                 _ssc.session.channels[_ssc.channel_list].vil,
                 _ssc.session.channels[_ssc.channel_list].vterm,
-                _ssc.session.channels[
-                    _ssc.channel_list
-                ].frequency_counter_measurement_time,
+                _ssc.session.channels[_ssc.channel_list].frequency_counter_measurement_time,
             )
         )
     return tsm, session_properties
@@ -784,9 +716,7 @@ def tsm_ssc_get_properties(tsm: TSMDigital):  # checked _
 def tsm_ssc_fetch_capture_waveform(
     tsm: TSMDigital, waveform_name: str, samples_to_read: int, timeout: float = 10
 ):
-    initialized_array = [
-        [0 for _ in range(samples_to_read)] for _ in range(len(tsm.site_numbers))
-    ]
+    initialized_array = [[0 for _ in range(samples_to_read)] for _ in range(len(tsm.site_numbers))]
     per_instrument_to_per_site_lut = _ssc_calculate_per_instrument_to_per_site_lut(
         tsm.ssc, tsm.site_numbers
     )
@@ -883,9 +813,7 @@ def _ssc_modify_time_set_for_clock_generation(
     # Configuration #
 
 
-def _ssc_select_function(
-    ssc: typing.List[SSCDigital], function: enums.SelectedFunction
-):
+def _ssc_select_function(ssc: typing.List[SSCDigital], function: enums.SelectedFunction):
     for _ssc in ssc:
         _ssc.session.abort()
         _ssc.session.channels[_ssc.channel_list].selected_function = function
@@ -909,9 +837,7 @@ def _ssc_frequency_counter_measure_frequency(ssc: typing.List[SSCDigital]):
     per_instrument_frequencies: typing.List[typing.List[float]] = []
     for _ssc in ssc:
         per_instrument_frequencies.append(
-            _ssc.session.channels[
-                _ssc.channel_list
-            ].frequency_counter_measure_frequency()
+            _ssc.session.channels[_ssc.channel_list].frequency_counter_measure_frequency()
         )
     return ssc, per_instrument_frequencies
     # End of Frequency Measurement #
@@ -930,12 +856,8 @@ def _ssc_configure_hram_settings(
     for _ssc in ssc:
         _ssc.session.history_ram_cycles_to_acquire = cycles_to_acquire
         _ssc.session.history_ram_pretrigger_samples = pretrigger_samples
-        _ssc.session.history_ram_max_samples_to_acquire_per_site = (
-            max_samples_to_acquire_per_site
-        )
-        _ssc.session.history_ram_number_of_samples_is_finite = (
-            number_of_samples_is_finite
-        )
+        _ssc.session.history_ram_max_samples_to_acquire_per_site = max_samples_to_acquire_per_site
+        _ssc.session.history_ram_number_of_samples_is_finite = number_of_samples_is_finite
         _ssc.session.history_ram_buffer_size_per_site = buffer_size_per_site
     return ssc
 
@@ -969,21 +891,15 @@ def _ssc_get_hram_settings(ssc: typing.List[SSCDigital]):
     per_instrument_number_of_samples_is_finite: typing.List[bool] = []
     per_instrument_buffer_size_per_site: typing.List[int] = []
     for _ssc in ssc:
-        per_instrument_cycles_to_acquire.append(
-            _ssc.session.history_ram_cycles_to_acquire
-        )
-        per_instrument_pretrigger_samples.append(
-            _ssc.session.history_ram_pretrigger_samples
-        )
+        per_instrument_cycles_to_acquire.append(_ssc.session.history_ram_cycles_to_acquire)
+        per_instrument_pretrigger_samples.append(_ssc.session.history_ram_pretrigger_samples)
         per_instrument_max_samples_to_acquire_per_site.append(
             _ssc.session.history_ram_max_samples_to_acquire_per_site
         )
         per_instrument_number_of_samples_is_finite.append(
             _ssc.session.history_ram_number_of_samples_is_finite
         )
-        per_instrument_buffer_size_per_site.append(
-            _ssc.session.history_ram_buffer_size_per_site
-        )
+        per_instrument_buffer_size_per_site.append(_ssc.session.history_ram_buffer_size_per_site)
     return (
         ssc,
         per_instrument_cycles_to_acquire,
@@ -1005,9 +921,7 @@ def _ssc_get_hram_trigger_settings(ssc: typing.List[SSCDigital]):
         per_instrument_cycle_number.append(
             _ssc.session.cycle_number_history_ram_trigger_cycle_number
         )
-        per_instrument_pattern_label.append(
-            _ssc.session.pattern_label_history_ram_trigger_label
-        )
+        per_instrument_pattern_label.append(_ssc.session.pattern_label_history_ram_trigger_label)
         per_instrument_cycle_offset.append(
             _ssc.session.pattern_label_history_ram_trigger_cycle_offset
         )
@@ -1031,9 +945,7 @@ def _ssc_stream_hram_results(ssc: typing.List[SSCDigital]):
             _ssc.channel_list, _ssc.site_list
         )
         for channel, site in zip(channel_list_array, site_list_array):
-            per_instrument_per_site_array.append(
-                SSCDigital(_ssc.session, channel, site)
-            )
+            per_instrument_per_site_array.append(SSCDigital(_ssc.session, channel, site))
     per_instrument_per_site_cycle_information: typing.List[
         typing.List[HistoryRAMCycleInformation]
     ] = []
@@ -1046,9 +958,7 @@ def _ssc_stream_hram_results(ssc: typing.List[SSCDigital]):
         while not stop:
             done = _ssc.session.is_done()
             _, pins, _ = _channel_list_to_pins(_ssc.channel_list)
-            sample_count = _ssc.session.sites[
-                _ssc.site_list
-            ].get_history_ram_sample_count()
+            sample_count = _ssc.session.sites[_ssc.site_list].get_history_ram_sample_count()
             samples_to_read = sample_count - read_position
             cycle_information += (
                 _ssc.session.sites[_ssc.site_list]
@@ -1136,9 +1046,7 @@ def _ssc_apply_levels_and_timing(
     ssc: typing.List[SSCDigital], levels_sheet: str, timing_sheet: str
 ):
     for _ssc in ssc:
-        _ssc.session.sites[_ssc.site_list].apply_levels_and_timing(
-            levels_sheet, timing_sheet
-        )
+        _ssc.session.sites[_ssc.site_list].apply_levels_and_timing(levels_sheet, timing_sheet)
     return ssc
 
 
@@ -1147,19 +1055,13 @@ def _ssc_apply_tdr_offsets(
     per_instrument_offsets: typing.List[typing.List[float]],
 ):
     for _ssc, per_instrument_offset in zip(ssc, per_instrument_offsets):
-        _ssc.session.channels[_ssc.channel_list].apply_tdr_offsets(
-            per_instrument_offset
-        )
+        _ssc.session.channels[_ssc.channel_list].apply_tdr_offsets(per_instrument_offset)
     return ssc
 
 
-def _ssc_configure_active_load(
-    ssc: typing.List[SSCDigital], vcom: float, iol: float, ioh: float
-):
+def _ssc_configure_active_load(ssc: typing.List[SSCDigital], vcom: float, iol: float, ioh: float):
     for _ssc in ssc:
-        _ssc.session.channels[_ssc.channel_list].configure_active_load_levels(
-            iol, ioh, vcom
-        )
+        _ssc.session.channels[_ssc.channel_list].configure_active_load_levels(iol, ioh, vcom)
     return ssc
 
 
@@ -1169,9 +1071,7 @@ def _ssc_configure_single_level_per_site(
     per_site_value: typing.List[typing.List[float]],
 ):
     for _ssc, settings in zip(ssc, per_site_value):
-        channel_list_array, _, _ = _arrange_channels_per_site(
-            _ssc.channel_list, _ssc.site_list
-        )
+        channel_list_array, _, _ = _arrange_channels_per_site(_ssc.channel_list, _ssc.site_list)
         for channel, setting in zip(channel_list_array, settings):
             if level_type_to_set == LevelTypeToSet.VIL:
                 _ssc.session.channels[channel].vil = setting
@@ -1245,9 +1145,7 @@ def _ssc_configure_time_set_compare_edge_per_site(
     per_site_compare_strobe: typing.List[typing.List[float]],
 ):
     for _ssc, compare_strobes in zip(ssc, per_site_compare_strobe):
-        channel_list_array, _, _ = _arrange_channels_per_site(
-            _ssc.channel_list, _ssc.site_list
-        )
+        channel_list_array, _, _ = _arrange_channels_per_site(_ssc.channel_list, _ssc.site_list)
         for channel, compare_strobe in zip(channel_list_array, compare_strobes):
             _ssc.session.channels[channel].configure_time_set_compare_edges_strobe(
                 time_set, compare_strobe
@@ -1259,15 +1157,13 @@ def _ssc_configure_time_set_compare_edge(
     ssc: typing.List[SSCDigital], time_set: str, compare_strobe: float
 ):
     for _ssc in ssc:
-        _ssc.session.channels[
-            _ssc.channel_list
-        ].configure_time_set_compare_edges_strobe(time_set, compare_strobe)
+        _ssc.session.channels[_ssc.channel_list].configure_time_set_compare_edges_strobe(
+            time_set, compare_strobe
+        )
     return ssc
 
 
-def _ssc_configure_time_set_period(
-    ssc: typing.List[SSCDigital], time_set: str, period: float
-):
+def _ssc_configure_time_set_period(ssc: typing.List[SSCDigital], time_set: str, period: float):
     configured_period = period
     if configured_period > 40e-6:
         configured_period = 40e-6
@@ -1287,18 +1183,14 @@ def _ssc_configure_voltage_levels(
     vterm: float,
 ):
     for _ssc in ssc:
-        _ssc.session.channels[_ssc.channel_list].configure_voltage_levels(
-            vil, vih, vol, voh, vterm
-        )
+        _ssc.session.channels[_ssc.channel_list].configure_voltage_levels(vil, vih, vol, voh, vterm)
     return ssc
     # End of Pin Levels and Timing #
 
     # PPMU #
 
 
-def _ssc_ppmu_configure_aperture_time(
-    ssc: typing.List[SSCDigital], aperture_time: float
-):
+def _ssc_ppmu_configure_aperture_time(ssc: typing.List[SSCDigital], aperture_time: float):
     for _ssc in ssc:
         _ssc.session.channels[_ssc.channel_list].ppmu_aperture_time = aperture_time
     return ssc
@@ -1309,9 +1201,7 @@ def _ssc_ppmu_configure_current_limit_range(
 ):
     current_limit_range = abs(current_limit_range)
     for _ssc in ssc:
-        _ssc.session.channels[
-            _ssc.channel_list
-        ].ppmu_current_limit_range = current_limit_range
+        _ssc.session.channels[_ssc.channel_list].ppmu_current_limit_range = current_limit_range
     return ssc
 
 
@@ -1319,18 +1209,12 @@ def _ssc_ppmu_configure_voltage_limits(
     ssc: typing.List[SSCDigital], voltage_limit_high: float, voltage_limit_low: float
 ):
     for _ssc in ssc:
-        _ssc.session.channels[
-            _ssc.channel_list
-        ].ppmu_voltage_limit_high = voltage_limit_high
-        _ssc.session.channels[
-            _ssc.channel_list
-        ].ppmu_voltage_limit_low = voltage_limit_low
+        _ssc.session.channels[_ssc.channel_list].ppmu_voltage_limit_high = voltage_limit_high
+        _ssc.session.channels[_ssc.channel_list].ppmu_voltage_limit_low = voltage_limit_low
     return ssc
 
 
-def _ssc_ppmu_measure(
-    ssc: typing.List[SSCDigital], measurement_type: enums.PPMUMeasurementType
-):
+def _ssc_ppmu_measure(ssc: typing.List[SSCDigital], measurement_type: enums.PPMUMeasurementType):
     per_instrument_measurements: typing.List[typing.List[float]] = []
     for _ssc in ssc:
         per_instrument_measurements.append(
@@ -1352,9 +1236,7 @@ def _ssc_ppmu_source_current(
         _ssc.session.channels[
             _ssc.channel_list
         ].ppmu_output_function = enums.PPMUOutputFunction.CURRENT
-        _ssc.session.channels[
-            _ssc.channel_list
-        ].ppmu_current_level_range = current_level_range
+        _ssc.session.channels[_ssc.channel_list].ppmu_current_level_range = current_level_range
         _ssc.session.channels[_ssc.channel_list].ppmu_current_level = current_level
         _ssc.session.channels[_ssc.channel_list].ppmu_source()
     return ssc
@@ -1370,9 +1252,7 @@ def _ssc_ppmu_source_voltage_per_site_per_pin(
         _ssc.session.channels[
             _ssc.channel_list
         ].ppmu_output_function = enums.PPMUOutputFunction.VOLTAGE
-        _ssc.session.channels[
-            _ssc.channel_list
-        ].ppmu_current_limit_range = current_limit_range
+        _ssc.session.channels[_ssc.channel_list].ppmu_current_limit_range = current_limit_range
         channels, _, _ = _channel_list_to_pins(_ssc.channel_list)
         for channel, source_voltage in zip(channels, source_voltages):
             _ssc.session.channels[channel].ppmu_voltage_level = source_voltage
@@ -1390,12 +1270,8 @@ def _ssc_ppmu_source_voltage_per_site(
         _ssc.session.channels[
             _ssc.channel_list
         ].ppmu_output_function = enums.PPMUOutputFunction.VOLTAGE
-        _ssc.session.channels[
-            _ssc.channel_list
-        ].ppmu_current_limit_range = current_limit_range
-        channel_list_array, _, _ = _arrange_channels_per_site(
-            _ssc.channel_list, _ssc.site_list
-        )
+        _ssc.session.channels[_ssc.channel_list].ppmu_current_limit_range = current_limit_range
+        channel_list_array, _, _ = _arrange_channels_per_site(_ssc.channel_list, _ssc.site_list)
         for channel, source_voltage in zip(channel_list_array, source_voltages):
             _ssc.session.channels[channel].ppmu_voltage_level = source_voltage
         _ssc.session.channels[_ssc.channel_list].ppmu_source()
@@ -1416,9 +1292,7 @@ def _ssc_ppmu_source_voltage(
         _ssc.session.channels[
             _ssc.channel_list
         ].ppmu_output_function = enums.PPMUOutputFunction.VOLTAGE
-        _ssc.session.channels[
-            _ssc.channel_list
-        ].ppmu_current_limit_range = current_limit_range
+        _ssc.session.channels[_ssc.channel_list].ppmu_current_limit_range = current_limit_range
         _ssc.session.channels[_ssc.channel_list].ppmu_voltage_level = voltage_level
         _ssc.session.channels[_ssc.channel_list].ppmu_source()
     return ssc
@@ -1433,9 +1307,7 @@ def _ssc_ppmu_source(ssc: typing.List[SSCDigital]):
     # Sequencer Flags and Registers #
 
 
-def _ssc_read_sequencer_flag(
-    ssc: typing.List[SSCDigital], sequencer_flag: enums.SequencerFlag
-):
+def _ssc_read_sequencer_flag(ssc: typing.List[SSCDigital], sequencer_flag: enums.SequencerFlag):
     per_instrument_state: typing.List[bool] = []
     for _ssc in ssc:
         per_instrument_state.append(_ssc.session.read_sequencer_flag(sequencer_flag))
@@ -1519,9 +1391,7 @@ def _ssc_write_source_waveform_site_unique(
         rows, cols = numpy.shape(per_instrument_waveform)
         site_numbers, _ = _site_list_to_site_numbers(_ssc.site_list)
         if minimum_size > cols and expand_to_minimum_size:
-            initialized_array = [
-                [0 for _ in range(minimum_size)] for _ in range(len(site_numbers))
-            ]
+            initialized_array = [[0 for _ in range(minimum_size)] for _ in range(len(site_numbers))]
             for row in range(rows):
                 for col in range(cols):
                     initialized_array[row][col] = per_instrument_waveform[row][col]
@@ -1539,9 +1409,7 @@ def _ssc_write_source_waveform_site_unique(
 def _ssc_read_static(ssc: typing.List[SSCDigital]):
     per_instrument_data: typing.List[typing.List[enums.PinState]] = []
     for _ssc in ssc:
-        per_instrument_data.append(
-            _ssc.session.channels[_ssc.channel_list].read_static()
-        )
+        per_instrument_data.append(_ssc.session.channels[_ssc.channel_list].read_static())
     return ssc, per_instrument_data
 
 
@@ -1567,9 +1435,7 @@ def _ssc_write_static_per_site(
     per_site_state: typing.List[typing.List[enums.WriteStaticPinState]],
 ):
     for _ssc, states in zip(ssc, per_site_state):
-        channel_list_array, _, _ = _arrange_channels_per_site(
-            _ssc.channel_list, _ssc.site_list
-        )
+        channel_list_array, _, _ = _arrange_channels_per_site(_ssc.channel_list, _ssc.site_list)
         for channel, state in zip(channel_list_array, states):
             _ssc.session.channels[channel].write_static(state)
     return ssc
@@ -1638,13 +1504,9 @@ def _ssc_initiate(ssc: typing.List[SSCDigital]):
 
 # Static #
 def tsm_ssc_read_static(tsm: TSMDigital):
-    initialized_array = [
-        [enums.PinState.ZERO for _ in tsm.pins] for _ in tsm.site_numbers
-    ]
-    per_instrument_to_per_site_per_pin_lut = (
-        _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
-            tsm.ssc, tsm.site_numbers, tsm.pins
-        )
+    initialized_array = [[enums.PinState.ZERO for _ in tsm.pins] for _ in tsm.site_numbers]
+    per_instrument_to_per_site_per_pin_lut = _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
+        tsm.ssc, tsm.site_numbers, tsm.pins
     )
     _, per_instrument_data = _ssc_read_static(tsm.ssc)
     per_site_per_pin_data = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -1661,9 +1523,7 @@ def tsm_ssc_write_static_per_site_per_pin(
         per_site_per_pin_to_per_instrument_lut,
         instrument_count,
         max_sites_on_instrument,
-    ) = _ssc_calculate_per_site_per_pin_to_per_instrument_lut(
-        tsm.ssc, tsm.site_numbers, tsm.pins
-    )
+    ) = _ssc_calculate_per_site_per_pin_to_per_instrument_lut(tsm.ssc, tsm.site_numbers, tsm.pins)
     initialized_array = [
         [enums.WriteStaticPinState.ZERO for _ in range(max_sites_on_instrument)]
         for _ in range(instrument_count)
@@ -1884,24 +1744,16 @@ def tsm_close_sessions(tsm_context: SemiconductorModuleContext):
         session.close()
 
 
-def tsm_initialize_sessions(
-    tsm_context: SemiconductorModuleContext, option_string: str = ""
-):
+def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, option_string: str = ""):
     instrument_names = tsm_context.get_all_nidigital_instrument_names()
     if instrument_names:
         pin_map_file_path = tsm_context.pin_map_file_path
-        specifications_file_paths = (
-            tsm_context.nidigital_project_specifications_file_paths
-        )
+        specifications_file_paths = tsm_context.nidigital_project_specifications_file_paths
         levels_file_paths = tsm_context.nidigital_project_levels_file_paths
         timing_file_paths = tsm_context.nidigital_project_timing_file_paths
         pattern_file_paths = tsm_context.nidigital_project_pattern_file_paths
-        source_waveform_file_paths = (
-            tsm_context.nidigital_project_source_waveform_file_paths
-        )
-        capture_waveform_file_paths = (
-            tsm_context.nidigital_project_capture_waveform_file_paths
-        )
+        source_waveform_file_paths = tsm_context.nidigital_project_source_waveform_file_paths
+        capture_waveform_file_paths = tsm_context.nidigital_project_capture_waveform_file_paths
     for instrument_name in instrument_names:
         session = nidigital.Session(instrument_name, options=option_string)
         tsm_context.set_nidigital_session(instrument_name, session)
@@ -1948,9 +1800,7 @@ def tsm_ssc_n_pins_to_m_sessions(
         pin_set_strings,
     ) = tsm_context.pins_to_nidigital_sessions_for_ppmu(pins)
     _, _, site_lists = tsm_context.pins_to_nidigital_sessions_for_pattern(pins)
-    for session, pin_set_string, site_list in zip(
-        sessions, pin_set_strings, site_lists
-    ):
+    for session, pin_set_string, site_list in zip(sessions, pin_set_strings, site_lists):
         ssc.append(SSCDigital(session, pin_set_string, site_list))
     tsm = TSMDigital(pin_query_context, ssc, site_numbers, pins)
     return tsm
@@ -1980,8 +1830,7 @@ def tsm_ssc_publish(
         ) = _ssc_calculate_per_site_to_per_instrument_lut(tsm.ssc, tsm.site_numbers)
         default = {bool: False, float: 0.0}[type(data_to_publish[0])]
         initialized_array = [
-            [default for _ in range(max_sites_on_instrument)]
-            for _ in range(instrument_count)
+            [default for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
         ]
         per_instrument_data = _apply_lut_per_site_to_per_instrument(
             initialized_array, per_site_to_per_instrument_lut, data_to_publish
@@ -1997,8 +1846,7 @@ def tsm_ssc_publish(
         )
         default = {bool: False, float: 0.0}[type(data_to_publish[0][0])]
         initialized_array = [
-            [default for _ in range(max_sites_on_instrument)]
-            for _ in range(instrument_count)
+            [default for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
         ]
         per_instrument_data = _apply_lut_per_site_per_pin_to_per_instrument(
             initialized_array, per_site_per_pin_to_per_instrument_lut, data_to_publish

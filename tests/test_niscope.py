@@ -50,9 +50,7 @@ def configure(
     tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
     scope.configure_impedance(tsm_scope, 0.5)
     scope.configure_reference_level(tsm_scope)
-    scope.configure_vertical(
-        tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True
-    )
+    scope.configure_vertical(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
     scope.configure(
         tsm_scope,
         5.0,

@@ -33,21 +33,14 @@ def clock_generation(tsm_context: SemiconductorModuleContext, pins: typing.List[
     tsm = digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
 
     frequency = 25000
-    digital.tsm_ssc_modify_time_set_for_clock_generation(
-        tsm, frequency, 0.5, "time_set"
-    )
+    digital.tsm_ssc_modify_time_set_for_clock_generation(tsm, frequency, 0.5, "time_set")
     digital.tsm_ssc_clock_generator_generate_clock(tsm, frequency)
     for ssc in tsm.ssc:
         assert ssc.session.channels[ssc.channel_list].clock_generator_is_running == True
-        assert (
-            round(ssc.session.channels[ssc.channel_list].clock_generator_frequency)
-            == frequency
-        )
+        assert round(ssc.session.channels[ssc.channel_list].clock_generator_frequency) == frequency
     digital.tsm_ssc_clock_generator_abort(tsm)
     for ssc in tsm.ssc:
-        assert (
-            ssc.session.channels[ssc.channel_list].clock_generator_is_running == False
-        )
+        assert ssc.session.channels[ssc.channel_list].clock_generator_is_running == False
 
 
 @nitsm.codemoduleapi.code_module
@@ -63,9 +56,7 @@ def configuration(tsm_context: SemiconductorModuleContext, pins: typing.List[str
 
 
 @nitsm.codemoduleapi.code_module
-def frequency_measurement(
-    tsm_context: SemiconductorModuleContext, pins: typing.List[str]
-):
+def frequency_measurement(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
     tsm = digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
 
     digital.tsm_ssc_frequency_counter_configure_measurement_time(tsm, 0.5)
@@ -92,9 +83,7 @@ def hram(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
     _, hram_configuration = digital.tsm_ssc_get_hram_configuration(tsm)
     assert isinstance(hram_configuration, digital.HRAM_Configuration)
     assert isinstance(hram_configuration.finite_samples, bool)
-    assert isinstance(
-        hram_configuration.cycles_to_acquire, enums.HistoryRAMCyclesToAcquire
-    )
+    assert isinstance(hram_configuration.cycles_to_acquire, enums.HistoryRAMCyclesToAcquire)
     assert isinstance(hram_configuration.max_samples_to_acquire_per_site, int)
     assert isinstance(hram_configuration.buffer_size_per_site, int)
     assert isinstance(hram_configuration.pretrigger_samples, int)
@@ -159,9 +148,7 @@ def pattern_actions(tsm_context: SemiconductorModuleContext, pins: typing.List[s
 
 
 @nitsm.codemoduleapi.code_module
-def pin_levels_and_timing(
-    tsm_context: SemiconductorModuleContext, pins: typing.List[str]
-):
+def pin_levels_and_timing(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
     tsm = digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
 
     digital.tsm_ssc_apply_levels_and_timing(tsm, "PinLevels", "Timing")
@@ -176,16 +163,10 @@ def pin_levels_and_timing(
     digital.tsm_ssc_configure_time_set_compare_edge_per_site_per_pin(
         tsm, "time_set", [[40e-6, 40e-6]] * 3
     )
-    digital.tsm_ssc_configure_time_set_compare_edge_per_site(
-        tsm, "time_set", [40e-6, 40e-6, 40e-6]
-    )
+    digital.tsm_ssc_configure_time_set_compare_edge_per_site(tsm, "time_set", [40e-6, 40e-6, 40e-6])
     digital.tsm_ssc_configure_time_set_compare_edge(tsm, "time_set", 40e-6)
-    digital.tsm_ssc_configure_voltage_levels(
-        tsm, 0.0015, 0.0015, 0.0015, 0.0015, 0.0015
-    )
-    _, configured_period = digital.tsm_ssc_configure_time_set_period(
-        tsm, "time_set", 40e-6
-    )
+    digital.tsm_ssc_configure_voltage_levels(tsm, 0.0015, 0.0015, 0.0015, 0.0015, 0.0015)
+    _, configured_period = digital.tsm_ssc_configure_time_set_period(tsm, "time_set", 40e-6)
     assert math.isclose(configured_period, 40e-6, abs_tol=5e-6)
     for ssc in tsm.ssc:
         assert math.isclose(
@@ -201,21 +182,11 @@ def pin_levels_and_timing(
             0.0015,
             abs_tol=5e-6,
         )
-        assert math.isclose(
-            ssc.session.channels[ssc.channel_list].vih, 0.0015, abs_tol=5e-6
-        )
-        assert math.isclose(
-            ssc.session.channels[ssc.channel_list].vil, 0.0015, abs_tol=5e-6
-        )
-        assert math.isclose(
-            ssc.session.channels[ssc.channel_list].voh, 0.0015, abs_tol=5e-6
-        )
-        assert math.isclose(
-            ssc.session.channels[ssc.channel_list].vol, 0.0015, abs_tol=5e-6
-        )
-        assert math.isclose(
-            ssc.session.channels[ssc.channel_list].vterm, 0.0015, abs_tol=5e-6
-        )
+        assert math.isclose(ssc.session.channels[ssc.channel_list].vih, 0.0015, abs_tol=5e-6)
+        assert math.isclose(ssc.session.channels[ssc.channel_list].vil, 0.0015, abs_tol=5e-6)
+        assert math.isclose(ssc.session.channels[ssc.channel_list].voh, 0.0015, abs_tol=5e-6)
+        assert math.isclose(ssc.session.channels[ssc.channel_list].vol, 0.0015, abs_tol=5e-6)
+        assert math.isclose(ssc.session.channels[ssc.channel_list].vterm, 0.0015, abs_tol=5e-6)
         assert ssc.session.channels[ssc.channel_list].tdr_offset.femtoseconds == 1000000
 
 
@@ -246,16 +217,12 @@ def ppmu(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def sequencer_flags_and_registers(
-    tsm_context: SemiconductorModuleContext, pins: typing.List[str]
-):
+def sequencer_flags_and_registers(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
     tsm = digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
 
     digital.tsm_ssc_write_sequencer_flag(tsm, enums.SequencerFlag.FLAG1, True)
     digital.tsm_ssc_write_sequencer_register(tsm, enums.SequencerRegister.REGISTER1, 1)
-    _, per_instrument_state = digital.tsm_ssc_read_sequencer_flag(
-        tsm, enums.SequencerFlag.FLAG1
-    )
+    _, per_instrument_state = digital.tsm_ssc_read_sequencer_flag(tsm, enums.SequencerFlag.FLAG1)
     assert isinstance(per_instrument_state, list)
     assert numpy.shape(per_instrument_state) == (2,)
     for state in per_instrument_state:
@@ -284,9 +251,7 @@ def session_properties(tsm_context: SemiconductorModuleContext, pins: typing.Lis
 
 
 @nitsm.codemoduleapi.code_module
-def source_and_capture_waveforms(
-    tsm_context: SemiconductorModuleContext, pins: typing.List[str]
-):
+def source_and_capture_waveforms(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
     tsm = digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
 
     digital.tsm_ssc_write_source_waveform_site_unique(
@@ -299,9 +264,7 @@ def source_and_capture_waveforms(
         tsm, "SourceWaveform_Broadcast", [1, 2, 3, 4, 5], True
     )
     digital.tsm_ssc_burst_pattern(tsm, "start_capture")
-    _, per_site_waveforms = digital.tsm_ssc_fetch_capture_waveform(
-        tsm, "CaptureWaveform", 2
-    )
+    _, per_site_waveforms = digital.tsm_ssc_fetch_capture_waveform(tsm, "CaptureWaveform", 2)
     assert isinstance(per_site_waveforms, list)
     assert numpy.shape(per_site_waveforms) == (3, 2)
     for waveforms in per_site_waveforms:
@@ -341,8 +304,8 @@ def misc(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
         assert ssc.site_list == "site2"
     digital.tsm_ssc_initiate(tsm)
     digital.tsm_ssc_abort(tsm)
-    per_instrument_to_per_site_lut = (
-        digital._ssc_calculate_per_instrument_to_per_site_lut(tsm.ssc, tsm.site_numbers)
+    per_instrument_to_per_site_lut = digital._ssc_calculate_per_instrument_to_per_site_lut(
+        tsm.ssc, tsm.site_numbers
     )
     per_site_data = digital._apply_lut_per_instrument_to_per_site(
         [False, False, False],
@@ -392,6 +355,4 @@ def misc(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
     digital.tsm_ssc_publish(tsm, [1.0, 1.0, 1.0], "Publish_1")
     digital.tsm_ssc_publish(tsm, [[1.0, 1.0], [1.0, 1.0], [1.0, 1.0]], "Publish_2")
     digital.tsm_ssc_publish(tsm, [True, True, True], "Publish_3")
-    digital.tsm_ssc_publish(
-        tsm, [[True, True], [True, True], [True, True]], "Publish_4"
-    )
+    digital.tsm_ssc_publish(tsm, [[True, True], [True, True], [True, True]], "Publish_4")

@@ -1,0 +1,11 @@
+[tool.black]
+line-length = 100
+target-version = ['py36']
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests"
+]
+markers = [
+    "pin_map",
+]

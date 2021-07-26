@@ -1,67 +1,82 @@
-import os
 import os.path
-import shutil
-import subprocess
 import pytest
+import win32com.client
+import win32com.client.selecttlb
+import pythoncom
+import nitsm.codemoduleapi
 
-_teststand_public_path = os.environ["TestStandPublic64"]
-
-
-class SystemTestRunner:
-    def __init__(self, sequence_file_path):
-        self._sequence_file_path = sequence_file_path
-
-    def run(self):
-        csharp_oi_path = os.path.join(
-            _teststand_public_path,
-            "UserInterfaces",
-            "Simple",
-            "CSharp",
-            "Source Code",
-            "bin",
-            "x64",
-            "release",
-            "TestExec.exe",
-        )
-        # subprocess.run with check=True will throw an exception if the return code is non-zero
-        # with stdout set to subprocess.PIPE, exit code and stdout will be included in the exception
-        subprocess.run(
-            [
-                csharp_oi_path,
-                "/outputtostdio",
-                "/runentrypoint",
-                "Test UUTs",
-                self._sequence_file_path,
-                "/quit",
-            ],
-            stdout=subprocess.PIPE,
-            timeout=180,
-            check=True,
-        )
-        return True
-
-
-@pytest.fixture(scope="session", autouse=True)
-def teststand_login_override():
-    system_tests_front_end_callbacks_path = os.path.join(
-        os.path.dirname(__file__), "FrontEndCallbacks.seq"
-    )
-    teststand_front_end_callbacks_path = os.path.join(
-        _teststand_public_path, "Components", "Callbacks", "FrontEnd", "FrontEndCallbacks.seq"
-    )
-    teststand_backup_front_end_callbacks_path = os.path.join(
-        _teststand_public_path, "Components", "Callbacks", "FrontEnd", "FrontEndCallbacks.seq.bak"
-    )
-    os.replace(teststand_front_end_callbacks_path, teststand_backup_front_end_callbacks_path)
-    shutil.copy(system_tests_front_end_callbacks_path, teststand_front_end_callbacks_path)
-    yield None
-    os.replace(teststand_backup_front_end_callbacks_path, teststand_front_end_callbacks_path)
+_standalone_tsm_context_tlb = win32com.client.selecttlb.FindTlbsWithDescription(
+    "NI TestStand Semiconductor Module Standalone Semiconductor Module Context"
+)[0]
 
 
 @pytest.fixture
-def system_test_runner(request):
-    # get absolute path of the test program file which is assumed to be relative to the test module
-    sequence_file_name = request.node.get_closest_marker("sequence_file").args[0]
+def _published_data_reader_factory(request):
+    # get absolute path of the pin map file which is assumed to be relative to the test module
+    pin_map_path = request.node.get_closest_marker("pin_map").args[0]
     module_directory = os.path.dirname(request.module.__file__)
-    sequence_file_path = os.path.join(module_directory, sequence_file_name)
-    return SystemTestRunner(sequence_file_path)
+    pin_map_path = os.path.join(module_directory, pin_map_path)
+
+    published_data_reader_factory = win32com.client.Dispatch(
+        "NationalInstruments.TestStand.SemiconductorModule.Restricted.PublishedDataReaderFactory"
+    )
+    return published_data_reader_factory.NewSemiconductorModuleContext(pin_map_path)
+
+
+@pytest.fixture
+def standalone_tsm_context(_published_data_reader_factory):
+    return nitsm.codemoduleapi.SemiconductorModuleContext(_published_data_reader_factory[0])
+
+
+class PublishedData:
+    def __init__(self, published_data_com_obj):
+        self._published_data = win32com.client.CastTo(
+            published_data_com_obj, "IPublishedData", _standalone_tsm_context_tlb
+        )
+        self._published_data._oleobj_ = self._published_data._oleobj_.QueryInterface(
+            self._published_data.CLSID, pythoncom.IID_IDispatch
+        )
+
+    @property
+    def boolean_value(self):
+        return self._published_data.BooleanValue
+
+    @property
+    def double_value(self):
+        return self._published_data.DoubleValue
+
+    @property
+    def pin(self):
+        return self._published_data.Pin
+
+    @property
+    def published_data_id(self):
+        return self._published_data.PublishedDataId
+
+    @property
+    def site_number(self):
+        return self._published_data.SiteNumber
+
+    @property
+    def string_value(self):
+        return self._published_data.StringValue
+
+    @property
+    def type(self):
+        return self._published_data.Type
+
+
+class PublishedDataReader:
+    def __init__(self, published_data_reader_com_obj):
+        self._published_data_reader = win32com.client.CastTo(
+            published_data_reader_com_obj, "IPublishedDataReader", _standalone_tsm_context_tlb
+        )
+
+    def get_and_clear_published_data(self):
+        published_data = self._published_data_reader.GetAndClearPublishedData()
+        return [PublishedData(published_data_point) for published_data_point in published_data]
+
+
+@pytest.fixture
+def published_data_reader(_published_data_reader_factory):
+    return PublishedDataReader(_published_data_reader_factory[1])
