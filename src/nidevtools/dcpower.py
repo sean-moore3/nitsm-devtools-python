@@ -3,7 +3,8 @@ import typing
 import nidcpower
 import nidcpower.errors
 import nitsm.codemoduleapi
-import nidevtools.common
+# import nidevtools.common
+import common
 
 _SemiconductorModuleContext = nitsm.codemoduleapi.SemiconductorModuleContext
 
@@ -212,7 +213,8 @@ def initialize_sessions(
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(tsm_context: _SemiconductorModuleContext, pins):
     pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
-    pins = nidevtools.common.get_all_pins(tsm_context)
+    # pins = nidevtools.common.get_all_pins(tsm_context)
+    pins = common.get_all_pins(tsm_context)
     # sscs = [_NIDCPowerSSC(session, channel) for session, channel in zip(sessions, channel_lists)]
     return
 
