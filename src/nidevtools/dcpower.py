@@ -126,6 +126,91 @@ class _NIDCPowerSSC:
     def query_output_state(self, output_state: nidcpower.OutputStates):
         return self._channels_session.query_output_state(output_state)
 
+    def configure_aperture_time_with_abort_and_initiate(
+        self,
+        aperture_time=16.667,
+        aperture_time_units=nidcpower.ApertureTimeUnits.SECONDS,
+    ):
+        self._channels_session.abort()
+        self._channels_session.aperture_time(aperture_time,aperture_time_units)
+        self._channels_session.initiate()
+
+    def configure_aperture_time(
+        self,
+        aperture_time=16.667,
+        aperture_time_units=nidcpower.ApertureTimeUnits.SECONDS,
+    ):
+        self._channels_session.aperture_time(aperture_time,aperture_time_units)
+
+    def configure_power_line_frequency(
+        self,
+        power_line_frequency=60.0
+    ):
+        self._channels_session.power_line_frequency(power_line_frequency)
+
+    def configure_sense(
+        self,
+        sense=nidcpower.Sense.LOCAL,
+    ):
+        self._channels_session.sense(sense)
+
+    def get_aperture_time_in_seconds(
+        self
+    ):
+        match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
+        all_supported_models = [
+            "4135",
+            "4136",
+            "4137",
+            "4138",
+            "4139",
+            "4140",
+            "4141",
+            "4142",
+            "4143",
+            "4144",
+            "4162",
+            "4163",
+        ]
+        if match in all_supported_models + ["4112", "4113", "4132"]:
+            actual_aperture_time = self._channels_session.aperture_time_units
+            if self._channels_session.aperture_time_units == nidcpower.ApertureTimeUnits.POWER_LINE_CYCLES :
+                actual_aperture_time = self._channels_session.aperture_time_units / self._channels_session.power_line_frequency
+
+        if match in ["4110", "4130"]:
+            actual_aperture_time = self._channels_session.samples_to_average / 3000
+        elif match == "4154":
+            actual_aperture_time = self._channels_session.samples_to_average / 300000
+        return actual_aperture_time
+
+    def get_power_line_frequency(
+        self
+    ):
+        match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
+        all_supported_models = [
+            "4135",
+            "4136",
+            "4137",
+            "4138",
+            "4139",
+            "4140",
+            "4141",
+            "4142",
+            "4143",
+            "4144",
+            "4162",
+            "4163",
+        ]
+        if match in all_supported_models + ["4112", "4113", "4132"]:
+            configured_power_line_frequency = self._channels_session.power_line_frequency
+
+        if match in ["4110", "4130"]:
+            configured_power_line_frequency = 60 # This needs to be replaced with global variable
+        elif match == "4154":
+            configured_power_line_frequency = 60 # This needs to be replaced with global variable
+        return configured_power_line_frequency
+
+
 
 class _NIDCPowerTSM:
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDCPowerSSC]):
