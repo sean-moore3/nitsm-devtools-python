@@ -98,27 +98,41 @@ class _NIDCPowerSSC:
     ):
         self._channels_session.abort()
         match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
-        all_supported_models = [
-            "4135",
-            "4136",
-            "4137",
-            "4138",
-            "4139",
-            "4140",
-            "4141",
-            "4142",
-            "4143",
-            "4144",
-            "4162",
-            "4163",
-        ]
-        if match in all_supported_models + ["4112", "4113", "4132"]:
-            self._channels_session.aperture_time_units = aperture_time_units
-        if match in all_supported_models:
-            self._channels_session.aperture_time = aperture_time
+        temp = aperture_time
+        if aperture_time_units == nidcpower.ApertureTimeUnits.POWER_LINE_CYCLES:
+            temp = temp / 60.0  # To do replace with power line frequency global.
+
+        if match == "4110":
             self._channels_session.source_delay = source_delay
+            self._channels_session.samples_to_average = 3000 * temp
+        elif match == "4130":
+            self._channels_session.source_delay = source_delay
+            self._channels_session.samples_to_average = 3000 * temp
+            # To do - validate and enable below code
+            # if self._channels_session.channels == "1":
+            # self._channels_session.sense = sense
+        elif match == "4154":
+            self._channels_session.source_delay = source_delay
+            self._channels_session.samples_to_average = 300000 * temp
+            self._channels_session.sense = sense
+            # To do - validate and enable below code
+            # if self._channels_session.channels == "0":
+            # self._channels_session.transient_response =transient_response
         elif match == "4132":
             self._channels_session.aperture_time_units = aperture_time_units
+            self._channels_session.aperture_time = aperture_time
+            self._channels_session.source_delay = source_delay
+            self._channels_session.sense = sense
+        elif (match == "4112") or (match == "4112"):
+            self._channels_session.aperture_time_units = aperture_time_units
+            self._channels_session.aperture_time = aperture_time
+            self._channels_session.source_delay = source_delay
+        else:  # All properties supported
+            self._channels_session.transient_response = transient_response
+            self._channels_session.aperture_time_units = aperture_time_units
+            self._channels_session.aperture_time = aperture_time
+            self._channels_session.source_delay = source_delay
+            self._channels_session.sense = sense
 
     def query_in_compliance(self):
         return self._channels_session.query_in_compliance()
@@ -132,7 +146,7 @@ class _NIDCPowerSSC:
         aperture_time_units=nidcpower.ApertureTimeUnits.SECONDS,
     ):
         self._channels_session.abort()
-        self._channels_session.aperture_time(aperture_time,aperture_time_units)
+        self._channels_session.aperture_time(aperture_time, aperture_time_units)
         self._channels_session.initiate()
 
     def configure_aperture_time(
@@ -140,7 +154,7 @@ class _NIDCPowerSSC:
         aperture_time=16.667,
         aperture_time_units=nidcpower.ApertureTimeUnits.SECONDS,
     ):
-        self._channels_session.aperture_time(aperture_time,aperture_time_units)
+        self._channels_session.aperture_time(aperture_time, aperture_time_units)
 
     def configure_power_line_frequency(
         self,
@@ -172,9 +186,9 @@ class _NIDCPowerSSC:
             "4162",
             "4163",
         ]
+        actual_aperture_time = self._channels_session.aperture_time_units
         if match in all_supported_models + ["4112", "4113", "4132"]:
-            actual_aperture_time = self._channels_session.aperture_time_units
-            if self._channels_session.aperture_time_units == nidcpower.ApertureTimeUnits.POWER_LINE_CYCLES :
+            if self._channels_session.aperture_time_units == nidcpower.ApertureTimeUnits.POWER_LINE_CYCLES:
                 actual_aperture_time = self._channels_session.aperture_time_units / self._channels_session.power_line_frequency
 
         if match in ["4110", "4130"]:
@@ -187,29 +201,12 @@ class _NIDCPowerSSC:
         self
     ):
         match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
-        all_supported_models = [
-            "4135",
-            "4136",
-            "4137",
-            "4138",
-            "4139",
-            "4140",
-            "4141",
-            "4142",
-            "4143",
-            "4144",
-            "4162",
-            "4163",
-        ]
-        if match in all_supported_models + ["4112", "4113", "4132"]:
-            configured_power_line_frequency = self._channels_session.power_line_frequency
-
+        configured_power_line_frequency = self._channels_session.power_line_frequency
         if match in ["4110", "4130"]:
-            configured_power_line_frequency = 60 # This needs to be replaced with global variable
+            configured_power_line_frequency = 60  # This needs to be replaced with global variable
         elif match == "4154":
-            configured_power_line_frequency = 60 # This needs to be replaced with global variable
+            configured_power_line_frequency = 60   # This needs to be replaced with global variable
         return configured_power_line_frequency
-
 
 
 class _NIDCPowerTSM:
