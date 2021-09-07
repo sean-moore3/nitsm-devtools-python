@@ -208,6 +208,42 @@ class _NIDCPowerSSC:
             configured_power_line_frequency = 60   # This needs to be replaced with global variable
         return configured_power_line_frequency
 
+    def configure_current_level_range(
+        self,
+        current_level_range=0.0,
+    ):
+        self._channels_session.current_level_range(current_level_range)
+
+    def configure_current_level(
+        self,
+        current_level=0.0,
+    ):
+        self._channels_session.current_level(current_level)
+
+    def configure_single_point_force_dc_current_asymmetric_limits(
+        self,
+        current_level=0.0,
+        current_level_range=0.0,
+        voltage_limit_high=0.0,
+        voltage_limit_low=0.0,
+        voltage_limit_range=0.0
+    ):
+        self._channels_session.source_mode(nidcpower.SourceMode.SINGLE_POINT)
+        self._channels_session.output_function(nidcpower.OutputFunction.DC_CURRENT)
+        self._channels_session.current_level(current_level)
+        self._channels_session.voltage_limit_high(voltage_limit_high)
+        self._channels_session.voltage_limit_low(voltage_limit_low)
+        c_value = current_level_range
+        if c_value == 0.0:
+            c_value = abs(current_level)
+        self._channels_session.current_level_range(c_value)
+        v_value = voltage_limit_range
+        if v_value == 0.0:
+            v_value = max(abs(voltage_limit_high), abs(voltage_limit_low))
+        self._channels_session.voltage_limit_range(v_value)
+        self._channels_session.compliance_limit_symmetry(nidcpower.ComplianceLimitSymmetry.ASYMMETRIC)
+
+
 
 class _NIDCPowerTSM:
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDCPowerSSC]):
