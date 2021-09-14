@@ -457,7 +457,7 @@ class _NIDCPowerSSC:
         self._channels_session.measure_trigger_type = measure_trigger_type
         self._channels_session.measure_record_length_is_finite = True
 
-    def configure_measurements(self,measurement_mode="Auto"):
+    def configure_measurements(self, measurement_mode="Auto"):
         temp = measurement_mode
         if self.measure_multiple_only:
             temp = "Measure_Multiple"
@@ -474,8 +474,6 @@ class _NIDCPowerSSC:
             self._channels_session.measure_record_length = 1
         else:
             self._channels_session.measure_when = nidcpower.MeasureWhen.ON_DEMAND
-
-
 
 
 class _NIDCPowerTSM:
@@ -515,14 +513,50 @@ class _NIDCPowerTSM:
             ssc.reset()
         return
 
-    def configure_settings(self):
-        pass
-
     def query_in_compliance(self):
         return [ssc.query_in_compliance() for ssc in self._sessions_sites_channels]
 
     def query_output_state(self, output_state: nidcpower.OutputStates):
         return [ssc.query_output_state(output_state) for ssc in self._sessions_sites_channels]
+
+    def configure_transient_response(self, transient_response=nidcpower.TransientResponse.NORMAL):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_transient_response(transient_response)
+        return
+
+    def configure_output_connected(self, output_connected=False):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_output_connected(output_connected)
+        return
+
+    def configure_output_enabled(self, output_enabled=False):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_output_enabled(output_enabled)
+        return
+
+    def configure_output_enabled_and_connected(self, output_enabled_and_connected=False):
+        if output_enabled_and_connected:
+            self.configure_output_enabled(output_enabled_and_connected)
+            self.configure_output_connected(output_enabled_and_connected)
+        else:
+            self.configure_output_connected(output_enabled_and_connected)
+            self.configure_output_enabled(output_enabled_and_connected)
+
+    def configure_output_resistance(self, output_resistance=0.0):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_output_resistance(output_resistance)
+        return
+
+    def configure_source_delay(self, source_delay=0.0):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_source_delay(source_delay)
+        return
+
+    def get_max_current(self):
+        return [ssc.get_max_current() for ssc in self._sessions_sites_channels]
+
+    def configure_settings(self):
+        pass
 
 
 @nitsm.codemoduleapi.code_module
