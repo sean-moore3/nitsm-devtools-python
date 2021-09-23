@@ -472,7 +472,9 @@ class _NIDCPowerTSM:
             generic_array = generic_in
             # Need to revisit this code for all cases as per reference LabVIEW code
         else:
-            generic_array = [generic_in] * len(self._sessions_sites_channels)
+            generic_array = []
+            for ssc in self._sessions_sites_channels:
+                generic_array.append(generic_in)
         return generic_array
 
     def abort(self):
