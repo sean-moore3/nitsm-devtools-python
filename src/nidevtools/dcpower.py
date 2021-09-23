@@ -80,6 +80,43 @@ class MeasurementMode(Enum):
     '''
 
 
+class ApertureTimeUnits(Enum):
+    SECONDS = nidcpower.ApertureTimeUnits.SECONDS
+    r'''
+    Specifies aperture time in seconds.
+    '''
+    POWER_LINE_CYCLES = nidcpower.ApertureTimeUnits.POWER_LINE_CYCLES
+    r'''
+    Specifies aperture time in power line cycles (PLCs).
+    '''
+
+
+class Sense(Enum):
+    REMOTE = nidcpower.Sense.REMOTE
+    r'''
+    Remote sensing is selected.
+    '''
+    LOCAL = nidcpower.Sense.LOCAL
+    r'''
+    Local sensing is selected.
+    '''
+
+
+class TransientResponse(Enum):
+    NORMAL = nidcpower.TransientResponse.NORMAL
+    r'''
+    The output responds to changes in load at a normal speed
+    '''
+    SLOW = nidcpower.TransientResponse.SLOW
+    r'''
+    The output responds to changes in load slowly.
+    '''
+    FAST = nidcpower.TransientResponse.FAST
+    r'''
+    The output responds to changes in load quickly.
+    '''
+
+
 class _NIDCPowerSSC:
     """Session, sites, and channels."""
 
@@ -110,13 +147,13 @@ class _NIDCPowerSSC:
     def reset(self):
         return self._channels_session.reset()
 
-    def configure_settings(self, aperture_time=16.667, source_delay=0.0, sense=nidcpower.Sense.LOCAL,
-                           aperture_time_unit=nidcpower.ApertureTimeUnits.SECONDS,
-                           transient_response=nidcpower.TransientResponse.NORMAL):
+    def configure_settings(self, aperture_time=16.667, source_delay=0.0, sense=Sense.LOCAL,
+                           aperture_time_unit=ApertureTimeUnits.SECONDS,
+                           transient_response=TransientResponse.NORMAL):
         self._channels_session.abort()
         match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
         temp = aperture_time
-        if aperture_time_unit == nidcpower.ApertureTimeUnits.POWER_LINE_CYCLES:
+        if aperture_time_unit == ApertureTimeUnits.POWER_LINE_CYCLES:
             temp = temp / self.power_line_frequency
 
         if match == "4110":
@@ -159,20 +196,20 @@ class _NIDCPowerSSC:
         return self._channels_session.query_output_state(output_state)
 
     def configure_aperture_time_with_abort_and_initiate(self, aperture_time=16.667,
-                                                        aperture_time_units=nidcpower.ApertureTimeUnits.SECONDS):
+                                                        aperture_time_units=ApertureTimeUnits.SECONDS):
         self._channels_session.abort()
         self._channels_session.aperture_time(aperture_time, aperture_time_units)
         self._channels_session.initiate()
 
-    def configure_aperture_time(self, aperture_time=16.667, aperture_time_units=nidcpower.ApertureTimeUnits.SECONDS):
+    def configure_aperture_time(self, aperture_time=16.667, aperture_time_units=ApertureTimeUnits.SECONDS):
         return self._channels_session.configure_aperture_time(aperture_time, aperture_time_units)
 
     def configure_power_line_frequency(self, power_line_frequency=60.0):
-        self.power_line_frequency = power_line_frequency  # To Do confirm global replaced with object attributes.
-        self._channels_session.power_line_frequency = power_line_frequency  # To Do method or property
+        self.power_line_frequency = power_line_frequency  # To Do - confirm global replaced with object attributes.
+        self._channels_session.power_line_frequency = power_line_frequency  # To Do - method or property
 
-    def configure_sense(self, sense=nidcpower.Sense.LOCAL):
-        self._channels_session.sense = sense  # To Do method or property
+    def configure_sense(self, sense=Sense.LOCAL):
+        self._channels_session.sense = sense  # To Do - method or property
 
     def get_aperture_time_in_seconds(self):
         match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
@@ -192,7 +229,7 @@ class _NIDCPowerSSC:
         ]
         actual_aperture_time = self._channels_session.aperture_time_units
         if match in all_supported_models + ["4112", "4113", "4132"]:
-            if self._channels_session.aperture_time_units == nidcpower.ApertureTimeUnits.POWER_LINE_CYCLES:
+            if self._channels_session.aperture_time_units == ApertureTimeUnits.POWER_LINE_CYCLES:
                 actual_aperture_time = self._channels_session.aperture_time_units / self._channels_session.power_line_frequency
 
         if match in ["4110", "4130"]:
@@ -340,7 +377,7 @@ class _NIDCPowerSSC:
 
     def configure_source_adapt(self, voltage_gain_bandwidth, voltage_compensation_frequency, voltage_pole_zero_ratio,
                                current_gain_bandwidth, current_compensation_frequency, current_pole_zero_ratio):
-        self._channels_session.transient_response = nidcpower.TransientResponse.CUSTOM
+        self._channels_session.transient_response = TransientResponse.CUSTOM
         self._channels_session.voltage_gain_bandwidth = voltage_gain_bandwidth
         self._channels_session.voltage_compensation_frequency = voltage_compensation_frequency
         self._channels_session.voltage_pole_zero_ratio = voltage_pole_zero_ratio
@@ -348,7 +385,7 @@ class _NIDCPowerSSC:
         self._channels_session.current_compensation_frequency = current_compensation_frequency
         self._channels_session.current_pole_zero_ratio = current_pole_zero_ratio
 
-    def configure_transient_response(self, transient_response=nidcpower.TransientResponse.NORMAL):
+    def configure_transient_response(self, transient_response=TransientResponse.NORMAL):
         self._channels_session.transient_response = transient_response
 
     def get_source_adapt_settings(self):
@@ -416,7 +453,7 @@ class _NIDCPowerSSC:
 
     def configure_and_commit_waveform_acquisition(self, sample_rate, buffer_length=1.0):
         settings = self.get_measurement_settings()
-        self._channels_session.aperture_time_units = nidcpower.ApertureTimeUnits.SECONDS
+        self._channels_session.aperture_time_units = ApertureTimeUnits.SECONDS
         self._channels_session.aperture_time = 1/sample_rate
         self._channels_session.measure_record_length_is_finite = False
         self._channels_session.measure_when = nidcpower.MeasureWhen.ON_MEASURE_TRIGGER
@@ -500,7 +537,7 @@ class _NIDCPowerTSM:
         return [ssc.query_output_state(output_state) for ssc in self._sessions_sites_channels]
 
     def configure_aperture_time_with_abort_and_initiate(self, aperture_time=16.667,
-                                                        aperture_time_units=nidcpower.ApertureTimeUnits.SECONDS):
+                                                        aperture_time_units=ApertureTimeUnits.SECONDS):
         for ssc in self._sessions_sites_channels:
             ssc.configure_aperture_time_with_abort_and_initiate(aperture_time, aperture_time_units)
         return
@@ -510,12 +547,12 @@ class _NIDCPowerTSM:
             ssc.configure_power_line_frequency(power_line_frequency)
         return
 
-    def configure_sense(self, sense=nidcpower.Sense.LOCAL):
+    def configure_sense(self, sense=Sense.LOCAL):
         for ssc in self._sessions_sites_channels:
             ssc.configure_sense(sense)
         return
 
-    def configure_transient_response(self, transient_response=nidcpower.TransientResponse.NORMAL):
+    def configure_transient_response(self, transient_response=TransientResponse.NORMAL):
         for ssc in self._sessions_sites_channels:
             ssc.configure_transient_response(transient_response)
         return
@@ -634,9 +671,9 @@ class _NIDCPowerTSM:
             ssc.configure_settings(aperture_time, source_delay, sense, aperture_time_unit, transient_response)
         return
 
-    def configure_settings(self, aperture_time=16.667, source_delay=0.0, sense=nidcpower.Sense.LOCAL,
-                           aperture_time_unit=nidcpower.ApertureTimeUnits.SECONDS,
-                           transient_response=nidcpower.TransientResponse.NORMAL):
+    def configure_settings(self, aperture_time=16.667, source_delay=0.0, sense=Sense.LOCAL,
+                           aperture_time_unit=ApertureTimeUnits.SECONDS,
+                           transient_response=TransientResponse.NORMAL):
         transient_responses = self.expand_array_to_sessions(transient_response)
         aperture_time_units = self.expand_array_to_sessions(aperture_time_unit)
         aperture_times = self.expand_array_to_sessions(aperture_time)
