@@ -117,6 +117,25 @@ class TransientResponse(Enum):
     '''
 
 
+class CustomTransientResponse:
+    def __init__(self, gain_bandwidth: float, compensation_frequency: float, pole_zero_ratio: float):
+        self._gain_bandwidth = gain_bandwidth
+        self._compensation_frequency = compensation_frequency
+        self._pole_zero_ratio = pole_zero_ratio
+
+    @property
+    def gain_bandwidth(self):
+        return self._gain_bandwidth
+
+    @property
+    def compensation_frequency(self):
+        return self._compensation_frequency
+
+    @property
+    def pole_zero_ratio(self):
+        return self._pole_zero_ratio
+
+
 class _NIDCPowerSSC:
     """Session, sites, and channels."""
 
@@ -146,6 +165,22 @@ class _NIDCPowerSSC:
 
     def reset(self):
         return self._channels_session.reset()
+
+    def configure_aperture_time_with_abort_and_initiate(self, aperture_time=16.667,
+                                                        aperture_time_units=ApertureTimeUnits.SECONDS):
+        self._channels_session.abort()
+        self._channels_session.aperture_time(aperture_time, aperture_time_units)
+        self._channels_session.initiate()
+
+    def configure_aperture_time(self, aperture_time=16.667, aperture_time_units=ApertureTimeUnits.SECONDS):
+        return self._channels_session.configure_aperture_time(aperture_time, aperture_time_units)
+
+    def configure_power_line_frequency(self, power_line_frequency=60.0):
+        self.power_line_frequency = power_line_frequency  # To Do - confirm global replaced with object attributes.
+        self._channels_session.power_line_frequency = power_line_frequency  # To Do - method or property
+
+    def configure_sense(self, sense=Sense.LOCAL):
+        self._channels_session.sense = sense  # To Do - method or property
 
     def configure_settings(self, aperture_time=16.667, source_delay=0.0, sense=Sense.LOCAL,
                            aperture_time_unit=ApertureTimeUnits.SECONDS,
@@ -189,28 +224,6 @@ class _NIDCPowerSSC:
             self._channels_session.source_delay = source_delay
             self._channels_session.sense = sense
 
-    def query_in_compliance(self):
-        return self._channels_session.query_in_compliance()
-
-    def query_output_state(self, output_state: nidcpower.OutputStates):
-        return self._channels_session.query_output_state(output_state)
-
-    def configure_aperture_time_with_abort_and_initiate(self, aperture_time=16.667,
-                                                        aperture_time_units=ApertureTimeUnits.SECONDS):
-        self._channels_session.abort()
-        self._channels_session.aperture_time(aperture_time, aperture_time_units)
-        self._channels_session.initiate()
-
-    def configure_aperture_time(self, aperture_time=16.667, aperture_time_units=ApertureTimeUnits.SECONDS):
-        return self._channels_session.configure_aperture_time(aperture_time, aperture_time_units)
-
-    def configure_power_line_frequency(self, power_line_frequency=60.0):
-        self.power_line_frequency = power_line_frequency  # To Do - confirm global replaced with object attributes.
-        self._channels_session.power_line_frequency = power_line_frequency  # To Do - method or property
-
-    def configure_sense(self, sense=Sense.LOCAL):
-        self._channels_session.sense = sense  # To Do - method or property
-
     def get_aperture_time_in_seconds(self):
         match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
         all_supported_models = [
@@ -247,11 +260,17 @@ class _NIDCPowerSSC:
             configured_power_line_frequency = self.power_line_frequency
         return configured_power_line_frequency
 
+    def query_in_compliance(self):
+        return self._channels_session.query_in_compliance()
+
+    def query_output_state(self, output_state: nidcpower.OutputStates):
+        return self._channels_session.query_output_state(output_state)
+
     def configure_current_level_range(self, current_level_range=0.0):
         self._channels_session.current_level_range = current_level_range  # To Do method or property
 
     def configure_current_level(self, current_level=0.0):
-        self._channels_session.current_level = current_level  # To Do method or property
+        self._channels_session.current_level = current_level
 
     def configure_single_point_force_dc_current_asymmetric_limits(self, current_level=0.0, current_level_range=0.0,
                                                                   voltage_limit_high=0.0, voltage_limit_low=0.0,
@@ -288,10 +307,10 @@ class _NIDCPowerSSC:
         self._channels_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.SYMMETRIC  # To Do method?
 
     def configure_voltage_limit_range(self, voltage_limit_range=0.0):
-        self._channels_session.voltage_limit_range = voltage_limit_range  # To Do method or property
+        self._channels_session.voltage_limit_range = voltage_limit_range
 
     def configure_voltage_limit(self, voltage_limit=0.0):
-        self._channels_session.voltage_limit = voltage_limit  # To Do method or property
+        self._channels_session.voltage_limit = voltage_limit
 
     def force_current_asymmetric_limits(self, current_level=0.0, current_level_range=0.0, voltage_limit_high=0.0,
                                         voltage_limit_low=0.0, voltage_limit_range=0.0):
@@ -310,11 +329,11 @@ class _NIDCPowerSSC:
                                                                                         voltage_limit_range)
         self._channels_session.commit()
 
-    def configure_voltage_level_range(self, voltage_level_range=0.0):
-        self._channels_session.voltage_level_range = voltage_level_range  # To Do method or property
+    def configure_current_limit_range(self, current_limit_range=0.0):
+        self._channels_session.current_limit_range = current_limit_range  # To Do method or property
 
-    def configure_voltage_level(self, voltage_level=0.0):
-        self._channels_session.voltage_level = voltage_level  # To Do method or property
+    def configure_current_limit(self, current_limit=0.0):
+        self._channels_session.current_limit = current_limit  # To Do method or property
 
     def configure_single_point_force_dc_voltage_asymmetric_limits(self, voltage_level=0.0, voltage_level_range=0.0,
                                                                   current_limit_high=0.0, current_limit_low=0.0,
@@ -350,11 +369,11 @@ class _NIDCPowerSSC:
         self._channels_session.current_limit_range = c_value  # To Do method or property
         self._channels_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.SYMMETRIC  # To Do method?
 
-    def configure_current_limit_range(self, current_limit_range=0.0):
-        self._channels_session.current_limit_range = current_limit_range  # To Do method or property
+    def configure_voltage_level_range(self, voltage_level_range=0.0):
+        self._channels_session.voltage_level_range = voltage_level_range  # To Do method or property
 
-    def configure_current_limit(self, current_limit=0.0):
-        self._channels_session.current_limit = current_limit  # To Do method or property
+    def configure_voltage_level(self, voltage_level=0.0):
+        self._channels_session.voltage_level = voltage_level  # To Do method or property
 
     def force_voltage_asymmetric_limits(self, voltage_level=0.0, voltage_level_range=0.0, current_limit_high=0.0,
                                         current_limit_low=0.0, current_limit_range=0.0):
@@ -375,30 +394,29 @@ class _NIDCPowerSSC:
                                                                                         current_limit_range)
         self._channels_session.commit()
 
-    def configure_source_adapt(self, voltage_gain_bandwidth, voltage_compensation_frequency, voltage_pole_zero_ratio,
-                               current_gain_bandwidth, current_compensation_frequency, current_pole_zero_ratio):
+    def configure_source_adapt(self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse):
         self._channels_session.transient_response = TransientResponse.CUSTOM
-        self._channels_session.voltage_gain_bandwidth = voltage_gain_bandwidth
-        self._channels_session.voltage_compensation_frequency = voltage_compensation_frequency
-        self._channels_session.voltage_pole_zero_ratio = voltage_pole_zero_ratio
-        self._channels_session.current_gain_bandwidth = current_gain_bandwidth
-        self._channels_session.current_compensation_frequency = current_compensation_frequency
-        self._channels_session.current_pole_zero_ratio = current_pole_zero_ratio
+        self._channels_session.voltage_gain_bandwidth = voltage_ctr.gain_bandwidth
+        self._channels_session.voltage_compensation_frequency = voltage_ctr.compensation_frequency
+        self._channels_session.voltage_pole_zero_ratio = voltage_ctr.pole_zero_ratio
+        self._channels_session.current_gain_bandwidth = current_ctr.gain_bandwidth
+        self._channels_session.current_compensation_frequency = current_ctr.compensation_frequency
+        self._channels_session.current_pole_zero_ratio = current_ctr.pole_zero_ratio
 
     def configure_transient_response(self, transient_response=TransientResponse.NORMAL):
         self._channels_session.transient_response = transient_response
 
     def get_source_adapt_settings(self):
         transient_response = self._channels_session.transient_response
-        voltage_gain_bandwidth = self._channels_session.voltage_gain_bandwidth
-        voltage_compensation_frequency = self._channels_session.voltage_compensation_frequency
-        voltage_pole_zero_ratio = self._channels_session.voltage_pole_zero_ratio
-        current_gain_bandwidth = self._channels_session.current_gain_bandwidth
-        current_compensation_frequency = self._channels_session.current_compensation_frequency
-        current_pole_zero_ratio = self._channels_session.current_pole_zero_ratio
-        voltage = (voltage_gain_bandwidth, voltage_compensation_frequency, voltage_pole_zero_ratio)
-        current = (current_gain_bandwidth, current_compensation_frequency, current_pole_zero_ratio)
-        return transient_response, voltage, current
+        v_gain_bw = self._channels_session.voltage_gain_bandwidth
+        v_comp_fr = self._channels_session.voltage_compensation_frequency
+        v_pole_0_ratio = self._channels_session.voltage_pole_zero_ratio
+        i_gain_bw = self._channels_session.current_gain_bandwidth
+        i_comp_fr = self._channels_session.current_compensation_frequency
+        i_pole_0_ratio = self._channels_session.current_pole_zero_ratio
+        voltage_ctr = CustomTransientResponse(v_gain_bw, v_comp_fr, v_pole_0_ratio)
+        current_ctr = CustomTransientResponse(i_gain_bw, i_comp_fr, i_pole_0_ratio)
+        return transient_response, voltage_ctr, current_ctr
 
     def configure_output_connected(self, output_connected=False):
         self._channels_session.output_connected = output_connected  # To Do method or property
@@ -410,13 +428,13 @@ class _NIDCPowerSSC:
         self._channels_session.output_function = output_function  # To Do method or property
 
     def configure_output_resistance(self, output_resistance=0.0):
-        self._channels_session.output_resistance = output_resistance  # To Do method or property
+        self._channels_session.output_resistance = output_resistance
 
     def configure_source_delay(self, source_delay=0.0):
-        self._channels_session.source_delay = source_delay  # To Do method or property
+        self._channels_session.source_delay = source_delay
 
     def configure_source_mode(self, source_mode=nidcpower.SourceMode.SINGLE_POINT):
-        self._channels_session.source_mode = source_mode  # To Do method or property
+        self._channels_session.source_mode = source_mode
 
     def get_smu_model(self):
         smu_model = re.search("\d\d\d\d", self._channels_session.instrument_model, re.RegexFlag.ASCII)[0]
@@ -424,6 +442,23 @@ class _NIDCPowerSSC:
 
     def get_max_current(self):
         pass
+
+    def configure_measurements(self, mode=MeasurementMode.AUTO):
+        self._channels_session.abort()
+        if self.measure_multiple_only:
+            mode = MeasurementMode.MEASURE_MULTIPLE
+        if mode == MeasurementMode.AUTO:
+            model = self.get_smu_model()
+            if model == 4110 or model == 4130:
+                mode = MeasurementMode.MEASURE_MULTIPLE
+            else:
+                mode = MeasurementMode.SOFTWARE_TRIGGER
+        if mode == MeasurementMode.SOFTWARE_TRIGGER:
+            self._channels_session.measure_when = nidcpower.MeasureWhen.ON_MEASURE_TRIGGER
+            self._channels_session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
+            self._channels_session.measure_record_length = 1
+        else:
+            self._channels_session.measure_when = nidcpower.MeasureWhen.ON_DEMAND
 
     def configure_export_signal(self, signal, output_terminal):
         pass
@@ -469,23 +504,6 @@ class _NIDCPowerSSC:
             self._channels_session.measure_buffer_size = num_samples
         return settings
 
-    def configure_measurements(self, mode=MeasurementMode.AUTO):
-        self._channels_session.abort()
-        if self.measure_multiple_only:
-            mode = MeasurementMode.MEASURE_MULTIPLE
-        if mode == MeasurementMode.AUTO:
-            model = self.get_smu_model()
-            if model == 4110 or model == 4130:
-                mode = MeasurementMode.MEASURE_MULTIPLE
-            else:
-                mode = MeasurementMode.SOFTWARE_TRIGGER
-        if mode == MeasurementMode.SOFTWARE_TRIGGER:
-            self._channels_session.measure_when = nidcpower.MeasureWhen.ON_MEASURE_TRIGGER
-            self._channels_session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
-            self._channels_session.measure_record_length = 1
-        else:
-            self._channels_session.measure_when = nidcpower.MeasureWhen.ON_DEMAND
-
 
 class _NIDCPowerTSM:
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDCPowerSSC]):
@@ -503,6 +521,12 @@ class _NIDCPowerTSM:
     @property
     def sessions_sites_channels(self):
         return self._sessions_sites_channels
+
+    def _configure_settings_array(self, aperture_times, source_delays, senses, aperture_time_units, transient_responses):
+        for (ssc, aperture_time, source_delay, sense, aperture_time_unit,
+             transient_response) in zip(self._sessions_sites_channels, aperture_times, source_delays, senses,
+                                        aperture_time_units, transient_responses):
+            ssc.configure_settings(aperture_time, source_delay, sense, aperture_time_unit, transient_response)
 
     def expand_array_to_sessions(self, generic_in):
         if hasattr(generic_in, "__iter__"):
@@ -530,12 +554,6 @@ class _NIDCPowerTSM:
         for ssc in self._sessions_sites_channels:
             ssc.reset()
 
-    def query_in_compliance(self):
-        return [ssc.query_in_compliance() for ssc in self._sessions_sites_channels]
-
-    def query_output_state(self, output_state: nidcpower.OutputStates):
-        return [ssc.query_output_state(output_state) for ssc in self._sessions_sites_channels]
-
     def configure_aperture_time_with_abort_and_initiate(self, aperture_time=16.667,
                                                         aperture_time_units=ApertureTimeUnits.SECONDS):
         for ssc in self._sessions_sites_channels:
@@ -551,6 +569,18 @@ class _NIDCPowerTSM:
         for ssc in self._sessions_sites_channels:
             ssc.configure_sense(sense)
         return
+
+    def get_aperture_times_in_seconds(self):
+        return [ssc.get_aperture_time_in_seconds() for ssc in self._sessions_sites_channels]
+
+    def get_power_line_frequencies(self):
+        return [ssc.get_power_line_frequency() for ssc in self._sessions_sites_channels]
+
+    def query_in_compliance(self):
+        return [ssc.query_in_compliance() for ssc in self._sessions_sites_channels]
+
+    def query_output_state(self, output_state: nidcpower.OutputStates):
+        return [ssc.query_output_state(output_state) for ssc in self._sessions_sites_channels]
 
     def configure_transient_response(self, transient_response=TransientResponse.NORMAL):
         for ssc in self._sessions_sites_channels:
@@ -580,10 +610,20 @@ class _NIDCPowerTSM:
             ssc.configure_output_resistance(output_resistance)
         return
 
+    def configure_output_resistance_array(self, output_resistance):
+        output_resistances = self.expand_array_to_sessions(output_resistance)
+        i = 0
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_output_resistance(output_resistances[i])
+            i += 1
+
     def configure_source_delay(self, source_delay=0.0):
         for ssc in self._sessions_sites_channels:
             ssc.configure_source_delay(source_delay)
-        return
+
+    def configure_source_mode(self, source_mode=nidcpower.SourceMode.SINGLE_POINT):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_source_mode(source_mode)
 
     def wait_for_event(self, event=nidcpower.Event.SOURCE_COMPLETE, timeout=10.0):
         for ssc in self._sessions_sites_channels:
@@ -664,13 +704,6 @@ class _NIDCPowerTSM:
             i += 1
         return
 
-    def configure_settings_array(self, aperture_times, source_delays, senses, aperture_time_units, transient_responses):
-        for (ssc, aperture_time, source_delay, sense, aperture_time_unit,
-             transient_response) in zip(self._sessions_sites_channels, aperture_times, source_delays, senses,
-                                        aperture_time_units, transient_responses):
-            ssc.configure_settings(aperture_time, source_delay, sense, aperture_time_unit, transient_response)
-        return
-
     def configure_settings(self, aperture_time=16.667, source_delay=0.0, sense=Sense.LOCAL,
                            aperture_time_unit=ApertureTimeUnits.SECONDS,
                            transient_response=TransientResponse.NORMAL):
@@ -679,7 +712,67 @@ class _NIDCPowerTSM:
         aperture_times = self.expand_array_to_sessions(aperture_time)
         source_delays = self.expand_array_to_sessions(source_delay)
         senses = self.expand_array_to_sessions(sense)
-        self.configure_settings_array(aperture_times, source_delays, senses, aperture_time_units, transient_responses)
+        self._configure_settings_array(aperture_times, source_delays, senses, aperture_time_units, transient_responses)
+
+    def configure_current_level_range(self, current_level_range=0.0):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_current_level_range(current_level_range)
+
+    def configure_current_level(self, current_level=0.0):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_current_level(current_level)
+
+    def configure_current_level_array(self, current_levels_array):
+        current_levels = self.expand_array_to_sessions(current_levels_array)
+        i = 0
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_current_level(current_levels[i])
+            i += 1
+
+    def configure_voltage_limit_range(self, voltage_limit_range=0.0):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_voltage_limit_range(voltage_limit_range)
+
+    def configure_voltage_limit(self, voltage_limit=0.0):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_voltage_limit(voltage_limit)
+
+    def configure_voltage_limit_array(self, voltage_limits_array):
+        voltage_limits = self.expand_array_to_sessions(voltage_limits_array)
+        i = 0
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_voltage_limit(voltage_limits[i])
+            i += 1
+
+    def configure_voltage_level_range(self, voltage_level_range=0.0):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_voltage_level_range(voltage_level_range)
+
+    def configure_voltage_level(self, voltage_level=0.0):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_voltage_level(voltage_level)
+
+    def configure_voltage_level_array(self, voltage_levels_array):
+        voltage_levels = self.expand_array_to_sessions(voltage_levels_array)
+        i = 0
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_voltage_level(voltage_levels[i])
+            i += 1
+
+    def configure_current_limit_range(self, current_limit_range=0.0):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_current_limit_range(current_limit_range)
+
+    def configure_current_limit(self, current_limit=0.0):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_current_limit(current_limit)
+
+    def configure_current_limit_array(self, current_limits_array):
+        current_limits = self.expand_array_to_sessions(current_limits_array)
+        i = 0
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_current_limit(current_limits[i])
+            i += 1
 
     def force_current_asymmetric_limits_array(self, current_levels, current_level_ranges, voltage_limit_highs,
                                               voltage_limit_lows, voltage_limit_ranges):
@@ -752,11 +845,16 @@ class _NIDCPowerTSM:
         self.force_current_symmetric_limits_array(voltage_levels, voltage_level_ranges, current_limits,
                                                   current_limit_ranges)
 
-    def get_aperture_times_in_seconds(self):
-        return [ssc.get_aperture_time_in_seconds() for ssc in self._sessions_sites_channels]
+    def _configure_source_adapt(self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_source_adapt(voltage_ctr, current_ctr)
 
-    def get_power_line_frequencies(self):
-        return [ssc.get_power_line_frequency() for ssc in self._sessions_sites_channels]
+    def _configure_transient_response(self, transient_response=TransientResponse.NORMAL):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_transient_response(transient_response)
+
+    def _get_source_adapt_settings(self):
+        return [ssc.get_source_adapt_settings() for ssc in self._sessions_sites_channels]
 
 
 @nitsm.codemoduleapi.code_module
