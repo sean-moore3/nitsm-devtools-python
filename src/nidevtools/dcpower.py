@@ -144,28 +144,6 @@ class CustomTransientResponse:
         return self._pole_zero_ratio
 
 
-def expand_to_requested_array_size(generic_in, size: int):
-    if hasattr(generic_in, "__iter__"):
-        generic_array = []
-        length = len(generic_in)
-        reminder = size % length
-        if (size == 0 or length == 0) and reminder != 0:
-            pass
-            # need to raise exception
-        else:
-            i = 0
-            for j in range(length):
-                generic_array.append(generic_in[i])
-                i += 1
-                if i == length:
-                    i = 0
-    else:
-        generic_array = []
-        for index in range(size):
-            generic_array.append(generic_in)
-    return generic_array
-
-
 def model_to_ranges(model, channel):
     r_v = []
     r_i = []
@@ -575,7 +553,7 @@ class _NIDCPowerSSC:
         # self._channels_session.export_signal () method not found.
         pass
 
-    def send_software_edge_trigger(self, trigger_to_send=nidcpower.SendSoftwareEdgeTriggerType.MEASURE):
+    def send_software_edge_trigger(self, trigger_to_send=SendSoftwareEdgeTriggerType.MEASURE):
         return self._channels_session.send_software_edge_trigger(trigger_to_send)
 
     def wait_for_event(self, event=nidcpower.Event.SOURCE_COMPLETE, timeout=10.0):
@@ -616,12 +594,21 @@ class _NIDCPowerSSC:
         self._channels_session.measure_record_length = settings['measure_record_length']
         self._channels_session.measure_record_length_is_finite = settings['measure_record_length_is_finite']
 
-    def measure_setup(self):
-        pass
+    def measure_setup(self, measurement_mode: MeasurementMode):
+        if measurement_mode == MeasurementMode.MEASURE_MULTIPLE:
+            fetch_or_measure = False
+        elif measurement_mode == MeasurementMode.SOFTWARE_TRIGGER:
+            fetch_or_measure = not self.measure_multiple_only
+        else:
+            fetch_or_measure = (self._channels_session.measure_when == MeasureWhen.ON_MEASURE_TRIGGER)
+
+        if fetch_or_measure:
+            self._channels_session.send_software_edge_trigger(SendSoftwareEdgeTriggerType.MEASURE)
+        return fetch_or_measure
 
     def measure_execute(self, fetch_or_measure: bool):
         if fetch_or_measure:
-             samples = self._channels_session.channels[self.channels].fetch_multiple(1, 1.0)
+            samples = self._channels_session.channels[self.channels].fetch_multiple(1, 1.0)
         else:
             samples = self._channels_session.channels[self.channels].measure_multiple()
         voltages = []
@@ -634,6 +621,7 @@ class _NIDCPowerSSC:
         voltage = voltages[0]
         current = currents[0]
         return voltage, current
+
 
 class _NIDCPowerTSM:
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDCPowerSSC]):
@@ -648,11 +636,75 @@ class _NIDCPowerTSM:
             instrument_names += instrument_name.strip()
         return instrument_names
 
+    @staticmethod
+    def _expand_to_requested_array_size(generic_in, size: int):
+        if hasattr(generic_in, "__iter__"):
+            generic_array = []
+            length = len(generic_in)
+            reminder = size % length
+            if (size == 0 or length == 0) and reminder != 0:
+                pass
+                # need to raise exception
+            else:
+                i = 0
+                for j in range(length):
+                    generic_array.append(generic_in[i])
+                    i += 1
+                    if i == length:
+                        i = 0
+        else:
+            generic_array = []
+            for index in range(size):
+                generic_array.append(generic_in)
+        return generic_array
+
     @property
     def sessions_sites_channels(self):
         return self._sessions_sites_channels
 
-    def expand_array_to_sessions(self, generic_in):
+    def _configure_settings_array(self, aperture_times, source_delays, senses, aperture_time_units, transient_responses):
+        for (ssc, aperture_time, source_delay, sense, aperture_time_unit,
+             transient_response) in zip(self._sessions_sites_channels, aperture_times, source_delays, senses,
+                                        aperture_time_units, transient_responses):
+            ssc.configure_settings(aperture_time, source_delay, sense, aperture_time_unit, transient_response)
+
+    def _force_current_asymmetric_limits_array(self, current_levels, current_level_ranges, voltage_limit_highs,
+                                               voltage_limit_lows, voltage_limit_ranges):
+        i = 0
+        for ssc in self._sessions_sites_channels:
+            ssc.force_current_asymmetric_limits(current_levels[i], current_level_ranges[i], voltage_limit_highs[i],
+                                                voltage_limit_lows[i], voltage_limit_ranges[i])
+            i += 1
+        self.initiate()
+
+    def _force_current_symmetric_limits_array(self, current_levels, current_level_ranges, voltage_limits,
+                                              voltage_limit_ranges):
+        i = 0
+        for ssc in self._sessions_sites_channels:
+            ssc.force_current_symmetric_limits(current_levels[i], current_level_ranges[i], voltage_limits[i],
+                                               voltage_limit_ranges[i])
+            i += 1
+        self.initiate()
+
+    def _force_voltage_asymmetric_limits_array(self, voltage_levels, voltage_level_ranges, current_limit_highs,
+                                               current_limit_lows, current_limit_ranges):
+        i = 0
+        for ssc in self._sessions_sites_channels:
+            ssc.force_voltage_asymmetric_limits(voltage_levels[i], voltage_level_ranges[i], current_limit_highs[i],
+                                                current_limit_lows[i], current_limit_ranges[i])
+            i += 1
+        self.initiate()
+
+    def _force_voltage_symmetric_limits_array(self, voltage_levels, voltage_level_ranges, current_limits,
+                                              current_limit_ranges):
+        i = 0
+        for ssc in self._sessions_sites_channels:
+            ssc.force_voltage_symmetric_limits(voltage_levels[i], voltage_level_ranges[i], current_limits[i],
+                                               current_limit_ranges[i])
+            i += 1
+        self.initiate()
+
+    def _expand_array_to_sessions(self, generic_in):
         if hasattr(generic_in, "__iter__"):
             generic_array = generic_in
             # Need to revisit this code for all cases as per reference LabVIEW code
@@ -661,6 +713,53 @@ class _NIDCPowerTSM:
             for ssc in self._sessions_sites_channels:
                 generic_array.append(generic_in)
         return generic_array
+
+    def _force_current_asymmetric_limits(self, current_level, current_level_range, voltage_limit_high,
+                                         voltage_limit_low, voltage_limit_range):
+        size = 0
+        for scc in self._sessions_sites_channels:
+            size += 1
+        current_levels = self._expand_to_requested_array_size(current_level, size)
+        current_level_ranges = self._expand_to_requested_array_size(current_level_range, size)
+        voltage_limit_highs = self._expand_to_requested_array_size(voltage_limit_high, size)
+        voltage_limit_lows = self._expand_to_requested_array_size(voltage_limit_low, size)
+        voltage_limit_ranges = self._expand_to_requested_array_size(voltage_limit_range, size)
+        self._force_current_asymmetric_limits_array(current_levels, current_level_ranges, voltage_limit_highs,
+                                                    voltage_limit_lows, voltage_limit_ranges)
+
+    def _force_current_symmetric_limits(self, current_level, current_level_range, voltage_limit, voltage_limit_range):
+        size = 0
+        for scc in self._sessions_sites_channels:
+            size += 1
+        current_levels = self._expand_to_requested_array_size(current_level, size)
+        current_level_ranges = self._expand_to_requested_array_size(current_level_range, size)
+        voltage_limits = self._expand_to_requested_array_size(voltage_limit, size)
+        voltage_limit_ranges = self._expand_to_requested_array_size(voltage_limit_range, size)
+        self._force_current_symmetric_limits_array(current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges)
+
+    def _force_voltage_asymmetric_limits(self, voltage_level, voltage_level_range, current_limit_high,
+                                         current_limit_low, current_limit_range):
+        size = 0
+        for scc in self._sessions_sites_channels:
+            size += 1
+        voltage_levels = self._expand_to_requested_array_size(voltage_level, size)
+        voltage_level_ranges = self._expand_to_requested_array_size(voltage_level_range, size)
+        current_limit_highs = self._expand_to_requested_array_size(current_limit_high, size)
+        current_limit_lows = self._expand_to_requested_array_size(current_limit_low, size)
+        current_limit_ranges = self._expand_to_requested_array_size(current_limit_range, size)
+        self._force_current_asymmetric_limits_array(voltage_levels, voltage_level_ranges, current_limit_highs,
+                                                    current_limit_lows, current_limit_ranges)
+
+    def _force_voltage_symmetric_limits(self, voltage_level, voltage_level_range, current_limit, current_limit_range):
+        size = 0
+        for scc in self._sessions_sites_channels:
+            size += 1
+        voltage_levels = self._expand_to_requested_array_size(voltage_level, size)
+        voltage_level_ranges = self._expand_to_requested_array_size(voltage_level_range, size)
+        current_limits = self._expand_to_requested_array_size(current_limit, size)
+        current_limit_ranges = self._expand_to_requested_array_size(current_limit_range, size)
+        self._force_current_symmetric_limits_array(voltage_levels, voltage_level_ranges, current_limits,
+                                                   current_limit_ranges)
 
     def abort(self):
         for ssc in self._sessions_sites_channels:
@@ -735,7 +834,7 @@ class _NIDCPowerTSM:
         return
 
     def configure_output_resistance_array(self, output_resistance):
-        output_resistances = self.expand_array_to_sessions(output_resistance)
+        output_resistances = self._expand_array_to_sessions(output_resistance)
         i = 0
         for ssc in self._sessions_sites_channels:
             ssc.configure_output_resistance(output_resistances[i])
@@ -826,22 +925,19 @@ class _NIDCPowerTSM:
         for ssc in self._sessions_sites_channels:
             ssc.set_measurement_settings(meas_settings[i])
             i += 1
-        return
 
-    def _configure_settings_array(self, aperture_times, source_delays, senses, aperture_time_units, transient_responses):
-        for (ssc, aperture_time, source_delay, sense, aperture_time_unit,
-             transient_response) in zip(self._sessions_sites_channels, aperture_times, source_delays, senses,
-                                        aperture_time_units, transient_responses):
-            ssc.configure_settings(aperture_time, source_delay, sense, aperture_time_unit, transient_response)
+    def configure_measurements(self, mode=MeasurementMode.AUTO):
+        for ssc in self._sessions_sites_channels:
+            ssc.configure_measurements(mode)
 
     def configure_settings(self, aperture_time=16.667, source_delay=0.0, sense=Sense.LOCAL,
                            aperture_time_unit=ApertureTimeUnits.SECONDS,
                            transient_response=TransientResponse.NORMAL):
-        transient_responses = self.expand_array_to_sessions(transient_response)
-        aperture_time_units = self.expand_array_to_sessions(aperture_time_unit)
-        aperture_times = self.expand_array_to_sessions(aperture_time)
-        source_delays = self.expand_array_to_sessions(source_delay)
-        senses = self.expand_array_to_sessions(sense)
+        transient_responses = self._expand_array_to_sessions(transient_response)
+        aperture_time_units = self._expand_array_to_sessions(aperture_time_unit)
+        aperture_times = self._expand_array_to_sessions(aperture_time)
+        source_delays = self._expand_array_to_sessions(source_delay)
+        senses = self._expand_array_to_sessions(sense)
         self._configure_settings_array(aperture_times, source_delays, senses, aperture_time_units, transient_responses)
 
     def configure_current_level_range(self, current_level_range=0.0):
@@ -853,7 +949,7 @@ class _NIDCPowerTSM:
             ssc.configure_current_level(current_level)
 
     def configure_current_level_array(self, current_levels_array):
-        current_levels = self.expand_array_to_sessions(current_levels_array)
+        current_levels = self._expand_array_to_sessions(current_levels_array)
         i = 0
         for ssc in self._sessions_sites_channels:
             ssc.configure_current_level(current_levels[i])
@@ -868,7 +964,7 @@ class _NIDCPowerTSM:
             ssc.configure_voltage_limit(voltage_limit)
 
     def configure_voltage_limit_array(self, voltage_limits_array):
-        voltage_limits = self.expand_array_to_sessions(voltage_limits_array)
+        voltage_limits = self._expand_array_to_sessions(voltage_limits_array)
         i = 0
         for ssc in self._sessions_sites_channels:
             ssc.configure_voltage_limit(voltage_limits[i])
@@ -883,7 +979,7 @@ class _NIDCPowerTSM:
             ssc.configure_voltage_level(voltage_level)
 
     def configure_voltage_level_array(self, voltage_levels_array):
-        voltage_levels = self.expand_array_to_sessions(voltage_levels_array)
+        voltage_levels = self._expand_array_to_sessions(voltage_levels_array)
         i = 0
         for ssc in self._sessions_sites_channels:
             ssc.configure_voltage_level(voltage_levels[i])
@@ -898,91 +994,60 @@ class _NIDCPowerTSM:
             ssc.configure_current_limit(current_limit)
 
     def configure_current_limit_array(self, current_limits_array):
-        current_limits = self.expand_array_to_sessions(current_limits_array)
+        current_limits = self._expand_array_to_sessions(current_limits_array)
         i = 0
         for ssc in self._sessions_sites_channels:
             ssc.configure_current_limit(current_limits[i])
             i += 1
 
-    def force_current_asymmetric_limits_array(self, current_levels, current_level_ranges, voltage_limit_highs,
-                                              voltage_limit_lows, voltage_limit_ranges):
-        i = 0
-        for ssc in self._sessions_sites_channels:
-            ssc.force_current_asymmetric_limits(current_levels[i], current_level_ranges[i], voltage_limit_highs[i],
-                                                voltage_limit_lows[i], voltage_limit_ranges[i])
-            i += 1
-        self.initiate()
-
     def force_current_asymmetric_limits(self, current_level, current_level_range, voltage_limit_high,
                                         voltage_limit_low, voltage_limit_range):
-        current_levels = self.expand_array_to_sessions(current_level)
-        current_level_ranges = self.expand_array_to_sessions(current_level_range)
-        voltage_limit_highs = self.expand_array_to_sessions(voltage_limit_high)
-        voltage_limit_lows = self.expand_array_to_sessions(voltage_limit_low)
-        voltage_limit_ranges = self.expand_array_to_sessions(voltage_limit_range)
-        self.force_current_asymmetric_limits_array(current_levels, current_level_ranges, voltage_limit_highs,
-                                                   voltage_limit_lows, voltage_limit_ranges)
-
-    def force_current_symmetric_limits_array(self, current_levels, current_level_ranges, voltage_limits,
-                                             voltage_limit_ranges):
-        i = 0
-        for ssc in self._sessions_sites_channels:
-            ssc.force_current_symmetric_limits(current_levels[i], current_level_ranges[i], voltage_limits[i],
-                                               voltage_limit_ranges[i])
-            i += 1
-        self.initiate()
+        current_levels = self._expand_array_to_sessions(current_level)
+        current_level_ranges = self._expand_array_to_sessions(current_level_range)
+        voltage_limit_highs = self._expand_array_to_sessions(voltage_limit_high)
+        voltage_limit_lows = self._expand_array_to_sessions(voltage_limit_low)
+        voltage_limit_ranges = self._expand_array_to_sessions(voltage_limit_range)
+        self._force_current_asymmetric_limits_array(current_levels, current_level_ranges, voltage_limit_highs,
+                                                    voltage_limit_lows, voltage_limit_ranges)
 
     def force_current_symmetric_limits(self, current_level, current_level_range, voltage_limit, voltage_limit_range):
-        current_levels = self.expand_array_to_sessions(current_level)
-        current_level_ranges = self.expand_array_to_sessions(current_level_range)
-        voltage_limits = self.expand_array_to_sessions(voltage_limit)
-        voltage_limit_ranges = self.expand_array_to_sessions(voltage_limit_range)
-        self.force_current_symmetric_limits_array(current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges)
-
-    def force_voltage_asymmetric_limits_array(self, voltage_levels, voltage_level_ranges, current_limit_highs,
-                                              current_limit_lows, current_limit_ranges):
-        i = 0
-        for ssc in self._sessions_sites_channels:
-            ssc.force_voltage_asymmetric_limits(voltage_levels[i], voltage_level_ranges[i], current_limit_highs[i],
-                                                current_limit_lows[i], current_limit_ranges[i])
-            i += 1
-        self.initiate()
+        current_levels = self._expand_array_to_sessions(current_level)
+        current_level_ranges = self._expand_array_to_sessions(current_level_range)
+        voltage_limits = self._expand_array_to_sessions(voltage_limit)
+        voltage_limit_ranges = self._expand_array_to_sessions(voltage_limit_range)
+        self._force_current_symmetric_limits_array(current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges)
 
     def force_voltage_asymmetric_limits(self, voltage_level, voltage_level_range, current_limit_high,
                                         current_limit_low, current_limit_range):
-        voltage_levels = self.expand_array_to_sessions(voltage_level)
-        voltage_level_ranges = self.expand_array_to_sessions(voltage_level_range)
-        current_limit_highs = self.expand_array_to_sessions(current_limit_high)
-        current_limit_lows = self.expand_array_to_sessions(current_limit_low)
-        current_limit_ranges = self.expand_array_to_sessions(current_limit_range)
-        self.force_current_asymmetric_limits_array(voltage_levels, voltage_level_ranges, current_limit_highs,
-                                                   current_limit_lows, current_limit_ranges)
-
-    def force_voltage_symmetric_limits_array(self, voltage_levels, voltage_level_ranges, current_limits,
-                                             current_limit_ranges):
-        i = 0
-        for ssc in self._sessions_sites_channels:
-            ssc.force_voltage_symmetric_limits(voltage_levels[i], voltage_level_ranges[i], current_limits[i],
-                                               current_limit_ranges[i])
-            i += 1
-        self.initiate()
-
-    def measure(self):
-        bool_array=[]
-        for ssc in self._sessions_sites_channels:
-            bool_array.append(ssc.measure_setup())
-        i = 0
-        for ssc in self._sessions_sites_channels:
-            ssc.measure_execute(bool_array[i])
-            i += 1
+        voltage_levels = self._expand_array_to_sessions(voltage_level)
+        voltage_level_ranges = self._expand_array_to_sessions(voltage_level_range)
+        current_limit_highs = self._expand_array_to_sessions(current_limit_high)
+        current_limit_lows = self._expand_array_to_sessions(current_limit_low)
+        current_limit_ranges = self._expand_array_to_sessions(current_limit_range)
+        self._force_current_asymmetric_limits_array(voltage_levels, voltage_level_ranges, current_limit_highs,
+                                                    current_limit_lows, current_limit_ranges)
 
     def force_voltage_symmetric_limits(self, voltage_level, voltage_level_range, current_limit, current_limit_range):
-        voltage_levels = self.expand_array_to_sessions(voltage_level)
-        voltage_level_ranges = self.expand_array_to_sessions(voltage_level_range)
-        current_limits = self.expand_array_to_sessions(current_limit)
-        current_limit_ranges = self.expand_array_to_sessions(current_limit_range)
-        self.force_current_symmetric_limits_array(voltage_levels, voltage_level_ranges, current_limits,
-                                                  current_limit_ranges)
+        voltage_levels = self._expand_array_to_sessions(voltage_level)
+        voltage_level_ranges = self._expand_array_to_sessions(voltage_level_range)
+        current_limits = self._expand_array_to_sessions(current_limit)
+        current_limit_ranges = self._expand_array_to_sessions(current_limit_range)
+        self._force_current_symmetric_limits_array(voltage_levels, voltage_level_ranges, current_limits,
+                                                   current_limit_ranges)
+
+    def measure(self, measurement_mode: MeasurementMode):
+        fetch_or_measure_array = []
+        voltages = []
+        currents = []
+        for ssc in self._sessions_sites_channels:
+            fetch_or_measure_array.append(ssc.measure_setup(measurement_mode))
+        i = 0
+        for ssc in self._sessions_sites_channels:
+            voltage, current = ssc.measure_execute(fetch_or_measure_array[i])
+            voltages.append(voltage)
+            currents.append(current)
+            i += 1
+        return voltages, currents
 
     def configure_source_adapt(self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse):
         for ssc in self._sessions_sites_channels:
