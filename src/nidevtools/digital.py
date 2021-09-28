@@ -272,7 +272,7 @@ def tsm_ssc_log_hram_results(
                         str(cycle_information.cycle_number),
                         str(cycle_information.scan_cycle_number),
                         str(
-                            (lambda x: "P" if x == True else "F")(
+                            (lambda x: "P" if x else "F")(
                                 all(cycle_information.per_pin_pass_fail)
                             )
                         ),
@@ -280,7 +280,7 @@ def tsm_ssc_log_hram_results(
                         "{"
                         + ",".join(
                             [
-                                (lambda x: "P" if x == True else "F")(value)
+                                (lambda x: "P" if x is True else "F")(value)
                                 for value in cycle_information.per_pin_pass_fail
                             ]
                         )
@@ -1754,28 +1754,28 @@ def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, option_stri
         pattern_file_paths = tsm_context.nidigital_project_pattern_file_paths
         source_waveform_file_paths = tsm_context.nidigital_project_source_waveform_file_paths
         capture_waveform_file_paths = tsm_context.nidigital_project_capture_waveform_file_paths
-    for instrument_name in instrument_names:
-        session = nidigital.Session(instrument_name, options=option_string)
-        tsm_context.set_nidigital_session(instrument_name, session)
-        session.load_pin_map(pin_map_file_path)
-        session.load_specifications_levels_and_timing(
-            specifications_file_paths, levels_file_paths, timing_file_paths
-        )
-        session.unload_all_patterns()
-        for pattern_file_path in pattern_file_paths:
-            session.load_pattern(pattern_file_path)
-        for capture_waveform_file_path in capture_waveform_file_paths:
-            filename = os.path.basename(capture_waveform_file_path)
-            waveform_name, _ = filename.split(".")
-            session.create_capture_waveform_from_file_digicapture(
-                waveform_name, capture_waveform_file_path
+        for instrument_name in instrument_names:
+            session = nidigital.Session(instrument_name, options=option_string)
+            tsm_context.set_nidigital_session(instrument_name, session)
+            session.load_pin_map(pin_map_file_path)
+            session.load_specifications_levels_and_timing(
+                specifications_file_paths, levels_file_paths, timing_file_paths
             )
-        for source_waveform_file_path in source_waveform_file_paths:
-            filename = os.path.basename(source_waveform_file_path)
-            waveform_name, _ = filename.split(".")
-            session.create_source_waveform_from_file_tdms(
-                waveform_name, source_waveform_file_path, False
-            )
+            session.unload_all_patterns()
+            for pattern_file_path in pattern_file_paths:
+                session.load_pattern(pattern_file_path)
+            for capture_waveform_file_path in capture_waveform_file_paths:
+                filename = os.path.basename(capture_waveform_file_path)
+                waveform_name, _ = filename.split(".")
+                session.create_capture_waveform_from_file_digicapture(
+                    waveform_name, capture_waveform_file_path
+                )
+            for source_waveform_file_path in source_waveform_file_paths:
+                filename = os.path.basename(source_waveform_file_path)
+                waveform_name, _ = filename.split(".")
+                session.create_source_waveform_from_file_tdms(
+                    waveform_name, source_waveform_file_path, False
+                )
 
 
 def tsm_ssc_1_pin_to_n_sessions(tsm_context: SemiconductorModuleContext, pin: str):
