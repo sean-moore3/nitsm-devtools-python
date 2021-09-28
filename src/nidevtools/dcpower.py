@@ -2,16 +2,15 @@ import datetime
 import re
 import math
 import typing
-# from nidcpower import *
 import nidcpower
 from nidcpower.enums import *
 import nidcpower.errors
 import nitsm.codemoduleapi
 # import nidevtools.common
 import common
-# import itertools # for iterlongest list
+
 from datetime import datetime
-from enum import Enum
+
 
 _SemiconductorModuleContext = nitsm.codemoduleapi.SemiconductorModuleContext
 
@@ -80,49 +79,6 @@ class MeasurementMode(Enum):
     r'''
     Performs measurements on demand. Typically allows for easier debugging but takes longer to fetch measurements.
     '''
-
-
-"""
-class ApertureTimeUnits(nidcpower.ApertureTimeUnits):
-    SECONDS = nidcpower.ApertureTimeUnits.SECONDS
-    r'''
-    Specifies aperture time in seconds.
-    '''
-    POWER_LINE_CYCLES = nidcpower.ApertureTimeUnits.POWER_LINE_CYCLES
-    r'''
-    Specifies aperture time in power line cycles (PLCs).
-    '''
-
-
-class Sense(nidcpower.Sense):
-    REMOTE = nidcpower.Sense.REMOTE
-    r'''
-    Remote sensing is selected.
-    '''
-    LOCAL = nidcpower.Sense.LOCAL
-    r'''
-    Local sensing is selected.
-    '''
-
-
-class TransientResponse(nidcpower.TransientResponse):
-    NORMAL = nidcpower.TransientResponse.NORMAL
-    r'''
-    The output responds to changes in load at a normal speed
-    '''
-    SLOW = nidcpower.TransientResponse.SLOW
-    r'''
-    The output responds to changes in load slowly.
-    '''
-    FAST = nidcpower.TransientResponse.FAST
-    r'''
-    The output responds to changes in load quickly.
-    '''
-    CUSTOM = nidcpower.TransientResponse.CUSTOM
-    r'''
-    The output responds to changes in load based on specified values.
-    '''
-"""
 
 
 class CustomTransientResponse:
