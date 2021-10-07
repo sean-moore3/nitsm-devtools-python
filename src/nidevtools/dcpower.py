@@ -1012,6 +1012,45 @@ class _NIDCPowerTSM:
     def get_source_adapt_settings(self):
         return [ssc.get_source_adapt_settings() for ssc in self._sessions_sites_channels]
 
+    def filter_sites(self, requested_sites):
+        filtered_ssc = []
+        for ssc in self._sessions_sites_channels:
+            found = False
+            sites = common.channel_list_to_pins(ssc.channels)[2]
+            for s in sites:
+                found = (s in requested_sites) or found
+            if found:
+                filtered_ssc.append(ssc)
+        return filtered_ssc
+
+    def filter_pins(self, requested_pins):
+        temp1 = []
+        temp2 = []
+        for ssc in self._sessions_sites_channels:
+            sites_pins, pins, sites = common.channel_list_to_pins(ssc.channels)
+            try:
+                search_pos = int(requested_pins.index(pins[0]))
+            except ValueError:
+                search_pos = -1
+            if sites[0] >= 0 and search_pos >= 0:
+                temp1.append((sites[0], search_pos, ssc))
+            elif sites[0] < 0 and search_pos >= 0:
+                temp2.append((sites[0], search_pos, ssc))
+        temp1 = sorted(temp1)
+        temp2 = sorted(temp2)
+        dut_pins_ssc = [i[2] for i in temp1]
+        sys_pins_ssc = [i[2] for i in temp2]
+        filtered_ssc = dut_pins_ssc + sys_pins_ssc
+        return filtered_ssc
+
+
+class TSMDCPower(typing.NamedTuple):
+    pin_query_context: typing.Any
+    ssc: _NIDCPowerTSM
+    site_numbers: typing.List[int]
+    pins_info: typing.List[common.PinInformation]
+    pins_expanded: typing.List[common.ExpandedPinInformation]
+
 
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(
@@ -1050,12 +1089,55 @@ def initialize_sessions(
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions(tsm_context: _SemiconductorModuleContext, pins):
+def pins_to_sessions(tsm_context: _SemiconductorModuleContext,
+                     pins: typing.List[str],
+                     site_numbers: typing.List[int] = [],
+                     fill_pin_site_info=False):
+    if len(site_numbers) == 0:
+        site_numbers = list(tsm_context.site_numbers)
+    pins_expanded = []
+    pins_info = []
+    if fill_pin_site_info:
+        pins_info, pins_expanded = common.expand_pin_groups_and_identify_pin_types(tsm_context, pins)
+    else:
+        for pin in pins:
+            a = common.PinInformation  # create instance of class
+            a.pin = pin
+            pins_info.append(a)
+
     pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
-    # pins = nidevtools.common.get_all_pins(tsm_context)
-    pins = common.get_all_pins(tsm_context)
-    # sscs = [_NIDCPowerSSC(session, channel) for session, channel in zip(sessions, channel_lists)]
-    return
+    session_channel_list = common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, [])
+    sscs = [_NIDCPowerSSC(session, channel) for session, channel in zip(sessions, session_channel_list)]
+    dc_power_tsm = _NIDCPowerTSM(sscs)
+    return TSMDCPower(pin_query_context, dc_power_tsm, site_numbers, pins_info, pins_expanded)
+
+
+@nitsm.codemoduleapi.code_module
+def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
+    dc_power_tsm.ssc.filter_pins(desired_pins)
+    all_pins = common.get_pin_names_from_expanded_pin_information(dc_power_tsm.pins_expanded)
+    i = 0
+    pins_expand_new = []
+    for d_pin in desired_pins:
+        index_d = all_pins.index(d_pin)
+        data = dc_power_tsm.pins_expanded[index_d]
+        output = common.PinInformation(data.pin, data.type, 1)
+        data.index = i
+        dc_power_tsm.pins_info.append(output)
+        if index_d >= 0:
+            pins_expand_new.append(data)
+        i += 1
+    dut_pins, system_pins = common.get_dut_pins_and_system_pins_from_expanded_pin_list(pins_expand_new)
+    pins_to_query_ctx = common.get_pin_names_from_expanded_pin_information(dut_pins+system_pins)
+    dc_power_tsm.pin_query_context.Pins = pins_to_query_ctx
+    return dc_power_tsm
+
+
+@nitsm.codemoduleapi.code_module
+def filter_sites(dc_power_tsm: TSMDCPower, sites):
+    dc_power_tsm.ssc = dc_power_tsm.ssc.filter_sites(sites)
+    dc_power_tsm.site_numbers = sites
+    return dc_power_tsm
 
 
 @nitsm.codemoduleapi.code_module

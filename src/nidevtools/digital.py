@@ -962,7 +962,7 @@ def _ssc_stream_hram_results(ssc: typing.List[SSCDigital]):
             samples_to_read = sample_count - read_position
             cycle_information += (
                 _ssc.session.sites[_ssc.site_list]
-                .pins[pins]
+                .pins_info[pins]
                 .fetch_history_ram_cycle_information(read_position, samples_to_read)
             )
             read_position = sample_count

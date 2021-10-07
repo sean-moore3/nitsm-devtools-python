@@ -321,7 +321,7 @@ def misc(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
     assert per_site_data == [[True, True]] * 3
     per_instrument_to_per_site_per_pin_lut = (
         digital._ssc_calculate_per_instrument_to_per_site_per_pin_lut(
-            tsm.ssc, tsm.site_numbers, tsm.pins
+            tsm.ssc, tsm.site_numbers, tsm.pins_info
         )
     )
     per_site_per_pin_data = digital._apply_lut_per_instrument_to_per_site_per_pin(
@@ -344,7 +344,7 @@ def misc(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
         _,
         _,
     ) = digital._ssc_calculate_per_site_per_pin_to_per_instrument_lut(
-        tsm.ssc, tsm.site_numbers, tsm.pins
+        tsm.ssc, tsm.site_numbers, tsm.pins_info
     )
     per_instrument_data = digital._apply_lut_per_site_per_pin_to_per_instrument(
         [[0, 0, 0], [0, 0, 0]],
