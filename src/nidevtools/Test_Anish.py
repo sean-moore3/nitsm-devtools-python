@@ -8,3 +8,12 @@ print(output_data)
 pattern = r"/\\"
 a = re.split(r'[/\\]', input_data)
 # print(a)
+
+data = []
+for pin_count in range(10):
+    pin_str = [""]
+    pins_array = pin_str * pin_count
+    # cluster = {pins_array}
+    data.append(pins_array)
+
+print(data)
