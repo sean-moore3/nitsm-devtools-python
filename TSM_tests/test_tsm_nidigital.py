@@ -1,7 +1,8 @@
 import pytest
+from nidigital import enums
 # import os.path
 # from nitsm.pinquerycontexts import PinQueryContext
-# import src.nidevtools.digital
+import src.nidevtools.digital as dev_digital
 
 
 """The Following APIs/VIs are used in the DUT Power on sequence. 
@@ -21,7 +22,7 @@ So these functions needs to be test first.
 
 
 @pytest.fixture
-def standalone_tsm_session(standalone_tsm_context):
+def standalone_tsm_sessions(standalone_tsm_context):
     # instrument_names = standalone_tsm_context.get_all_nidigital_instrument_names()
     # sessions = [
     #     nidigital.Session(
@@ -38,8 +39,10 @@ def standalone_tsm_session(standalone_tsm_context):
 
 
 class TestTSMDigital:
-    def test_tsm_ssc_select_function(self):
-        assert 1 == 0
+    def test_tsm_ssc_select_function(self, standalone_tsm_context):
+        function_to_select = enums.SelectedFunction.DIGITAL
+        temp_tsm = dev_digital.tsm_ssc_select_function(standalone_tsm_context, function_to_select)
+        assert 1 == function_to_select
 
     def test_tsm_ssc_ppmu_source_voltage(self):
         assert 1 == 1
