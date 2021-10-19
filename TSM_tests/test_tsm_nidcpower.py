@@ -1,5 +1,5 @@
 import pytest
-import src.nidevtools.dcpower
+# import src.nidevtools.dcpower
 
 
 @pytest.fixture

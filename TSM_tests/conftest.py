@@ -9,6 +9,7 @@ _standalone_tsm_context_tlb = win32com.client.selecttlb.FindTlbsWithDescription(
     "NI TestStand Semiconductor Module Standalone Semiconductor Module Context"
 )[0]
 
+
 @pytest.fixture
 def _published_data_reader_factory(request):
     # get absolute path of the pin map file which is assumed to be relative to the test module
