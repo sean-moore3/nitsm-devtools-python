@@ -17,5 +17,3 @@ for pin_count in range(10):
     data.append(pins_array)
 
 print(data)
-
-print(5.0)

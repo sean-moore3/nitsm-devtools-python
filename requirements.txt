@@ -4,3 +4,4 @@ black
 nitsm~=0.1.0a0
 numpy~=1.19.5
 nidigital~=1.4.1
+digital~=0.0.1.3
