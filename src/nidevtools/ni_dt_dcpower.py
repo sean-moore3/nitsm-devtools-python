@@ -1056,7 +1056,7 @@ class TSMDCPower(typing.NamedTuple):
     pins_expanded: typing.List[ni_dt_common.ExpandedPinInformation]
 
 
-@nitsm.codemoduleapi.code_module
+#@nitsm.codemoduleapi.code_module
 def initialize_sessions(
         tsm_context: _SemiconductorModuleContext, power_line_frequency=60.0, **kwargs
 ):
