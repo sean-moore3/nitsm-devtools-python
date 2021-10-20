@@ -11,7 +11,6 @@ import os.path
 import nidigital
 import nidevtools.digital as digital
 
-#import digital_copy as digital
 
 
 # from nitsm.pinquerycontexts import PinQueryContext
