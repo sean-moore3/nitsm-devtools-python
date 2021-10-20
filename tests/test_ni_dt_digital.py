@@ -56,7 +56,7 @@ class TestNIDigital:
         queried_sessions = ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context)
         assert isinstance(queried_sessions, nidigital.Session)
 
-    def test_tsm_ssc_select_function(self, standalone_tsm_context):
+"""    def test_tsm_ssc_select_function(self, standalone_tsm_context):
         # function_to_select = enums.SelectedFunction.DIGITAL
         # temp_tsm = dev_digital.tsm_ssc_select_function(standalone_tsm_context, function_to_select)
         assert 1 == 1
@@ -84,7 +84,7 @@ class TestNIDigital:
 
     def test_tsm_ssc_n_pins_to_m_sessions(self):
         assert 1 == 1
-
+"""
 
 #  @pytest.mark.sequence_file("/nites/nidigital.seq")
 #  def test_nidigital(system_test_runner):

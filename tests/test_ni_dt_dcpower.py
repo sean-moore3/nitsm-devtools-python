@@ -30,13 +30,13 @@ def simulated_tsm_nidcpower_sessions(standalone_tsm_context):
     # )
     # yield ni_dt_dcpower.pins_to_sessions(standalone_tsm_context, ["DUTPin1", "DUTPin2"])
     # ni_dt_dcpower.close_sessions(standalone_tsm_context)
-    resource_strings = standalone_tsm_context.get_all_nidcpower_resource_strings()
+    instrument_names = standalone_tsm_context.get_all_nidcpower_instrument_names()
     sessions = [
-        nidcpower.Session(resource_string, options=OPTIONS)
-        for resource_string in resource_strings
+        nidcpower.Session(instrument_name, options=OPTIONS)
+        for instrument_name in instrument_names
     ]
-    for resource_string, session in zip(resource_strings, sessions):
-        standalone_tsm_context.set_nidcpower_session(resource_string, session)
+    for instrument_name, session in zip(instrument_names, sessions):
+        standalone_tsm_context.set_nidcpower_session(instrument_name, session)
     yield sessions
     for session in sessions:
         session.close()
@@ -55,7 +55,7 @@ class TestDCPower:
         queried_sessions = ni_dt_dcpower.initialize_sessions(standalone_tsm_context)
         assert isinstance(queried_sessions, nidcpower.Session)
 
-    def test_dummy(self, simulated_tsm_nidcpower_sessions):
+"""    def test_dummy(self, simulated_tsm_nidcpower_sessions):
         pass
 
     def test_abort(self, simulated_tsm_nidcpower_sessions):
@@ -75,3 +75,4 @@ class TestDCPower:
 
     def test_query_in_compliance(self, simulated_tsm_nidcpower_sessions):
         simulated_tsm_nidcpower_sessions.query_in_compliance()
+"""

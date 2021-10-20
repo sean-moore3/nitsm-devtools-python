@@ -1089,7 +1089,7 @@ def initialize_sessions(
 
         # set session in the tsm context
         tsm_context.set_nidcpower_session(resource_string, session)
-    return
+    return session
 
 
 @nitsm.codemoduleapi.code_module
