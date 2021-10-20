@@ -1744,7 +1744,7 @@ def tsm_close_sessions(tsm_context: SemiconductorModuleContext):
         session.close()
 
 
-def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, option_string: str = ""):
+def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: dict = {}):
     instrument_names = tsm_context.get_all_nidigital_instrument_names()
     if instrument_names:
         pin_map_file_path = tsm_context.pin_map_file_path
@@ -1755,7 +1755,7 @@ def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, option_stri
         # source_waveform_file_paths = tsm_context.nidigital_project_source_waveform_file_paths
         # capture_waveform_file_paths = tsm_context.nidigital_project_capture_waveform_file_paths
         for instrument_name in instrument_names:
-            session = nidigital.Session(instrument_name, options=option_string)
+            session = nidigital.Session(instrument_name, options=options)
             tsm_context.set_nidigital_session(instrument_name, session)
             session.load_pin_map(pin_map_file_path)
             # session.load_specifications_levels_and_timing(

@@ -1,13 +1,13 @@
 import pytest
 import typing
 import os
+import os.path
 import math
 import numpy
 import nitsm.codemoduleapi
 from nidigital import enums
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 from nitsm.codemoduleapi import SemiconductorModuleContext
-import os.path
 import nidigital
 import nidevtools.ni_dt_digital as ni_dt_digital
 # from nitsm.pinquerycontexts import PinQueryContext
@@ -27,7 +27,7 @@ So these functions needs to be test first.
 
 """
 
-OPTIONS = "Simulate = true, DriverSetup = Model : 6570"
+OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6570"}}
 
 @pytest.fixture
 def simulated_nidigital_sessions(standalone_tsm_context):
@@ -91,8 +91,6 @@ class TestNIDigital:
 #  @pytest.mark.sequence_file("/nites/nidigital.seq")
 #  def test_nidigital(system_test_runner):
 #    assert system_test_runner.run()
-
-
 
 
 #@pytest.fixture
