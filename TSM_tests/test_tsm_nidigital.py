@@ -2,7 +2,7 @@ import pytest
 from nidigital import enums
 # import os.path
 # from nitsm.pinquerycontexts import PinQueryContext
-import src.nidevtools.digital as dev_digital
+import src.nidevtools.ni_dt_digital as dev_digital
 
 
 """The Following APIs/VIs are used in the DUT Power on sequence. 

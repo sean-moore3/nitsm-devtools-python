@@ -7,7 +7,7 @@ from nidcpower.enums import *
 import nidcpower.errors
 import nitsm.codemoduleapi
 # import nidevtools.common
-import common
+import ni_dt_common
 
 from datetime import datetime
 
@@ -286,7 +286,8 @@ class _NIDCPowerSSC:
         actual_aperture_time = self._channels_session.aperture_time_units
         if match in all_supported_models + ["4112", "4113", "4132"]:
             if self._channels_session.aperture_time_units == ApertureTimeUnits.POWER_LINE_CYCLES:
-                actual_aperture_time = self._channels_session.aperture_time_units / self._channels_session.power_line_frequency
+                actual_aperture_time = self._channels_session.aperture_time_units / \
+                                       self._channels_session.power_line_frequency
 
         if match in ["4110", "4130"]:
             actual_aperture_time = self._channels_session.samples_to_average / 3000
@@ -618,7 +619,8 @@ class _NIDCPowerTSM:
     def sessions_sites_channels(self):
         return self._sessions_sites_channels
 
-    def _configure_settings_array(self, aperture_times, source_delays, senses, aperture_time_units, transient_responses):
+    def _configure_settings_array(self, aperture_times, source_delays, senses, aperture_time_units,
+                                  transient_responses):
         for (ssc, aperture_time, source_delay, sense, aperture_time_unit,
              transient_response) in zip(self._sessions_sites_channels, aperture_times, source_delays, senses,
                                         aperture_time_units, transient_responses):
@@ -691,7 +693,8 @@ class _NIDCPowerTSM:
         current_level_ranges = self._expand_to_requested_array_size(current_level_range, size)
         voltage_limits = self._expand_to_requested_array_size(voltage_limit, size)
         voltage_limit_ranges = self._expand_to_requested_array_size(voltage_limit_range, size)
-        self._force_current_symmetric_limits_array(current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges)
+        self._force_current_symmetric_limits_array(current_levels, current_level_ranges, voltage_limits,
+                                                   voltage_limit_ranges)
 
     def _force_voltage_asymmetric_limits(self, voltage_level, voltage_level_range, current_limit_high,
                                          current_limit_low, current_limit_range):
@@ -971,7 +974,8 @@ class _NIDCPowerTSM:
         current_level_ranges = self._expand_array_to_sessions(current_level_range)
         voltage_limits = self._expand_array_to_sessions(voltage_limit)
         voltage_limit_ranges = self._expand_array_to_sessions(voltage_limit_range)
-        self._force_current_symmetric_limits_array(current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges)
+        self._force_current_symmetric_limits_array(current_levels, current_level_ranges, voltage_limits,
+                                                   voltage_limit_ranges)
 
     def force_voltage_asymmetric_limits(self, voltage_level, voltage_level_range, current_limit_high,
                                         current_limit_low, current_limit_range):
@@ -1016,7 +1020,7 @@ class _NIDCPowerTSM:
         filtered_ssc = []
         for ssc in self._sessions_sites_channels:
             found = False
-            sites = common.channel_list_to_pins(ssc.channels)[2]
+            sites = ni_dt_common.channel_list_to_pins(ssc.channels)[2]
             for s in sites:
                 found = (s in requested_sites) or found
             if found:
@@ -1027,14 +1031,14 @@ class _NIDCPowerTSM:
         temp1 = []
         temp2 = []
         for ssc in self._sessions_sites_channels:
-            sites_pins, pins, sites = common.channel_list_to_pins(ssc.channels)
+            sites_pins, pins, sites = ni_dt_common.channel_list_to_pins(ssc.channels)
             try:
                 search_pos = int(requested_pins.index(pins[0]))
             except ValueError:
                 search_pos = -1
             if sites[0] >= 0 and search_pos >= 0:
                 temp1.append((sites[0], search_pos, ssc))
-            elif sites[0] < 0 and search_pos >= 0:
+            elif (sites[0] < 0) and (search_pos >= 0):
                 temp2.append((sites[0], search_pos, ssc))
         temp1 = sorted(temp1)
         temp2 = sorted(temp2)
@@ -1048,8 +1052,8 @@ class TSMDCPower(typing.NamedTuple):
     pin_query_context: typing.Any
     ssc: _NIDCPowerTSM
     site_numbers: typing.List[int]
-    pins_info: typing.List[common.PinInformation]
-    pins_expanded: typing.List[common.ExpandedPinInformation]
+    pins_info: typing.List[ni_dt_common.PinInformation]
+    pins_expanded: typing.List[ni_dt_common.ExpandedPinInformation]
 
 
 @nitsm.codemoduleapi.code_module
@@ -1091,22 +1095,22 @@ def initialize_sessions(
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(tsm_context: _SemiconductorModuleContext,
                      pins: typing.List[str],
-                     site_numbers: typing.List[int] = [],
+                     site_numbers: typing.List[int],
                      fill_pin_site_info=False):
     if len(site_numbers) == 0:
         site_numbers = list(tsm_context.site_numbers)
     pins_expanded = []
     pins_info = []
     if fill_pin_site_info:
-        pins_info, pins_expanded = common.expand_pin_groups_and_identify_pin_types(tsm_context, pins)
+        pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(tsm_context, pins)
     else:
         for pin in pins:
-            a = common.PinInformation  # create instance of class
+            a = ni_dt_common.PinInformation  # create instance of class
             a.pin = pin
             pins_info.append(a)
 
     pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
-    session_channel_list = common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, [])
+    session_channel_list = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, [])
     sscs = [_NIDCPowerSSC(session, channel) for session, channel in zip(sessions, session_channel_list)]
     dc_power_tsm = _NIDCPowerTSM(sscs)
     return TSMDCPower(pin_query_context, dc_power_tsm, site_numbers, pins_info, pins_expanded)
@@ -1115,20 +1119,20 @@ def pins_to_sessions(tsm_context: _SemiconductorModuleContext,
 @nitsm.codemoduleapi.code_module
 def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
     dc_power_tsm.ssc.filter_pins(desired_pins)
-    all_pins = common.get_pin_names_from_expanded_pin_information(dc_power_tsm.pins_expanded)
+    all_pins = ni_dt_common.get_pin_names_from_expanded_pin_information(dc_power_tsm.pins_expanded)
     i = 0
     pins_expand_new = []
     for d_pin in desired_pins:
         index_d = all_pins.index(d_pin)
         data = dc_power_tsm.pins_expanded[index_d]
-        output = common.PinInformation(data.pin, data.type, 1)
+        output = ni_dt_common.PinInformation(data.pin, data.type, 1)
         data.index = i
         dc_power_tsm.pins_info.append(output)
         if index_d >= 0:
             pins_expand_new.append(data)
         i += 1
-    dut_pins, system_pins = common.get_dut_pins_and_system_pins_from_expanded_pin_list(pins_expand_new)
-    pins_to_query_ctx = common.get_pin_names_from_expanded_pin_information(dut_pins+system_pins)
+    dut_pins, system_pins = ni_dt_common.get_dut_pins_and_system_pins_from_expanded_pin_list(pins_expand_new)
+    pins_to_query_ctx = ni_dt_common.get_pin_names_from_expanded_pin_information(dut_pins + system_pins)
     dc_power_tsm.pin_query_context.Pins = pins_to_query_ctx
     return dc_power_tsm
 

@@ -1,15 +1,15 @@
 import pytest
 import nidcpower
-import dcpower
+import nidevtools.ni_dt_dcpower as ni_dt_dcpower
 
 
 @pytest.fixture
 def nidcpower_tsm(standalone_tsm_context):
-    nidevtools.dcpower.initialize_sessions(
+    ni_dt_dcpower.initialize_sessions(
         standalone_tsm_context, options={"Simulate": True, "DriverSetup": {"Model": "4162"}}
     )
-    yield nidevtools.dcpower.pins_to_sessions(standalone_tsm_context, ["DUTPin1", "DUTPin2"])
-    nidevtools.dcpower.close_sessions(standalone_tsm_context)
+    yield ni_dt_dcpower.pins_to_sessions(standalone_tsm_context, ["DUTPin1", "DUTPin2"])
+    ni_dt_dcpower.close_sessions(standalone_tsm_context)
 
 
 @pytest.mark.pin_map("nidcpower.pinmap")
@@ -32,5 +32,5 @@ class TestDCPower:
     # def test_reset(tsm):
     #     tsm.reset()
 
-    def test_query_in_compliance(tsm):
-        tsm.query_in_compliance()
+    def test_query_in_compliance(self, nidcpower_tsm):
+        nidcpower_tsm.query_in_compliance()
