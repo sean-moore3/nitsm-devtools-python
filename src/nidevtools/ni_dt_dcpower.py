@@ -6,8 +6,8 @@ import nidcpower
 from nidcpower.enums import *
 import nidcpower.errors
 import nitsm.codemoduleapi
-# import nidevtools.common
-import ni_dt_common
+import nidevtools.ni_dt_common as ni_dt_common
+
 
 from datetime import datetime
 
