@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PinMap schemaVersion="1.6" xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<Instruments>
-		<NIDCPowerInstrument name="DCPower1" numberOfChannels="12">
-			<ChannelGroup name="ChannelGroup1" channels="0-5" />
-			<ChannelGroup name="ChannelGroup2" channels="6-11" />
+		<NIDCPowerInstrument name="DCPower1" numberOfChannels="4">
+			<ChannelGroup name="ChannelGroup1" channels="0-1" />
+			<ChannelGroup name="ChannelGroup2" channels="2-3" />
 		</NIDCPowerInstrument>
-		<NIDCPowerInstrument name="DCPower2" numberOfChannels="12">
-			<ChannelGroup name="ChannelGroup1" channels="0-5" />
-			<ChannelGroup name="ChannelGroup2" channels="6-11" />
+		<NIDCPowerInstrument name="DCPower2" numberOfChannels="4">
+			<ChannelGroup name="ChannelGroup1" channels="0-1" />
+			<ChannelGroup name="ChannelGroup2" channels="2-3" />
 		</NIDCPowerInstrument>
 	</Instruments>
 	<Pins>
@@ -26,9 +26,9 @@
 	</Sites>
 	<Connections>
 		<Connection pin="DUTPin1" siteNumber="0" instrument="DCPower1" channel="0" />
-		<Connection pin="DUTPin1" siteNumber="1" instrument="DCPower1" channel="6" />
+		<Connection pin="DUTPin1" siteNumber="1" instrument="DCPower1" channel="1" />
 		<Connection pin="DUTPin2" siteNumber="0" instrument="DCPower2" channel="0" />
-		<Connection pin="DUTPin2" siteNumber="1" instrument="DCPower2" channel="6" />
-		<SystemConnection pin="SystemPin1" instrument="DCPower1" channel="1" />
+		<Connection pin="DUTPin2" siteNumber="1" instrument="DCPower2" channel="1" />
+		<SystemConnection pin="SystemPin1" instrument="DCPower1" channel="2" />
 	</Connections>
 </PinMap>

@@ -26,7 +26,7 @@ OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
 @pytest.fixture
 def simulated_tsm_nidcpower_sessions(standalone_tsm_context):
     # ni_dt_dcpower.initialize_sessions(
-    #    standalone_tsm_context, options={"Simulate": True, "DriverSetup": {"Model": "4162"}}
+    #    standalone_tsm_context, options=OPTIONS
     # )
     # yield ni_dt_dcpower.pins_to_sessions(standalone_tsm_context, ["DUTPin1", "DUTPin2"])
     # ni_dt_dcpower.close_sessions(standalone_tsm_context)
@@ -42,8 +42,8 @@ def simulated_tsm_nidcpower_sessions(standalone_tsm_context):
         session.close()
 
 
+# @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 @pytest.mark.pin_map("nidcpower.pinmap")
-@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestDCPower:
     pin_map_instruments = ["DCPower1", "DCPower2"]
     pin_map_dut_pins = ["DUTPin1", "DUTPin2"]

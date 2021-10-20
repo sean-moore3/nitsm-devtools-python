@@ -33,9 +33,7 @@ OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6570"}}
 def simulated_nidigital_sessions(standalone_tsm_context):
     instrument_names = standalone_tsm_context.get_all_nidigital_instrument_names()
     sessions = [
-        nidigital.Session(
-            instrument_name, options={"Simulate": True, "driver_setup": {"Model": "6570"}}
-        )
+        nidigital.Session(instrument_name, options=OPTIONS)
         for instrument_name in instrument_names
     ]
     for instrument_name, session in zip(instrument_names, sessions):
