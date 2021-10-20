@@ -12,6 +12,21 @@ import nidigital
 import nidevtools.ni_dt_digital as ni_dt_digital
 
 
+"""The Following APIs/VIs are used in the DUT Power on sequence. 
+So these functions needs to be test first.
+
+# TSM SSC Digital Select Function.vi
+# TSM SSC Digital PPMU Source Voltage.vi
+# TSM SSC Digital Burst Pattern [Pass Fail].vi
+# TSM SSC Digital Apply Levels and Timing.vi
+# TSM SSC Digital Configure Time Set Period.vi
+# TSM SSC Digital Write Sequencer Register.vi
+# TSM SSC Digital Write Source Waveform [Broadcast].vi
+# TSM SSC Digital Write Static.vi
+# TSM SSC Digital N Pins To M Sessions.vi
+
+"""
+
 
 # from nitsm.pinquerycontexts import PinQueryContext
 
@@ -46,6 +61,35 @@ class TestNIDigital:
     def test_open_sessions(self, standalone_tsm_context):
         queried_sessions = ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context)
         assert isinstance(queried_sessions, nidigital.Session)
+
+    def test_tsm_ssc_select_function(self, standalone_tsm_context):
+        # function_to_select = enums.SelectedFunction.DIGITAL
+        # temp_tsm = dev_digital.tsm_ssc_select_function(standalone_tsm_context, function_to_select)
+        assert 1 == 1
+
+    def test_tsm_ssc_ppmu_source_voltage(self):
+        assert 1 == 1
+
+    def test_tsm_ssc_burst_pattern_pass_fail(self):
+        assert 1 == 1
+
+    def test_tsm_ssc_apply_levels_and_timing(self):
+        assert 1 == 1
+
+    def test_tsm_ssc_configure_time_set_period(self):
+        assert 1 == 1
+
+    def test_tsm_ssc_write_sequencer_register(self):
+        assert 1 == 1
+
+    def test_tsm_ssc_write_source_waveform_broadcast(self):
+        assert 1 == 1
+
+    def test_tsm_ssc_write_static(self):
+        assert 1 == 1
+
+    def test_tsm_ssc_n_pins_to_m_sessions(self):
+        assert 1 == 1
 
 
 #  @pytest.mark.sequence_file("/nites/nidigital.seq")
