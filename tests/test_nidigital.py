@@ -9,9 +9,9 @@ from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import os.path
 import nidigital
-#import src.nidevtools.digital as digital
+import nidevtools.digital as digital
 
-import digital_copy as digital
+#import digital_copy as digital
 
 
 # from nitsm.pinquerycontexts import PinQueryContext
@@ -24,7 +24,7 @@ def simulated_nidigital_sessions(standalone_tsm_context):
     instrument_names = standalone_tsm_context.get_all_nidigital_instrument_names()
     sessions = [
         nidigital.Session(
-            instrument_name, options={"Simulate": True, "driver_setup": {"Model": "6571"}}
+            instrument_name, options={"Simulate": True, "driver_setup": {"Model": "6570"}}
         )
         for instrument_name in instrument_names
     ]
