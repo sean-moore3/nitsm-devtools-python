@@ -10,7 +10,7 @@ from nitsm.codemoduleapi import SemiconductorModuleContext
 import os.path
 import nidigital
 import nidevtools.ni_dt_digital as ni_dt_digital
-
+# from nitsm.pinquerycontexts import PinQueryContext
 
 """The Following APIs/VIs are used in the DUT Power on sequence. 
 So these functions needs to be test first.
@@ -27,11 +27,7 @@ So these functions needs to be test first.
 
 """
 
-
-# from nitsm.pinquerycontexts import PinQueryContext
-
 OPTIONS = "Simulate = true, DriverSetup = Model : 6570"
-
 
 @pytest.fixture
 def simulated_nidigital_sessions(standalone_tsm_context):

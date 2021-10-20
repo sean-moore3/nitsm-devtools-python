@@ -18,6 +18,7 @@ So these functions needs to be test first.
 
 """
 
+OPTIONS = "Simulate = True, DriverSetup = Model : 4162"
 
 @pytest.fixture
 def nidcpower_tsm(standalone_tsm_context):
@@ -30,6 +31,12 @@ def nidcpower_tsm(standalone_tsm_context):
 
 @pytest.mark.pin_map("nidcpower.pinmap")
 class TestDCPower:
+
+
+    def test_open_sessions(self, standalone_tsm_context):
+        queried_sessions = ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context)
+        assert isinstance(queried_sessions, nidigital.Session)
+
     def test_dummy(self, nidcpower_tsm):
         pass
 
