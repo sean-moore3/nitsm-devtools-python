@@ -3,22 +3,60 @@ import typing
 import os
 import math
 import numpy
-import digital
 import nitsm.codemoduleapi
 from nidigital import enums
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 from nitsm.codemoduleapi import SemiconductorModuleContext
+import os.path
+import nidigital
+#import src.nidevtools.digital as digital
+
+import digital_copy as digital
 
 
-OPTIONS = "Simulate = true, DriverSetup = Model : 6570"
+# from nitsm.pinquerycontexts import PinQueryContext
+
+OPTIONS = "Simulaste = true, DriverSetup = Model : 6570"
 
 
-@pytest.mark.sequence_file("nidigital.seq")
-def test_nidigital(system_test_runner):
-    assert system_test_runner.run()
+@pytest.fixture
+def simulated_nidigital_sessions(standalone_tsm_context):
+    instrument_names = standalone_tsm_context.get_all_nidigital_instrument_names()
+    sessions = [
+        nidigital.Session(
+            instrument_name, options={"Simulate": True, "driver_setup": {"Model": "6571"}}
+        )
+        for instrument_name in instrument_names
+    ]
+    for instrument_name, session in zip(instrument_names, sessions):
+        standalone_tsm_context.set_nidigital_session(instrument_name, session)
+    yield sessions
+    for session in sessions:
+        session.close()
 
 
-@nitsm.codemoduleapi.code_module
+@pytest.mark.pin_map("nidigital.pinmap")
+class TestNIDigital:
+    pin_map_instruments = ["DigitalPattern1", "DigitalPattern2"]
+    pin_map_dut_pins = ["DUTPin1", "DUTPin2"]
+    pin_map_system_pins = ["SystemPin1"]
+    # pin_map_file_path = "C://G//nitsm-devtools-python//tests//supporting_materials//nidigital.pinmap"
+    pin_map_file_path = os.path.join(os.path.dirname(__file__), "nidigital.pinmap")
+
+
+    def test_open_sessions(self, standalone_tsm_context):
+        queried_sessions = digital.tsm_initialize_sessions(standalone_tsm_context)
+        assert isinstance(queried_sessions, nidigital.Session)
+
+
+#  @pytest.mark.sequence_file("/nites/nidigital.seq")
+#  def test_nidigital(system_test_runner):
+#    assert system_test_runner.run()
+
+
+
+
+#@pytest.fixture
 def open_sessions(tsm_context: SemiconductorModuleContext):
     digital.tsm_initialize_sessions(tsm_context, OPTIONS)
 

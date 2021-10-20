@@ -4,7 +4,7 @@ import os
 import niscope
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext
-import scope
+import _scope as scope
 
 
 OPTIONS = "Simulate = true, DriverSetup = Model : 5122"
