@@ -16,7 +16,7 @@ import digital_copy as digital
 
 # from nitsm.pinquerycontexts import PinQueryContext
 
-OPTIONS = "Simulaste = true, DriverSetup = Model : 6570"
+OPTIONS = "Simulate = true, DriverSetup = Model : 6570"
 
 
 @pytest.fixture
