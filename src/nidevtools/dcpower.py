@@ -1056,11 +1056,12 @@ class TSMDCPower(typing.NamedTuple):
     pins_expanded: typing.List[ni_dt_common.ExpandedPinInformation]
 
 
-# @nitsm.codemoduleapi.code_module
+@nitsm.codemoduleapi.code_module
 def initialize_sessions(
         tsm_context: _SemiconductorModuleContext, power_line_frequency=60.0, **kwargs
 ):
-    """Todo(smooresni): Future docstring."""
+    """Creates the sessions for all the nidcpower resource string
+    available in the tsm_context"""
     # cache kwargs
     reset = kwargs["reset"] if "reset" in kwargs.keys() else False
     options = kwargs["options"] if "options" in kwargs.keys() else {}
@@ -1089,14 +1090,14 @@ def initialize_sessions(
 
         # set session in the tsm context
         tsm_context.set_nidcpower_session(resource_string, session)
-    return session
+    return
 
 
-@nitsm.codemoduleapi.code_module
+# @nitsm.codemoduleapi.code_module
 def pins_to_sessions(tsm_context: _SemiconductorModuleContext,
                      pins: typing.List[str],
                      site_numbers: typing.List[int],
-                     fill_pin_site_info=False):
+                     fill_pin_site_info=True):
     if len(site_numbers) == 0:
         site_numbers = list(tsm_context.site_numbers)
     pins_expanded = []

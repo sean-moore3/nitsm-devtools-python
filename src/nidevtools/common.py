@@ -82,7 +82,7 @@ def channel_list_to_pins(channel_list: str):
     return sites_and_pins, sites, pins
 
 
-@nitsm.codemoduleapi.code_module
+# @nitsm.codemoduleapi.code_module
 def get_all_pins(tsm_context: _SemiconductorModuleContext, reload_cache=False):
     """todo(smooresni): Future docstring."""
     global _pins, _pin_types
@@ -91,19 +91,20 @@ def get_all_pins(tsm_context: _SemiconductorModuleContext, reload_cache=False):
         dut_pin_names, system_pin_names = tsm_context.get_pin_names()
         _pins = []  # reset to empty list in case reload_cache is true
         # _pins.extend(DutPin(dut_pin_name) for dut_pin_name in dut_pin_names)
-        _pins = [DutPin(dut_pin_name) for dut_pin_name in dut_pin_names]
-        _pins.extend([SystemPin(system_pin_name) for system_pin_name in system_pin_names])
+        # _pins = [DutPin(dut_pin_name) for dut_pin_name in dut_pin_names] # disabled the class wrapper
+        # _pins.extend([SystemPin(system_pin_name) for system_pin_name in system_pin_names]) # disabled the classwrapper
+        _pins = dut_pin_names + system_pin_names
         _pin_types = [PinType.DUT_PIN] * len(dut_pin_names)
         _pin_types.extend(([PinType.SYSTEM_PIN] * len(system_pin_names)))
     return _pins, _pin_types
 
 
-@nitsm.codemoduleapi.code_module
+# @nitsm.codemoduleapi.code_module
 def get_pin_names_from_expanded_pin_information(expanded_pin_info: typing.List[ExpandedPinInformation]):
     return [pin_info.pin for pin_info in expanded_pin_info]
 
 
-@nitsm.codemoduleapi.code_module
+# @nitsm.codemoduleapi.code_module
 def get_dut_pins_and_system_pins_from_expanded_pin_list(expanded_pin_info: typing.List[ExpandedPinInformation]):
     dut_pins = []
     system_pins = []
@@ -115,7 +116,7 @@ def get_dut_pins_and_system_pins_from_expanded_pin_list(expanded_pin_info: typin
     return dut_pins, system_pins
 
 
-@nitsm.codemoduleapi.code_module
+# @nitsm.codemoduleapi.code_module
 def expand_pin_groups_and_identify_pin_types(tsm_context: _SemiconductorModuleContext, pins_in):
     pins_temp, pin_types_temp = get_all_pins(tsm_context)
     pin_type_out = []
@@ -146,13 +147,17 @@ def expand_pin_groups_and_identify_pin_types(tsm_context: _SemiconductorModuleCo
                 pin_type_ex_out.append(a_pin_type)
         i += 1
 
-    pins_info = zip(pins_in, pin_type_out, count_out)
-    pins_expanded = zip(pins_out, pin_type_ex_out, index_out)
+    # pins_info = zip(pins_in, pin_type_out, count_out)
+    pins_info = [PinInformation(pin, p_type, count) for (pin, p_type, count) in (pins_in, pin_type_out, count_out)]
+    # pins_expanded = zip(pins_out, pin_type_ex_out, index_out)
+    pins_expanded = [ExpandedPinInformation(pin, p_type, index_d) for (pin, p_type, index_d) in (pins_out,
+                                                                                                 pin_type_ex_out,
+                                                                                                 index_out)]
     pins_expanded = remove_duplicates_from_tsm_pin_information_array(pins_info, pins_expanded)
     return pins_info, pins_expanded
 
 
-@nitsm.codemoduleapi.code_module
+# @nitsm.codemoduleapi.code_module
 def remove_duplicates_from_tsm_pin_information_array(pins_info: typing.List[PinInformation],
                                                      pins_expanded: typing.List[ExpandedPinInformation]):
     temp_pins = []
@@ -169,7 +174,7 @@ def remove_duplicates_from_tsm_pin_information_array(pins_info: typing.List[PinI
     return temp_pins_expanded
 
 
-@nitsm.codemoduleapi.code_module
+# @nitsm.codemoduleapi.code_module
 def select_between_expanded_pin_information_options(current: ExpandedPinInformation,
                                                     duplicate: ExpandedPinInformation,
                                                     pin_group_info: typing.List[PinInformation]):
@@ -183,7 +188,7 @@ def select_between_expanded_pin_information_options(current: ExpandedPinInformat
     return best_choice
 
 
-@nitsm.codemoduleapi.code_module
+# @nitsm.codemoduleapi.code_module
 def pin_query_context_to_channel_list(pin_query_context: typing.Any,
                                       expanded_pin_info: typing.List[ExpandedPinInformation],
                                       site_numbers: typing.List[int]):
@@ -230,7 +235,7 @@ def pin_query_context_to_channel_list(pin_query_context: typing.Any,
     return per_session_channel_list, site_numbers
 
 
-@nitsm.codemoduleapi.code_module
+# @nitsm.codemoduleapi.code_module
 def identify_pin_types(tsm_context, pins):
     all_pins, all_pin_types = get_all_pins(tsm_context)
     pin_group_found = False
