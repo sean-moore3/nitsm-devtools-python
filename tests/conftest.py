@@ -30,8 +30,7 @@ def standalone_tsm_context(_published_data_reader_factory):
 # @pytest.fixture
 # def standalone_tsm_context(standalone_tsm_context_com_object):
 #    return nitsm.codemoduleapi.SemiconductorModuleContext(standalone_tsm_context_com_object)
-
-
+#
 # @pytest.fixture
 # def standalone_tsm_context_com_object(_published_data_reader_factory):
 #    return _published_data_reader_factory[0]
