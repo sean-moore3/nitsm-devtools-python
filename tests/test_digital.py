@@ -9,7 +9,7 @@ from nidigital import enums
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import nidigital
-import nidevtools.ni_dt_digital as ni_dt_digital
+import nidevtools.digital as ni_dt_digital
 # from nitsm.pinquerycontexts import PinQueryContext
 
 """The Following APIs/VIs are used in the DUT Power on sequence. 

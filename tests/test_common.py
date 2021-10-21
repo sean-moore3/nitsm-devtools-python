@@ -1,4 +1,4 @@
-import nidevtools.ni_dt_common as ni_dt_common
+import nidevtools.common as ni_dt_common
 import re
 
 # This file is used for testing some common functions

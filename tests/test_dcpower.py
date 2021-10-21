@@ -2,7 +2,7 @@ import pytest
 # import os
 import os.path
 import nidcpower
-import nidevtools.ni_dt_dcpower as ni_dt_dcpower
+import nidevtools.dcpower as ni_dt_dcpower
 
 """The Following APIs/VIs are used in the DUT Power on sequence. 
 So these functions needs to be test first.
