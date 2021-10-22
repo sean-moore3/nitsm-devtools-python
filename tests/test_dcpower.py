@@ -6,14 +6,16 @@ import nidevtools.dcpower as ni_dt_dc_power
 
 OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
 
+
 @pytest.fixture
-def tsm_context_nidcpower(standalone_tsm_context):
+def tsm_context(standalone_tsm_context):
     ni_dt_dc_power.initialize_sessions(standalone_tsm_context)
     yield standalone_tsm_context
     ni_dt_dc_power.close_sessions(standalone_tsm_context)
 
+
 @pytest.fixture
-def tsm_ssc_nidcpower_pins(tsm_context_nidcpower, pins):
+def dcpower_tsm(tsm_context, pins):
     # ni_dt_dc_power.initialize_sessions(
     #    standalone_tsm_context, options=OPTIONS
     # )
@@ -21,62 +23,91 @@ def tsm_ssc_nidcpower_pins(tsm_context_nidcpower, pins):
     #                                       fill_pin_site_info=True)
     # yield ni_dt_tsm
     # ni_dt_dc_power.close_sessions(standalone_tsm_context)
-    return tsm_context_nidcpower
+    return tsm_context
+
+
+@pytest.fixture
+def dcpower_ssc(dcpower_tsm):
+    return dcpower_tsm
 
 
 @pytest.mark.pin_map("nidcpower.pinmap")
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestDCPower:
+    """
+    The Following APIs/VIs are used in the DUT Power on sequence.
+    So these functions needs to be test first.
+    """
 
-    def test_initialize_session(self, tsm_context_nidcpower):
-        queried_sessions = list(tsm_context_nidcpower.get_all_nidcpower_sessions())
+    def test_initialize_session(self, tsm_context):
+        """ This Api is used in the Init routine"""
+        queried_sessions = list(tsm_context.get_all_nidcpower_sessions())
         for session in queried_sessions:
             assert isinstance(session, nidcpower.Session)
-        assert len(queried_sessions) == len(tsm_context_nidcpower.get_all_nidcpower_resource_strings())
+        assert len(queried_sessions) == len(tsm_context.get_all_nidcpower_resource_strings())
 
     @pytest.mark.skip
-    def test_pin_to_sessions(self, tsm_context_nidcpower):
-        for session in tsm_context_nidcpower:
+    def test_pin_to_sessions(self, dcpower_tsm):
+        """ TSM SSC DCPower Pins to Sessions.vi """
+        for session in dcpower_tsm:
             assert isinstance(session, nidcpower.Session)
 
     @pytest.mark.skip
-    def test_initiate(self, tsm_ssc_nidcpower_pins):
-        tsm_ssc_nidcpower_pins.initiate()
+    def test_get_max_current(self, dcpower_tsm):
+        """TSM DC Power Get Max Current.vi"""
+        dcpower_tsm.get_max_current()
 
     @pytest.mark.skip
-    def test_commit(self, tsm_ssc_nidcpower_pins):
-        tsm_ssc_nidcpower_pins.commit()
+    def test_configure_settings(self, dcpower_tsm):
+        """  TSM SSC DCPower Configure Settings.vim"""
+        dcpower_tsm.configure_settings()
 
     @pytest.mark.skip
-    def test_reset(self, tsm_ssc_nidcpower_pins):
-        tsm_ssc_nidcpower_pins.reset()
+    def test_abort(self, dcpower_tsm):
+        """# TSM SSC DCPower Measure.vi"""
+        dcpower_tsm.abort()
 
     @pytest.mark.skip
-    def test_abort(self, tsm_ssc_nidcpower_pins):
-        tsm_ssc_nidcpower_pins.abort()
+    def test_abort(self, dcpower_tsm):
+        """# TSM SSC DCPower Source Current.vim"""
+        dcpower_tsm.abort()
 
     @pytest.mark.skip
-    def test_query_in_compliance(self, tsm_ssc_nidcpower_pins):
-        tsm_ssc_nidcpower_pins.query_in_compliance()
+    def test_abort(self, dcpower_tsm):
+        """# TSM SSC DCPower Source Voltage.vim"""
+        dcpower_tsm.abort()
+
+    @pytest.mark.skip
+    def test_abort(self, dcpower_tsm):
+        """# SSC DCPower Reset Channels.vi"""
+        dcpower_tsm.abort()
+
+    @pytest.mark.skip
+    def test_abort(self, dcpower_tsm):
+        """# SSC DCPower Source Current.vim"""
+        dcpower_tsm.abort()
+
+    @pytest.mark.skip
+    def test_query_in_compliance(self, dcpower_tsm):
+        dcpower_tsm.query_in_compliance()
+
+    @pytest.mark.skip
+    def test_initiate(self, dcpower_tsm):
+        dcpower_tsm.initiate()
+
+    @pytest.mark.skip
+    def test_commit(self, dcpower_tsm):
+        dcpower_tsm.commit()
+
+    @pytest.mark.skip
+    def test_reset(self, dcpower_tsm):
+        dcpower_tsm.reset()
+
+    @pytest.mark.skip
+    def test_abort(self, dcpower_tsm):
+        dcpower_tsm.abort()
 
 
-
-
-"""The Following APIs/VIs are used in the DUT Power on sequence. 
-So these functions needs to be test first.
-
-# TSM SSC DCPower Abort.vi
-# TSM SSC DCPower Initiate.vi
-# SSC DCPower Reset Channels.vi
-# SSC DCPower Source Current.vim
-# TSM SSC DCPower Get Max Current.vi
-# TSM SSC DCPower Configure Settings.vim
-# TSM SSC DCPower Measure.vi
-# TSM SSC DCPower Source Current.vim
-# TSM SSC DCPower Source Voltage.vim
-# TSM SSC DCPower Pins to Sessions.vi
-
-"""
 # pin_map_instruments = ["DCPower1", "DCPower2"]
 # pin_map_dut_pins = ["DUTPin1", "DUTPin2"]
 # pin_map_system_pins = ["SystemPin1"]
