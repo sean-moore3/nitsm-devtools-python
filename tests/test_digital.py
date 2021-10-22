@@ -19,10 +19,14 @@ OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6570"}}
 @pytest.fixture
 def tsm_context(standalone_tsm_context):
     """This TSM context is simulated one ref the conftest.py for the standalone_tsm_context fixture"""
-    ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context)
+    ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, OPTIONS)
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
 
+
+#@pytest.fixture
+def open_sessions(tsm_context: SemiconductorModuleContext):
+    ni_dt_digital.tsm_initialize_sessions(tsm_context, OPTIONS)
 
 
 @pytest.fixture
@@ -119,10 +123,6 @@ class TestNIDigital:
 #  def test_nidigital(system_test_runner):
 #    assert system_test_runner.run()
 
-
-#@pytest.fixture
-def open_sessions(tsm_context: SemiconductorModuleContext):
-    ni_dt_digital.tsm_initialize_sessions(tsm_context, OPTIONS)
 
 
 @nitsm.codemoduleapi.code_module

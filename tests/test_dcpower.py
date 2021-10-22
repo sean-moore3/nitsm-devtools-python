@@ -1,6 +1,7 @@
 import pytest
 import nidcpower
 import nidevtools.dcpower as ni_dt_dc_power
+from nitsm.codemoduleapi import SemiconductorModuleContext
 # import os.path
 # import os
 
@@ -8,11 +9,12 @@ OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm_context):
+def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     """This TSM context is simulated one ref the conftest.py for the standalone_tsm_context fixture"""
-    ni_dt_dc_power.initialize_sessions(standalone_tsm_context)
+    ni_dt_dc_power.initialize_sessions(standalone_tsm_context, options = OPTIONS)
     yield standalone_tsm_context
     ni_dt_dc_power.close_sessions(standalone_tsm_context)
+
 
 
 @pytest.fixture
