@@ -1053,9 +1053,7 @@ class TSMDCPower(typing.NamedTuple):
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(
-        tsm_context: SemiconductorModuleContext, power_line_frequency=60.0, **kwargs
-):
+def initialize_sessions(tsm_context: SemiconductorModuleContext, power_line_frequency=60.0, **kwargs):
     """Creates the sessions for all the nidcpower resource string
     available in the tsm_context"""
     # cache kwargs
@@ -1086,7 +1084,6 @@ def initialize_sessions(
 
         # set session in the tsm context
         tsm_context.set_nidcpower_session(resource_string, session)
-    return
 
 
 @nitsm.codemoduleapi.code_module

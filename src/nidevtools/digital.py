@@ -1778,7 +1778,7 @@ def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: di
             #     session.create_source_waveform_from_file_tdms(
             #         waveform_name, source_waveform_file_path, False
             #     )
-        return session
+
 
 @nitsm.codemoduleapi.code_module
 def tsm_ssc_1_pin_to_n_sessions(tsm_context: SemiconductorModuleContext, pin: str):

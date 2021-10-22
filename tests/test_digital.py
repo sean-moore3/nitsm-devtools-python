@@ -12,53 +12,113 @@ import nidigital
 import nidevtools.digital as ni_dt_digital
 # from nitsm.pinquerycontexts import PinQueryContext
 
-OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6570"}}
-
+# To create simulated hardware at runtime define the OPTIONS variable below.
+OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
+# OPTIONS = {} # empty options to run on real hardware.
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm_context):
-    """This TSM context is simulated one ref the conftest.py for the standalone_tsm_context fixture"""
+def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
+    """This TSM context is on simulated hardware or on real hardware based on OPTIONS defined above.
+    This TSM context uses standalone_tsm_context fixture created by the conftest.py """
     ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, OPTIONS)
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
 
 
-#@pytest.fixture
-def open_sessions(tsm_context: SemiconductorModuleContext):
-    ni_dt_digital.tsm_initialize_sessions(tsm_context, OPTIONS)
+@pytest.fixture
+def digital_tsm(tsm_context, pins):
+    """Returns LabVIEW Cluster equivalent data"""
+    # func needs to be defined.
+    return tsm_context
 
 
 @pytest.fixture
-def simulated_nidigital_sessions(standalone_tsm_context):
-    instrument_names = standalone_tsm_context.get_all_nidigital_instrument_names()
-    sessions = [
-        nidigital.Session(instrument_name, options=OPTIONS)
-        for instrument_name in instrument_names
-    ]
-    for instrument_name, session in zip(instrument_names, sessions):
-        standalone_tsm_context.set_nidigital_session(instrument_name, session)
-    yield sessions
-    for session in sessions:
-        session.close()
+def digital_ssc(digital_tsm):
+    """Returns LabVIEW Array equivalent data"""
+    # func needs to be defined.
+    return digital_tsm
 
 
 @pytest.mark.pin_map("nidigital.pinmap")
 class TestNIDigital:
     """The Following APIs/VIs are used in the DUT Power on sequence.
     So these functions needs to be test first.
-
-    # TSM SSC Digital Select Function.vi
-    # TSM SSC Digital PPMU Source Voltage.vi
-    # TSM SSC Digital Burst Pattern [Pass Fail].vi
-    # TSM SSC Digital Apply Levels and Timing.vi
-    # TSM SSC Digital Configure Time Set Period.vi
-    # TSM SSC Digital Write Sequencer Register.vi
-    # TSM SSC Digital Write Source Waveform [Broadcast].vi
-    # TSM SSC Digital Write Static.vi
-    # TSM SSC Digital N Pins To M Sessions.vi
-
     """
+
+    def test_initialize_session(self, tsm_context):
+        """ This Api is used in the Init routine"""
+        queried_sessions = list(tsm_context.get_all_nidigital_sessions())
+        for session in queried_sessions:
+            assert isinstance(session, nidigital.Session)
+        assert len(queried_sessions) == len(tsm_context.get_all_nidigital_instrument_names())
+
+    @pytest.mark.skip
+    def test_tsm_ssc_n_pins_to_m_sessions(self):
+        """TSM SSC Digital N Pins To M Sessions.vi"""
+        assert 1 == 1
+
+    @pytest.mark.skip
+    def test_tsm_ssc_select_function(self, standalone_tsm_context):
+        """ TSM SSC Digital Select Function.vi"""
+        # function_to_select = enums.SelectedFunction.DIGITAL
+        # temp_tsm = dev_digital.tsm_ssc_select_function(standalone_tsm_context, function_to_select)
+        assert 1 == 1
+
+    @pytest.mark.skip
+    def test_tsm_ssc_ppmu_source_voltage(self):
+        """TSM SSC Digital PPMU Source Voltage.vi"""
+        assert 1 == 1
+
+    @pytest.mark.skip
+    def test_tsm_ssc_burst_pattern_pass_fail(self):
+        """TSM SSC Digital Burst Pattern [Pass Fail].vi"""
+        assert 1 == 1
+
+    @pytest.mark.skip
+    def test_tsm_ssc_apply_levels_and_timing(self):
+        """TSM SSC Digital Apply Levels and Timing.vi"""
+        assert 1 == 1
+
+    @pytest.mark.skip
+    def test_tsm_ssc_configure_time_set_period(self):
+        """TSM SSC Digital Configure Time Set Period.vi"""
+        assert 1 == 1
+
+    @pytest.mark.skip
+    def test_tsm_ssc_write_sequencer_register(self):
+        """TSM SSC Digital Write Sequencer Register.vi"""
+        assert 1 == 1
+
+    @pytest.mark.skip
+    def test_tsm_ssc_write_source_waveform_broadcast(self):
+        """TSM SSC Digital Write Source Waveform [Broadcast].vi"""
+        assert 1 == 1
+
+    @pytest.mark.skip
+    def test_tsm_ssc_write_static(self, fixture):
+        """TSM SSC Digital Write Static.vi"""
+        ni_dt_digital.tsm_ssc_write_static(fixture, enums.WriteStaticPinState.ONE)
+        assert 1 == 1
+
+    @pytest.mark.skip
+    def test_tsm_ssc_burst_pattern(self, standalone_tsm_context):
+        """To do"""
+        pass
+
+    @pytest.mark.skip
+    def test_tsm_ssc_ppmu_source_voltage_per_site_per_pin(self, standalone_tsm_context):
+        pass
+
+    @pytest.mark.skip
+    def test_tsm_ssc_get_properties(self, standalone_tsm_context):
+        pass
+
+    @pytest.mark.skip
+    def test_tsm_ssc_read_static(self, standalone_tsm_context):
+        ni_dt_digital.tsm_ssc_write_static(standalone_tsm_context, enums.WriteStaticPinState.ONE)
+        _, pin_state = ni_dt_digital.tsm_ssc_read_static(standalone_tsm_context)
+        assert pin_state == enums.WriteStaticPinState.ONE
 
     pin_map_instruments = ["DigitalPattern1", "DigitalPattern2"]
     pin_map_dut_pins = ["DUTPin1", "DUTPin2"]
@@ -67,62 +127,9 @@ class TestNIDigital:
     pin_map_file_path = os.path.join(os.path.dirname(__file__), "nidigital.pinmap")
 
 
-    def test_open_sessions(self, standalone_tsm_context):
-        queried_sessions = ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context)
-        assert isinstance(queried_sessions, nidigital.Session)
-
-    def test_tsm_ssc_burst_pattern(self, standalone_tsm_context):
-        pass
-
-    def test_tsm_ssc_ppmu_source_voltage_per_site_per_pin(self, standalone_tsm_context):
-        pass
-
-    def test_tsm_ssc_get_properties(self, standalone_tsm_context):
-        pass
-
-    def test_tsm_ssc_write_static(self, standalone_tsm_context):
-        ni_dt_digital.tsm_ssc_write_static(standalone_tsm_context, enums.WriteStaticPinState.ONE)
-        pass
-
-    def test_tsm_ssc_read_static(self, standalone_tsm_context):
-        ni_dt_digital.tsm_ssc_write_static(standalone_tsm_context, enums.WriteStaticPinState.ONE)
-        _, pin_state = ni_dt_digital.tsm_ssc_read_static(standalone_tsm_context)
-        assert pin_state == enums.WriteStaticPinState.ONE
-
-"""    def test_tsm_ssc_select_function(self, standalone_tsm_context):
-        # function_to_select = enums.SelectedFunction.DIGITAL
-        # temp_tsm = dev_digital.tsm_ssc_select_function(standalone_tsm_context, function_to_select)
-        assert 1 == 1
-
-    def test_tsm_ssc_ppmu_source_voltage(self):
-        assert 1 == 1
-
-    def test_tsm_ssc_burst_pattern_pass_fail(self):
-        assert 1 == 1
-
-    def test_tsm_ssc_apply_levels_and_timing(self):
-        assert 1 == 1
-
-    def test_tsm_ssc_configure_time_set_period(self):
-        assert 1 == 1
-
-    def test_tsm_ssc_write_sequencer_register(self):
-        assert 1 == 1
-
-    def test_tsm_ssc_write_source_waveform_broadcast(self):
-        assert 1 == 1
-
-    def test_tsm_ssc_write_static(self):
-        assert 1 == 1
-
-    def test_tsm_ssc_n_pins_to_m_sessions(self):
-        assert 1 == 1
-"""
-
 #  @pytest.mark.sequence_file("/nites/nidigital.seq")
 #  def test_nidigital(system_test_runner):
 #    assert system_test_runner.run()
-
 
 
 @nitsm.codemoduleapi.code_module
@@ -138,11 +145,11 @@ def clock_generation(tsm_context: SemiconductorModuleContext, pins: typing.List[
     ni_dt_digital.tsm_ssc_modify_time_set_for_clock_generation(tsm, frequency, 0.5, "time_set")
     ni_dt_digital.tsm_ssc_clock_generator_generate_clock(tsm, frequency)
     for ssc in tsm.ssc:
-        assert ssc.session.channels[ssc.channel_list].clock_generator_is_running == True
+        assert ssc.session.channels[ssc.channel_list].clock_generator_is_running
         assert round(ssc.session.channels[ssc.channel_list].clock_generator_frequency) == frequency
     ni_dt_digital.tsm_ssc_clock_generator_abort(tsm)
     for ssc in tsm.ssc:
-        assert ssc.session.channels[ssc.channel_list].clock_generator_is_running == False
+        assert not ssc.session.channels[ssc.channel_list].clock_generator_is_running
 
 
 @nitsm.codemoduleapi.code_module
@@ -197,8 +204,8 @@ def hram(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
     ni_dt_digital.tsm_ssc_burst_pattern(tsm, "start_burst")
     ni_dt_digital.tsm_ssc_wait_until_done(tsm)
     _, per_site_cycle_information = ni_dt_digital.tsm_ssc_stream_hram_results(tsm)
-    for cycle_informations in per_site_cycle_information:
-        assert not cycle_informations
+    for cycle_information in per_site_cycle_information:
+        assert not cycle_information
     _, files_generated = ni_dt_digital.tsm_ssc_log_hram_results(
         tsm,
         [

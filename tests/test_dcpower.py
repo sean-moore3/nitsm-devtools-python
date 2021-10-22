@@ -5,20 +5,33 @@ from nitsm.codemoduleapi import SemiconductorModuleContext
 # import os.path
 # import os
 
+# To create simulated hardware at runtime define the OPTIONS variable below.
 OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
-
+# OPTIONS = {} # empty options to run on real hardware.
 
 @pytest.fixture
 def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
-    """This TSM context is simulated one ref the conftest.py for the standalone_tsm_context fixture"""
+    """This TSM context is on simulated hardware or on real hardware based on OPTIONS defined above.
+    This TSM context uses standalone_tsm_context fixture created by the conftest.py """
     ni_dt_dc_power.initialize_sessions(standalone_tsm_context, options = OPTIONS)
     yield standalone_tsm_context
     ni_dt_dc_power.close_sessions(standalone_tsm_context)
 
 
-
 @pytest.fixture
 def dcpower_tsm(tsm_context, pins):
+    """Returns LabVIEW Cluster equivalent data"""
+    # func needs to be defined.
+    return tsm_context
+
+
+@pytest.fixture
+def dcpower_ssc(dcpower_tsm):
+    """Returns LabVIEW Array equivalent data"""
+    # func needs to be defined.
+    return dcpower_tsm
+
+def test_dummy():
     # ni_dt_dc_power.initialize_sessions(
     #    standalone_tsm_context, options=OPTIONS
     # )
@@ -26,12 +39,7 @@ def dcpower_tsm(tsm_context, pins):
     #                                       fill_pin_site_info=True)
     # yield ni_dt_tsm
     # ni_dt_dc_power.close_sessions(standalone_tsm_context)
-    return tsm_context
-
-
-@pytest.fixture
-def dcpower_ssc(dcpower_tsm):
-    return dcpower_tsm
+    pass
 
 
 @pytest.mark.pin_map("nidcpower.pinmap")
