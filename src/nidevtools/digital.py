@@ -8,6 +8,7 @@ from enum import Enum
 from nidigital import enums
 from datetime import datetime
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
+import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext
 
 
@@ -1737,13 +1738,14 @@ def _ssc_calculate_per_site_to_per_instrument_lut(
 
 
 # TSM #
+@nitsm.codemoduleapi.code_module
 def tsm_close_sessions(tsm_context: SemiconductorModuleContext):
     sessions = tsm_context.get_all_nidigital_sessions()
     for session in sessions:
         session.reset()
         session.close()
 
-
+@nitsm.codemoduleapi.code_module
 def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: dict = {}):
     instrument_names = tsm_context.get_all_nidigital_instrument_names()
     if instrument_names:
@@ -1778,12 +1780,12 @@ def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: di
             #     )
         return session
 
-
+@nitsm.codemoduleapi.code_module
 def tsm_ssc_1_pin_to_n_sessions(tsm_context: SemiconductorModuleContext, pin: str):
     tsm = tsm_ssc_n_pins_to_m_sessions(tsm_context, [pin])
     return tsm
 
-
+@nitsm.codemoduleapi.code_module
 def tsm_ssc_n_pins_to_m_sessions(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],

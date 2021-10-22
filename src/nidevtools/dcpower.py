@@ -6,13 +6,9 @@ import nidcpower
 from nidcpower.enums import *
 import nidcpower.errors
 import nitsm.codemoduleapi
+from nitsm.codemoduleapi import SemiconductorModuleContext
 import nidevtools.common as ni_dt_common
-
-
 from datetime import datetime
-
-
-_SemiconductorModuleContext = nitsm.codemoduleapi.SemiconductorModuleContext
 
 
 class _ModelSupport:
@@ -1058,7 +1054,7 @@ class TSMDCPower(typing.NamedTuple):
 
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(
-        tsm_context: _SemiconductorModuleContext, power_line_frequency=60.0, **kwargs
+        tsm_context: SemiconductorModuleContext, power_line_frequency=60.0, **kwargs
 ):
     """Creates the sessions for all the nidcpower resource string
     available in the tsm_context"""
@@ -1093,8 +1089,8 @@ def initialize_sessions(
     return
 
 
-# @nitsm.codemoduleapi.code_module
-def pins_to_sessions(tsm_context: _SemiconductorModuleContext,
+@nitsm.codemoduleapi.code_module
+def pins_to_sessions(tsm_context: SemiconductorModuleContext,
                      pins: typing.List[str],
                      site_numbers: typing.List[int],
                      fill_pin_site_info=True):
@@ -1117,7 +1113,6 @@ def pins_to_sessions(tsm_context: _SemiconductorModuleContext,
     return TSMDCPower(pin_query_context, dc_power_tsm, site_numbers, pins_info, pins_expanded)
 
 
-@nitsm.codemoduleapi.code_module
 def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
     dc_power_tsm.ssc.filter_pins(desired_pins)
     all_pins = ni_dt_common.get_pin_names_from_expanded_pin_information(dc_power_tsm.pins_expanded)
@@ -1138,7 +1133,6 @@ def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
     return dc_power_tsm
 
 
-@nitsm.codemoduleapi.code_module
 def filter_sites(dc_power_tsm: TSMDCPower, sites):
     dc_power_tsm.ssc = dc_power_tsm.ssc.filter_sites(sites)
     dc_power_tsm.site_numbers = sites
@@ -1146,7 +1140,7 @@ def filter_sites(dc_power_tsm: TSMDCPower, sites):
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: _SemiconductorModuleContext):
+def close_sessions(tsm_context: SemiconductorModuleContext):
     """Todo(smooresni): Future docstring."""
     sessions = tsm_context.get_all_nidcpower_sessions()
     for session in sessions:

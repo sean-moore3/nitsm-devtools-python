@@ -12,22 +12,18 @@ import nidigital
 import nidevtools.digital as ni_dt_digital
 # from nitsm.pinquerycontexts import PinQueryContext
 
-"""The Following APIs/VIs are used in the DUT Power on sequence. 
-So these functions needs to be test first.
-
-# TSM SSC Digital Select Function.vi
-# TSM SSC Digital PPMU Source Voltage.vi
-# TSM SSC Digital Burst Pattern [Pass Fail].vi
-# TSM SSC Digital Apply Levels and Timing.vi
-# TSM SSC Digital Configure Time Set Period.vi
-# TSM SSC Digital Write Sequencer Register.vi
-# TSM SSC Digital Write Source Waveform [Broadcast].vi
-# TSM SSC Digital Write Static.vi
-# TSM SSC Digital N Pins To M Sessions.vi
-
-"""
-
 OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6570"}}
+
+
+
+@pytest.fixture
+def tsm_context(standalone_tsm_context):
+    """This TSM context is simulated one ref the conftest.py for the standalone_tsm_context fixture"""
+    ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context)
+    yield standalone_tsm_context
+    ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
+
+
 
 @pytest.fixture
 def simulated_nidigital_sessions(standalone_tsm_context):
@@ -45,6 +41,21 @@ def simulated_nidigital_sessions(standalone_tsm_context):
 
 @pytest.mark.pin_map("nidigital.pinmap")
 class TestNIDigital:
+    """The Following APIs/VIs are used in the DUT Power on sequence.
+    So these functions needs to be test first.
+
+    # TSM SSC Digital Select Function.vi
+    # TSM SSC Digital PPMU Source Voltage.vi
+    # TSM SSC Digital Burst Pattern [Pass Fail].vi
+    # TSM SSC Digital Apply Levels and Timing.vi
+    # TSM SSC Digital Configure Time Set Period.vi
+    # TSM SSC Digital Write Sequencer Register.vi
+    # TSM SSC Digital Write Source Waveform [Broadcast].vi
+    # TSM SSC Digital Write Static.vi
+    # TSM SSC Digital N Pins To M Sessions.vi
+
+    """
+
     pin_map_instruments = ["DigitalPattern1", "DigitalPattern2"]
     pin_map_dut_pins = ["DUTPin1", "DUTPin2"]
     pin_map_system_pins = ["SystemPin1"]
