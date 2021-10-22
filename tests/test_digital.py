@@ -14,7 +14,7 @@ import nidevtools.digital as ni_dt_digital
 
 # To create simulated hardware at runtime define the OPTIONS variable below.
 OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
-# OPTIONS = {} # empty options to run on real hardware.
+# OPTIONS = {} # empty dict options to run on real hardware.
 
 
 @pytest.fixture
