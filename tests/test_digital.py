@@ -56,6 +56,24 @@ class TestNIDigital:
         queried_sessions = ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context)
         assert isinstance(queried_sessions, nidigital.Session)
 
+    def test_tsm_ssc_burst_pattern(self, standalone_tsm_context):
+        pass
+
+    def test_tsm_ssc_ppmu_source_voltage_per_site_per_pin(self, standalone_tsm_context):
+        pass
+
+    def test_tsm_ssc_get_properties(self, standalone_tsm_context):
+        pass
+
+    def test_tsm_ssc_write_static(self, standalone_tsm_context):
+        ni_dt_digital.tsm_ssc_write_static(standalone_tsm_context, enums.WriteStaticPinState.ONE)
+        pass
+
+    def test_tsm_ssc_read_static(self, standalone_tsm_context):
+        ni_dt_digital.tsm_ssc_write_static(standalone_tsm_context, enums.WriteStaticPinState.ONE)
+        _, pin_state = ni_dt_digital.tsm_ssc_read_static(standalone_tsm_context)
+        assert pin_state == enums.WriteStaticPinState.ONE
+
 """    def test_tsm_ssc_select_function(self, standalone_tsm_context):
         # function_to_select = enums.SelectedFunction.DIGITAL
         # temp_tsm = dev_digital.tsm_ssc_select_function(standalone_tsm_context, function_to_select)
