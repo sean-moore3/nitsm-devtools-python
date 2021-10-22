@@ -25,24 +25,25 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
 
+
 @pytest.fixture
 def test_pin_s():
     """Need to improve this logic for supplying test pins
     using @pytest.mark.parametrize"""
-    test_pins =["SystemPin1"]
+    # test_pins =["SystemPin1"]
+    test_pins = ["DUTPin1", "DUTPin2"]
     return test_pins
+
 
 @pytest.fixture
 def digital_tsm(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data
     This fixture accepts single pin in string format or
     multiple pins in list of string format"""
-    a = tsm_context
-    b = test_pin_s
-    if isinstance(b, str):
-        digital_tsm_out = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(a, b )
-    elif isinstance(b, list):
-        digital_tsm_out = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(a, b)
+    if isinstance(test_pin_s, str):
+        digital_tsm_out = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, test_pin_s)
+    elif isinstance(test_pin_s, list):
+        digital_tsm_out = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, test_pin_s)
     else:
         assert False   # unexpected datatype
     return digital_tsm_out
@@ -90,22 +91,22 @@ class TestNIDigital:
         assert 1 == 1
 
     @pytest.mark.skip
-    def test_tsm_ssc_apply_levels_and_timing(self,digital_tsm):
+    def test_tsm_ssc_apply_levels_and_timing(self, digital_tsm):
         """TSM SSC Digital Apply Levels and Timing.vi"""
         assert 1 == 1
 
     @pytest.mark.skip
-    def test_tsm_ssc_configure_time_set_period(self,digital_tsm):
+    def test_tsm_ssc_configure_time_set_period(self, digital_tsm):
         """TSM SSC Digital Configure Time Set Period.vi"""
         assert 1 == 1
 
     @pytest.mark.skip
-    def test_tsm_ssc_write_sequencer_register(self,digital_tsm):
+    def test_tsm_ssc_write_sequencer_register(self, digital_tsm):
         """TSM SSC Digital Write Sequencer Register.vi"""
         assert 1 == 1
 
     @pytest.mark.skip
-    def test_tsm_ssc_write_source_waveform_broadcast(self,digital_tsm):
+    def test_tsm_ssc_write_source_waveform_broadcast(self, digital_tsm):
         """TSM SSC Digital Write Source Waveform [Broadcast].vi"""
         assert 1 == 1
 
