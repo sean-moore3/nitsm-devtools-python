@@ -80,6 +80,18 @@ class TestNIDigital:
         temp_tsm = ni_dt_digital.tsm_ssc_select_function(digital_tsm, function_to_select)
         assert isinstance(temp_tsm, ni_dt_digital.TSMDigital)
 
+    def test_tsm_ssc_write_static(self, digital_tsm):
+        """TSM SSC Digital Write Static.vi"""
+        ni_dt_digital.tsm_ssc_write_static(digital_tsm, enums.WriteStaticPinState.ONE)
+        assert 1 == 1
+
+    def test_tsm_ssc_read_static(self, digital_tsm):
+        ni_dt_digital.tsm_ssc_write_static(digital_tsm, enums.WriteStaticPinState.ONE)
+        _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm)
+        for per_site_data in per_site_per_pin_data:
+            for per_pin_data in per_site_data:
+                assert per_pin_data == enums.WriteStaticPinState.ONE
+
     @pytest.mark.skip
     def test_tsm_ssc_ppmu_source_voltage(self, digital_tsm):
         """TSM SSC Digital PPMU Source Voltage.vi"""
@@ -111,12 +123,6 @@ class TestNIDigital:
         assert 1 == 1
 
     @pytest.mark.skip
-    def test_tsm_ssc_write_static(self, digital_tsm):
-        """TSM SSC Digital Write Static.vi"""
-        ni_dt_digital.tsm_ssc_write_static(digital_tsm, enums.WriteStaticPinState.ONE)
-        assert 1 == 1
-
-    @pytest.mark.skip
     def test_tsm_ssc_burst_pattern(self, digital_tsm):
         """To do"""
         pass
@@ -129,16 +135,10 @@ class TestNIDigital:
     def test_tsm_ssc_get_properties(self, digital_tsm):
         pass
 
-    @pytest.mark.skip
-    def test_tsm_ssc_read_static(self, digital_tsm):
-        ni_dt_digital.tsm_ssc_write_static(digital_tsm, enums.WriteStaticPinState.ONE)
-        _, pin_state = ni_dt_digital.tsm_ssc_read_static(digital_tsm)
-        assert pin_state == enums.WriteStaticPinState.ONE
 
-    # pin_map_instruments = ["DigitalPattern1", "DigitalPattern2"]
-
-    # pin_map_file_path = "C://G//nitsm-devtools-python//tests//supporting_materials//nidigital.pinmap"
-    # pin_map_file_path = os.path.join(os.path.dirname(__file__), "nidigital.pinmap")
+# pin_map_instruments = ["DigitalPattern1", "DigitalPattern2"]
+# pin_map_file_path = "C://G//nitsm-devtools-python//tests//supporting_materials//nidigital.pinmap"
+# pin_map_file_path = os.path.join(os.path.dirname(__file__), "nidigital.pinmap")
 
 
 #  @pytest.mark.sequence_file("/nites/nidigital.seq")
