@@ -31,17 +31,6 @@ def dcpower_ssc(dcpower_tsm):
     # func needs to be defined.
     return dcpower_tsm
 
-def test_dummy():
-    # ni_dt_dc_power.initialize_sessions(
-    #    standalone_tsm_context, options=OPTIONS
-    # )
-    # ni_dt_tsm=ni_dt_dc_power.pins_to_sessions(standalone_tsm_context, ["DUTPin1", "DUTPin2"], site_numbers=[],
-    #                                       fill_pin_site_info=True)
-    # yield ni_dt_tsm
-    # ni_dt_dc_power.close_sessions(standalone_tsm_context)
-    pass
-
-
 @pytest.mark.pin_map("nidcpower.pinmap")
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestDCPower:
@@ -117,6 +106,17 @@ class TestDCPower:
     @pytest.mark.skip
     def test_abort(self, dcpower_tsm):
         dcpower_tsm.abort()
+
+
+def test_dummy():
+    # ni_dt_dc_power.initialize_sessions(
+    #    standalone_tsm_context, options=OPTIONS
+    # )
+    # ni_dt_tsm=ni_dt_dc_power.pins_to_sessions(standalone_tsm_context, ["DUTPin1", "DUTPin2"], site_numbers=[],
+    #                                       fill_pin_site_info=True)
+    # yield ni_dt_tsm
+    # ni_dt_dc_power.close_sessions(standalone_tsm_context)
+    pass
 
 
 # pin_map_instruments = ["DCPower1", "DCPower2"]
