@@ -16,56 +16,87 @@ import nidevtools.digital as ni_dt_digital
 OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
 # OPTIONS = {} # empty dict options to run on real hardware.
 
-FILE_PATHS = {'specifications': [],
-              'levels': [],
-              'timing': [],
-              'pattern': [],
+data_dir = os.path.join(os.path.dirname(__file__), "Data")
+specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs")
+specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
+level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
+timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C Timing.digitiming")
+pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Write Template.digipat")
+pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Read Template.digipat")
+src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "Source Memory Buffer.tdms")
+cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "Capture Memory Buffer.digicapture")
+
+
+FILE_PATHS = {'specifications': [specification1, specification2],
+              'levels': [level],
+              'timing': [timing],
+              'pattern': [pattern1, pattern2],
               'source_waveforms': [],
               'capture_waveforms': []
               }
+
+print(FILE_PATHS)
 
 
 @pytest.fixture
 def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     """This TSM context is on simulated hardware or on real hardware based on OPTIONS defined above.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py """
+    print("")
+    print("entering tsm_context fixture")
+    # print(FILE_PATHS)
     ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=OPTIONS, file_paths=FILE_PATHS)
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
+    print("exiting tsm_context fixture")
 
 
 @pytest.fixture
-def test_pin_s():
+def test_pin_s(request):
     """Need to improve this logic for supplying test pins
     using @pytest.mark.parametrize"""
-    # test_pins =["SystemPin1"]
-    test_pins = ["DUTPin1", "DUTPin2"]
-    return test_pins
+    pin_map_name = request.node.get_closest_marker("pin_map").args[0]
+    if pin_map_name == "I2C.pinmap":
+        test_pins = ["SCL", "SDA"]
+        read_pins = ["R_SCL", "R_SDA"]
+    else:
+        test_pins = ["DUTPin1", "SystemPin1"]
+        read_pins = ["DUTPin2"]
+    return [test_pins, read_pins]
 
 
 @pytest.fixture
-def digital_tsm(tsm_context, test_pin_s):
+def digital_tsm_s(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data
     This fixture accepts single pin in string format or
     multiple pins in list of string format"""
-    if isinstance(test_pin_s, str):
-        digital_tsm_out = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, test_pin_s)
-    elif isinstance(test_pin_s, list):
-        digital_tsm_out = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, test_pin_s)
+    if isinstance(test_pin_s[0], str):
+        digital_tsm_in = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, test_pin_s[0])
+    elif isinstance(test_pin_s[0], list):
+        digital_tsm_in = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, test_pin_s[0])
     else:
         assert False   # unexpected datatype
-    return digital_tsm_out
+
+    if isinstance(test_pin_s[1], str):
+        digital_tsm_out = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, test_pin_s[1])
+    elif isinstance(test_pin_s[1], list):
+        digital_tsm_out = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, test_pin_s[1])
+    else:
+        assert False  # unexpected datatype
+
+    return [digital_tsm_in, digital_tsm_out]
 
 
 @pytest.fixture
-def digital_ssc(digital_tsm):
+def digital_ssc(digital_tsm_s):
     """Returns LabVIEW Array equivalent data"""
     # func needs to be defined.
-    return digital_tsm
+    return digital_tsm_s
 
 
 # @pytest.mark.pin_map("RedDragon1.pinmap")
-@pytest.mark.pin_map("nidigital.pinmap")
+@pytest.mark.pin_map("I2C.pinmap")
+# @pytest.mark.pin_map("nidigital.pinmap")
 class TestNIDigital:
     """The Following APIs/VIs are used in the DUT Power on sequence.
     So these functions needs to be test first.
@@ -78,72 +109,74 @@ class TestNIDigital:
             assert isinstance(session, nidigital.Session)
         assert len(queried_sessions) == len(tsm_context.get_all_nidigital_instrument_names())
 
-    def test_tsm_ssc_n_pins_to_m_sessions(self, digital_tsm, test_pin_s):
+    def test_tsm_ssc_n_pins_to_m_sessions(self, digital_tsm_s, test_pin_s):
         """TSM SSC Digital N Pins To M Sessions.vi"""
-        assert isinstance(digital_tsm, ni_dt_digital.TSMDigital)
+        print(test_pin_s)
+        assert isinstance(digital_tsm_s[0], ni_dt_digital.TSMDigital)
+        assert isinstance(digital_tsm_s[1], ni_dt_digital.TSMDigital)
 
-    def test_tsm_ssc_select_function(self, digital_tsm):
+    def test_tsm_ssc_select_function(self, digital_tsm_s):
         """ TSM SSC Digital Select Function.vi
         Need to add logic to check back if the selected function is applied or not"""
         function_to_select = enums.SelectedFunction.DIGITAL
-        temp_tsm = ni_dt_digital.tsm_ssc_select_function(digital_tsm, function_to_select)
+        temp_tsm = ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], function_to_select)
         assert isinstance(temp_tsm, ni_dt_digital.TSMDigital)
 
-    def test_tsm_ssc_write_static(self, digital_tsm):
+    def test_tsm_ssc_write_static(self, digital_tsm_s):
         """TSM SSC Digital Write Static.vi"""
-        ni_dt_digital.tsm_ssc_write_static(digital_tsm, enums.WriteStaticPinState.ONE)
+        ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
         assert 1 == 1
 
-    def test_tsm_ssc_read_static(self, digital_tsm):
-        ni_dt_digital.tsm_ssc_select_function(digital_tsm, enums.SelectedFunction.DIGITAL)
-        ni_dt_digital.tsm_ssc_write_static(digital_tsm, enums.WriteStaticPinState.ONE)
-        _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm)
+    def test_tsm_ssc_read_static(self, digital_tsm_s):
+        ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
+        ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
+        _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
                 assert per_pin_data == enums.PinState.ONE
 
     @pytest.mark.skip
-    def test_tsm_ssc_ppmu_source_voltage(self, digital_tsm):
+    def test_tsm_ssc_ppmu_source_voltage(self, digital_tsm_s):
         """TSM SSC Digital PPMU Source Voltage.vi"""
         assert 1 == 1
 
     @pytest.mark.skip
-    def test_tsm_ssc_burst_pattern_pass_fail(self, digital_tsm):
+    def test_tsm_ssc_burst_pattern_pass_fail(self, digital_tsm_s):
         """TSM SSC Digital Burst Pattern [Pass Fail].vi"""
         assert 1 == 1
 
     @pytest.mark.skip
-    def test_tsm_ssc_apply_levels_and_timing(self, digital_tsm):
+    def test_tsm_ssc_apply_levels_and_timing(self, digital_tsm_s):
         """TSM SSC Digital Apply Levels and Timing.vi"""
         assert 1 == 1
 
     @pytest.mark.skip
-    def test_tsm_ssc_configure_time_set_period(self, digital_tsm):
+    def test_tsm_ssc_configure_time_set_period(self, digital_tsm_s):
         """TSM SSC Digital Configure Time Set Period.vi"""
         assert 1 == 1
 
     @pytest.mark.skip
-    def test_tsm_ssc_write_sequencer_register(self, digital_tsm):
+    def test_tsm_ssc_write_sequencer_register(self, digital_tsm_s):
         """TSM SSC Digital Write Sequencer Register.vi"""
         assert 1 == 1
 
     @pytest.mark.skip
-    def test_tsm_ssc_write_source_waveform_broadcast(self, digital_tsm):
+    def test_tsm_ssc_write_source_waveform_broadcast(self, digital_tsm_s):
         """TSM SSC Digital Write Source Waveform [Broadcast].vi"""
         assert 1 == 1
 
     @pytest.mark.skip
-    def test_tsm_ssc_burst_pattern(self, digital_tsm):
+    def test_tsm_ssc_burst_pattern(self, digital_tsm_s):
         """To do"""
         pass
 
     @pytest.mark.skip
-    def test_tsm_ssc_ppmu_source_voltage_per_site_per_pin(self, digital_tsm):
+    def test_tsm_ssc_ppmu_source_voltage_per_site_per_pin(self, digital_tsm_s):
         pass
 
     @pytest.mark.skip
-    def test_tsm_ssc_get_properties(self, digital_tsm):
+    def test_tsm_ssc_get_properties(self, digital_tsm_s):
         pass
 
 
