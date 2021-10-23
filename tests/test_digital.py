@@ -16,12 +16,20 @@ import nidevtools.digital as ni_dt_digital
 OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
 # OPTIONS = {} # empty dict options to run on real hardware.
 
+FILE_PATHS = {'specifications': [],
+              'levels': [],
+              'timing': [],
+              'pattern': [],
+              'source_waveforms': [],
+              'capture_waveforms': []
+              }
+
 
 @pytest.fixture
 def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     """This TSM context is on simulated hardware or on real hardware based on OPTIONS defined above.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py """
-    ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, OPTIONS)
+    ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=OPTIONS, file_paths=FILE_PATHS)
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
 
@@ -55,7 +63,8 @@ def digital_ssc(digital_tsm):
     # func needs to be defined.
     return digital_tsm
 
-#@pytest.mark.pin_map("RedDragon1.pinmap")
+
+# @pytest.mark.pin_map("RedDragon1.pinmap")
 @pytest.mark.pin_map("nidigital.pinmap")
 class TestNIDigital:
     """The Following APIs/VIs are used in the DUT Power on sequence.
@@ -91,7 +100,7 @@ class TestNIDigital:
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm)
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
-                assert type(per_pin_data) == type(enums.PinState.ONE)
+                assert isinstance(per_pin_data, enums.PinState)
                 assert per_pin_data == enums.PinState.ONE
 
     @pytest.mark.skip
