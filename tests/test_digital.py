@@ -55,14 +55,14 @@ def digital_ssc(digital_tsm):
     # func needs to be defined.
     return digital_tsm
 
-
+#@pytest.mark.pin_map("RedDragon1.pinmap")
 @pytest.mark.pin_map("nidigital.pinmap")
 class TestNIDigital:
     """The Following APIs/VIs are used in the DUT Power on sequence.
     So these functions needs to be test first.
     """
 
-    def test_initialize_session(self, tsm_context):
+    def test_tsm_initialize_sessions(self, tsm_context):
         """ This Api is used in the Init routine"""
         queried_sessions = list(tsm_context.get_all_nidigital_sessions())
         for session in queried_sessions:
@@ -86,11 +86,13 @@ class TestNIDigital:
         assert 1 == 1
 
     def test_tsm_ssc_read_static(self, digital_tsm):
+        ni_dt_digital.tsm_ssc_select_function(digital_tsm, enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm, enums.WriteStaticPinState.ONE)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm)
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
-                assert per_pin_data == enums.WriteStaticPinState.ONE
+                assert type(per_pin_data) == type(enums.PinState.ONE)
+                assert per_pin_data == enums.PinState.ONE
 
     @pytest.mark.skip
     def test_tsm_ssc_ppmu_source_voltage(self, digital_tsm):
