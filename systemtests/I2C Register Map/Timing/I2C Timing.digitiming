@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TimingFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.0" xmlns="http://www.ni.com/Semiconductor/Timing">
+  <TimingSheet>
+    <TimeSets>
+      <TimeSet name="Start">
+        <Period>t.SCL</Period>
+        <PinEdges>
+          <PinEdge pin="SCL">
+            <ReturnToLow>
+              <On>0</On>
+              <Data>0</Data>
+              <Return>t.SU_STA + t.HD_STA</Return>
+              <Off>t.SCL</Off>
+            </ReturnToLow>
+            <CompareStrobe>
+              <Strobe>0</Strobe>
+            </CompareStrobe>
+            <DataSource>Pattern</DataSource>
+            <Comment>Clock line START condition timing</Comment>
+          </PinEdge>
+          <PinEdge pin="SDA">
+            <ReturnToLow>
+              <On>0</On>
+              <Data>0</Data>
+              <Return>t.SU_STA</Return>
+              <Off>t.SCL</Off>
+            </ReturnToLow>
+            <CompareStrobe>
+              <Strobe>0</Strobe>
+            </CompareStrobe>
+            <DataSource>Pattern</DataSource>
+            <Comment>Data line START condition timing</Comment>
+          </PinEdge>
+        </PinEdges>
+      </TimeSet>
+      <TimeSet name="Busy">
+        <Period>t.SCL</Period>
+        <PinEdges>
+          <PinEdge pin="SCL">
+            <ReturnToLow>
+              <On>0</On>
+              <Data>t.SU_DAT</Data>
+              <Return>t.SU_DAT + t.HIGH</Return>
+              <Off>t.SCL</Off>
+            </ReturnToLow>
+            <CompareStrobe>
+              <Strobe>0</Strobe>
+            </CompareStrobe>
+            <DataSource>Pattern</DataSource>
+            <Comment>Clock line timing while transferring data</Comment>
+          </PinEdge>
+          <PinEdge pin="SDA">
+            <DriveNonReturn>
+              <On>0</On>
+              <Data>t.HD_DAT</Data>
+              <Off>t.SCL</Off>
+            </DriveNonReturn>
+            <CompareStrobe>
+              <Strobe>t.SU_DAT + t.HIGH/2</Strobe>
+            </CompareStrobe>
+            <DataSource>Pattern</DataSource>
+            <Comment>Data line timing while transferring data</Comment>
+          </PinEdge>
+        </PinEdges>
+      </TimeSet>
+      <TimeSet name="Stop">
+        <Period>t.SCL + t.BUF</Period>
+        <PinEdges>
+          <PinEdge pin="SCL">
+            <DriveNonReturn>
+              <On>0</On>
+              <Data>t.LOW</Data>
+              <Off>t.SCL + t.BUF</Off>
+            </DriveNonReturn>
+            <CompareStrobe>
+              <Strobe>0</Strobe>
+            </CompareStrobe>
+            <DataSource>Pattern</DataSource>
+            <Comment>Clock line STOP condition timing</Comment>
+          </PinEdge>
+          <PinEdge pin="SDA">
+            <ReturnToHigh>
+              <On>0</On>
+              <Data>0</Data>
+              <Return>t.LOW + t.SU_STO</Return>
+              <Off>t.SCL + t.BUF</Off>
+            </ReturnToHigh>
+            <CompareStrobe>
+              <Strobe>0</Strobe>
+            </CompareStrobe>
+            <DataSource>Pattern</DataSource>
+            <Comment>Data line STOP condition timing</Comment>
+          </PinEdge>
+        </PinEdges>
+      </TimeSet>
+      <TimeSet name="Idle">
+        <Period>t.SCL</Period>
+        <PinEdges>
+          <PinEdge pin="AllPins">
+            <DriveNonReturn>
+              <On>0</On>
+              <Data>0</Data>
+              <Off>0</Off>
+            </DriveNonReturn>
+            <CompareStrobe>
+              <Strobe>0</Strobe>
+            </CompareStrobe>
+            <DataSource>Pattern</DataSource>
+            <Comment>Timing while the bus is idle</Comment>
+          </PinEdge>
+        </PinEdges>
+      </TimeSet>
+      <TimeSet name="SourceStartSetup">
+        <Period>3 µs</Period>
+        <PinEdges>
+          <PinEdge pin="AllPins">
+            <DriveNonReturn>
+              <On>0</On>
+              <Data>0</Data>
+              <Off>0</Off>
+            </DriveNonReturn>
+            <CompareStrobe>
+              <Strobe>0</Strobe>
+            </CompareStrobe>
+            <DataSource>Pattern</DataSource>
+            <Comment>A setup delay required by the source_start opcode</Comment>
+          </PinEdge>
+        </PinEdges>
+      </TimeSet>
+    </TimeSets>
+  </TimingSheet>
+</TimingFile>
