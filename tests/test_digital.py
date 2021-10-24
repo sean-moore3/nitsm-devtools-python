@@ -12,7 +12,7 @@ import nidigital
 import nidevtools.digital as ni_dt_digital
 # from nitsm.pinquerycontexts import PinQueryContext
 
-# To create simulated hardware at runtime define the SIMULATE_HARDWARE boolean flag below.
+# To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
 pin_file_names = ["I2C.pinmap", "nidigital.pinmap"]
 # Change index below to change the pinmap to use
