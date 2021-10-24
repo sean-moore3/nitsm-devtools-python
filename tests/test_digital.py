@@ -12,9 +12,16 @@ import nidigital
 import nidevtools.digital as ni_dt_digital
 # from nitsm.pinquerycontexts import PinQueryContext
 
-# To create simulated hardware at runtime define the OPTIONS variable below.
-OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
-# OPTIONS = {} # empty dict options to run on real hardware.
+# To create simulated hardware at runtime define the SIMULATE_HARDWARE boolean flag below.
+SIMULATE_HARDWARE = True
+if SIMULATE_HARDWARE:
+    OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
+else:
+    OPTIONS = {}  # empty dict options to run on real hardware.
+
+pin_file_names = ["RedDragon1.pinmap", "I2C.pinmap", "nidigital.pinmap"]
+# Change index below to change the pinmap to use
+pin_file_name = pin_file_names[1]
 
 data_dir = os.path.join(os.path.dirname(__file__), "Data")
 specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs")
@@ -25,8 +32,6 @@ pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Write Template.
 pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Read Template.digipat")
 src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "Source Memory Buffer.tdms")
 cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "Capture Memory Buffer.digicapture")
-
-
 FILE_PATHS = {'specifications': [specification1, specification2],
               'levels': [level],
               'timing': [timing],
@@ -35,8 +40,6 @@ FILE_PATHS = {'specifications': [specification1, specification2],
               'capture_waveforms': []
               }
 
-print(FILE_PATHS)
-
 
 @pytest.fixture
 def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
@@ -44,11 +47,16 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     This TSM context uses standalone_tsm_context fixture created by the conftest.py """
     print("")
     print("entering tsm_context fixture")
-    # print(FILE_PATHS)
+    print(FILE_PATHS)
     ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=OPTIONS, file_paths=FILE_PATHS)
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
+    print("")
     print("exiting tsm_context fixture")
+
+#  @pytest.mark.sequence_file("/nites/nidigital.seq")
+#  def test_nidigital(system_test_runner):
+#    assert system_test_runner.run()
 
 
 @pytest.fixture
@@ -70,33 +78,28 @@ def digital_tsm_s(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data
     This fixture accepts single pin in string format or
     multiple pins in list of string format"""
-    if isinstance(test_pin_s[0], str):
-        digital_tsm_in = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, test_pin_s[0])
-    elif isinstance(test_pin_s[0], list):
-        digital_tsm_in = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, test_pin_s[0])
-    else:
-        assert False   # unexpected datatype
-
-    if isinstance(test_pin_s[1], str):
-        digital_tsm_out = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, test_pin_s[1])
-    elif isinstance(test_pin_s[1], list):
-        digital_tsm_out = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, test_pin_s[1])
-    else:
-        assert False  # unexpected datatype
-
-    return [digital_tsm_in, digital_tsm_out]
+    digital_tsms = []
+    for test_pin in test_pin_s:
+        if isinstance(test_pin, str):
+            digital_tsms.append(ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, test_pin))
+        elif isinstance(test_pin, list):
+            digital_tsms.append(ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, test_pin))
+        else:
+            assert False   # unexpected datatype
+    return digital_tsms
 
 
 @pytest.fixture
-def digital_ssc(digital_tsm_s):
+def digital_ssc_s(digital_tsm_s):
     """Returns LabVIEW Array equivalent data"""
     # func needs to be defined.
-    return digital_tsm_s
+    digital_sscs = []
+    for digital_tsm in digital_tsm_s:
+        digital_sscs.extend(digital_tsm.ssc)
+    return digital_sscs
 
 
-# @pytest.mark.pin_map("RedDragon1.pinmap")
-@pytest.mark.pin_map("I2C.pinmap")
-# @pytest.mark.pin_map("nidigital.pinmap")
+@pytest.mark.pin_map(pin_file_name)
 class TestNIDigital:
     """The Following APIs/VIs are used in the DUT Power on sequence.
     So these functions needs to be test first.
@@ -180,16 +183,6 @@ class TestNIDigital:
         pass
 
 
-# pin_map_instruments = ["DigitalPattern1", "DigitalPattern2"]
-# pin_map_file_path = "C://G//nitsm-devtools-python//tests//supporting_materials//nidigital.pinmap"
-# pin_map_file_path = os.path.join(os.path.dirname(__file__), "nidigital.pinmap")
-
-
-#  @pytest.mark.sequence_file("/nites/nidigital.seq")
-#  def test_nidigital(system_test_runner):
-#    assert system_test_runner.run()
-
-
 @nitsm.codemoduleapi.code_module
 def close_sessions(tsm_context: SemiconductorModuleContext):
     ni_dt_digital.tsm_close_sessions(tsm_context)
@@ -223,7 +216,7 @@ def configuration(tsm_context: SemiconductorModuleContext, pins: typing.List[str
 
 
 @nitsm.codemoduleapi.code_module
-def frequency_measurement(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
+def frequency_measurement_func(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
     tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_frequency_counter_configure_measurement_time(tsm, 0.5)
@@ -404,7 +397,7 @@ def sequencer_flags_and_registers(tsm_context: SemiconductorModuleContext, pins:
 
 
 @nitsm.codemoduleapi.code_module
-def session_properties(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
+def session_properties_func(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
     tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
 
     _, session_properties = ni_dt_digital.tsm_ssc_get_properties(tsm)
