@@ -32,7 +32,6 @@ pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Write Template.
 pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Read Template.digipat")
 cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
 src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
-
 FILE_PATHS = {'specifications': [specification1, specification2],
               'levels': [level],
               'timing': [timing],
