@@ -13,7 +13,7 @@ import nidevtools.digital as ni_dt_digital
 # from nitsm.pinquerycontexts import PinQueryContext
 
 # To create simulated hardware at runtime define the SIMULATE_HARDWARE boolean flag below.
-SIMULATE_HARDWARE = True
+SIMULATE_HARDWARE = False
 if SIMULATE_HARDWARE:
     OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
 else:
@@ -124,19 +124,27 @@ class TestNIDigital:
         temp_tsm = ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], function_to_select)
         assert isinstance(temp_tsm, ni_dt_digital.TSMDigital)
 
-    def test_tsm_ssc_write_static(self, digital_tsm_s):
-        """TSM SSC Digital Write Static.vi"""
+    def test_tsm_ssc_write_static_lopback_pin(self, digital_tsm_s):
+        """TSM SSC Digital Write Static.vi
+        This onoot
+        """
+        ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
-        assert 1 == 1
+        _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[1])
+        for per_site_data in per_site_per_pin_data:
+            for per_pin_data in per_site_data:
+                assert isinstance(per_pin_data, enums.PinState)
+                assert per_pin_data == enums.PinState.H
 
-    def test_tsm_ssc_read_static(self, digital_tsm_s):
+    def test_tsm_ssc_rite_read_static_same_pin(self, digital_tsm_s):
+        """Write satic on pin rrad onsaao pn """
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
-                assert per_pin_data == enums.PinState.ONE
+                assert (per_pin_data == enums.PinState.H)
 
     @pytest.mark.skip
     def test_tsm_ssc_ppmu_source_voltage(self, digital_tsm_s):
@@ -171,11 +179,12 @@ class TestNIDigital:
     @pytest.mark.skip
     def test_tsm_ssc_burst_pattern(self, digital_tsm_s):
         """To do"""
-        pass
+        assert 1 == 1
 
     @pytest.mark.skip
     def test_tsm_ssc_ppmu_source_voltage_per_site_per_pin(self, digital_tsm_s):
-        pass
+        """To do"""
+        assert 1 == 1
 
     @pytest.mark.skip
     def test_tsm_ssc_get_properties(self, digital_tsm_s):
