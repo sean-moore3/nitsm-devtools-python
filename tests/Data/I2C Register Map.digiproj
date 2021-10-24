@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="71E0E4EF7D67D9F0B1858340C8DD3650" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="3D3E409C9BB6794F7F9D28371BDDB70A" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
@@ -33,6 +33,8 @@
 			<FileReference Id="232" ModelDefinitionType="SpecificationsDefinition" Name="I2C\ Characteristic\.specs" StoragePath="Specifications\I2C Characteristic.specs" />
 			<FileReference Id="235" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}DutBringupDefinition" Name="I2C\ Bringup\.dutbringup" StoragePath="I2C Bringup.dutbringup" />
 			<SourceFileReference Id="270" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}SystemViewDefinition" Name="SystemView\.digisysview" StoragePath="SystemView.digisysview" />
+			<FileReference Id="273" ModelDefinitionType="PinMap" Name="nidcpower\.pinmap" StoragePath="nidcpower.pinmap" />
+			<FileReference Id="274" ModelDefinitionType="PinMap" Name="nidigital\.pinmap" StoragePath="nidigital.pinmap" />
 		</NameScopingEnvoy>
 		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">
 			<ProjectPropertiesDefinition xmlns="http://www.ni.com/PatternBasedDigital" />

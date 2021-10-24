@@ -13,8 +13,27 @@
 		<SystemPin name="VDDIO" />
 		<DUTPin name="R_SCL" />
 		<DUTPin name="R_SDA" />
+		<SystemPin name="SMD" />
 	</Pins>
 	<PinGroups>
+		<PinGroup name="SGL">
+			<PinReference pin="SCL" />
+			<PinReference pin="SDA" />
+		</PinGroup>
+		<PinGroup name="R_SGL">
+			<PinReference pin="R_SCL" />
+			<PinReference pin="R_SDA" />
+		</PinGroup>
+		<PinGroup name="Mix">
+			<PinReference pin="SCL" />
+			<PinReference pin="R_SDA" />
+			<PinReference pin="VDDIO" />
+		</PinGroup>
+		<PinGroup name="Pwr">
+			<PinReference pin="VDD" />
+			<PinReference pin="VDDIO" />
+			<PinReference pin="SMD" />
+		</PinGroup>
 		<PinGroup name="AllPins">
 			<PinReference pin="SCL" />
 			<PinReference pin="SDA" />
@@ -60,7 +79,8 @@
 		<Connection pin="SDA" siteNumber="5" instrument="DPI1" channel="26" />
 		<Connection pin="SDA" siteNumber="6" instrument="DPI1" channel="30" />
 		<Connection pin="SDA" siteNumber="0" instrument="DPI1" channel="6" />
-		<SystemConnection pin="VDD" instrument="DPI1" channel="1" />
+		<SystemConnection pin="VDD" instrument="DPI1" channel="2" />
 		<SystemConnection pin="VDDIO" instrument="DPI1" channel="3" />
+		<SystemConnection pin="SMD" instrument="SMU1" channel="0" />
 	</Connections>
 </PinMap>

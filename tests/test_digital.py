@@ -30,12 +30,11 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     """
     print("")
     print("entering tsm_context fixture")
-    print ("Test is running on Simulated driver?", SIMULATE_HARDWARE)
+    print("Test is running on Simulated driver?", SIMULATE_HARDWARE)
     if SIMULATE_HARDWARE:
-        OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
+        options = {"Simulate": True, "driver_setup": {"Model": "6571"}}
     else:
-        OPTIONS = {}  # empty dict options to run on real hardware.
-
+        options = {}  # empty dict options to run on real hardware.
     data_dir = os.path.join(os.path.dirname(__file__), "Data")
     specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs")
     specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
@@ -46,14 +45,11 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
     src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
     digital_project_files = {'specifications': [specification1, specification2],
-                  'levels': [level],
-                  'timing': [timing],
-                  'pattern': [pattern1, pattern2],
-                  'capture_waveforms': [cap_wfm],
-                  'source_waveforms': [src_wfm]
-                  }
+                             'levels': [level], 'timing': [timing],
+                             'pattern': [pattern1, pattern2],
+                             'capture_waveforms': [cap_wfm], 'source_waveforms': [src_wfm]}
     print(digital_project_files)
-    ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=OPTIONS, file_paths=digital_project_files)
+    ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=options, file_paths=digital_project_files)
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
     print("")
@@ -65,16 +61,14 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
 
 
 @pytest.fixture
-def test_pin_s(request):
+def test_pin_s():
     """Need to improve this logic for supplying test pins
     using @pytest.mark.parametrize"""
-    pin_map_name = request.node.get_closest_marker("pin_map").args[0]
-    if pin_map_name == "I2C.pinmap":
-        test_pins = ["SCL", "SDA"]
-        read_pins = ["R_SCL", "R_SDA"]
-    else:
-        test_pins = ["DUTPin1", "SystemPin1"]
-        read_pins = ["DUTPin2"]
+    test_pins = ["SCL", "SDA"]
+    read_pins = ["R_SCL", "R_SDA"]
+    all_pins = test_pins+read_pins
+    power_pins = ["VDD", "VDDIO"]
+    resistor_pin = ["SMD"]
     return [test_pins, read_pins]
 
 
