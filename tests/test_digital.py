@@ -13,41 +13,47 @@ import nidevtools.digital as ni_dt_digital
 # from nitsm.pinquerycontexts import PinQueryContext
 
 # To create simulated hardware at runtime define the SIMULATE_HARDWARE boolean flag below.
-SIMULATE_HARDWARE = False
-if SIMULATE_HARDWARE:
-    OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
-else:
-    OPTIONS = {}  # empty dict options to run on real hardware.
+SIMULATE_HARDWARE = True
 
 pin_file_names = ["RedDragon1.pinmap", "I2C.pinmap", "nidigital.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[1]
 
-data_dir = os.path.join(os.path.dirname(__file__), "Data")
-specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs")
-specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
-level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
-timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C Timing.digitiming")
-pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Write Template.digipat")
-pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Read Template.digipat")
-cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
-src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
-FILE_PATHS = {'specifications': [specification1, specification2],
-              'levels': [level],
-              'timing': [timing],
-              'pattern': [pattern1, pattern2],
-              'capture_waveforms': [cap_wfm],
-              'source_waveforms': [src_wfm]
-              }
-
 
 @pytest.fixture
 def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
-    """This TSM context is on simulated hardware or on real hardware based on OPTIONS defined above.
-    This TSM context uses standalone_tsm_context fixture created by the conftest.py """
+    """
+    This TSM context is on simulated hardware or on real hardware based on OPTIONS defined above.
+    This TSM context uses standalone_tsm_context fixture created by the conftest.py
+    The fixture provides the digital project files necessary for initialisation of sessions
+    in a dictionary format.
+    """
     print("")
     print("entering tsm_context fixture")
-    ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=OPTIONS, file_paths=FILE_PATHS)
+    print ("Test is running on Simulated driver?", SIMULATE_HARDWARE)
+    if SIMULATE_HARDWARE:
+        OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
+    else:
+        OPTIONS = {}  # empty dict options to run on real hardware.
+
+    data_dir = os.path.join(os.path.dirname(__file__), "Data")
+    specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs")
+    specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
+    level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
+    timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C Timing.digitiming")
+    pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Write Template.digipat")
+    pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Read Template.digipat")
+    cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
+    src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
+    digital_project_files = {'specifications': [specification1, specification2],
+                  'levels': [level],
+                  'timing': [timing],
+                  'pattern': [pattern1, pattern2],
+                  'capture_waveforms': [cap_wfm],
+                  'source_waveforms': [src_wfm]
+                  }
+    print(digital_project_files)
+    ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=OPTIONS, file_paths=digital_project_files)
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
     print("")
@@ -124,9 +130,26 @@ class TestNIDigital:
         temp_tsm = ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], function_to_select)
         assert isinstance(temp_tsm, ni_dt_digital.TSMDigital)
 
-    def test_tsm_ssc_write_static_lopback_pin(self, digital_tsm_s):
+    def test_tsm_ssc_write_read_static_loop_back_pin_low(self, digital_tsm_s):
         """TSM SSC Digital Write Static.vi
-        This onoot
+        This test writes data on one pin and reads back on another pin.
+        digital_tsm_s[0] is write pin and digital_tsm_s[1] is read pin
+        This test may pass on simulated device as low is the default value.
+        Test with write ZERO and read Low
+        """
+        ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
+        ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
+        _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[1])
+        for per_site_data in per_site_per_pin_data:
+            for per_pin_data in per_site_data:
+                assert isinstance(per_pin_data, enums.PinState)
+                assert per_pin_data == enums.PinState.L
+
+    def test_tsm_ssc_write_read_static_loop_back_pin_high(self, digital_tsm_s):
+        """TSM SSC Digital Write Static.vi
+        This test writes data on one pin and reads back on another pin.
+        digital_tsm_s[0] is write pin and digital_tsm_s[1] is read pin
+        Test with write ONE and read High
         """
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
@@ -136,8 +159,26 @@ class TestNIDigital:
                 assert isinstance(per_pin_data, enums.PinState)
                 assert per_pin_data == enums.PinState.H
 
-    def test_tsm_ssc_rite_read_static_same_pin(self, digital_tsm_s):
-        """Write satic on pin rrad onsaao pn """
+    def test_tsm_ssc_write_read_static_same_pin_low(self, digital_tsm_s):
+        """TSM SSC Digital Write Static.vi
+         This test writes data on one pin and reads back on same pin.
+         digital_tsm_s[0] is write pin and digital_tsm_s[0] is read pin
+         Test with write ZERO and read Low
+         """
+        ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
+        ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
+        _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
+        for per_site_data in per_site_per_pin_data:
+            for per_pin_data in per_site_data:
+                assert isinstance(per_pin_data, enums.PinState)
+                assert (per_pin_data == enums.PinState.L)
+
+    def test_tsm_ssc_write_read_static_same_pin_high(self, digital_tsm_s):
+        """TSM SSC Digital Write Static.vi
+         This test writes data on one pin and reads back on same pin.
+         digital_tsm_s[0] is write pin and digital_tsm_s[0] is read pin
+         Test with write ONE and read High
+         """
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
