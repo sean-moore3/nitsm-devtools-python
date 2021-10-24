@@ -47,8 +47,6 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     This TSM context uses standalone_tsm_context fixture created by the conftest.py """
     print("")
     print("entering tsm_context fixture")
-    print(FILE_PATHS['source_waveforms'])
-    print(FILE_PATHS['capture_waveforms'])
     ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=OPTIONS, file_paths=FILE_PATHS)
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)

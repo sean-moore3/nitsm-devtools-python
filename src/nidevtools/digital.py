@@ -1786,14 +1786,10 @@ def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: di
             for capture_waveform_file in capture_waveform_files:
                 filename = os.path.basename(capture_waveform_file)
                 waveform_name, _ = filename.split(".")
-                print("File Name is:", filename)
-                print("Waveform name is ", waveform_name)
                 session.create_capture_waveform_from_file_digicapture(waveform_name, capture_waveform_file)
             for source_waveform_file in source_waveform_files:
                 filename = os.path.basename(source_waveform_file)
                 waveform_name, _ = filename.split(".")
-                print("File Name is:", filename)
-                print("Waveform name is ", waveform_name)
                 session.create_source_waveform_from_file_tdms(waveform_name, source_waveform_file, False)
 
 
