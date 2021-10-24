@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="61F3F162FAC0DFA0927E0B6524FFFD80" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="71E0E4EF7D67D9F0B1858340C8DD3650" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
@@ -25,10 +25,10 @@
 			<EmbeddedDefinitionReference Id="217" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}DigitalScopeDefinition" Name="DigitalScope">
 				<DigitalScopeDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
 			</EmbeddedDefinitionReference>
-			<FileReference Id="225" ModelDefinitionType="CaptureWaveformDefinition" Name="Capture\ Memory\ Buffer\.digicapture" StoragePath="Waveforms\Capture Memory Buffer.digicapture" />
+			<FileReference Id="225" ModelDefinitionType="CaptureWaveformDefinition" Name="capture_buffer\.digicapture" StoragePath="Waveforms\capture_buffer.digicapture" />
 			<FileReference Id="226" ModelDefinitionType="DigitalPatternEditor.PatternDefinition" Name="I2C\ Read\ Template\.digipat" StoragePath="Patterns\I2C Read Template.digipat" />
 			<FileReference Id="227" ModelDefinitionType="DigitalPatternEditor.PatternDefinition" Name="I2C\ Write\ Template\.digipat" StoragePath="Patterns\I2C Write Template.digipat" />
-			<FileReference Id="228" ModelDefinitionType="SourceWaveformDefinition" Name="Source\ Memory\ Buffer\.tdms" StoragePath="Waveforms\Source Memory Buffer.tdms" />
+			<FileReference Id="228" ModelDefinitionType="SourceWaveformDefinition" Name="source_buffer\.tdms" StoragePath="Waveforms\source_buffer.tdms" />
 			<FileReference Id="229" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}RegisterMapDefinition" Name="I2C\ Register\ Map\.digireg" StoragePath="I2C Register Map.digireg" />
 			<FileReference Id="232" ModelDefinitionType="SpecificationsDefinition" Name="I2C\ Characteristic\.specs" StoragePath="Specifications\I2C Characteristic.specs" />
 			<FileReference Id="235" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}DutBringupDefinition" Name="I2C\ Bringup\.dutbringup" StoragePath="I2C Bringup.dutbringup" />

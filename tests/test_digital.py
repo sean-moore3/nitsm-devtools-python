@@ -30,14 +30,15 @@ level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
 timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C Timing.digitiming")
 pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Write Template.digipat")
 pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Read Template.digipat")
-src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "Source Memory Buffer.tdms")
-cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "Capture Memory Buffer.digicapture")
+cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
+src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
+
 FILE_PATHS = {'specifications': [specification1, specification2],
               'levels': [level],
               'timing': [timing],
               'pattern': [pattern1, pattern2],
-              'source_waveforms': [],
-              'capture_waveforms': []
+              'capture_waveforms': [cap_wfm],
+              'source_waveforms': [src_wfm]
               }
 
 
@@ -47,7 +48,8 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     This TSM context uses standalone_tsm_context fixture created by the conftest.py """
     print("")
     print("entering tsm_context fixture")
-    print(FILE_PATHS)
+    print(FILE_PATHS['source_waveforms'])
+    print(FILE_PATHS['capture_waveforms'])
     ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=OPTIONS, file_paths=FILE_PATHS)
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
