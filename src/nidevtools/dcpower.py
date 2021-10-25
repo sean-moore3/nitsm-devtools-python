@@ -1089,7 +1089,7 @@ def initialize_sessions(tsm_context: SemiconductorModuleContext, power_line_freq
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(tsm_context: SemiconductorModuleContext,
                      pins: typing.List[str],
-                     site_numbers: typing.List[int],
+                     site_numbers: typing.List[int] = [],
                      fill_pin_site_info=True):
     if len(site_numbers) == 0:
         site_numbers = list(tsm_context.site_numbers)

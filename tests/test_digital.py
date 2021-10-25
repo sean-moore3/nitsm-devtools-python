@@ -14,7 +14,7 @@ import nidevtools.digital as ni_dt_digital
 
 # To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
-pin_file_names = ["I2C.pinmap", "nidigital.pinmap"]
+pin_file_names = ["I2C.pinmap", "I2C_Logic.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 
@@ -22,7 +22,7 @@ pin_file_name = pin_file_names[0]
 @pytest.fixture
 def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     """
-    This TSM context is on simulated hardware or on real hardware based on OPTIONS defined above.
+    This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     The fixture provides the digital project files necessary for initialisation of sessions
     in a dictionary format.
@@ -67,7 +67,7 @@ def test_pin_s():
     read_pins = ["R_SCL", "R_SDA"]
     all_pins = test_pins+read_pins
     power_pins = ["VDD", "VDDIO"]
-    resistor_pin = ["SMD"]
+    # resistor_pin = ["SMD"]
     return [test_pins, read_pins]
 
 
@@ -98,6 +98,7 @@ def digital_ssc_s(digital_tsm_s):
 
 
 @pytest.mark.pin_map(pin_file_name)
+@pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestNIDigital:
     """The Following APIs/VIs are used in the DUT Power on sequence.
     So these functions needs to be test first.
@@ -113,8 +114,8 @@ class TestNIDigital:
     def test_tsm_ssc_n_pins_to_m_sessions(self, digital_tsm_s, test_pin_s):
         """TSM SSC Digital N Pins To M Sessions.vi"""
         print(test_pin_s)
-        assert isinstance(digital_tsm_s[0], ni_dt_digital.TSMDigital)
-        assert isinstance(digital_tsm_s[1], ni_dt_digital.TSMDigital)
+        for digital_tsm in digital_tsm_s:
+            assert isinstance(digital_tsm, ni_dt_digital.TSMDigital)
 
     def test_tsm_ssc_select_function(self, digital_tsm_s):
         """ TSM SSC Digital Select Function.vi
@@ -133,10 +134,18 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[1])
+        flag = False
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
-                assert (per_pin_data == enums.PinState.L or per_pin_data == enums.PinState.M)
+                if per_pin_data == enums.PinState.M:
+                    print("value of per_site_data is midvalue M")
+                    assert per_pin_data == enums.PinState.M
+                    flag = True
+                else:
+                    assert per_pin_data == enums.PinState.L
+        if flag:
+            print(per_site_per_pin_data)
 
     def test_tsm_ssc_write_read_static_loop_back_pin_high(self, digital_tsm_s):
         """TSM SSC Digital Write Static.vi

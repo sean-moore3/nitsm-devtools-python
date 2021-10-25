@@ -123,6 +123,7 @@ def expand_pin_groups_and_identify_pin_types(tsm_context: SemiconductorModuleCon
     pin_type_ex_out = []
     index_out = []
     i = 0
+    print(pins_in)
     for d_pin in pins_in:
         if d_pin in pins_temp:
             index_d = pins_temp.index(d_pin)

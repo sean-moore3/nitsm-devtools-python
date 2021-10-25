@@ -3,7 +3,7 @@
 	<Instruments>
 		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" />
 		<NIDCPowerInstrument name="SMU1" numberOfChannels="1">
-			<ChannelGroup name="CommonDCPowerChannelGroup" />
+			<ChannelGroup name="VCC_G_SY" channels="0" />
 		</NIDCPowerInstrument>
 	</Instruments>
 	<Pins>
@@ -13,7 +13,7 @@
 		<SystemPin name="VDDIO" />
 		<DUTPin name="R_SCL" />
 		<DUTPin name="R_SDA" />
-		<SystemPin name="SMD" />
+		<SystemPin name="VCC" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="SGL">
@@ -32,7 +32,7 @@
 		<PinGroup name="Pwr">
 			<PinReference pin="VDD" />
 			<PinReference pin="VDDIO" />
-			<PinReference pin="SMD" />
+			<PinReference pin="VCC" />
 		</PinGroup>
 		<PinGroup name="AllPins">
 			<PinReference pin="SCL" />
@@ -81,6 +81,6 @@
 		<Connection pin="SDA" siteNumber="0" instrument="DPI1" channel="6" />
 		<SystemConnection pin="VDD" instrument="DPI1" channel="2" />
 		<SystemConnection pin="VDDIO" instrument="DPI1" channel="3" />
-		<SystemConnection pin="SMD" instrument="SMU1" channel="0" />
+		<SystemConnection pin="VCC" instrument="SMU1" channel="0" />
 	</Connections>
 </PinMap>

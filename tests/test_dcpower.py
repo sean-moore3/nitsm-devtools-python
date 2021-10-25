@@ -2,36 +2,71 @@ import pytest
 import nidcpower
 import nidevtools.dcpower as ni_dt_dc_power
 from nitsm.codemoduleapi import SemiconductorModuleContext
-# import os.path
+import os.path
 # import os
 
-# To create simulated hardware at runtime define the OPTIONS variable below.
-OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
-# OPTIONS = {} # empty options to run on real hardware.
+# To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
+SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
+
+pin_file_names = ["I2C.pinmap",  "I2C_Logic.pinmap", "Logic.pinmap"]
+# Change index below to change the pinmap to use
+pin_file_name = pin_file_names[0]
+
 
 @pytest.fixture
 def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
-    """This TSM context is on simulated hardware or on real hardware based on OPTIONS defined above.
-    This TSM context uses standalone_tsm_context fixture created by the conftest.py """
-    ni_dt_dc_power.initialize_sessions(standalone_tsm_context, options = OPTIONS)
+    """
+    This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
+    This TSM context uses standalone_tsm_context fixture created by the conftest.py
+    """
+    print("")
+    print("entering tsm_context fixture")
+    print("Test is running on Simulated driver?", SIMULATE_HARDWARE)
+    if SIMULATE_HARDWARE:
+        options = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
+    else:
+        options = {}  # empty options to run on real hardware.
+
+    ni_dt_dc_power.initialize_sessions(standalone_tsm_context, options=options)
     yield standalone_tsm_context
     ni_dt_dc_power.close_sessions(standalone_tsm_context)
+    print("")
+    print("exiting tsm_context fixture")
 
 
 @pytest.fixture
-def dcpower_tsm(tsm_context, pins):
+def test_pin_s():
+    """Need to improve this logic for supplying test pins
+    using @pytest.mark.parametrize"""
+    # pin_map_instruments = ["SMU1", "SMU2"]
+    test_pins = ["SCL", "SDA"]
+    read_pins = ["R_SCL", "R_SDA"]
+    all_pins = test_pins+read_pins
+    resistor_pin = ["SMD"]
+    power_pins = ["VDD", "VDDIO"]
+    return [resistor_pin]
+
+
+@pytest.fixture
+def dcpower_tsm_s(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data"""
-    # func needs to be defined.
-    return tsm_context
+    dcpower_tsms = []
+    for test_pin in test_pin_s:
+        dcpower_tsms.append(ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin))
+    return dcpower_tsms
 
 
 @pytest.fixture
-def dcpower_ssc(dcpower_tsm):
+def dcpower_ssc_s(dcpower_tsm_s):
     """Returns LabVIEW Array equivalent data"""
     # func needs to be defined.
-    return dcpower_tsm
+    dcpower_ssc = []
+    for dcpower_tsm in dcpower_tsm_s:
+        dcpower_ssc.extend(dcpower_tsm.ssc)
+    return dcpower_ssc
 
-@pytest.mark.pin_map("nidcpower.pinmap")
+
+@pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestDCPower:
     """
@@ -49,81 +84,55 @@ class TestDCPower:
             assert isinstance(session, nidcpower.Session)
         assert len(queried_sessions) == len(tsm_context.get_all_nidcpower_resource_strings())
 
-    @pytest.mark.skip
-    def test_pin_to_sessions(self, dcpower_tsm):
+    def test_pin_to_sessions(self, dcpower_tsm_s, test_pin_s):
         """ TSM SSC DCPower Pins to Sessions.vi """
-        for session in dcpower_tsm:
+        print(test_pin_s)
+        for session in dcpower_tsm_s:
             assert isinstance(session, nidcpower.Session)
 
-    @pytest.mark.skip
-    def test_get_max_current(self, dcpower_tsm):
+    def test_get_max_current(self, dcpower_tsm_s):
         """TSM DC Power Get Max Current.vi"""
-        dcpower_tsm.get_max_current()
+        assert dcpower_tsm_s.get_max_current()
 
-    @pytest.mark.skip
-    def test_configure_settings(self, dcpower_tsm):
+    def test_configure_settings(self, dcpower_tsm_s):
         """  TSM SSC DCPower Configure Settings.vim"""
-        dcpower_tsm.configure_settings()
+        assert dcpower_tsm_s.configure_settings()
 
-    @pytest.mark.skip
-    def test_abort(self, dcpower_tsm):
+    def test_measure(self, dcpower_tsm_s):
         """# TSM SSC DCPower Measure.vi"""
-        dcpower_tsm.abort()
+        assert dcpower_tsm_s.measure()
 
     @pytest.mark.skip
-    def test_abort(self, dcpower_tsm):
+    def test_tsm_source_current(self, dcpower_tsm_s):
         """# TSM SSC DCPower Source Current.vim"""
-        dcpower_tsm.abort()
+        dcpower_tsm_s.abort()
 
     @pytest.mark.skip
-    def test_abort(self, dcpower_tsm):
+    def test_tsm_source_voltage(self, dcpower_tsm_s):
         """# TSM SSC DCPower Source Voltage.vim"""
-        dcpower_tsm.abort()
+        dcpower_tsm_s.abort()
 
-    @pytest.mark.skip
-    def test_abort(self, dcpower_tsm):
+    def test_reset(self, dcpower_tsm_s):
         """# SSC DCPower Reset Channels.vi"""
-        dcpower_tsm.abort()
+        dcpower_tsm_s.reset()
 
     @pytest.mark.skip
-    def test_abort(self, dcpower_tsm):
+    def test_ssc_source_current(self, dcpower_tsm_s):
         """# SSC DCPower Source Current.vim"""
-        dcpower_tsm.abort()
+        dcpower_tsm_s.abort()
+
+    def test_query_in_compliance(self, dcpower_tsm_s):
+        assert dcpower_tsm_s.query_in_compliance()
+
+    def test_initiate(self, dcpower_tsm_s):
+        assert dcpower_tsm_s.initiate()
+
+    def test_commit(self, dcpower_tsm_s):
+        assert dcpower_tsm_s.commit()
 
     @pytest.mark.skip
-    def test_query_in_compliance(self, dcpower_tsm):
-        dcpower_tsm.query_in_compliance()
+    def test_reset(self, dcpower_tsm_s):
+        dcpower_tsm_s.reset()
 
-    @pytest.mark.skip
-    def test_initiate(self, dcpower_tsm):
-        dcpower_tsm.initiate()
-
-    @pytest.mark.skip
-    def test_commit(self, dcpower_tsm):
-        dcpower_tsm.commit()
-
-    @pytest.mark.skip
-    def test_reset(self, dcpower_tsm):
-        dcpower_tsm.reset()
-
-    @pytest.mark.skip
-    def test_abort(self, dcpower_tsm):
-        dcpower_tsm.abort()
-
-
-def test_dummy():
-    # ni_dt_dc_power.initialize_sessions(
-    #    standalone_tsm_context, options=OPTIONS
-    # )
-    # ni_dt_tsm=ni_dt_dc_power.pins_to_sessions(standalone_tsm_context, ["DUTPin1", "DUTPin2"], site_numbers=[],
-    #                                       fill_pin_site_info=True)
-    # yield ni_dt_tsm
-    # ni_dt_dc_power.close_sessions(standalone_tsm_context)
-    pass
-
-
-# pin_map_instruments = ["DCPower1", "DCPower2"]
-# pin_map_dut_pins = ["DUTPin1", "DUTPin2"]
-# pin_map_system_pins = ["SystemPin1"]
-# pin_map_file_path = "C://G//nitsm-devtools-python//tests//supporting_materials//nidcpower.pinmap"
-# pin_map_file_path = os.path.join(os.path.dirname(__file__), "nidcpower.pinmap")
+    def test_abort(self, dcpower_tsm_s):
+        dcpower_tsm_s.abort()
