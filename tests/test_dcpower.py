@@ -8,7 +8,7 @@ import os.path
 # To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
 
-pin_file_names = ["I2C.pinmap",  "I2C_Logic.pinmap", "Logic.pinmap"]
+pin_file_names = ["I2C.pinmap",  "I2C_Logic.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 
@@ -36,15 +36,21 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
 
 @pytest.fixture
 def test_pin_s():
-    """Need to improve this logic for supplying test pins
-    using @pytest.mark.parametrize"""
-    # pin_map_instruments = ["SMU1", "SMU2"]
-    test_pins = ["SCL", "SDA"]
-    read_pins = ["R_SCL", "R_SDA"]
-    all_pins = test_pins+read_pins
-    resistor_pin = ["SMD"]
-    power_pins = ["VDD", "VDDIO"]
-    return [resistor_pin]
+    """
+    Need to improve this logic for supplying test pins
+    using @pytest.mark.parametrize
+    Also need to have selection input for requested pins and move this to conftest.py file.
+    Till then this function will be duplicate in both files with different output
+    """
+    # for Digital pattern instrument driver i.e. nidigital Testing
+    test_dut_pins = ["SCL", "SDA"]
+    read_dut_pins = ["R_SCL", "R_SDA"]
+    dpi_power_pins = ["VDD", "VDDIO"]
+    # for SMU driver i.e. nidcpower Testing
+    smu_power_pins = ["VCC"]
+    input_dut_pins = ["A", "B"]
+    output_dut_pins = ["C_Y", "Y"]
+    return [smu_power_pins]
 
 
 @pytest.fixture

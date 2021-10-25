@@ -7,14 +7,14 @@
 			<ChannelGroup name="VCC_G_SY" channels="0" />
 		</NIDCPowerInstrument>
 		<NIDCPowerInstrument name="SMU2" numberOfChannels="4">
-				<ChannelGroup name="IP_G_S0" channels="0-1" />
-			    <ChannelGroup name="IP_G_S1" channels="2-3" />
-        </NIDCPowerInstrument>
-            <NIDCPowerInstrument name="SMU3" numberOfChannels="4">
-                <ChannelGroup name="OP_G_S0" channels="0-1" />
-                <ChannelGroup name="OP_G_S1" channels="2-3" />
-            </NIDCPowerInstrument>
-        </Instruments>
+			<ChannelGroup name="IP_G_S0" channels="0-1" />
+			<ChannelGroup name="IP_G_S1" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU3" numberOfChannels="4">
+			<ChannelGroup name="OP_G_S0" channels="0-1" />
+			<ChannelGroup name="OP_G_S1" channels="2-3" />
+		</NIDCPowerInstrument>
+	</Instruments>
 	<Pins>
 		<DUTPin name="SCL" />
 		<DUTPin name="SDA" />
