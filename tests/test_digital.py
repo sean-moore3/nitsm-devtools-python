@@ -18,7 +18,7 @@ pin_file_names = ["I2C.pinmap", "I2C_Logic.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 if SIMULATE_HARDWARE:
-    # pin_file_name = pin_file_names[1]
+    pin_file_name = pin_file_names[1]
     pass
 
 
