@@ -42,13 +42,15 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
     level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
     timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C Timing.digitiming")
-    pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
-    pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read.digipat")
+    pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write_Loop.digipat")
+    pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read_Loop.digipat")
+    pattern3 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
+    pattern4 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read.digipat")
     cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
     src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
     digital_project_files = {'specifications': [specification1, specification2],
                              'levels': [level], 'timing': [timing],
-                             'pattern': [pattern1, pattern2],
+                             'pattern': [pattern1, pattern2, pattern3, pattern4],
                              'capture_waveforms': [cap_wfm], 'source_waveforms': [src_wfm]}
     print(digital_project_files)
     ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=options, file_paths=digital_project_files)
@@ -150,18 +152,15 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[1])
-        flag = False
+        print(per_site_per_pin_data)
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
                 if per_pin_data == enums.PinState.M:
                     print("value of per_site_data is midvalue M")
                     assert per_pin_data == enums.PinState.M
-                    flag = True
                 else:
                     assert per_pin_data == enums.PinState.L
-        if flag:
-            print(per_site_per_pin_data)
 
     def test_tsm_ssc_write_read_static_loop_back_pin_high(self, digital_tsm_s):
         """TSM SSC Digital Write Static.vi
@@ -172,6 +171,7 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[1])
+        print(per_site_per_pin_data)
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
@@ -186,6 +186,7 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
+        print(per_site_per_pin_data)
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
@@ -200,6 +201,7 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
+        print(per_site_per_pin_data)
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
@@ -233,7 +235,7 @@ class TestNIDigital:
 
     def test_tsm_ssc_burst_pattern_pass_fail(self, digital_tsm_s):
         """TSM SSC Digital Burst Pattern [Pass Fail].vi"""
-        _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(digital_tsm_s[2],"I2C_Write")
+        _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(digital_tsm_s[2],"I2C_Write_Loop")
         print(per_site_pass)
         for per_pass in per_site_pass:
             assert isinstance(per_pass, bool)
@@ -241,7 +243,7 @@ class TestNIDigital:
 
     def test_tsm_ssc_burst_pattern(self, digital_tsm_s):
         """To do"""
-        ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[2],"I2C_Read")
+        ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[2],"I2C_Read_Loop")
 
 
     @pytest.mark.skip
