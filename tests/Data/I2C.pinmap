@@ -14,6 +14,8 @@
 		<DUTPin name="R_SCL" />
 		<DUTPin name="R_SDA" />
 		<SystemPin name="VCC" />
+		<SystemPin name="R_VDD" />
+		<SystemPin name="R_VDDIO" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="SGL">
@@ -51,36 +53,38 @@
 		<Site siteNumber="6" />
 	</Sites>
 	<Connections>
-		<Connection pin="R_SCL" siteNumber="6" instrument="DPI1" channel="29" />
-		<Connection pin="R_SCL" siteNumber="5" instrument="DPI1" channel="25" />
-		<Connection pin="R_SCL" siteNumber="4" instrument="DPI1" channel="21" />
-		<Connection pin="R_SCL" siteNumber="3" instrument="DPI1" channel="17" />
-		<Connection pin="R_SCL" siteNumber="2" instrument="DPI1" channel="13" />
-		<Connection pin="R_SCL" siteNumber="1" instrument="DPI1" channel="9" />
-		<Connection pin="R_SCL" siteNumber="0" instrument="DPI1" channel="5" />
-		<Connection pin="R_SDA" siteNumber="6" instrument="DPI1" channel="31" />
-		<Connection pin="R_SDA" siteNumber="5" instrument="DPI1" channel="27" />
-		<Connection pin="R_SDA" siteNumber="0" instrument="DPI1" channel="7" />
-		<Connection pin="R_SDA" siteNumber="2" instrument="DPI1" channel="15" />
-		<Connection pin="R_SDA" siteNumber="1" instrument="DPI1" channel="11" />
-		<Connection pin="R_SDA" siteNumber="3" instrument="DPI1" channel="19" />
-		<Connection pin="R_SDA" siteNumber="4" instrument="DPI1" channel="23" />
-		<Connection pin="SCL" siteNumber="0" instrument="DPI1" channel="4" />
-		<Connection pin="SCL" siteNumber="2" instrument="DPI1" channel="12" />
-		<Connection pin="SCL" siteNumber="3" instrument="DPI1" channel="16" />
-		<Connection pin="SCL" siteNumber="4" instrument="DPI1" channel="20" />
-		<Connection pin="SCL" siteNumber="5" instrument="DPI1" channel="24" />
-		<Connection pin="SCL" siteNumber="6" instrument="DPI1" channel="28" />
-		<Connection pin="SCL" siteNumber="1" instrument="DPI1" channel="8" />
-		<Connection pin="SDA" siteNumber="1" instrument="DPI1" channel="10" />
-		<Connection pin="SDA" siteNumber="2" instrument="DPI1" channel="14" />
-		<Connection pin="SDA" siteNumber="3" instrument="DPI1" channel="18" />
-		<Connection pin="SDA" siteNumber="4" instrument="DPI1" channel="22" />
-		<Connection pin="SDA" siteNumber="5" instrument="DPI1" channel="26" />
-		<Connection pin="SDA" siteNumber="6" instrument="DPI1" channel="30" />
-		<Connection pin="SDA" siteNumber="0" instrument="DPI1" channel="6" />
-		<SystemConnection pin="VDD" instrument="DPI1" channel="2" />
-		<SystemConnection pin="VDDIO" instrument="DPI1" channel="3" />
+		<Connection pin="R_SCL" siteNumber="6" instrument="DPI1" channel="25" />
+		<Connection pin="R_SCL" siteNumber="5" instrument="DPI1" channel="21" />
+		<Connection pin="R_SCL" siteNumber="4" instrument="DPI1" channel="17" />
+		<Connection pin="R_SCL" siteNumber="3" instrument="DPI1" channel="13" />
+		<Connection pin="R_SCL" siteNumber="2" instrument="DPI1" channel="9" />
+		<Connection pin="R_SCL" siteNumber="1" instrument="DPI1" channel="5" />
+		<Connection pin="R_SCL" siteNumber="0" instrument="DPI1" channel="1" />
+		<Connection pin="R_SDA" siteNumber="6" instrument="DPI1" channel="27" />
+		<Connection pin="R_SDA" siteNumber="5" instrument="DPI1" channel="23" />
+		<Connection pin="R_SDA" siteNumber="0" instrument="DPI1" channel="3" />
+		<Connection pin="R_SDA" siteNumber="2" instrument="DPI1" channel="11" />
+		<Connection pin="R_SDA" siteNumber="1" instrument="DPI1" channel="7" />
+		<Connection pin="R_SDA" siteNumber="3" instrument="DPI1" channel="15" />
+		<Connection pin="R_SDA" siteNumber="4" instrument="DPI1" channel="19" />
+		<Connection pin="SCL" siteNumber="0" instrument="DPI1" channel="0" />
+		<Connection pin="SCL" siteNumber="2" instrument="DPI1" channel="8" />
+		<Connection pin="SCL" siteNumber="3" instrument="DPI1" channel="12" />
+		<Connection pin="SCL" siteNumber="4" instrument="DPI1" channel="16" />
+		<Connection pin="SCL" siteNumber="5" instrument="DPI1" channel="20" />
+		<Connection pin="SCL" siteNumber="6" instrument="DPI1" channel="24" />
+		<Connection pin="SCL" siteNumber="1" instrument="DPI1" channel="4" />
+		<Connection pin="SDA" siteNumber="1" instrument="DPI1" channel="6" />
+		<Connection pin="SDA" siteNumber="2" instrument="DPI1" channel="10" />
+		<Connection pin="SDA" siteNumber="3" instrument="DPI1" channel="14" />
+		<Connection pin="SDA" siteNumber="4" instrument="DPI1" channel="18" />
+		<Connection pin="SDA" siteNumber="5" instrument="DPI1" channel="22" />
+		<Connection pin="SDA" siteNumber="6" instrument="DPI1" channel="26" />
+		<Connection pin="SDA" siteNumber="0" instrument="DPI1" channel="2" />
+		<SystemConnection pin="R_VDD" instrument="DPI1" channel="29" />
+		<SystemConnection pin="R_VDDIO" instrument="DPI1" channel="31" />
+		<SystemConnection pin="VDD" instrument="DPI1" channel="28" />
+		<SystemConnection pin="VDDIO" instrument="DPI1" channel="30" />
 		<SystemConnection pin="VCC" instrument="SMU1" channel="0" />
 	</Connections>
 </PinMap>
