@@ -204,10 +204,17 @@ class TestNIDigital:
                 assert isinstance(per_pin_data, enums.PinState)
                 assert (per_pin_data == enums.PinState.H)
 
-    @pytest.mark.skip
     def test_tsm_ssc_ppmu_source_voltage(self, digital_tsm_s):
         """TSM SSC Digital PPMU Source Voltage.vi"""
-        assert 1 == 1
+        ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.PPMU)
+        Voltage_to_source = 3.0
+        ni_dt_digital.tsm_ssc_ppmu_source_voltage(digital_tsm_s[0],Voltage_to_source, 0.02)
+        _,per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(digital_tsm_s[1])
+        print(per_site_per_pin_measurements)
+        for per_site_measurements in per_site_per_pin_measurements:
+            for per_pin_measurement in per_site_measurements:
+                assert isinstance(per_pin_measurement, float)
+                assert (Voltage_to_source-0.1 <= per_pin_measurement <= Voltage_to_source+0.1)
 
     @pytest.mark.skip
     def test_tsm_ssc_burst_pattern_pass_fail(self, digital_tsm_s):
