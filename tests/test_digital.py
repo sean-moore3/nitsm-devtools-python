@@ -42,8 +42,8 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
     level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
     timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C Timing.digitiming")
-    pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Write Template.digipat")
-    pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C Read Template.digipat")
+    pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
+    pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read.digipat")
     cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
     src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
     digital_project_files = {'specifications': [specification1, specification2],
@@ -83,7 +83,7 @@ def test_pin_s():
     else:
         pins_select = [smu_power_pins]
     # overriding the pin_select as it is inside digital module
-    pins_select = [test_dut_pins, read_dut_pins]
+    pins_select = [test_dut_pins, read_dut_pins, test_dut_pins+read_dut_pins]
     return pins_select
 
 
@@ -231,10 +231,18 @@ class TestNIDigital:
                     assert isinstance(per_pin_measurement, float)
                     assert (test_voltage-0.1 <= per_pin_measurement <= test_voltage+0.1)
 
-    @pytest.mark.skip
     def test_tsm_ssc_burst_pattern_pass_fail(self, digital_tsm_s):
         """TSM SSC Digital Burst Pattern [Pass Fail].vi"""
-        assert 1 == 1
+        _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(digital_tsm_s[2],"I2C_Write")
+        print(per_site_pass)
+        for per_pass in per_site_pass:
+            assert isinstance(per_pass, bool)
+            assert per_pass
+
+    def test_tsm_ssc_burst_pattern(self, digital_tsm_s):
+        """To do"""
+        ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[2],"I2C_Read")
+
 
     @pytest.mark.skip
     def test_tsm_ssc_apply_levels_and_timing(self, digital_tsm_s):
@@ -254,11 +262,6 @@ class TestNIDigital:
     @pytest.mark.skip
     def test_tsm_ssc_write_source_waveform_broadcast(self, digital_tsm_s):
         """TSM SSC Digital Write Source Waveform [Broadcast].vi"""
-        assert 1 == 1
-
-    @pytest.mark.skip
-    def test_tsm_ssc_burst_pattern(self, digital_tsm_s):
-        """To do"""
         assert 1 == 1
 
     @pytest.mark.skip
