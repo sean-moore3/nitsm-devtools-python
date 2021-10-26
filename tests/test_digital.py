@@ -216,7 +216,7 @@ class TestNIDigital:
             for per_site_measurements in per_site_per_pin_measurements:
                 for per_pin_measurement in per_site_measurements:
                     assert isinstance(per_pin_measurement, float)
-                    assert (test_voltage-0.01 <= per_pin_measurement <= test_voltage+0.01)
+                    assert (test_voltage-0.1 <= per_pin_measurement <= test_voltage+0.1)
 
     def test_tsm_ssc_ppmu_source_voltage_same_pin(self, digital_tsm_s):
         """TSM SSC Digital PPMU Source Voltage.vi"""
@@ -229,7 +229,7 @@ class TestNIDigital:
             for per_site_measurements in per_site_per_pin_measurements:
                 for per_pin_measurement in per_site_measurements:
                     assert isinstance(per_pin_measurement, float)
-                    assert (test_voltage-0.01 <= per_pin_measurement <= test_voltage+0.01)
+                    assert (test_voltage-0.1 <= per_pin_measurement <= test_voltage+0.1)
 
     @pytest.mark.skip
     def test_tsm_ssc_burst_pattern_pass_fail(self, digital_tsm_s):
