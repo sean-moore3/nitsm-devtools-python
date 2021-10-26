@@ -17,7 +17,9 @@ SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "
 pin_file_names = ["I2C.pinmap", "I2C_Logic.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
-
+if SIMULATE_HARDWARE:
+   # pin_file_name = pin_file_names[1]
+    pass
 
 @pytest.fixture
 def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
@@ -75,7 +77,13 @@ def test_pin_s():
     smu_power_pins = ["VCC"]
     input_dut_pins = ["A", "B"]
     output_dut_pins = ["C_Y", "Y"]
-    return [test_dut_pins, read_dut_pins]
+    if SIMULATE_HARDWARE:
+        pins_select = [input_dut_pins, output_dut_pins]
+    else:
+        pins_select = [smu_power_pins]
+    # overriding the pin_select as it is inside digital module
+    pins_select = [test_dut_pins, read_dut_pins]
+    return pins_select
 
 
 @pytest.fixture

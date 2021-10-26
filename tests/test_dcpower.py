@@ -11,6 +11,8 @@ SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "
 pin_file_names = ["I2C.pinmap",  "I2C_Logic.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
+if SIMULATE_HARDWARE:
+    pin_file_name = pin_file_names[1]
 
 
 @pytest.fixture
@@ -50,7 +52,13 @@ def test_pin_s():
     smu_power_pins = ["VCC"]
     input_dut_pins = ["A", "B"]
     output_dut_pins = ["C_Y", "Y"]
-    return [smu_power_pins]
+    if SIMULATE_HARDWARE:
+        pins_select = [input_dut_pins, output_dut_pins]
+    else:
+        pins_select = [smu_power_pins]
+    # disabling the pin_select below as it is inside dcpower module
+    # pins_select = [test_dut_pins, read_dut_pins]
+    return pins_select
 
 
 @pytest.fixture
