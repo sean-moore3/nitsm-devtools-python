@@ -20,6 +20,17 @@ pin_file_name = pin_file_names[0]
 if SIMULATE_HARDWARE:
     pin_file_name = pin_file_names[1]
     pass
+data_dir = os.path.join(os.path.dirname(__file__), "Data")
+specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs")
+specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
+level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
+timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C Timing.digitiming")
+pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write_Loop.digipat")
+pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read_Loop.digipat")
+pattern3 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
+pattern4 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read.digipat")
+cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
+src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
 
 
 @pytest.fixture
@@ -37,17 +48,6 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
         options = {"Simulate": True, "driver_setup": {"Model": "6571"}}
     else:
         options = {}  # empty dict options to run on real hardware.
-    data_dir = os.path.join(os.path.dirname(__file__), "Data")
-    specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs")
-    specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
-    level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
-    timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C Timing.digitiming")
-    pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write_Loop.digipat")
-    pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read_Loop.digipat")
-    pattern3 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
-    pattern4 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read.digipat")
-    cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
-    src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
     digital_project_files = {'specifications': [specification1, specification2],
                              'levels': [level], 'timing': [timing],
                              'pattern': [pattern1, pattern2, pattern3, pattern4],
@@ -234,7 +234,11 @@ class TestNIDigital:
                     assert (test_voltage-0.1 <= per_pin_measurement <= test_voltage+0.1)
 
     def test_tsm_ssc_burst_pattern_pass_fail(self, digital_tsm_s):
-        """TSM SSC Digital Burst Pattern [Pass Fail].vi"""
+        """
+        TSM SSC Digital Burst Pattern [Pass Fail].vi
+        TSM SSC Digital Apply Levels and Timing.vi
+        """
+        ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2],str(level),str(timing))
         _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(digital_tsm_s[2],"I2C_Write_Loop")
         print(per_site_pass)
         for per_pass in per_site_pass:
@@ -242,7 +246,8 @@ class TestNIDigital:
             assert per_pass
 
     def test_tsm_ssc_burst_pattern(self, digital_tsm_s):
-        """To do"""
+        """TSM SSC Digital Apply Levels and Timing.vi"""
+        ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2],str(level),str(timing))
         ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[2],"I2C_Read_Loop")
 
 
