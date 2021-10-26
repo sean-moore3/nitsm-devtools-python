@@ -90,9 +90,10 @@ class TestDCPower:
 
     def test_initialize_session(self, tsm_context):
         """ This Api is used in the Init routine"""
-        queried_sessions = list(tsm_context.get_all_nidcpower_sessions())
+        queried_sessions = tsm_context.get_all_nidcpower_sessions()
         print("")
-        print("The number of sessions opened is ", len(queried_sessions))
+        print("The number of sessions opened is ", len(list(queried_sessions)))
+        assert isinstance(queried_sessions, tuple)
         for session in queried_sessions:
             print(session)
             assert isinstance(session, nidcpower.Session)
