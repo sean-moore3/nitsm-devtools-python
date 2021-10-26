@@ -18,8 +18,9 @@ pin_file_names = ["I2C.pinmap", "I2C_Logic.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 if SIMULATE_HARDWARE:
-   # pin_file_name = pin_file_names[1]
+    # pin_file_name = pin_file_names[1]
     pass
+
 
 @pytest.fixture
 def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
@@ -204,17 +205,33 @@ class TestNIDigital:
                 assert isinstance(per_pin_data, enums.PinState)
                 assert (per_pin_data == enums.PinState.H)
 
-    def test_tsm_ssc_ppmu_source_voltage(self, digital_tsm_s):
+    def test_tsm_ssc_ppmu_source_voltage_loop_back_pin(self, digital_tsm_s):
         """TSM SSC Digital PPMU Source Voltage.vi"""
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.PPMU)
-        Voltage_to_source = 3.0
-        ni_dt_digital.tsm_ssc_ppmu_source_voltage(digital_tsm_s[0],Voltage_to_source, 0.02)
-        _,per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(digital_tsm_s[1])
-        print(per_site_per_pin_measurements)
-        for per_site_measurements in per_site_per_pin_measurements:
-            for per_pin_measurement in per_site_measurements:
-                assert isinstance(per_pin_measurement, float)
-                assert (Voltage_to_source-0.1 <= per_pin_measurement <= Voltage_to_source+0.1)
+        test_voltages = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0 ]
+        for test_voltage in test_voltages:
+            test_voltage = 3.0
+            ni_dt_digital.tsm_ssc_ppmu_source_voltage(digital_tsm_s[0], test_voltage, 0.02)
+            _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(digital_tsm_s[1])
+            print(per_site_per_pin_measurements)
+            for per_site_measurements in per_site_per_pin_measurements:
+                for per_pin_measurement in per_site_measurements:
+                    assert isinstance(per_pin_measurement, float)
+                    assert (test_voltage-0.01 <= per_pin_measurement <= test_voltage+0.01)
+
+    def test_tsm_ssc_ppmu_source_voltage_same_pin(self, digital_tsm_s):
+        """TSM SSC Digital PPMU Source Voltage.vi"""
+        ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.PPMU)
+        test_voltages = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0 ]
+        for test_voltage in test_voltages:
+            test_voltage = 3.0
+            ni_dt_digital.tsm_ssc_ppmu_source_voltage(digital_tsm_s[0], test_voltage, 0.02)
+            _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(digital_tsm_s[0])
+            print(per_site_per_pin_measurements)
+            for per_site_measurements in per_site_per_pin_measurements:
+                for per_pin_measurement in per_site_measurements:
+                    assert isinstance(per_pin_measurement, float)
+                    assert (test_voltage-0.01 <= per_pin_measurement <= test_voltage+0.01)
 
     @pytest.mark.skip
     def test_tsm_ssc_burst_pattern_pass_fail(self, digital_tsm_s):
