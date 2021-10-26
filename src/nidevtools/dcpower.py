@@ -1064,6 +1064,7 @@ def initialize_sessions(tsm_context: SemiconductorModuleContext, power_line_freq
     resource_strings = tsm_context.get_all_nidcpower_resource_strings()
     for resource_string in resource_strings:
         session = nidcpower.Session(resource_string, reset=reset, options=options)
+        print(resource_string)
         try:
             session.reset()
         except nidcpower.errors.DriverError as error:
@@ -1095,6 +1096,9 @@ def pins_to_sessions(tsm_context: SemiconductorModuleContext,
         site_numbers = list(tsm_context.site_numbers)
     pins_expanded = []
     pins_info = []
+    pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
+    print("pin_query_context, sessions, channels \n", pin_query_context, sessions, channels)
+
     if fill_pin_site_info:
         pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(tsm_context, pins)
     else:
@@ -1102,8 +1106,6 @@ def pins_to_sessions(tsm_context: SemiconductorModuleContext,
             a = ni_dt_common.PinInformation  # create instance of class
             a.pin = pin
             pins_info.append(a)
-
-    pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
     session_channel_list = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, [])
     sscs = [_NIDCPowerSSC(session, channel) for session, channel in zip(sessions, session_channel_list)]
     dc_power_tsm = _NIDCPowerTSM(sscs)
