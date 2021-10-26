@@ -250,12 +250,6 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2],str(level),str(timing))
         ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[2],"I2C_Read_Loop")
 
-
-    @pytest.mark.skip
-    def test_tsm_ssc_apply_levels_and_timing(self, digital_tsm_s):
-        """TSM SSC Digital Apply Levels and Timing.vi"""
-        assert 1 == 1
-
     @pytest.mark.skip
     def test_tsm_ssc_configure_time_set_period(self, digital_tsm_s):
         """TSM SSC Digital Configure Time Set Period.vi"""
