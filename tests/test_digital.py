@@ -30,7 +30,9 @@ pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read_Loop.digip
 pattern3 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
 pattern4 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read.digipat")
 cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
-src_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
+src_wfm1 = os.path.join(os.path.join(data_dir, "Waveforms"), "Broadcast.tdms")
+src_wfm2 = os.path.join(os.path.join(data_dir, "Waveforms"), "SiteUnique.tdms")
+src_wfm3 = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
 
 
 @pytest.fixture
@@ -51,7 +53,7 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     digital_project_files = {'specifications': [specification1, specification2],
                              'levels': [level], 'timing': [timing],
                              'pattern': [pattern1, pattern2, pattern3, pattern4],
-                             'capture_waveforms': [cap_wfm], 'source_waveforms': [src_wfm]}
+                             'capture_waveforms': [cap_wfm], 'source_waveforms': [src_wfm1, src_wfm2, src_wfm3 ]}
     print(digital_project_files)
     ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=options, file_paths=digital_project_files)
     yield standalone_tsm_context
@@ -282,9 +284,24 @@ class TestNIDigital:
 
     def test_tsm_ssc_write_source_waveform_broadcast(self, digital_tsm_s):
         """TSM SSC Digital Write Source Waveform [Broadcast].vi"""
-        ni_dt_digital.tsm_ssc_write_source_waveform_broadcast()
+        ni_dt_digital.tsm_ssc_write_source_waveform_site_unique(
+            digital_tsm_s[0],
+            "SiteUnique",
+            [[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5],
+             [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]],
+            True,
+        )
+        ni_dt_digital.tsm_ssc_write_source_waveform_broadcast(
+            digital_tsm_s[0], "Broadcast", [1, 2, 3, 4, 5], True
+        )
+        # ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[0], "start_capture")
+        # _, per_site_waveforms = ni_dt_digital.tsm_ssc_fetch_capture_waveform(digital_tsm_s[0], "CaptureWaveform", 2)
+        # assert isinstance(per_site_waveforms, list)
+        # assert numpy.shape(per_site_waveforms) == (3, 2)
+        # for waveforms in per_site_waveforms:
+        #     for waveform in waveforms:
+        #         assert isinstance(waveform, int)
 
-        assert 1 == 0
 
     def test_tsm_ssc_write_sequencer_register(self, digital_tsm_s):
         """TSM SSC Digital Write Sequencer Register.vi"""
