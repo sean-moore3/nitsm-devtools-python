@@ -179,17 +179,12 @@ def pin_query_context_to_channel_list(pin_query_context: typing.Any,
     To do - find a way to fix the site number issue.For now assume that if site number is not passed
     no site is selected i.e. empty site array.
     """
-
     tsm_context = pin_query_context._tsm_context
-    print("\npin_query_context\n", pin_query_context)
-    print("\ntsm_context\n", tsm_context)
-
     if not site_numbers:
         try:
             site_numbers = list(tsm_context.site_numbers())
         except Exception:
             site_numbers = []
-
     if expanded_pin_info:
         pins = [pin_info.pin for pin_info in expanded_pin_info]
         pin_types = [pin_info.type for pin_info in expanded_pin_info]
@@ -201,21 +196,15 @@ def pin_query_context_to_channel_list(pin_query_context: typing.Any,
             pin_types, pin_group_found = identify_pin_types(tsm_context, pins)
     num_pins_per_channel_group, channel_group_indices, channel_indices = \
         tsm_context.GetChannelGroupAndChannelIndex(pins=pins)
-    print("\nnum_pins_per_channel_group\n", num_pins_per_channel_group)
     channel_group_indices = tuple(zip(*channel_group_indices))  # transpose(channel_group_indices)
     channel_indices = tuple(zip(*channel_indices)) # transpose(channel_indices)
-    print("\nchannel_group_indices\n", channel_group_indices )
-    print("\nchannel_indices\n", channel_indices)
-    print("\nPins\n", pins)
-
     data = []
     for pin_count in num_pins_per_channel_group:
         pin_str = [""]
         pins_array = pin_str * pin_count
         data.append(pins_array)
-    print("\ndata\n", data)
 
-    for channel_group_index_s, channel_index_s, site_number in zip(site_numbers, channel_group_indices, channel_indices):
+    for site_number, channel_group_index_s, channel_index_s  in zip(site_numbers, channel_group_indices, channel_indices):
         for channel_group_index, channel_index, pin, pin_type in zip(channel_group_index_s, channel_index_s, pins, pin_types):
             if pin_type == PinType.SYSTEM_PIN:
                 data[channel_group_index][channel_index] = str(pin)
@@ -225,15 +214,16 @@ def pin_query_context_to_channel_list(pin_query_context: typing.Any,
                     data[channel_group_index][channel_index] = temp[0]+"+"+str(site_number)+"/"+temp[1]
                 else:
                     data[channel_group_index][channel_index] = "Site"+str(site_number)+"/"+pin
-    print("\ndata\n", data)
     per_session_channel_list = []
     for row in data:
         row_data = ""
         for column in row:
             if column:
-                row_data = row_data+","+column
+                if row_data == "":
+                    row_data = column
+                else:
+                    row_data = row_data+","+column
         per_session_channel_list.append(row_data.strip())
-
     return per_session_channel_list, site_numbers
 
 

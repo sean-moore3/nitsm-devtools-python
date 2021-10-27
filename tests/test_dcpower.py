@@ -21,7 +21,7 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
-    print("\nTest is running on Simulated driver?", SIMULATE_HARDWARE)
+    print("\nSimulated driver?", SIMULATE_HARDWARE)
     if SIMULATE_HARDWARE:
         options = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
     else:
@@ -90,15 +90,16 @@ class TestDCPower:
         queried_sessions = tsm_context.get_all_nidcpower_sessions()
         assert isinstance(queried_sessions, tuple)
         for session in queried_sessions:
-            print(session)
+            print("\nTest_session\n", session)
             assert isinstance(session, nidcpower.Session)
         assert len(queried_sessions) == len(tsm_context.get_all_nidcpower_resource_strings())
 
     def test_pin_to_sessions(self, dcpower_tsm_s, test_pin_s):
         """ TSM SSC DCPower Pins to Sessions.vi """
-        print(test_pin_s)
-        for session in dcpower_tsm_s:
-            assert isinstance(session, nidcpower.Session)
+        print("\nTest_pin_s\n", test_pin_s)
+        for dcpower_tsm in dcpower_tsm_s:
+            print("\nTest_dcpower_tsm\n", dcpower_tsm)
+            assert isinstance(dcpower_tsm, ni_dt_dc_power.TSMDCPower)
 
     @pytest.mark.skip
     def test_get_max_current(self, dcpower_tsm_s):

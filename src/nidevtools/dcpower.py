@@ -1103,7 +1103,7 @@ def pins_to_sessions(tsm_context: SemiconductorModuleContext,
             a = ni_dt_common.PinInformation  # create instance of class
             a.pin = pin
             pins_info.append(a)
-    session_channel_list = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, site_numbers)
+    session_channel_list, _ = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, site_numbers)
     sscs = [_NIDCPowerSSC(session, channel) for session, channel in zip(sessions, session_channel_list)]
     dc_power_tsm = _NIDCPowerTSM(sscs)
     return TSMDCPower(pin_query_context, dc_power_tsm, site_numbers, pins_info, pins_expanded)
