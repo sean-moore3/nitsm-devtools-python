@@ -266,16 +266,24 @@ class TestNIDigital:
     def test_tsm_ssc_get_properties(self, digital_tsm_s):
         _, session_properties = ni_dt_digital.tsm_ssc_get_properties(digital_tsm_s[0])
         for session_property in session_properties:
+            print("instrument_name")
             assert session_property[0].startswith("DPI")
             print(session_property)
-            assert math.isclose(session_property[1], 0.0015, abs_tol=5e-6)
-            assert math.isclose(session_property[2], 0.0015, abs_tol=5e-6)
-            assert math.isclose(session_property[3], 0.0015, abs_tol=5e-6)
-            assert math.isclose(session_property[4], 0.0015, abs_tol=5e-6)
-            assert math.isclose(session_property[5], 0.0015, abs_tol=5e-6)
+            print("voh")
+            assert math.isclose(session_property[1], 1.7, abs_tol=5e-4)
+            print("vol")
+            assert math.isclose(session_property[2], 1.6, abs_tol=5e-4)
+            print("vih")
+            assert math.isclose(session_property[3], 3.3, abs_tol=5e-4)
+            print("vil")
+            assert session_property[4] == pytest.approx(3.05, 0.05)
+            print("vterm")
+            assert math.isclose(session_property[5], 2.0, abs_tol=5e-4)
 
     def test_tsm_ssc_write_source_waveform_broadcast(self, digital_tsm_s):
         """TSM SSC Digital Write Source Waveform [Broadcast].vi"""
+        ni_dt_digital.tsm_ssc_write_source_waveform_broadcast()
+
         assert 1 == 0
 
     def test_tsm_ssc_write_sequencer_register(self, digital_tsm_s):
