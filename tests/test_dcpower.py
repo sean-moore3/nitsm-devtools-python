@@ -21,9 +21,7 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
-    print("")
-    print("entering tsm_context fixture")
-    print("Test is running on Simulated driver?", SIMULATE_HARDWARE)
+    print("\nTest is running on Simulated driver?", SIMULATE_HARDWARE)
     if SIMULATE_HARDWARE:
         options = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
     else:
@@ -32,8 +30,7 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     ni_dt_dc_power.initialize_sessions(standalone_tsm_context, options=options)
     yield standalone_tsm_context
     ni_dt_dc_power.close_sessions(standalone_tsm_context)
-    print("")
-    print("exiting tsm_context fixture")
+
 
 
 @pytest.fixture
@@ -66,7 +63,7 @@ def dcpower_tsm_s(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data"""
     dcpower_tsms = []
     for test_pin in test_pin_s:
-        dcpower_tsms.append(ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin))
+        dcpower_tsms.append(ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True))
     return dcpower_tsms
 
 
@@ -90,10 +87,7 @@ class TestDCPower:
 
     def test_initialize_session(self, tsm_context):
         """ This Api is used in the Init routine"""
-        # instrument_names = tsm_context.get_all_nidcpower_instrument_names()
         queried_sessions = tsm_context.get_all_nidcpower_sessions()
-        print("")
-        # print("Instrument_names\n", instrument_names)
         assert isinstance(queried_sessions, tuple)
         for session in queried_sessions:
             print(session)
@@ -106,14 +100,17 @@ class TestDCPower:
         for session in dcpower_tsm_s:
             assert isinstance(session, nidcpower.Session)
 
+    @pytest.mark.skip
     def test_get_max_current(self, dcpower_tsm_s):
         """TSM DC Power Get Max Current.vi"""
         assert dcpower_tsm_s.get_max_current()
 
+    @pytest.mark.skip
     def test_configure_settings(self, dcpower_tsm_s):
         """  TSM SSC DCPower Configure Settings.vim"""
         assert dcpower_tsm_s.configure_settings()
 
+    @pytest.mark.skip
     def test_measure(self, dcpower_tsm_s):
         """# TSM SSC DCPower Measure.vi"""
         assert dcpower_tsm_s.measure()
@@ -128,6 +125,7 @@ class TestDCPower:
         """# TSM SSC DCPower Source Voltage.vim"""
         dcpower_tsm_s.abort()
 
+    @pytest.mark.skip
     def test_reset(self, dcpower_tsm_s):
         """# SSC DCPower Reset Channels.vi"""
         dcpower_tsm_s.reset()
@@ -137,12 +135,15 @@ class TestDCPower:
         """# SSC DCPower Source Current.vim"""
         dcpower_tsm_s.abort()
 
+    @pytest.mark.skip
     def test_query_in_compliance(self, dcpower_tsm_s):
         assert dcpower_tsm_s.query_in_compliance()
 
+    @pytest.mark.skip
     def test_initiate(self, dcpower_tsm_s):
         assert dcpower_tsm_s.initiate()
 
+    @pytest.mark.skip
     def test_commit(self, dcpower_tsm_s):
         assert dcpower_tsm_s.commit()
 
@@ -150,5 +151,6 @@ class TestDCPower:
     def test_reset(self, dcpower_tsm_s):
         dcpower_tsm_s.reset()
 
+    @pytest.mark.skip
     def test_abort(self, dcpower_tsm_s):
         dcpower_tsm_s.abort()
