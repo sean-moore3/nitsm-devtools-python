@@ -276,7 +276,7 @@ class TestNIDigital:
             print("vih")
             assert math.isclose(session_property[3], 3.3, abs_tol=5e-4)
             print("vil")
-            assert session_property[4] == pytest.approx(3.05, 0.05)
+            assert math.isclose(session_property[4], 3.05e-5, abs_tol=5e-4)
             print("vterm")
             assert math.isclose(session_property[5], 2.0, abs_tol=5e-4)
 
