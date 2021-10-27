@@ -2,13 +2,13 @@ import datetime
 import re
 import math
 import typing
+from datetime import datetime
 import nidcpower
 import nidcpower.enums as enums
 import nidcpower.errors
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import nidevtools.common as ni_dt_common
-from datetime import datetime
 
 
 class _ModelSupport:
