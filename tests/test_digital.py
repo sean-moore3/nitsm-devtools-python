@@ -24,7 +24,7 @@ data_dir = os.path.join(os.path.dirname(__file__), "Data")
 specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs")
 specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
 level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
-timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C Timing.digitiming")
+timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C_Timing.digitiming")
 pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write_Loop.digipat")
 pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read_Loop.digipat")
 pattern3 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
@@ -248,8 +248,13 @@ class TestNIDigital:
             assert per_pass
 
     def test_tsm_ssc_burst_pattern(self, digital_tsm_s):
-        """TSM SSC Digital Apply Levels and Timing.vi"""
+        """
+        TSM SSC Digital Apply Levels and Timing.vi
+        TSM SSC Digital Configure Time Set Period.vi
+        """
         ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2],str(level),str(timing))
+        _, configured_period = ni_dt_digital.tsm_ssc_configure_time_set_period(digital_tsm_s[0], "Idle", 40e-6)
+        assert math.isclose(configured_period, 40e-6, abs_tol=5e-6)
         ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[2],"I2C_Read_Loop")
 
     def test_tsm_ssc_ppmu_source_voltage_per_site_per_pin(self, digital_tsm_s):
@@ -294,22 +299,23 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_write_source_waveform_broadcast(
             digital_tsm_s[0], "Broadcast", [1, 2, 3, 4, 5], True
         )
-        # ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[0], "start_capture")
-        # _, per_site_waveforms = ni_dt_digital.tsm_ssc_fetch_capture_waveform(digital_tsm_s[0], "CaptureWaveform", 2)
-        # assert isinstance(per_site_waveforms, list)
-        # assert numpy.shape(per_site_waveforms) == (3, 2)
-        # for waveforms in per_site_waveforms:
-        #     for waveform in waveforms:
-        #         assert isinstance(waveform, int)
-
 
     def test_tsm_ssc_write_sequencer_register(self, digital_tsm_s):
         """TSM SSC Digital Write Sequencer Register.vi"""
-        assert 1 == 0
-
-    def test_tsm_ssc_configure_time_set_period(self, digital_tsm_s):
-        """TSM SSC Digital Configure Time Set Period.vi"""
-        assert 1 == 0
+        ni_dt_digital.tsm_ssc_write_sequencer_flag(digital_tsm_s[0], enums.SequencerFlag.FLAG1, True)
+        ni_dt_digital.tsm_ssc_write_sequencer_register(digital_tsm_s[0], enums.SequencerRegister.REGISTER1, 1)
+        _, per_instrument_state = ni_dt_digital.tsm_ssc_read_sequencer_flag(digital_tsm_s[0], enums.SequencerFlag.FLAG1)
+        assert isinstance(per_instrument_state, list)
+        assert numpy.shape(per_instrument_state) == (1,)
+        for state in per_instrument_state:
+            assert isinstance(state, bool)
+        _, per_instrument_register_values = ni_dt_digital.tsm_ssc_read_sequencer_register(
+            digital_tsm_s[0], enums.SequencerRegister.REGISTER1
+        )
+        assert isinstance(per_instrument_register_values, list)
+        assert numpy.shape(per_instrument_register_values) == (1,)
+        for register_value in per_instrument_register_values:
+            assert isinstance(register_value, int)
 
 
 @nitsm.codemoduleapi.code_module

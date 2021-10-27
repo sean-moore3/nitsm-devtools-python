@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="FFF423978B57B3C9E16A545634A13082" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="BB50091EE1DFA5F92447604B2E1B9CF2" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
@@ -14,7 +14,7 @@
 			<DefaultTarget />
 			<FileReference Id="11" ModelDefinitionType="PinMap" Name="I2C\.pinmap" StoragePath="I2C.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
 			<FileReference Id="12" ModelDefinitionType="SpecificationsDefinition" Name="Electrical\ Characteristics\.specs" StoragePath="Specifications\Electrical Characteristics.specs" />
-			<FileReference Id="19" ModelDefinitionType="TimingDefinition" Name="I2C\ Timing\.digitiming" StoragePath="Timing\I2C Timing.digitiming" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
+			<FileReference Id="19" ModelDefinitionType="TimingDefinition" Name="I2C_Timing\.digitiming" StoragePath="Timing\I2C_Timing.digitiming" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
 			<FileReference Id="20" ModelDefinitionType="PinLevelsDefinition" Name="PinLevels\.digilevels" StoragePath="Levels\PinLevels.digilevels" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
 			<EmbeddedDefinitionReference Id="212" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}CaptureResultsDefinition" Name="CaptureResults">
 				<CaptureResultsDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
