@@ -250,21 +250,6 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2],str(level),str(timing))
         ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[2],"I2C_Read_Loop")
 
-    @pytest.mark.skip
-    def test_tsm_ssc_configure_time_set_period(self, digital_tsm_s):
-        """TSM SSC Digital Configure Time Set Period.vi"""
-        assert 1 == 1
-
-    @pytest.mark.skip
-    def test_tsm_ssc_write_sequencer_register(self, digital_tsm_s):
-        """TSM SSC Digital Write Sequencer Register.vi"""
-        assert 1 == 1
-
-    @pytest.mark.skip
-    def test_tsm_ssc_write_source_waveform_broadcast(self, digital_tsm_s):
-        """TSM SSC Digital Write Source Waveform [Broadcast].vi"""
-        assert 1 == 1
-
     def test_tsm_ssc_ppmu_source_voltage_per_site_per_pin(self, digital_tsm_s):
         """To do"""
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.PPMU)
@@ -278,9 +263,28 @@ class TestNIDigital:
                     assert isinstance(per_pin_measurement, float)
                     assert (test_voltage - 0.1 <= per_pin_measurement <= test_voltage + 0.1)
 
-    @pytest.mark.skip
     def test_tsm_ssc_get_properties(self, digital_tsm_s):
-        pass
+        _, session_properties = ni_dt_digital.tsm_ssc_get_properties(digital_tsm_s[0])
+        for session_property in session_properties:
+            assert session_property[0].startswith("DPI")
+            print(session_property)
+            assert math.isclose(session_property[1], 0.0015, abs_tol=5e-6)
+            assert math.isclose(session_property[2], 0.0015, abs_tol=5e-6)
+            assert math.isclose(session_property[3], 0.0015, abs_tol=5e-6)
+            assert math.isclose(session_property[4], 0.0015, abs_tol=5e-6)
+            assert math.isclose(session_property[5], 0.0015, abs_tol=5e-6)
+
+    def test_tsm_ssc_write_source_waveform_broadcast(self, digital_tsm_s):
+        """TSM SSC Digital Write Source Waveform [Broadcast].vi"""
+        assert 1 == 0
+
+    def test_tsm_ssc_write_sequencer_register(self, digital_tsm_s):
+        """TSM SSC Digital Write Sequencer Register.vi"""
+        assert 1 == 0
+
+    def test_tsm_ssc_configure_time_set_period(self, digital_tsm_s):
+        """TSM SSC Digital Configure Time Set Period.vi"""
+        assert 1 == 0
 
 
 @nitsm.codemoduleapi.code_module
