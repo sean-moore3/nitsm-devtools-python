@@ -10,6 +10,7 @@ from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import nidigital
 import nidevtools.digital as ni_dt_digital
+
 # from nitsm.pinquerycontexts import PinQueryContext
 
 # To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
@@ -21,7 +22,9 @@ if SIMULATE_HARDWARE:
     pin_file_name = pin_file_names[1]
     pass
 data_dir = os.path.join(os.path.dirname(__file__), "Data")
-specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs")
+specification1 = os.path.join(
+    os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs"
+)
 specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
 level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
 timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C_Timing.digitiming")
@@ -50,16 +53,23 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
         options = {"Simulate": True, "driver_setup": {"Model": "6571"}}
     else:
         options = {}  # empty dict options to run on real hardware.
-    digital_project_files = {'specifications': [specification1, specification2],
-                             'levels': [level], 'timing': [timing],
-                             'pattern': [pattern1, pattern2, pattern3, pattern4],
-                             'capture_waveforms': [cap_wfm], 'source_waveforms': [src_wfm1, src_wfm2, src_wfm3 ]}
+    digital_project_files = {
+        "specifications": [specification1, specification2],
+        "levels": [level],
+        "timing": [timing],
+        "pattern": [pattern1, pattern2, pattern3, pattern4],
+        "capture_waveforms": [cap_wfm],
+        "source_waveforms": [src_wfm1, src_wfm2, src_wfm3],
+    }
     print(digital_project_files)
-    ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=options, file_paths=digital_project_files)
+    ni_dt_digital.tsm_initialize_sessions(
+        standalone_tsm_context, options=options, file_paths=digital_project_files
+    )
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
     print("")
     print("exiting tsm_context fixture")
+
 
 #  @pytest.mark.sequence_file("/nites/nidigital.seq")
 #  def test_nidigital(system_test_runner):
@@ -87,7 +97,7 @@ def test_pin_s():
     else:
         pins_select = [smu_power_pins]
     # overriding the pin_select as it is inside digital module
-    pins_select = [test_dut_pins, read_dut_pins, test_dut_pins+read_dut_pins]
+    pins_select = [test_dut_pins, read_dut_pins, test_dut_pins + read_dut_pins]
     return pins_select
 
 
@@ -103,7 +113,7 @@ def digital_tsm_s(tsm_context, test_pin_s):
         elif isinstance(test_pin, list):
             digital_tsms.append(ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, test_pin))
         else:
-            assert False   # unexpected datatype
+            assert False  # unexpected datatype
     return digital_tsms
 
 
@@ -125,7 +135,7 @@ class TestNIDigital:
     """
 
     def test_tsm_initialize_sessions(self, tsm_context):
-        """ This Api is used in the Init routine"""
+        """This Api is used in the Init routine"""
         queried_sessions = list(tsm_context.get_all_nidigital_sessions())
         for session in queried_sessions:
             assert isinstance(session, nidigital.Session)
@@ -138,7 +148,7 @@ class TestNIDigital:
             assert isinstance(digital_tsm, ni_dt_digital.TSMDigital)
 
     def test_tsm_ssc_select_function(self, digital_tsm_s):
-        """ TSM SSC Digital Select Function.vi
+        """TSM SSC Digital Select Function.vi
         Need to add logic to check back if the selected function is applied or not"""
         function_to_select = enums.SelectedFunction.DIGITAL
         temp_tsm = ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], function_to_select)
@@ -181,10 +191,10 @@ class TestNIDigital:
 
     def test_tsm_ssc_write_read_static_same_pin_low(self, digital_tsm_s):
         """TSM SSC Digital Write Static.vi
-         This test writes data on one pin and reads back on same pin.
-         digital_tsm_s[0] is write pin and digital_tsm_s[0] is read pin
-         Test with write ZERO and read Low
-         """
+        This test writes data on one pin and reads back on same pin.
+        digital_tsm_s[0] is write pin and digital_tsm_s[0] is read pin
+        Test with write ZERO and read Low
+        """
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
@@ -192,14 +202,14 @@ class TestNIDigital:
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
-                assert (per_pin_data == enums.PinState.L)
+                assert per_pin_data == enums.PinState.L
 
     def test_tsm_ssc_write_read_static_same_pin_high(self, digital_tsm_s):
         """TSM SSC Digital Write Static.vi
-         This test writes data on one pin and reads back on same pin.
-         digital_tsm_s[0] is write pin and digital_tsm_s[0] is read pin
-         Test with write ONE and read High
-         """
+        This test writes data on one pin and reads back on same pin.
+        digital_tsm_s[0] is write pin and digital_tsm_s[0] is read pin
+        Test with write ONE and read High
+        """
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
@@ -207,41 +217,47 @@ class TestNIDigital:
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
-                assert (per_pin_data == enums.PinState.H)
+                assert per_pin_data == enums.PinState.H
 
     def test_tsm_ssc_ppmu_source_voltage_loop_back_pin(self, digital_tsm_s):
         """TSM SSC Digital PPMU Source Voltage.vi"""
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.PPMU)
-        test_voltages = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0 ]
+        test_voltages = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0]
         for test_voltage in test_voltages:
             ni_dt_digital.tsm_ssc_ppmu_source_voltage(digital_tsm_s[0], test_voltage, 0.02)
-            _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(digital_tsm_s[1])
+            _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(
+                digital_tsm_s[1]
+            )
             print(per_site_per_pin_measurements)
             for per_site_measurements in per_site_per_pin_measurements:
                 for per_pin_measurement in per_site_measurements:
                     assert isinstance(per_pin_measurement, float)
-                    assert (test_voltage-0.1 <= per_pin_measurement <= test_voltage+0.1)
+                    assert test_voltage - 0.1 <= per_pin_measurement <= test_voltage + 0.1
 
     def test_tsm_ssc_ppmu_source_voltage_same_pin(self, digital_tsm_s):
         """TSM SSC Digital PPMU Source Voltage.vi"""
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.PPMU)
-        test_voltages = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0 ]
+        test_voltages = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0]
         for test_voltage in test_voltages:
             ni_dt_digital.tsm_ssc_ppmu_source_voltage(digital_tsm_s[0], test_voltage, 0.02)
-            _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(digital_tsm_s[0])
+            _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(
+                digital_tsm_s[0]
+            )
             print(per_site_per_pin_measurements)
             for per_site_measurements in per_site_per_pin_measurements:
                 for per_pin_measurement in per_site_measurements:
                     assert isinstance(per_pin_measurement, float)
-                    assert (test_voltage-0.1 <= per_pin_measurement <= test_voltage+0.1)
+                    assert test_voltage - 0.1 <= per_pin_measurement <= test_voltage + 0.1
 
     def test_tsm_ssc_burst_pattern_pass_fail(self, digital_tsm_s):
         """
         TSM SSC Digital Burst Pattern [Pass Fail].vi
         TSM SSC Digital Apply Levels and Timing.vi
         """
-        ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2],str(level),str(timing))
-        _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(digital_tsm_s[2],"I2C_Write_Loop")
+        ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2], str(level), str(timing))
+        _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(
+            digital_tsm_s[2], "I2C_Write_Loop"
+        )
         print(per_site_pass)
         for per_pass in per_site_pass:
             assert isinstance(per_pass, bool)
@@ -252,10 +268,12 @@ class TestNIDigital:
         TSM SSC Digital Apply Levels and Timing.vi
         TSM SSC Digital Configure Time Set Period.vi
         """
-        ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2],str(level),str(timing))
-        _, configured_period = ni_dt_digital.tsm_ssc_configure_time_set_period(digital_tsm_s[0], "Idle", 40e-6)
+        ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2], str(level), str(timing))
+        _, configured_period = ni_dt_digital.tsm_ssc_configure_time_set_period(
+            digital_tsm_s[0], "Idle", 40e-6
+        )
         assert math.isclose(configured_period, 40e-6, abs_tol=5e-6)
-        ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[2],"I2C_Read_Loop")
+        ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[2], "I2C_Read_Loop")
 
     def test_tsm_ssc_ppmu_source_voltage_per_site_per_pin(self, digital_tsm_s):
         """To do"""
@@ -263,12 +281,14 @@ class TestNIDigital:
         test_voltages = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0]
         for test_voltage in test_voltages:
             ni_dt_digital.tsm_ssc_ppmu_source_voltage(digital_tsm_s[0], test_voltage, 0.02)
-            _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(digital_tsm_s[1])
+            _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(
+                digital_tsm_s[1]
+            )
             print(per_site_per_pin_measurements)
             for per_site_measurements in per_site_per_pin_measurements:
                 for per_pin_measurement in per_site_measurements:
                     assert isinstance(per_pin_measurement, float)
-                    assert (test_voltage - 0.1 <= per_pin_measurement <= test_voltage + 0.1)
+                    assert test_voltage - 0.1 <= per_pin_measurement <= test_voltage + 0.1
 
     def test_tsm_ssc_get_properties(self, digital_tsm_s):
         _, session_properties = ni_dt_digital.tsm_ssc_get_properties(digital_tsm_s[0])
@@ -292,8 +312,15 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_write_source_waveform_site_unique(
             digital_tsm_s[0],
             "SiteUnique",
-            [[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5],
-             [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]],
+            [
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+            ],
             True,
         )
         ni_dt_digital.tsm_ssc_write_source_waveform_broadcast(
@@ -302,9 +329,15 @@ class TestNIDigital:
 
     def test_tsm_ssc_write_sequencer_register(self, digital_tsm_s):
         """TSM SSC Digital Write Sequencer Register.vi"""
-        ni_dt_digital.tsm_ssc_write_sequencer_flag(digital_tsm_s[0], enums.SequencerFlag.FLAG1, True)
-        ni_dt_digital.tsm_ssc_write_sequencer_register(digital_tsm_s[0], enums.SequencerRegister.REGISTER1, 1)
-        _, per_instrument_state = ni_dt_digital.tsm_ssc_read_sequencer_flag(digital_tsm_s[0], enums.SequencerFlag.FLAG1)
+        ni_dt_digital.tsm_ssc_write_sequencer_flag(
+            digital_tsm_s[0], enums.SequencerFlag.FLAG1, True
+        )
+        ni_dt_digital.tsm_ssc_write_sequencer_register(
+            digital_tsm_s[0], enums.SequencerRegister.REGISTER1, 1
+        )
+        _, per_instrument_state = ni_dt_digital.tsm_ssc_read_sequencer_flag(
+            digital_tsm_s[0], enums.SequencerFlag.FLAG1
+        )
         assert isinstance(per_instrument_state, list)
         assert numpy.shape(per_instrument_state) == (1,)
         for state in per_instrument_state:
@@ -458,7 +491,9 @@ def pin_levels_and_timing(tsm_context: SemiconductorModuleContext, pins: typing.
     ni_dt_digital.tsm_ssc_configure_time_set_compare_edge_per_site_per_pin(
         tsm, "time_set", [[40e-6, 40e-6]] * 3
     )
-    ni_dt_digital.tsm_ssc_configure_time_set_compare_edge_per_site(tsm, "time_set", [40e-6, 40e-6, 40e-6])
+    ni_dt_digital.tsm_ssc_configure_time_set_compare_edge_per_site(
+        tsm, "time_set", [40e-6, 40e-6, 40e-6]
+    )
     ni_dt_digital.tsm_ssc_configure_time_set_compare_edge(tsm, "time_set", 40e-6)
     ni_dt_digital.tsm_ssc_configure_voltage_levels(tsm, 0.0015, 0.0015, 0.0015, 0.0015, 0.0015)
     _, configured_period = ni_dt_digital.tsm_ssc_configure_time_set_period(tsm, "time_set", 40e-6)
@@ -517,7 +552,9 @@ def sequencer_flags_and_registers(tsm_context: SemiconductorModuleContext, pins:
 
     ni_dt_digital.tsm_ssc_write_sequencer_flag(tsm, enums.SequencerFlag.FLAG1, True)
     ni_dt_digital.tsm_ssc_write_sequencer_register(tsm, enums.SequencerRegister.REGISTER1, 1)
-    _, per_instrument_state = ni_dt_digital.tsm_ssc_read_sequencer_flag(tsm, enums.SequencerFlag.FLAG1)
+    _, per_instrument_state = ni_dt_digital.tsm_ssc_read_sequencer_flag(
+        tsm, enums.SequencerFlag.FLAG1
+    )
     assert isinstance(per_instrument_state, list)
     assert numpy.shape(per_instrument_state) == (2,)
     for state in per_instrument_state:

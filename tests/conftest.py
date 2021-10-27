@@ -14,7 +14,7 @@ _standalone_tsm_context_tlb = win32com.client.selecttlb.FindTlbsWithDescription(
 def _published_data_reader_factory(request):
     # get absolute path of the pin map file which is assumed to be relative to the test module
     pin_map_path = request.node.get_closest_marker("pin_map").args[0]
-    module_directory = os.path.join(os.path.dirname(request.module.__file__),"Data")
+    module_directory = os.path.join(os.path.dirname(request.module.__file__), "Data")
     pin_map_path = os.path.join(module_directory, pin_map_path)
 
     published_data_reader_factory = win32com.client.Dispatch(

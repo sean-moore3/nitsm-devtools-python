@@ -8,7 +8,7 @@ output_data = ni_dt_common.channel_list_to_pins(input_data)
 print(input_data)
 print(output_data)
 pattern = r"/\\"
-a = re.split(r'[/\\]', input_data)
+a = re.split(r"[/\\]", input_data)
 # print(a)
 
 data = []

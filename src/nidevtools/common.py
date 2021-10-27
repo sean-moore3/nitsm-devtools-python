@@ -35,21 +35,21 @@ class PinGroup(_Pin):
 
 class PinType(enum.Enum):
     DUT_PIN = 0
-    r'''
+    r"""
     This pin belongs to the device under test
-    '''
+    """
     SYSTEM_PIN = 1
-    r'''
+    r"""
     system pin belongs to the PCB for powering up components
-    '''
+    """
     PIN_GROUP = 2
-    r'''
+    r"""
     Pin Group is logical grouping of pins with similar attributes
-    '''
+    """
     NOT_DETERMINED = 3
-    r'''
+    r"""
     This pin type is not defined 
-    '''
+    """
 
 
 class PinInformation(typing.NamedTuple):
@@ -71,7 +71,7 @@ def channel_list_to_pins(channel_list: str):
     for pin in channel_list.split(","):
         clean_pin = pin.strip()
         sites_and_pins.append(clean_pin)
-        a = re.split(r'[/\\]', clean_pin, 2)
+        a = re.split(r"[/\\]", clean_pin, 2)
         if len(a) >= 2:
             sites.append(int(a[0][4:]))
             pins.append(a[1])
@@ -98,12 +98,15 @@ def get_all_pins(tsm_context: SemiconductorModuleContext, reload_cache=False):
     return _pins, _pin_types
 
 
-
-def get_pin_names_from_expanded_pin_information(expanded_pin_info: typing.List[ExpandedPinInformation]):
+def get_pin_names_from_expanded_pin_information(
+    expanded_pin_info: typing.List[ExpandedPinInformation],
+):
     return [pin_info.pin for pin_info in expanded_pin_info]
 
 
-def get_dut_pins_and_system_pins_from_expanded_pin_list(expanded_pin_info: typing.List[ExpandedPinInformation]):
+def get_dut_pins_and_system_pins_from_expanded_pin_list(
+    expanded_pin_info: typing.List[ExpandedPinInformation],
+):
     dut_pins = []
     system_pins = []
     for pin in expanded_pin_info:
@@ -136,15 +139,16 @@ def expand_pin_groups_and_identify_pin_types(tsm_context: SemiconductorModuleCon
                 a_pin_type = pin_types_temp[index_a]
                 pin_expanded = ExpandedPinInformation(_Pin(a_pin), a_pin_type, i)
                 pins_expanded.append(pin_expanded)
-        pin_info = PinInformation(d_pin,d_pin_type,count)
+        pin_info = PinInformation(d_pin, d_pin_type, count)
         pins_info.append(pin_info)
         i += 1
     pins_expanded = remove_duplicates_from_tsm_pin_information_array(pins_info, pins_expanded)
     return pins_info, pins_expanded
 
 
-def remove_duplicates_from_tsm_pin_information_array(pins_info: typing.List[PinInformation],
-                                                     pins_expanded: typing.List[ExpandedPinInformation]):
+def remove_duplicates_from_tsm_pin_information_array(
+    pins_info: typing.List[PinInformation], pins_expanded: typing.List[ExpandedPinInformation]
+):
     temp_pins = []
     temp_pins_expanded = []
     for pin_exp in pins_expanded:
@@ -159,9 +163,11 @@ def remove_duplicates_from_tsm_pin_information_array(pins_info: typing.List[PinI
     return temp_pins_expanded
 
 
-def select_between_expanded_pin_information_options(current: ExpandedPinInformation,
-                                                    duplicate: ExpandedPinInformation,
-                                                    pin_group_info: typing.List[PinInformation]):
+def select_between_expanded_pin_information_options(
+    current: ExpandedPinInformation,
+    duplicate: ExpandedPinInformation,
+    pin_group_info: typing.List[PinInformation],
+):
     a = pin_group_info[current.index].type
     b = pin_group_info[duplicate.index].type
     flag = (a != PinType.PIN_GROUP) and (b == PinType.PIN_GROUP)
@@ -172,9 +178,11 @@ def select_between_expanded_pin_information_options(current: ExpandedPinInformat
     return best_choice
 
 
-def pin_query_context_to_channel_list(pin_query_context: typing.Any,
-                                      expanded_pin_info: typing.List[ExpandedPinInformation],
-                                      site_numbers: typing.List[int]):
+def pin_query_context_to_channel_list(
+    pin_query_context: typing.Any,
+    expanded_pin_info: typing.List[ExpandedPinInformation],
+    site_numbers: typing.List[int],
+):
     """
     To do - find a way to fix the site number issue.For now assume that if site number is not passed
     no site is selected i.e. empty site array.
@@ -194,26 +202,35 @@ def pin_query_context_to_channel_list(pin_query_context: typing.Any,
         if pin_group_found:
             pins = tsm_context.get_pins_in_pin_groups(pins)
             pin_types, pin_group_found = identify_pin_types(tsm_context, pins)
-    num_pins_per_channel_group, channel_group_indices, channel_indices = \
-        tsm_context.GetChannelGroupAndChannelIndex(pins=pins)
+    (
+        num_pins_per_channel_group,
+        channel_group_indices,
+        channel_indices,
+    ) = tsm_context.GetChannelGroupAndChannelIndex(pins=pins)
     channel_group_indices = tuple(zip(*channel_group_indices))  # transpose(channel_group_indices)
-    channel_indices = tuple(zip(*channel_indices)) # transpose(channel_indices)
+    channel_indices = tuple(zip(*channel_indices))  # transpose(channel_indices)
     data = []
     for pin_count in num_pins_per_channel_group:
         pin_str = [""]
         pins_array = pin_str * pin_count
         data.append(pins_array)
 
-    for site_number, channel_group_index_s, channel_index_s  in zip(site_numbers, channel_group_indices, channel_indices):
-        for channel_group_index, channel_index, pin, pin_type in zip(channel_group_index_s, channel_index_s, pins, pin_types):
+    for site_number, channel_group_index_s, channel_index_s in zip(
+        site_numbers, channel_group_indices, channel_indices
+    ):
+        for channel_group_index, channel_index, pin, pin_type in zip(
+            channel_group_index_s, channel_index_s, pins, pin_types
+        ):
             if pin_type == PinType.SYSTEM_PIN:
                 data[channel_group_index][channel_index] = str(pin)
             else:
                 if data[channel_group_index][channel_index]:
                     temp = data[channel_group_index][channel_index].split("/")
-                    data[channel_group_index][channel_index] = temp[0]+"+"+str(site_number)+"/"+temp[1]
+                    data[channel_group_index][channel_index] = (
+                        temp[0] + "+" + str(site_number) + "/" + temp[1]
+                    )
                 else:
-                    data[channel_group_index][channel_index] = "Site"+str(site_number)+"/"+pin
+                    data[channel_group_index][channel_index] = "Site" + str(site_number) + "/" + pin
     per_session_channel_list = []
     for row in data:
         row_data = ""
@@ -222,7 +239,7 @@ def pin_query_context_to_channel_list(pin_query_context: typing.Any,
                 if row_data == "":
                     row_data = column
                 else:
-                    row_data = row_data+","+column
+                    row_data = row_data + "," + column
         per_session_channel_list.append(row_data.strip())
     return per_session_channel_list, site_numbers
 

@@ -3,12 +3,13 @@ import nidcpower
 import nidevtools.dcpower as ni_dt_dc_power
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import os.path
+
 # import os
 
 # To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
 
-pin_file_names = ["I2C.pinmap",  "I2C_Logic.pinmap"]
+pin_file_names = ["I2C.pinmap", "I2C_Logic.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 if SIMULATE_HARDWARE:
@@ -30,7 +31,6 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     ni_dt_dc_power.initialize_sessions(standalone_tsm_context, options=options)
     yield standalone_tsm_context
     ni_dt_dc_power.close_sessions(standalone_tsm_context)
-
 
 
 @pytest.fixture
@@ -63,7 +63,10 @@ def dcpower_tsm_s(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data"""
     dcpower_tsms = []
     for test_pin in test_pin_s:
-        dcpower_tsms.append(ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True))
+        dcpower_tsms.append(
+            ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True)
+        )
+    print("dcpower_tsms", dcpower_tsms)
     return dcpower_tsms
 
 
@@ -86,7 +89,7 @@ class TestDCPower:
     """
 
     def test_initialize_session(self, tsm_context):
-        """ This Api is used in the Init routine"""
+        """This Api is used in the Init routine"""
         queried_sessions = tsm_context.get_all_nidcpower_sessions()
         assert isinstance(queried_sessions, tuple)
         for session in queried_sessions:
@@ -95,20 +98,24 @@ class TestDCPower:
         assert len(queried_sessions) == len(tsm_context.get_all_nidcpower_resource_strings())
 
     def test_pin_to_sessions(self, dcpower_tsm_s, test_pin_s):
-        """ TSM SSC DCPower Pins to Sessions.vi """
+        """TSM SSC DCPower Pins to Sessions.vi"""
         print("\nTest_pin_s\n", test_pin_s)
         for dcpower_tsm in dcpower_tsm_s:
             print("\nTest_dcpower_tsm\n", dcpower_tsm)
             assert isinstance(dcpower_tsm, ni_dt_dc_power.TSMDCPower)
 
-    @pytest.mark.skip
     def test_get_max_current(self, dcpower_tsm_s):
         """TSM DC Power Get Max Current.vi"""
-        assert dcpower_tsm_s.get_max_current()
+        for dcpower_tsm in dcpower_tsm_s:
+            dcpower_tsm.pins_expanded
+            max_current = dcpower_tsm_s[0].get_max_current()
+
+        print("\nmax_current\n", max_current)
+        assert 0 == 1
 
     @pytest.mark.skip
     def test_configure_settings(self, dcpower_tsm_s):
-        """  TSM SSC DCPower Configure Settings.vim"""
+        """TSM SSC DCPower Configure Settings.vim"""
         assert dcpower_tsm_s.configure_settings()
 
     @pytest.mark.skip

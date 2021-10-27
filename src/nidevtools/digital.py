@@ -273,9 +273,7 @@ def tsm_ssc_log_hram_results(
                         str(cycle_information.cycle_number),
                         str(cycle_information.scan_cycle_number),
                         str(
-                            (lambda x: "P" if x else "F")(
-                                all(cycle_information.per_pin_pass_fail)
-                            )
+                            (lambda x: "P" if x else "F")(all(cycle_information.per_pin_pass_fail))
                         ),
                         "{" + ",".join(tsm.pins) + "}",
                         "{"
@@ -1745,8 +1743,11 @@ def tsm_close_sessions(tsm_context: SemiconductorModuleContext):
         session.reset()
         session.close()
 
+
 @nitsm.codemoduleapi.code_module
-def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: dict = {}, file_paths: dict = {}):
+def tsm_initialize_sessions(
+    tsm_context: SemiconductorModuleContext, options: dict = {}, file_paths: dict = {}
+):
     instrument_names = tsm_context.get_all_nidigital_instrument_names()
     if instrument_names:
         pin_map_file_path = tsm_context.pin_map_file_path
@@ -1761,42 +1762,49 @@ def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: di
         try:
             timing_files = tsm_context.nidigital_project_timing_file_paths
         except Exception:
-            timing_files = file_paths.get('timing', [])
+            timing_files = file_paths.get("timing", [])
         try:
             pattern_files = tsm_context.nidigital_project_pattern_file_paths
         except Exception:
-            pattern_files = file_paths.get('pattern', [])
+            pattern_files = file_paths.get("pattern", [])
         try:
             source_waveform_files = tsm_context.nidigital_project_source_waveform_file_paths
         except Exception:
-            source_waveform_files = file_paths.get('source_waveforms', [])
+            source_waveform_files = file_paths.get("source_waveforms", [])
         try:
             capture_waveform_files = tsm_context.nidigital_project_capture_waveform_file_paths
         except Exception:
-            capture_waveform_files = file_paths.get('capture_waveforms', [])
+            capture_waveform_files = file_paths.get("capture_waveforms", [])
 
         for instrument_name in instrument_names:
             session = nidigital.Session(instrument_name, options=options)
             tsm_context.set_nidigital_session(instrument_name, session)
             session.load_pin_map(pin_map_file_path)
-            session.load_specifications_levels_and_timing(specifications_files, levels_files, timing_files)
+            session.load_specifications_levels_and_timing(
+                specifications_files, levels_files, timing_files
+            )
             session.unload_all_patterns()
             for pattern_file in pattern_files:
                 session.load_pattern(pattern_file)
             for capture_waveform_file in capture_waveform_files:
                 filename = os.path.basename(capture_waveform_file)
                 waveform_name, _ = filename.split(".")
-                session.create_capture_waveform_from_file_digicapture(waveform_name, capture_waveform_file)
+                session.create_capture_waveform_from_file_digicapture(
+                    waveform_name, capture_waveform_file
+                )
             for source_waveform_file in source_waveform_files:
                 filename = os.path.basename(source_waveform_file)
                 waveform_name, _ = filename.split(".")
-                session.create_source_waveform_from_file_tdms(waveform_name, source_waveform_file, False)
+                session.create_source_waveform_from_file_tdms(
+                    waveform_name, source_waveform_file, False
+                )
 
 
 @nitsm.codemoduleapi.code_module
 def tsm_ssc_1_pin_to_n_sessions(tsm_context: SemiconductorModuleContext, pin: str):
     tsm = tsm_ssc_n_pins_to_m_sessions(tsm_context, [pin])
     return tsm
+
 
 @nitsm.codemoduleapi.code_module
 def tsm_ssc_n_pins_to_m_sessions(
