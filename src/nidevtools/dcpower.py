@@ -98,57 +98,14 @@ class CustomTransientResponse:
         return self._pole_zero_ratio
 
 
-def model_to_ranges(model, channel):
+def model_to_ranges(model: int, channel: int):
     """Returns current, voltage and resistance (for voltage and current) ranges """
     current_ranges = []
     voltage_ranges = []
     resistor_v_ranges = []
     resistor_i_ranges = []
-    if model == 4135:
-        resistor_v_ranges = [500000000, 5000000, 50000, 5000, 500, 50, 5]
-        resistor_i_ranges = resistor_v_ranges
-    elif model == 4137:
-        resistor_v_ranges = [5000000, 500000, 50000, 5000, 500, 50, 5]
-        resistor_i_ranges = resistor_v_ranges
-    elif model == 4139:
-        resistor_v_ranges = [5000000, 500000, 50000, 5000, 500, 50, 5, 0.5]
-        resistor_i_ranges = resistor_v_ranges
-    elif model == 4141:
-        resistor_v_ranges = [100000, 10000, 1000, 100, 10]
-    elif model == 4143:
-        resistor_v_ranges = [100000, 10000, 1000, 100, 6.66]
-    elif model == 4145:
-        resistor_v_ranges = [50000, 5000, 500, 50, 5, 1]
-    elif model == 4147:
-        resistor_v_ranges = [4000000, 400000, 40000, 4000, 400, 40, 1.25]
-        resistor_i_ranges = [2500000, 250000, 25000, 2500, 250, 25, 750]
-
-    if model == 4110 or model == 4112:
-        current_ranges = [1]
-    elif model == 4113:
-        current_ranges = [6]
-    elif model == 4132:
-        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1]
-    elif model == 4135:
-        current_ranges = [10e-9, 1e-6, 100e-6, 1e-3, 10e-3, 0.1, 1]
-    elif model == 4136 or model == 4137:
-        current_ranges = [1e-6, 10e-6, 100e-6, 1e-3, 10e-3, 0.1, 1]
-    elif model == 4138 or model == 4139:
-        current_ranges = [1e-6, 10e-6, 100e-6, 1e-3, 10e-3, 0.1, 1, 3]
-    elif model == 4140 or model == 4141:
-        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1]
-    elif model == 4142 or model == 4143:
-        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.15]
-    elif model == 4144 or model == 4145:
-        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1, 0.5]
-    elif model == 4147:
-        current_ranges = [1e-6, 10e-6, 100e-6, 1e-3, 10e-3, 0.1, 3]
-    elif model == 4162:
-        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1]
-    elif model == 4163:
-        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.05]
-
     if model == 4110:
+        current_ranges = [1]
         if channel == 0:
             voltage_ranges = [6]
         elif channel == 1:
@@ -156,23 +113,67 @@ def model_to_ranges(model, channel):
         elif channel == 2:
             voltage_ranges = [-20]
     elif model == 4112:
+        current_ranges = [1]
         voltage_ranges = [60]
     elif model == 4113:
+        current_ranges = [6]
         voltage_ranges = [10]
     elif model == 4132:
+        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1]
         voltage_ranges = [10, 100]
-    elif model == 4135 or model == 4136 or model == 4137:
+    elif model == 4135:
+        resistor_v_ranges = [500000000, 5000000, 50000, 5000, 500, 50, 5]
+        resistor_i_ranges = resistor_v_ranges
+        current_ranges = [10e-9, 1e-6, 100e-6, 1e-3, 10e-3, 0.1, 1]
         voltage_ranges = [0.6, 6, 20, 200]
-    elif model == 4138 or model == 4139:
+    elif model == 4136:
+        current_ranges = [1e-6, 10e-6, 100e-6, 1e-3, 10e-3, 0.1, 1]
+        voltage_ranges = [0.6, 6, 20, 200]
+    elif model == 4137:
+        resistor_v_ranges = [5000000, 500000, 50000, 5000, 500, 50, 5]
+        resistor_i_ranges = resistor_v_ranges
+        current_ranges = [1e-6, 10e-6, 100e-6, 1e-3, 10e-3, 0.1, 1]
+        voltage_ranges = [0.6, 6, 20, 200]
+    elif model == 4138:
+        current_ranges = [1e-6, 10e-6, 100e-6, 1e-3, 10e-3, 0.1, 1, 3]
         voltage_ranges = [0.6, 6, 60]
-    elif model == 4140 or model == 4141:
+    elif model == 4139:
+        resistor_v_ranges = [5000000, 500000, 50000, 5000, 500, 50, 5, 0.5]
+        resistor_i_ranges = resistor_v_ranges
+        current_ranges = [1e-6, 10e-6, 100e-6, 1e-3, 10e-3, 0.1, 1, 3]
+        voltage_ranges = [0.6, 6, 60]
+    elif model == 4140:
+        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1]
         voltage_ranges = [10]
-    elif model == 4142 or model == 4143 or model == 4162 or model == 4163:
+    elif model == 4141:
+        resistor_v_ranges = [100000, 10000, 1000, 100, 10]
+        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1]
+        voltage_ranges = [10]
+    elif model == 4142:
+        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.15]
         voltage_ranges = [24]
-    elif model == 4144 or model == 4145:
+    elif model == 4143:
+        resistor_v_ranges = [100000, 10000, 1000, 100, 6.66]
+        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.15]
+        voltage_ranges = [24]
+    elif model == 4144:
+        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1, 0.5]
+        voltage_ranges = [6]
+    elif model == 4145:
+        resistor_v_ranges = [50000, 5000, 500, 50, 5, 1]
+        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1, 0.5]
         voltage_ranges = [6]
     elif model == 4147:
+        resistor_v_ranges = [4000000, 400000, 40000, 4000, 400, 40, 1.25]
+        resistor_i_ranges = [2500000, 250000, 25000, 2500, 250, 25, 750]
         voltage_ranges = [1, 8]
+        current_ranges = [1e-6, 10e-6, 100e-6, 1e-3, 10e-3, 0.1, 3]
+    elif model == 4162:
+        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1]
+        voltage_ranges = [24]
+    elif model == 4163:
+        current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.05]
+        voltage_ranges = [24]
     return [voltage_ranges, current_ranges, resistor_v_ranges, resistor_i_ranges]
 
 
@@ -538,14 +539,17 @@ class _NIDCPowerSSC:
         self.session.source_mode = source_mode
 
     def get_smu_model(self):
-        smu_model = re.search("\d\d\d\d", self.session.instrument_model, re.RegexFlag.ASCII)[0]
-        return smu_model
+        smu_model_str = re.search("\d\d\d\d", self.session.instrument_model, re.RegexFlag.ASCII)[0]
+        smu_model_number = int(smu_model_str)
+        return smu_model_number
 
     def get_max_current(self):
-        smu_model = self.get_smu_model()
-        all_ranges = model_to_ranges(smu_model, self.channels)
-        print(smu_model, all_ranges)
-        current_ranges = all_ranges[1] # V_ranges, current_ranges, R_v, R_i
+        smu_model_number = self.get_smu_model()
+        # channel_number = int(self.channels)
+        channel_number = 0
+        all_ranges = model_to_ranges(smu_model_number, channel_number)
+        print(smu_model_number, all_ranges)
+        current_ranges = all_ranges[1]  # V_ranges, current_ranges, R_v, R_i
         max_current = current_ranges[-1]
         return max_current
 
@@ -1354,8 +1358,4 @@ if __name__ == "__main__":
     #     ssc = NIDCPowerSSC(session, "Dev1/0")
     #     tsm = NIDCPowerTSM([ssc])
     #     tsm.abort()
-    all_ranges = model_to_ranges(4162, "werew")
-    current_ranges = all_ranges[1]  # V_ranges, current_ranges, R_v, R_i
-    max_current = current_ranges[-1]
-    print("max_current", max_current)
-
+    pass

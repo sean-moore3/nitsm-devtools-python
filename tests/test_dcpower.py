@@ -103,6 +103,16 @@ class TestDCPower:
             print("\nTest_dcpower_tsm\n", dcpower_tsm)
             assert isinstance(dcpower_tsm, ni_dt_dc_power.TSMDCPower)
 
+    def test_get_max_current(self, dcpower_tsm_s):
+         """TSM DC Power Get Max Current.vi"""
+         expected_currents = [0.1, 0.1, 0.1]
+         index = 0
+         for dcpower_tsm in dcpower_tsm_s:
+             max_currents = dcpower_tsm.ssc.get_max_current()
+             print("\nmax_current\n", max_currents)
+             assert max(max_currents) == expected_currents[index]
+             index += 1
+
     def test_reset(self, dcpower_tsm_s):
         """# SSC DCPower Reset Channels.vi"""
         # the below code needs refactoring after changes from driver.
@@ -111,17 +121,17 @@ class TestDCPower:
             print("\ndcpower_tsm\n", dcpower_tsm)
             dcpower_tsm.ssc.reset() # resetting for all pins in all sites
 
-    def test_query_in_compliance(self, dcpower_tsm_s):
-        for dcpower_tsm in dcpower_tsm_s:
-            print("\ndcpower_tsm\n", dcpower_tsm)
-            dcpower_tsm.ssc.query_in_compliance()
-
-    def test_initiate(self, dcpower_tsm_s):
+    def test_initiate_commit_abort(self, dcpower_tsm_s):
         """Test initiate commit and abort """
         for dcpower_tsm in dcpower_tsm_s:
             dcpower_tsm.ssc.initiate()
             dcpower_tsm[1].commit() # ssc is at index 1 in Named Tuple
             dcpower_tsm.ssc.abort()
+
+    def test_query_in_compliance(self, dcpower_tsm_s):
+        for dcpower_tsm in dcpower_tsm_s:
+            print("\ndcpower_tsm\n", dcpower_tsm)
+            dcpower_tsm.ssc.query_in_compliance()
 
     @pytest.mark.skip
     def test_configure_settings(self, dcpower_tsm_s):
@@ -130,20 +140,11 @@ class TestDCPower:
             dcpower_tsm.ssc.configure_settings()
 
     @pytest.mark.skip
-    def test_measure(self, dcpower_tsm_s):
-        """# TSM SSC DCPower Measure.vi"""
-        for dcpower_tsm in dcpower_tsm_s:
-            dcpower_tsm.ssc.measure()
-
-    @pytest.mark.skip
     def test_tsm_source_current(self, dcpower_tsm_s):
-        """# TSM SSC DCPower Source Current.vim"""
-        for dcpower_tsm in dcpower_tsm_s:
-            dcpower_tsm.ssc.source_current()
-
-    @pytest.mark.skip
-    def test_ssc_source_current(self, dcpower_tsm_s):
-        """# SSC DCPower Source Current.vim"""
+        """
+        # TSM SSC DCPower Source Current.vim
+        # SSC DCPower Source Current.vim
+        """
         for dcpower_tsm in dcpower_tsm_s:
             dcpower_tsm.ssc.source_current()
 
@@ -153,13 +154,8 @@ class TestDCPower:
         for dcpower_tsm in dcpower_tsm_s:
             dcpower_tsm.ssc.source_voltage()
 
-    def test_get_max_current(self, dcpower_tsm_s):
-         """TSM DC Power Get Max Current.vi"""
-         expected_currents = [2.0, 2.0, 2.0]
-         index = 0
-         for dcpower_tsm in dcpower_tsm_s:
-             max_currents = dcpower_tsm.ssc.get_max_current()
-             print("\nmax_current\n", max_currents)
-             assert max(max_currents) == expected_currents[index]
-             index += 1
-
+    @pytest.mark.skip
+    def test_measure(self, dcpower_tsm_s):
+        """# TSM SSC DCPower Measure.vi"""
+        for dcpower_tsm in dcpower_tsm_s:
+            dcpower_tsm.ssc.measure()
