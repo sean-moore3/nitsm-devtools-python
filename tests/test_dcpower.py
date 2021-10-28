@@ -63,9 +63,7 @@ def dcpower_tsm_s(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data"""
     dcpower_tsms = []
     for test_pin in test_pin_s:
-        dcpower_tsms.append(
-            ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True)
-        )
+        dcpower_tsms.append(ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True))
     return dcpower_tsms
 
 
@@ -112,6 +110,33 @@ class TestDCPower:
              print("\nmax_current\n", max_currents)
              assert max(max_currents) == expected_currents[index]
              index += 1
+        # model = dcpower_tsm_s.get_smu_model() #not sure what object to call to get this property
+        # if model == 4110 or model == 4112:
+        #     current_ranges = [1]
+        # elif model == 4113:
+        #     current_ranges = [6]
+        # elif model == 4132:
+        #     current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1]
+        # elif model == 4135:
+        #     current_ranges = [10e-9, 1e-6, 100e-6, 1e-3, 10e-3, 0.1, 1]
+        # elif model == 4136 or model == 4137:
+        #     current_ranges = [1e-6, 10e-6, 100e-6, 1e-3, 10e-3, 0.1, 1]
+        # elif model == 4138 or model == 4139:
+        #     current_ranges = [1e-6, 10e-6, 100e-6, 1e-3, 10e-3, 0.1, 1, 3]
+        # elif model == 4140 or model == 4141:
+        #     current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1]
+        # elif model == 4142 or model == 4143:
+        #     current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.15]
+        # elif model == 4144 or model == 4145:
+        #     current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1, 0.5]
+        # elif model == 4147:
+        #     current_ranges = [1e-6, 10e-6, 100e-6, 1e-3, 10e-3, 0.1, 3]
+        # elif model == 4162:
+        #     current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.1]
+        # elif model == 4163:
+        #     current_ranges = [10e-6, 100e-6, 1e-3, 10e-3, 0.05]
+        # max_current = max(current_ranges)
+        # assert dcpower_tsm_s.get_max_current() == max_current
 
     def test_reset(self, dcpower_tsm_s):
         """# SSC DCPower Reset Channels.vi"""
@@ -120,6 +145,11 @@ class TestDCPower:
         for dcpower_tsm in dcpower_tsm_s:
             print("\ndcpower_tsm\n", dcpower_tsm)
             dcpower_tsm.ssc.reset() # resetting for all pins in all sites
+        # custom_settings = {"aperture_time": 20, "source_delay": 1.0, "sense": Sense.LOCAL}
+        # dcpower_tsm_s.configure_settings(custom_settings)
+        # dcpower_tsm_s.reset()
+        # default_settings = dcpower_tsm_s.get_measurement_settings()
+        # assert custom_settings != default_settings
 
     def test_initiate_commit_abort(self, dcpower_tsm_s):
         """Test initiate commit and abort """
@@ -138,6 +168,10 @@ class TestDCPower:
         """TSM SSC DCPower Configure Settings.vim"""
         for dcpower_tsm in dcpower_tsm_s:
             dcpower_tsm.ssc.configure_settings()
+        # custom_settings = {"aperture_time": 20, "source_delay": 1.0, "sense": Sense.LOCAL}
+        # dcpower_tsm_s.configure_settings(custom_settings)
+        # default_settings = dcpower_tsm_s.get_measurement_settings()
+        # assert custom_settings == default_settings
 
     @pytest.mark.skip
     def test_tsm_source_current(self, dcpower_tsm_s):
@@ -147,6 +181,10 @@ class TestDCPower:
         """
         for dcpower_tsm in dcpower_tsm_s:
             dcpower_tsm.ssc.source_current()
+        # c_Level = 0.5
+        # # Do not call configure meas since the default is auto
+        # ni_dt_dc_power.tsm_source_current(c_level)  # Where is the function to source? it force voltage?
+        # assert dcpower_tsm_s.measure()[1] == c_Level
 
     @pytest.mark.skip
     def test_tsm_source_voltage(self, dcpower_tsm_s):
@@ -159,3 +197,8 @@ class TestDCPower:
         """# TSM SSC DCPower Measure.vi"""
         for dcpower_tsm in dcpower_tsm_s:
             dcpower_tsm.ssc.measure()
+        # v_Level = 5
+        # # Do not call configure meas since the default is auto
+        # ni_dt_dc_power.tsm_source_voltage(v_level) #Where is the function to source? it force voltage?
+        # assert dcpower_tsm_s.measure()[0] == v_Level
+        #
