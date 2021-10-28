@@ -1353,9 +1353,4 @@ def close_sessions(tsm_context: SemiconductorModuleContext):
 
 
 if __name__ == "__main__":
-    # nidcpower.Session("Dev1", options={"Simulate": True, "DriverSetup": {"Model": "4162"}})
-    # with nidcpower.Session("Dev1/0", options={"Simulate": True, "DriverSetup": {"Model": "4162"}}) as session:
-    #     ssc = NIDCPowerSSC(session, "Dev1/0")
-    #     tsm = NIDCPowerTSM([ssc])
-    #     tsm.abort()
     pass
