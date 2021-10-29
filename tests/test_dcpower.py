@@ -9,7 +9,7 @@ import os.path
 # To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
 
-pin_file_names = ["I2C.pinmap", "I2C_Logic.pinmap"]
+pin_file_names = ["I2C.pinmap", "I2C_Logic_SingleSite.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 if SIMULATE_HARDWARE:

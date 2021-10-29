@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="BB50091EE1DFA5F92447604B2E1B9CF2" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="C98C50FE4FE323EA89843AB8866A1A2D" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
@@ -38,6 +38,7 @@
 			<FileReference Id="278" ModelDefinitionType="DigitalPatternEditor.PatternDefinition" Name="I2C_Write_Loop\.digipat" StoragePath="Patterns\I2C_Write_Loop.digipat" />
 			<FileReference Id="281" ModelDefinitionType="SourceWaveformDefinition" Name="SiteUnique\.tdms" StoragePath="Waveforms\SiteUnique.tdms" />
 			<FileReference Id="282" ModelDefinitionType="SourceWaveformDefinition" Name="Broadcast\.tdms" StoragePath="Waveforms\Broadcast.tdms" />
+			<FileReference Id="285" ModelDefinitionType="PinMap" Name="I2C_Logic_SingleSite\.pinmap" StoragePath="I2C_Logic_SingleSite.pinmap" />
 		</NameScopingEnvoy>
 		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">
 			<ProjectPropertiesDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
