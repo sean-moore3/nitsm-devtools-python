@@ -11,9 +11,9 @@ SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "
 
 pin_file_names = ["I2C.pinmap", "I2C_Logic_SingleSite.pinmap"]
 # Change index below to change the pinmap to use
-pin_file_name = pin_file_names[0]
+pin_file_name = pin_file_names[1]
 if SIMULATE_HARDWARE:
-    pin_file_name = pin_file_names[1]
+    pin_file_name = pin_file_names[0]
 
 
 @pytest.fixture
@@ -165,7 +165,9 @@ class TestDCPower:
     def test_tsm_source_voltage(self, dcpower_tsm_s):
         """# TSM SSC DCPower Source Voltage.vim"""
         for dcpower_tsm in dcpower_tsm_s:
+            dcpower_tsm.ssc.abort()
             dcpower_tsm.ssc.source_voltage()
+            dcpower_tsm[1].commit() # ssc is at index 1 in Named Tuple
 
     @pytest.mark.skip
     def test_measure(self, dcpower_tsm_s):
