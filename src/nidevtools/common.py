@@ -209,7 +209,6 @@ def pin_query_context_to_channel_list(
     ) = tsm_context.GetChannelGroupAndChannelIndex(pins=pins)
     channel_group_indices = tuple(zip(*channel_group_indices))  # transpose(channel_group_indices)
     channel_indices = tuple(zip(*channel_indices))  # transpose(channel_indices)
-    print(channel_indices, channel_group_indices, num_pins_per_channel_group)
     data = []
     for pin_count in num_pins_per_channel_group:
         pin_str = [""]
@@ -232,7 +231,7 @@ def pin_query_context_to_channel_list(
                     )
                 else:
                     data[channel_group_index][channel_index] = "Site" + str(site_number) + "/" + pin
-    per_session_channel_list = []
+    per_session_pin_list = []
     for row in data:
         row_data = ""
         for column in row:
@@ -241,9 +240,8 @@ def pin_query_context_to_channel_list(
                     row_data = column
                 else:
                     row_data = row_data + "," + column
-        per_session_channel_list.append(row_data.strip())
-    print(per_session_channel_list)
-    return per_session_channel_list, site_numbers
+        per_session_pin_list.append(row_data.strip())
+    return per_session_pin_list, site_numbers
 
 
 @nitsm.codemoduleapi.code_module

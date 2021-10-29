@@ -184,9 +184,10 @@ class _NIDCPowerSSC:
     To store a _Session and _Channel(s) for different _Site(s) you need an array of this class object.
     """
 
-    def __init__(self, session: nidcpower.Session, channels: str):
+    def __init__(self, session: nidcpower.Session, channels: str, pin_list: str):
         self._session = session  # mostly shared session  (very rarely unique session) depends on pinmap file.
         self._channels = channels  # specific channel(s) of that session
+        self._pin_list = pin_list   # pin names mapped to the channels
         self._channels_session = session.channels[channels]  # To operate on session on very specific channel(s)
         self.power_line_frequency = 60.0  # To Do confirm global replaced with object attributes.
         self.measure_multiple_only = False  # To Do confirm global replaced with object attributes.
@@ -553,9 +554,8 @@ class _NIDCPowerSSC:
         # channel_number = int(self.channels)
         channel_number = 0
         all_ranges = model_to_ranges(smu_model_number, channel_number)
-        print(smu_model_number, all_ranges)
         current_ranges = all_ranges[1]  # V_ranges, current_ranges, R_v, R_i
-        max_current = current_ranges[-1]
+        max_current = current_ranges[-1]  # this throws exception if ranges is empty list
         return max_current
 
     def configure_measurements(self, mode=MeasurementMode.AUTO):
@@ -1305,12 +1305,13 @@ def pins_to_sessions(
             a = ni_dt_common.PinInformation  # create instance of class
             a.pin = pin
             pins_info.append(a)
-    session_channel_list, _ = ni_dt_common.pin_query_context_to_channel_list(
+    pin_lists, _ = ni_dt_common.pin_query_context_to_channel_list(
         pin_query_context, pins_expanded, site_numbers
     )
-    # sscs = [_NIDCPowerSSC(session, channel, pin-site )
-    # for session, channel in zip(sessions, channels, session_channel_list)]
-    sscs = [_NIDCPowerSSC(session, channel) for session, channel in zip(sessions, channels)]
+
+    sscs = [
+        _NIDCPowerSSC(session, channel, pin_list) for session, channel, pin_list in zip(sessions, channels, pin_lists)
+    ]
     dc_power_tsm = _NIDCPowerTSM(sscs)
     return TSMDCPower(pin_query_context, dc_power_tsm, site_numbers, pins_info, pins_expanded)
 
