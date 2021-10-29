@@ -136,19 +136,6 @@ class TestDCPower:
             dcpower_tsm.ssc.commit()
             dcpower_tsm.ssc.abort()
 
-    def test_tsm_source_voltage(self, dcpower_tsm_s):
-        """
-        # TSM SSC DCPower Source Voltage.vim
-        Force_voltage_symmetric_limits is the python function name
-        """
-        for dcpower_tsm in dcpower_tsm_s:
-            dcpower_tsm.ssc.force_voltage_symmetric_limits(1.0, 1.0, 0.01, 0.01)
-            compliance = dcpower_tsm.ssc.query_in_compliance()
-            print(compliance)
-            voltages, currents = dcpower_tsm.ssc.measure()
-            print(voltages, currents)
-            dcpower_tsm.ssc.abort()
-
 
     def test_configure_settings(self, dcpower_tsm_s):
         """
@@ -157,7 +144,7 @@ class TestDCPower:
         """
         for dcpower_tsm in dcpower_tsm_s:
             dcpower_tsm.ssc.configure_settings(aperture_time=40e-03)
-            dcpower_tsm.ssc.force_voltage_symmetric_limits(1.0, 1.0, 0.01, 0.01)
+            dcpower_tsm.ssc.force_voltage_symmetric_limits(1.0, 1.0, 0.1, 0.1)
             compliance = dcpower_tsm.ssc.query_in_compliance()
             print(compliance)
             voltages, currents = dcpower_tsm.ssc.measure()
@@ -168,15 +155,33 @@ class TestDCPower:
         # default_settings = dcpower_tsm_s.get_measurement_settings()
         # assert custom_settings == default_settings
 
-    @pytest.mark.skip
+    def test_tsm_source_voltage(self, dcpower_tsm_s):
+        """
+        # TSM SSC DCPower Source Voltage.vim
+        Force_voltage_symmetric_limits is the python function name
+        """
+        for dcpower_tsm in dcpower_tsm_s:
+            dcpower_tsm.ssc.force_voltage_symmetric_limits(1.0, 1.0, 0.1, 0.1)
+            compliance = dcpower_tsm.ssc.query_in_compliance()
+            print(compliance)
+            voltages, currents = dcpower_tsm.ssc.measure()
+            print(voltages, currents)
+            dcpower_tsm.ssc.abort()
+
+
     def test_tsm_source_current(self, dcpower_tsm_s):
         """
         # TSM SSC DCPower Source Current.vim
         # SSC DCPower Source Current.vim
         """
         for dcpower_tsm in dcpower_tsm_s:
-            dcpower_tsm.ssc.configure_settings()
-            dcpower_tsm.ssc.source_current()
+            dcpower_tsm.ssc.configure_settings(aperture_time=20e-03)
+            dcpower_tsm.ssc.force_current_symmetric_limits(0.1e-03, 0.1e-03, 3.0, 5.0)
+            compliance = dcpower_tsm.ssc.query_in_compliance()
+            print(compliance)
+            voltages, currents = dcpower_tsm.ssc.measure()
+            print(voltages, currents)
+            dcpower_tsm.ssc.abort()
         # c_Level = 0.5
         # # Do not call configure meas since the default is auto
         # ni_dt_dc_power.tsm_source_current(c_level)  # Where is the function to source? it force voltage?
