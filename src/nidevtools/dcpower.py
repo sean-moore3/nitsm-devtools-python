@@ -216,14 +216,14 @@ class _NIDCPowerSSC:
         return self._channels_session.reset()
 
     def configure_aperture_time_with_abort_and_initiate(
-        self, aperture_time=16.667, aperture_time_units=enums.ApertureTimeUnits.SECONDS
+        self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS
     ):
         self._channels_session.abort()
         self._channels_session.aperture_time(aperture_time, aperture_time_units)
         self._channels_session.initiate()
 
     def configure_aperture_time(
-        self, aperture_time=16.667, aperture_time_units=enums.ApertureTimeUnits.SECONDS
+        self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS
     ):
         return self._channels_session.configure_aperture_time(aperture_time, aperture_time_units)
 
@@ -238,7 +238,7 @@ class _NIDCPowerSSC:
 
     def configure_settings(
         self,
-        aperture_time=16.667,
+        aperture_time=16.667e-03,
         source_delay=0.0,
         sense=enums.Sense.LOCAL,
         aperture_time_unit=enums.ApertureTimeUnits.SECONDS,
@@ -902,7 +902,7 @@ class _NIDCPowerTSM:
             ssc.reset()
 
     def configure_aperture_time_with_abort_and_initiate(
-        self, aperture_time=16.667, aperture_time_units=enums.ApertureTimeUnits.SECONDS
+        self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS
     ):
         for ssc in self._sessions_sites_channels:
             ssc.configure_aperture_time_with_abort_and_initiate(aperture_time, aperture_time_units)
@@ -1063,7 +1063,7 @@ class _NIDCPowerTSM:
 
     def configure_settings(
         self,
-        aperture_time=16.667,
+        aperture_time=16.667e-03,
         source_delay=0.0,
         sense=enums.Sense.LOCAL,
         aperture_time_unit=enums.ApertureTimeUnits.SECONDS,

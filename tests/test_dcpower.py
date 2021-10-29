@@ -142,7 +142,6 @@ class TestDCPower:
         Force_voltage_symmetric_limits is the python function name
         """
         for dcpower_tsm in dcpower_tsm_s:
-            # dcpower_tsm.ssc.configure_settings()
             dcpower_tsm.ssc.force_voltage_symmetric_limits(1.0, 1.0, 0.01, 0.01)
             compliance = dcpower_tsm.ssc.query_in_compliance()
             print(compliance)
@@ -150,14 +149,20 @@ class TestDCPower:
             print(voltages, currents)
             dcpower_tsm.ssc.abort()
 
-    @pytest.mark.skip
+
     def test_configure_settings(self, dcpower_tsm_s):
         """
         TSM SSC DCPower Configure Settings.vim
         dcpower_tsm.query_in_compliance()
         """
         for dcpower_tsm in dcpower_tsm_s:
-            dcpower_tsm.ssc.configure_settings()
+            dcpower_tsm.ssc.configure_settings(aperture_time=40e-03)
+            dcpower_tsm.ssc.force_voltage_symmetric_limits(1.0, 1.0, 0.01, 0.01)
+            compliance = dcpower_tsm.ssc.query_in_compliance()
+            print(compliance)
+            voltages, currents = dcpower_tsm.ssc.measure()
+            print(voltages, currents)
+            dcpower_tsm.ssc.abort()
         # custom_settings = {"aperture_time": 20, "source_delay": 1.0, "sense": Sense.LOCAL}
         # dcpower_tsm_s.configure_settings(custom_settings)
         # default_settings = dcpower_tsm_s.get_measurement_settings()
