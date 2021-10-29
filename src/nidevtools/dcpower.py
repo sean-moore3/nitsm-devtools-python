@@ -326,10 +326,10 @@ class _NIDCPowerSSC:
         return configured_power_line_frequency
 
     def query_in_compliance(self):
-        # return self._channels_session.query_in_compliance()
         compliance = []
-        for chan in self._channels:
-            comp = self.session.channels[chan].query_in_compliance
+        channels = self._channels.split(",")
+        for channel in channels:
+            comp = self.session.channels[channel].query_in_compliance()
             compliance.append(comp)
         return compliance
 
