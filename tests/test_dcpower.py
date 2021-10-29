@@ -121,7 +121,7 @@ class TestDCPower:
         """# SSC DCPower Reset Channels.vi"""
         # the below code needs refactoring after changes from driver.
         print("\ndcpower_tsm_s\n", dcpower_tsm_s)
-        custom_settings = {"aperture_time": 20, "source_delay": 1.0, "sense": nidcpower.Sense.LOCAL}
+        custom_settings = {"aperture_time": 20e-03, "source_delay": 1.0, "sense": nidcpower.Sense.LOCAL}
         for dcpower_tsm in dcpower_tsm_s:
             # print("\ndcpower_tsm\n", dcpower_tsm)
             # default_settings = dcpower_tsm.ssc.get_measurement_settings()
@@ -163,7 +163,7 @@ class TestDCPower:
             voltages, currents = dcpower_tsm.ssc.measure()
             print(voltages, currents)
             dcpower_tsm.ssc.abort()
-        # custom_settings = {"aperture_time": 20, "source_delay": 1.0, "sense": Sense.LOCAL}
+        # custom_settings = {"aperture_time": 20e-03, "source_delay": 1.0, "sense": Sense.LOCAL}
         # dcpower_tsm_s.configure_settings(custom_settings)
         # default_settings = dcpower_tsm_s.get_measurement_settings()
         # assert custom_settings == default_settings
