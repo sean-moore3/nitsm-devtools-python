@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.6">
+	<Instruments>
+		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" />
+		<NIDCPowerInstrument name="SMU1" numberOfChannels="1">
+			<ChannelGroup name="VCC_G_SY" channels="0" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU2" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+	</Instruments>
+	<Pins>
+		<SystemPin name="VCC" />
+		<SystemPin name="VDD" />
+		<SystemPin name="R_VDD" />
+		<SystemPin name="VDDIO" />
+		<SystemPin name="R_VDDIO" />
+		<DUTPin name="SCL" />
+		<DUTPin name="R_SCL" />
+		<DUTPin name="SDA" />
+		<DUTPin name="R_SDA" />
+		<DUTPin name="A" />
+		<DUTPin name="B" />
+		<DUTPin name="C_Y" />
+		<DUTPin name="Y" />
+	</Pins>
+	<PinGroups>
+		<PinGroup name="SGL">
+			<PinReference pin="SCL" />
+			<PinReference pin="SDA" />
+		</PinGroup>
+		<PinGroup name="R_SGL">
+			<PinReference pin="R_SCL" />
+			<PinReference pin="R_SDA" />
+		</PinGroup>
+		<PinGroup name="Mix">
+			<PinReference pin="SCL" />
+			<PinReference pin="R_SDA" />
+			<PinReference pin="VDDIO" />
+		</PinGroup>
+		<PinGroup name="Pwr">
+			<PinReference pin="VDD" />
+			<PinReference pin="VDDIO" />
+			<PinReference pin="VCC" />
+		</PinGroup>
+		<PinGroup name="SMU">
+			<PinReference pin="VCC" />
+		</PinGroup>
+		<PinGroup name="Logic">
+			<PinReference pin="A" />
+			<PinReference pin="B" />
+			<PinReference pin="Y" />
+			<PinReference pin="C_Y" />
+		</PinGroup>
+		<PinGroup name="AllPins">
+			<PinReference pin="SCL" />
+			<PinReference pin="SDA" />
+			<PinReference pin="R_SCL" />
+			<PinReference pin="R_SDA" />
+		</PinGroup>
+	</PinGroups>
+	<Sites>
+		<Site siteNumber="0" />
+	</Sites>
+	<Connections>
+		<SystemConnection pin="VCC" instrument="SMU1" channel="0" />
+		<SystemConnection pin="VDD" instrument="DPI1" channel="0" />
+		<SystemConnection pin="R_VDD" instrument="DPI1" channel="1" />
+		<SystemConnection pin="VDDIO" instrument="DPI1" channel="2" />
+		<SystemConnection pin="R_VDDIO" instrument="DPI1" channel="3" />
+		<Connection pin="SCL" siteNumber="0" instrument="DPI1" channel="4" />
+		<Connection pin="R_SCL" siteNumber="0" instrument="DPI1" channel="5" />
+		<Connection pin="SDA" siteNumber="0" instrument="DPI1" channel="6" />
+		<Connection pin="R_SDA" siteNumber="0" instrument="DPI1" channel="7" />
+		<Connection pin="A" siteNumber="0" instrument="SMU2" channel="0" />
+		<Connection pin="B" siteNumber="0" instrument="SMU2" channel="1" />
+		<Connection pin="C_Y" siteNumber="0" instrument="SMU2" channel="2" />
+		<Connection pin="Y" siteNumber="0" instrument="SMU2" channel="3" />
+	</Connections>
+</PinMap>
