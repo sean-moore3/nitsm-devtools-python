@@ -47,8 +47,8 @@
 		<DUTPin name="R_SDA" />
 		<DUTPin name="A" />
 		<DUTPin name="B" />
-		<DUTPin name="Y" />
 		<DUTPin name="C_Y" />
+		<DUTPin name="Y" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="SGL">

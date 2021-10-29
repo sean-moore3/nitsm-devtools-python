@@ -5,6 +5,34 @@
 		<NIDCPowerInstrument name="SMU1" numberOfChannels="1">
 			<ChannelGroup name="VCC_G_SY" channels="0" />
 		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU2" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU3" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU4" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU5" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU6" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU7" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU8" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
 	</Instruments>
 	<Pins>
 		<SystemPin name="VCC" />
@@ -16,6 +44,10 @@
 		<DUTPin name="R_SCL" />
 		<DUTPin name="SDA" />
 		<DUTPin name="R_SDA" />
+		<DUTPin name="A" />
+		<DUTPin name="B" />
+		<DUTPin name="C_Y" />
+		<DUTPin name="Y" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="SGL">
@@ -35,6 +67,15 @@
 			<PinReference pin="VDD" />
 			<PinReference pin="VDDIO" />
 			<PinReference pin="VCC" />
+		</PinGroup>
+		<PinGroup name="SMU">
+			<PinReference pin="VCC" />
+		</PinGroup>
+		<PinGroup name="Logic">
+			<PinReference pin="A" />
+			<PinReference pin="B" />
+			<PinReference pin="Y" />
+			<PinReference pin="C_Y" />
 		</PinGroup>
 		<PinGroup name="AllPins">
 			<PinReference pin="SCL" />
@@ -86,5 +127,33 @@
 		<Connection pin="R_SCL" siteNumber="6" instrument="DPI1" channel="29" />
 		<Connection pin="SDA" siteNumber="6" instrument="DPI1" channel="30" />
 		<Connection pin="R_SDA" siteNumber="6" instrument="DPI1" channel="31" />
+		<Connection pin="A" siteNumber="0" instrument="SMU2" channel="0" />
+		<Connection pin="B" siteNumber="0" instrument="SMU2" channel="1" />
+		<Connection pin="C_Y" siteNumber="0" instrument="SMU2" channel="2" />
+		<Connection pin="Y" siteNumber="0" instrument="SMU2" channel="3" />
+		<Connection pin="A" siteNumber="1" instrument="SMU3" channel="0" />
+		<Connection pin="B" siteNumber="1" instrument="SMU3" channel="1" />
+		<Connection pin="C_Y" siteNumber="1" instrument="SMU3" channel="2" />
+		<Connection pin="Y" siteNumber="1" instrument="SMU3" channel="3" />
+		<Connection pin="A" siteNumber="2" instrument="SMU4" channel="0" />
+		<Connection pin="B" siteNumber="2" instrument="SMU4" channel="1" />
+		<Connection pin="C_Y" siteNumber="2" instrument="SMU4" channel="2" />
+		<Connection pin="Y" siteNumber="2" instrument="SMU4" channel="3" />
+		<Connection pin="A" siteNumber="3" instrument="SMU5" channel="0" />
+		<Connection pin="B" siteNumber="3" instrument="SMU5" channel="1" />
+		<Connection pin="C_Y" siteNumber="3" instrument="SMU5" channel="2" />
+		<Connection pin="Y" siteNumber="3" instrument="SMU5" channel="3" />
+		<Connection pin="A" siteNumber="4" instrument="SMU6" channel="0" />
+		<Connection pin="B" siteNumber="4" instrument="SMU6" channel="1" />
+		<Connection pin="C_Y" siteNumber="4" instrument="SMU6" channel="2" />
+		<Connection pin="Y" siteNumber="4" instrument="SMU6" channel="3" />
+		<Connection pin="A" siteNumber="5" instrument="SMU7" channel="0" />
+		<Connection pin="B" siteNumber="5" instrument="SMU7" channel="1" />
+		<Connection pin="C_Y" siteNumber="5" instrument="SMU7" channel="2" />
+		<Connection pin="Y" siteNumber="5" instrument="SMU7" channel="3" />
+		<Connection pin="A" siteNumber="6" instrument="SMU8" channel="0" />
+		<Connection pin="B" siteNumber="6" instrument="SMU8" channel="1" />
+		<Connection pin="C_Y" siteNumber="6" instrument="SMU8" channel="2" />
+		<Connection pin="Y" siteNumber="6" instrument="SMU8" channel="3" />
 	</Connections>
 </PinMap>
