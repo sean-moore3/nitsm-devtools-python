@@ -11,6 +11,35 @@ _standalone_tsm_context_tlb = win32com.client.selecttlb.FindTlbsWithDescription(
 
 
 @pytest.fixture
+def test_pin_s(request):
+    """
+    Need to improve this logic for supplying test pins
+    using @pytest.mark.parametrize
+    Also need to have selection input for requested pins and move this to conftest.py file.
+    Till then this function will be duplicate in both files with different output
+    """
+    # for Digital pattern instrument driver i.e. nidigital Testing
+    _, file_name = os.path.split(request.module.__file__)
+    test_dut_pins = ["SCL", "SDA"]
+    read_dut_pins = ["R_SCL", "R_SDA"]
+    all_dut_pins = test_dut_pins + read_dut_pins
+    # dpi_system_pins = ["VDD", "VDDIO"]
+    dpi_pins = [test_dut_pins, read_dut_pins, all_dut_pins]
+    # for SMU driver i.e. nidcpower Testing
+    smu_system_pins = ["VCC"]
+    input_dut_pins = ["A", "B"]
+    output_dut_pins = ["C_Y", "Y"]
+    smu_pins = [smu_system_pins, input_dut_pins, output_dut_pins]
+    if file_name == "test_dcpower.py":  # overriding the pin_select as it is inside dcpower module
+        pins_select = smu_pins
+    else:
+        pins_select = dpi_pins
+    print(file_name)
+    print(pins_select)
+    return pins_select
+
+
+@pytest.fixture
 def _published_data_reader_factory(request):
     # get absolute path of the pin map file which is assumed to be relative to the test module
     pin_map_path = request.node.get_closest_marker("pin_map").args[0]

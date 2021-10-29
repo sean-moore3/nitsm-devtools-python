@@ -34,31 +34,6 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
 
 
 @pytest.fixture
-def test_pin_s():
-    """
-    Need to improve this logic for supplying test pins
-    using @pytest.mark.parametrize
-    Also need to have selection input for requested pins and move this to conftest.py file.
-    Till then this function will be duplicate in both files with different output
-    """
-    # for Digital pattern instrument driver i.e. nidigital Testing
-    test_dut_pins = ["SCL", "SDA"]
-    read_dut_pins = ["R_SCL", "R_SDA"]
-    dpi_power_pins = ["VDD", "VDDIO"]
-    # for SMU driver i.e. nidcpower Testing
-    smu_power_pins = ["VCC"]
-    input_dut_pins = ["A", "B"]
-    output_dut_pins = ["C_Y", "Y"]
-    if SIMULATE_HARDWARE:
-        pins_select = [input_dut_pins, output_dut_pins]
-    else:
-        pins_select = [smu_power_pins]
-    # disabling the pin_select below as it is inside dcpower module
-    # pins_select = [test_dut_pins, read_dut_pins]
-    return pins_select
-
-
-@pytest.fixture
 def dcpower_tsm_s(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data"""
     dcpower_tsms = []
