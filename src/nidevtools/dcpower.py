@@ -99,7 +99,7 @@ class CustomTransientResponse:
 
 
 def model_to_ranges(model: int, channel: int):
-    """Returns current, voltage and resistance (for voltage and current) ranges """
+    """Returns current, voltage and resistance (for voltage and current) ranges"""
     current_ranges = []
     voltage_ranges = []
     resistor_v_ranges = []
@@ -185,10 +185,13 @@ class _NIDCPowerSSC:
     """
 
     def __init__(self, session: nidcpower.Session, channels: str, pin_list: str):
-        self._session = session  # mostly shared session  (very rarely unique session) depends on pinmap file.
+        self._session = (
+            session  # mostly shared session  (very rarely unique session) depends on pinmap file.
+        )
         self._channels = channels  # specific channel(s) of that session
-        self._pin_list = pin_list   # pin names mapped to the channels
-        self._channels_session = session.channels[channels]  # To operate on session on very specific channel(s)
+        self._pin_list = pin_list  # pin names mapped to the channels
+        self._channels_session = session.channels[channels]
+        # To operate on session on very specific channel(s)
         self.power_line_frequency = 60.0  # To Do confirm global replaced with object attributes.
         self.measure_multiple_only = False  # To Do confirm global replaced with object attributes.
 
@@ -204,7 +207,7 @@ class _NIDCPowerSSC:
         return self._channels_session.abort()
 
     def commit(self):
-        return self._channels_session.commit()
+        return self.session.commit()
 
     def initiate(self):
         return self._channels_session.initiate()
@@ -298,7 +301,10 @@ class _NIDCPowerSSC:
         ]
         actual_aperture_time = self._channels_session.aperture_time_units
         if match in all_supported_models + ["4112", "4113", "4132"]:
-            if self._channels_session.aperture_time_units == enums.ApertureTimeUnits.POWER_LINE_CYCLES:
+            if (
+                self._channels_session.aperture_time_units
+                == enums.ApertureTimeUnits.POWER_LINE_CYCLES
+            ):
                 actual_aperture_time = (
                     self._channels_session.aperture_time_units
                     / self._channels_session.power_line_frequency
@@ -320,7 +326,12 @@ class _NIDCPowerSSC:
         return configured_power_line_frequency
 
     def query_in_compliance(self):
-        return self._channels_session.query_in_compliance()
+        # return self._channels_session.query_in_compliance()
+        compliance = []
+        for chan in self._channels:
+            comp = self.session.channels[chan].query_in_compliance
+            compliance.append(comp)
+        return compliance
 
     def query_output_state(self, output_state: nidcpower.OutputStates):
         return self._channels_session.query_output_state(output_state)
@@ -405,7 +416,7 @@ class _NIDCPowerSSC:
             voltage_limit_low,
             voltage_limit_range,
         )
-        self._channels_session.commit()
+        self.session.commit()
 
     def force_current_symmetric_limits(
         self, current_level=0.0, current_level_range=0.0, voltage_limit=0.0, voltage_limit_range=0.0
@@ -414,7 +425,7 @@ class _NIDCPowerSSC:
         self.configure_single_point_force_dc_current_symmetric_limits(
             current_level, current_level_range, voltage_limit, voltage_limit_range
         )
-        self._channels_session.commit()
+        self.session.commit()
 
     def configure_current_limit_range(self, current_limit_range=0.0):
         self._channels_session.current_limit_range = current_limit_range
@@ -488,7 +499,7 @@ class _NIDCPowerSSC:
             current_limit_low,
             current_limit_range,
         )
-        self._channels_session.commit()
+        self.session.commit()
 
     def force_voltage_symmetric_limits(
         self, voltage_level=0.0, voltage_level_range=0.0, current_limit=0.0, current_limit_range=0.0
@@ -592,7 +603,7 @@ class _NIDCPowerSSC:
         self._channels_session.measure_record_length_is_finite = False
         self._channels_session.measure_when = nidcpower.MeasureWhen.ON_MEASURE_TRIGGER
         self._channels_session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
-        self._channels_session.commit()
+        self.session.commit()
         num_samples = int(
             math.ceil(buffer_length / self._channels_session.measure_record_delta_time)
         )
@@ -632,17 +643,21 @@ class _NIDCPowerSSC:
         elif measurement_mode == MeasurementMode.SOFTWARE_TRIGGER:
             fetch_or_measure = not self.measure_multiple_only
         else:
-            fetch_or_measure = self._channels_session.measure_when == enums.MeasureWhen.ON_MEASURE_TRIGGER
+            fetch_or_measure = (
+                self._channels_session.measure_when == enums.MeasureWhen.ON_MEASURE_TRIGGER
+            )
 
         if fetch_or_measure:
-            self._channels_session.send_software_edge_trigger(enums.SendSoftwareEdgeTriggerType.MEASURE)
+            self._channels_session.send_software_edge_trigger(
+                enums.SendSoftwareEdgeTriggerType.MEASURE
+            )
         return fetch_or_measure
 
     def measure_execute(self, fetch_or_measure: bool):
         if fetch_or_measure:
-            samples = self._channels_session.channels[self.channels].fetch_multiple(1, 1.0)
+            samples = self._channels_session.fetch_multiple(1, 1.0)
         else:
-            samples = self._channels_session.channels[self.channels].measure_multiple()
+            samples = self._channels_session.measure_multiple()
         voltages = []
         currents = []
         in_compliance = []
@@ -866,7 +881,7 @@ class _NIDCPowerTSM:
         voltage_level_ranges = self._expand_to_requested_array_size(voltage_level_range, size)
         current_limits = self._expand_to_requested_array_size(current_limit, size)
         current_limit_ranges = self._expand_to_requested_array_size(current_limit_range, size)
-        self._force_current_symmetric_limits_array(
+        self._force_voltage_symmetric_limits_array(
             voltage_levels, voltage_level_ranges, current_limits, current_limit_ranges
         )
 
@@ -1177,17 +1192,17 @@ class _NIDCPowerTSM:
         )
 
     def force_voltage_symmetric_limits(
-        self, voltage_level, voltage_level_range, current_limit, current_limit_range
+        self, voltage_level=0.0, voltage_level_range=0.0, current_limit=0.0, current_limit_range=0.0
     ):
         voltage_levels = self._expand_array_to_sessions(voltage_level)
         voltage_level_ranges = self._expand_array_to_sessions(voltage_level_range)
         current_limits = self._expand_array_to_sessions(current_limit)
         current_limit_ranges = self._expand_array_to_sessions(current_limit_range)
-        self._force_current_symmetric_limits_array(
+        self._force_voltage_symmetric_limits_array(
             voltage_levels, voltage_level_ranges, current_limits, current_limit_ranges
         )
 
-    def measure(self, measurement_mode: MeasurementMode):
+    def measure(self, measurement_mode=MeasurementMode.AUTO):
         fetch_or_measure_array = []
         voltages = []
         currents = []
@@ -1299,7 +1314,9 @@ def pins_to_sessions(
     pins_info = []
     pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
     if fill_pin_site_info:
-        pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(tsm_context, pins)
+        pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(
+            tsm_context, pins
+        )
     else:
         for pin in pins:
             a = ni_dt_common.PinInformation  # create instance of class
@@ -1310,7 +1327,8 @@ def pins_to_sessions(
     )
 
     sscs = [
-        _NIDCPowerSSC(session, channel, pin_list) for session, channel, pin_list in zip(sessions, channels, pin_lists)
+        _NIDCPowerSSC(session, channel, pin_list)
+        for session, channel, pin_list in zip(sessions, channels, pin_lists)
     ]
     dc_power_tsm = _NIDCPowerTSM(sscs)
     return TSMDCPower(pin_query_context, dc_power_tsm, site_numbers, pins_info, pins_expanded)
@@ -1330,8 +1348,12 @@ def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
         if index_d >= 0:
             pins_expand_new.append(data)
         i += 1
-    dut_pins, system_pins = ni_dt_common.get_dut_pins_and_system_pins_from_expanded_pin_list(pins_expand_new)
-    pins_to_query_ctx = ni_dt_common.get_pin_names_from_expanded_pin_information(dut_pins + system_pins)
+    dut_pins, system_pins = ni_dt_common.get_dut_pins_and_system_pins_from_expanded_pin_list(
+        pins_expand_new
+    )
+    pins_to_query_ctx = ni_dt_common.get_pin_names_from_expanded_pin_information(
+        dut_pins + system_pins
+    )
     dc_power_tsm.pin_query_context.Pins = pins_to_query_ctx
     return dc_power_tsm
 
