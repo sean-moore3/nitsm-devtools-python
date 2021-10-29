@@ -178,12 +178,16 @@ def model_to_ranges(model: int, channel: int):
 
 
 class _NIDCPowerSSC:
-    """Session, sites, and channels."""
+    """
+    _Site specific _Session and _Channel.
+    Each object of this class is used to store info for a specified pin under specific Site.
+    To store a _Session and _Channel(s) for different _Site(s) you need an array of this class object.
+    """
 
     def __init__(self, session: nidcpower.Session, channels: str):
-        self._session = session
-        self._channels = channels
-        self._channels_session = session.channels[channels]
+        self._session = session  # mostly shared session  (very rarely unique session) depends on pinmap file.
+        self._channels = channels  # specific channel(s) of that session
+        self._channels_session = session.channels[channels]  # To operate on session on very specific channel(s)
         self.power_line_frequency = 60.0  # To Do confirm global replaced with object attributes.
         self.measure_multiple_only = False  # To Do confirm global replaced with object attributes.
 
@@ -196,37 +200,37 @@ class _NIDCPowerSSC:
         return self._channels
 
     def abort(self):
-        return self.session.abort()
+        return self._channels_session.abort()
 
     def commit(self):
-        return self.session.commit()
+        return self._channels_session.commit()
 
     def initiate(self):
-        return self.session.initiate()
+        return self._channels_session.initiate()
 
     def reset(self):
-        return self.session.reset()
+        return self._channels_session.reset()
 
     def configure_aperture_time_with_abort_and_initiate(
         self, aperture_time=16.667, aperture_time_units=enums.ApertureTimeUnits.SECONDS
     ):
-        self.session.abort()
-        self.session.aperture_time(aperture_time, aperture_time_units)
-        self.session.initiate()
+        self._channels_session.abort()
+        self._channels_session.aperture_time(aperture_time, aperture_time_units)
+        self._channels_session.initiate()
 
     def configure_aperture_time(
         self, aperture_time=16.667, aperture_time_units=enums.ApertureTimeUnits.SECONDS
     ):
-        return self.session.configure_aperture_time(aperture_time, aperture_time_units)
+        return self._channels_session.configure_aperture_time(aperture_time, aperture_time_units)
 
     def configure_power_line_frequency(self, power_line_frequency=60.0):
         self.power_line_frequency = (
             power_line_frequency  # To Do - confirm global replaced with object attributes.
         )
-        self.session.power_line_frequency = power_line_frequency
+        self._channels_session.power_line_frequency = power_line_frequency
 
     def configure_sense(self, sense=enums.Sense.LOCAL):
-        self.session.sense = sense
+        self._channels_session.sense = sense
 
     def configure_settings(
         self,
@@ -236,44 +240,44 @@ class _NIDCPowerSSC:
         aperture_time_unit=enums.ApertureTimeUnits.SECONDS,
         transient_response=enums.TransientResponse.NORMAL,
     ):
-        self.session.abort()
+        self._channels_session.abort()
         match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
         temp = aperture_time
         if aperture_time_unit == enums.ApertureTimeUnits.POWER_LINE_CYCLES:
             temp = temp / self.power_line_frequency
 
         if match == "4110":
-            self.session.source_delay = source_delay
-            self.session.samples_to_average = 3000 * temp
+            self._channels_session.source_delay = source_delay
+            self._channels_session.samples_to_average = 3000 * temp
         elif match == "4130":
-            self.session.source_delay = source_delay
-            self.session.samples_to_average = 3000 * temp
+            self._channels_session.source_delay = source_delay
+            self._channels_session.samples_to_average = 3000 * temp
             # To do - validate and enable below code
-            # if self.session.channels == "1":
-            # self.session.sense = sense
+            # if self._channels_session.channels == "1":
+            # self._channels_session.sense = sense
         elif match == "4154":
-            self.session.source_delay = source_delay
-            self.session.samples_to_average = 300000 * temp
-            self.session.sense = sense
+            self._channels_session.source_delay = source_delay
+            self._channels_session.samples_to_average = 300000 * temp
+            self._channels_session.sense = sense
             # To do - validate and enable below code
-            # if self.session.channels == "0":
-            # self.session.transient_response =transient_response
+            # if self._channels_session.channels == "0":
+            # self._channels_session.transient_response =transient_response
         elif match == "4132":
-            self.session.aperture_time_units = aperture_time_unit
-            self.session.aperture_time = aperture_time
-            self.session.source_delay = source_delay
-            self.session.sense = sense
-            self.session.sense = sense
+            self._channels_session.aperture_time_units = aperture_time_unit
+            self._channels_session.aperture_time = aperture_time
+            self._channels_session.source_delay = source_delay
+            self._channels_session.sense = sense
+            self._channels_session.sense = sense
         elif (match == "4112") or (match == "4112"):
-            self.session.aperture_time_units = aperture_time_unit
-            self.session.aperture_time = aperture_time
-            self.session.source_delay = source_delay
+            self._channels_session.aperture_time_units = aperture_time_unit
+            self._channels_session.aperture_time = aperture_time
+            self._channels_session.source_delay = source_delay
         else:  # All properties supported
-            self.session.transient_response = transient_response
-            self.session.aperture_time_units = aperture_time_unit
-            self.session.aperture_time = aperture_time
-            self.session.source_delay = source_delay
-            self.session.sense = sense
+            self._channels_session.transient_response = transient_response
+            self._channels_session.aperture_time_units = aperture_time_unit
+            self._channels_session.aperture_time = aperture_time
+            self._channels_session.source_delay = source_delay
+            self._channels_session.sense = sense
 
     def get_aperture_time_in_seconds(self):
         match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
@@ -291,23 +295,23 @@ class _NIDCPowerSSC:
             "4162",
             "4163",
         ]
-        actual_aperture_time = self.session.aperture_time_units
+        actual_aperture_time = self._channels_session.aperture_time_units
         if match in all_supported_models + ["4112", "4113", "4132"]:
-            if self.session.aperture_time_units == enums.ApertureTimeUnits.POWER_LINE_CYCLES:
+            if self._channels_session.aperture_time_units == enums.ApertureTimeUnits.POWER_LINE_CYCLES:
                 actual_aperture_time = (
-                    self.session.aperture_time_units
-                    / self.session.power_line_frequency
+                    self._channels_session.aperture_time_units
+                    / self._channels_session.power_line_frequency
                 )
 
         if match in ["4110", "4130"]:
-            actual_aperture_time = self.session.samples_to_average / 3000
+            actual_aperture_time = self._channels_session.samples_to_average / 3000
         elif match == "4154":
-            actual_aperture_time = self.session.samples_to_average / 300000
+            actual_aperture_time = self._channels_session.samples_to_average / 300000
         return actual_aperture_time
 
     def get_power_line_frequency(self):
         match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
-        configured_power_line_frequency = self.session.power_line_frequency
+        configured_power_line_frequency = self._channels_session.power_line_frequency
         if match in ["4110", "4130"]:
             configured_power_line_frequency = self.power_line_frequency
         elif match == "4154":
@@ -315,16 +319,16 @@ class _NIDCPowerSSC:
         return configured_power_line_frequency
 
     def query_in_compliance(self):
-        return self.session.query_in_compliance()
+        return self._channels_session.query_in_compliance()
 
     def query_output_state(self, output_state: nidcpower.OutputStates):
-        return self.session.query_output_state(output_state)
+        return self._channels_session.query_output_state(output_state)
 
     def configure_current_level_range(self, current_level_range=0.0):
-        self.session.current_level_range = current_level_range  # To Do method or property
+        self._channels_session.current_level_range = current_level_range  # To Do method or property
 
     def configure_current_level(self, current_level=0.0):
-        self.session.current_level = current_level
+        self._channels_session.current_level = current_level
 
     def configure_single_point_force_dc_current_asymmetric_limits(
         self,
@@ -334,55 +338,55 @@ class _NIDCPowerSSC:
         voltage_limit_low=0.0,
         voltage_limit_range=0.0,
     ):
-        self.session.source_mode = (
+        self._channels_session.source_mode = (
             nidcpower.SourceMode.SINGLE_POINT
         )  # To Do method or property
-        self.session.output_function = (
+        self._channels_session.output_function = (
             nidcpower.OutputFunction.DC_CURRENT
         )  # To Do method or property
-        self.session.current_level = current_level  # To Do method or property
-        self.session.voltage_limit_high = voltage_limit_high  # To Do method or property
-        self.session.voltage_limit_low = voltage_limit_low  # To Do method or property
+        self._channels_session.current_level = current_level  # To Do method or property
+        self._channels_session.voltage_limit_high = voltage_limit_high  # To Do method or property
+        self._channels_session.voltage_limit_low = voltage_limit_low  # To Do method or property
         c_value = current_level_range
         if c_value == 0.0:
             c_value = abs(current_level)
-        self.session.current_level_range = c_value  # To Do method or property
+        self._channels_session.current_level_range = c_value  # To Do method or property
         v_value = voltage_limit_range
         if v_value == 0.0:
             v_value = max(abs(voltage_limit_high), abs(voltage_limit_low))
-        self.session.voltage_limit_range = v_value  # To Do method or property
-        self.session.compliance_limit_symmetry = (
+        self._channels_session.voltage_limit_range = v_value  # To Do method or property
+        self._channels_session.compliance_limit_symmetry = (
             nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
         )  # To Do method?
 
     def configure_single_point_force_dc_current_symmetric_limits(
         self, current_level=0.0, current_level_range=0.0, voltage_limit=0.0, voltage_limit_range=0.0
     ):
-        self.session.source_mode = (
+        self._channels_session.source_mode = (
             nidcpower.SourceMode.SINGLE_POINT
         )  # To Do method or property
-        self.session.output_function = (
+        self._channels_session.output_function = (
             nidcpower.OutputFunction.DC_CURRENT
         )  # To Do method or property
-        self.session.current_level = current_level  # To Do method or property
-        self.session.voltage_limit = voltage_limit  # To Do method or property
+        self._channels_session.current_level = current_level  # To Do method or property
+        self._channels_session.voltage_limit = voltage_limit  # To Do method or property
         c_value = current_level_range
         if c_value == 0.0:
             c_value = abs(current_level)
-        self.session.current_level_range = c_value  # To Do method or property
+        self._channels_session.current_level_range = c_value  # To Do method or property
         v_value = voltage_limit_range
         if v_value == 0.0:
             v_value = abs(voltage_limit)
-        self.session.voltage_limit_range = v_value  # To Do method or property
-        self.session.compliance_limit_symmetry = (
+        self._channels_session.voltage_limit_range = v_value  # To Do method or property
+        self._channels_session.compliance_limit_symmetry = (
             nidcpower.ComplianceLimitSymmetry.SYMMETRIC
         )  # To Do method?
 
     def configure_voltage_limit_range(self, voltage_limit_range=0.0):
-        self.session.voltage_limit_range = voltage_limit_range
+        self._channels_session.voltage_limit_range = voltage_limit_range
 
     def configure_voltage_limit(self, voltage_limit=0.0):
-        self.session.voltage_limit = voltage_limit
+        self._channels_session.voltage_limit = voltage_limit
 
     def force_current_asymmetric_limits(
         self,
@@ -392,7 +396,7 @@ class _NIDCPowerSSC:
         voltage_limit_low=0.0,
         voltage_limit_range=0.0,
     ):
-        self.session.abort()
+        self._channels_session.abort()
         self.configure_single_point_force_dc_current_asymmetric_limits(
             current_level,
             current_level_range,
@@ -400,22 +404,22 @@ class _NIDCPowerSSC:
             voltage_limit_low,
             voltage_limit_range,
         )
-        self.session.commit()
+        self._channels_session.commit()
 
     def force_current_symmetric_limits(
         self, current_level=0.0, current_level_range=0.0, voltage_limit=0.0, voltage_limit_range=0.0
     ):
-        self.session.abort()
+        self._channels_session.abort()
         self.configure_single_point_force_dc_current_symmetric_limits(
             current_level, current_level_range, voltage_limit, voltage_limit_range
         )
-        self.session.commit()
+        self._channels_session.commit()
 
     def configure_current_limit_range(self, current_limit_range=0.0):
-        self.session.current_limit_range = current_limit_range
+        self._channels_session.current_limit_range = current_limit_range
 
     def configure_current_limit(self, current_limit=0.0):
-        self.session.current_limit = current_limit
+        self._channels_session.current_limit = current_limit
 
     def configure_single_point_force_dc_voltage_asymmetric_limits(
         self,
@@ -425,47 +429,47 @@ class _NIDCPowerSSC:
         current_limit_low=0.0,
         current_limit_range=0.0,
     ):
-        self.session.source_mode = nidcpower.SourceMode.SINGLE_POINT
-        self.session.output_function = nidcpower.OutputFunction.DC_VOLTAGE
-        self.session.voltage_level = voltage_level
-        self.session.current_limit_high = current_limit_high
-        self.session.current_limit_low = current_limit_low
+        self._channels_session.source_mode = nidcpower.SourceMode.SINGLE_POINT
+        self._channels_session.output_function = nidcpower.OutputFunction.DC_VOLTAGE
+        self._channels_session.voltage_level = voltage_level
+        self._channels_session.current_limit_high = current_limit_high
+        self._channels_session.current_limit_low = current_limit_low
         v_value = voltage_level_range
         if v_value == 0.0:
             v_value = abs(voltage_level)
-        self.session.voltage_level_range = v_value
+        self._channels_session.voltage_level_range = v_value
         c_value = current_limit_range
         if c_value == 0.0:
             c_value = max(abs(current_limit_high), abs(current_limit_low))
-        self.session.current_limit_range = c_value
-        self.session.compliance_limit_symmetry = (
+        self._channels_session.current_limit_range = c_value
+        self._channels_session.compliance_limit_symmetry = (
             nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
         )
 
     def configure_single_point_force_dc_voltage_symmetric_limits(
         self, voltage_level=0.0, voltage_level_range=0.0, current_limit=0.0, current_limit_range=0.0
     ):
-        self.session.source_mode = nidcpower.SourceMode.SINGLE_POINT
-        self.session.output_function = nidcpower.OutputFunction.DC_VOLTAGE
-        self.session.voltage_level = voltage_level
-        self.session.current_limit = current_limit
+        self._channels_session.source_mode = nidcpower.SourceMode.SINGLE_POINT
+        self._channels_session.output_function = nidcpower.OutputFunction.DC_VOLTAGE
+        self._channels_session.voltage_level = voltage_level
+        self._channels_session.current_limit = current_limit
         v_value = voltage_level_range
         if v_value == 0.0:
             v_value = abs(voltage_level)
-        self.session.voltage_level_range = v_value
+        self._channels_session.voltage_level_range = v_value
         c_value = current_limit_range
         if c_value == 0.0:
             c_value = abs(current_limit)
-        self.session.current_limit_range = c_value
-        self.session.compliance_limit_symmetry = (
+        self._channels_session.current_limit_range = c_value
+        self._channels_session.compliance_limit_symmetry = (
             nidcpower.ComplianceLimitSymmetry.SYMMETRIC
         )  # To Do method?
 
     def configure_voltage_level_range(self, voltage_level_range=0.0):
-        self.session.voltage_level_range = voltage_level_range
+        self._channels_session.voltage_level_range = voltage_level_range
 
     def configure_voltage_level(self, voltage_level=0.0):
-        self.session.voltage_level = voltage_level
+        self._channels_session.voltage_level = voltage_level
 
     def force_voltage_asymmetric_limits(
         self,
@@ -475,7 +479,7 @@ class _NIDCPowerSSC:
         current_limit_low=0.0,
         current_limit_range=0.0,
     ):
-        self.session.abort()
+        self._channels_session.abort()
         self.configure_single_point_force_dc_voltage_asymmetric_limits(
             voltage_level,
             voltage_level_range,
@@ -483,63 +487,64 @@ class _NIDCPowerSSC:
             current_limit_low,
             current_limit_range,
         )
-        self.session.commit()
+        self._channels_session.commit()
 
     def force_voltage_symmetric_limits(
         self, voltage_level=0.0, voltage_level_range=0.0, current_limit=0.0, current_limit_range=0.0
     ):
-        self.session.abort()
+        self._channels_session.abort()
         self.configure_single_point_force_dc_voltage_symmetric_limits(
             voltage_level, voltage_level_range, current_limit, current_limit_range
         )
-        self.session.commit()
+        self._channels_session.commit()
 
     def configure_source_adapt(
         self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse
     ):
-        self.session.transient_response = enums.TransientResponse.CUSTOM
-        self.session.voltage_gain_bandwidth = voltage_ctr.gain_bandwidth
-        self.session.voltage_compensation_frequency = voltage_ctr.compensation_frequency
-        self.session.voltage_pole_zero_ratio = voltage_ctr.pole_zero_ratio
-        self.session.current_gain_bandwidth = current_ctr.gain_bandwidth
-        self.session.current_compensation_frequency = current_ctr.compensation_frequency
-        self.session.current_pole_zero_ratio = current_ctr.pole_zero_ratio
+        self._channels_session.transient_response = enums.TransientResponse.CUSTOM
+        self._channels_session.voltage_gain_bandwidth = voltage_ctr.gain_bandwidth
+        self._channels_session.voltage_compensation_frequency = voltage_ctr.compensation_frequency
+        self._channels_session.voltage_pole_zero_ratio = voltage_ctr.pole_zero_ratio
+        self._channels_session.current_gain_bandwidth = current_ctr.gain_bandwidth
+        self._channels_session.current_compensation_frequency = current_ctr.compensation_frequency
+        self._channels_session.current_pole_zero_ratio = current_ctr.pole_zero_ratio
 
     def configure_transient_response(self, transient_response=enums.TransientResponse.NORMAL):
-        self.session.transient_response = transient_response
+        self._channels_session.transient_response = transient_response
 
     def get_source_adapt_settings(self):
-        transient_response = self.session.transient_response
-        v_gain_bw = self.session.voltage_gain_bandwidth
-        v_comp_fr = self.session.voltage_compensation_frequency
-        v_pole_0_ratio = self.session.voltage_pole_zero_ratio
-        i_gain_bw = self.session.current_gain_bandwidth
-        i_comp_fr = self.session.current_compensation_frequency
-        i_pole_0_ratio = self.session.current_pole_zero_ratio
+        transient_response = self._channels_session.transient_response
+        v_gain_bw = self._channels_session.voltage_gain_bandwidth
+        v_comp_fr = self._channels_session.voltage_compensation_frequency
+        v_pole_0_ratio = self._channels_session.voltage_pole_zero_ratio
+        i_gain_bw = self._channels_session.current_gain_bandwidth
+        i_comp_fr = self._channels_session.current_compensation_frequency
+        i_pole_0_ratio = self._channels_session.current_pole_zero_ratio
         voltage_ctr = CustomTransientResponse(v_gain_bw, v_comp_fr, v_pole_0_ratio)
         current_ctr = CustomTransientResponse(i_gain_bw, i_comp_fr, i_pole_0_ratio)
         return transient_response, voltage_ctr, current_ctr
 
     def configure_output_connected(self, output_connected=False):
-        self.session.output_connected = output_connected
+        self._channels_session.output_connected = output_connected
 
     def configure_output_enabled(self, output_enabled=False):
-        self.session.output_enabled = output_enabled
+        self._channels_session.output_enabled = output_enabled
 
     def configure_output_function(self, output_function=nidcpower.OutputFunction.DC_VOLTAGE):
-        self.session.output_function = output_function
+        self._channels_session.output_function = output_function
 
     def configure_output_resistance(self, output_resistance=0.0):
-        self.session.output_resistance = output_resistance
+        self._channels_session.output_resistance = output_resistance
 
     def configure_source_delay(self, source_delay=0.0):
-        self.session.source_delay = source_delay
+        self._channels_session.source_delay = source_delay
 
     def configure_source_mode(self, source_mode=nidcpower.SourceMode.SINGLE_POINT):
-        self.session.source_mode = source_mode
+        self._channels_session.source_mode = source_mode
 
     def get_smu_model(self):
         smu_model_str = re.search("\d\d\d\d", self.session.instrument_model, re.RegexFlag.ASCII)[0]
+        # This will throw error if different types / models of instruments are under same session.
         smu_model_number = int(smu_model_str)
         return smu_model_number
 
@@ -554,7 +559,7 @@ class _NIDCPowerSSC:
         return max_current
 
     def configure_measurements(self, mode=MeasurementMode.AUTO):
-        self.session.abort()
+        self._channels_session.abort()
         if self.measure_multiple_only:
             mode = MeasurementMode.MEASURE_MULTIPLE
         if mode == MeasurementMode.AUTO:
@@ -564,60 +569,60 @@ class _NIDCPowerSSC:
             else:
                 mode = MeasurementMode.SOFTWARE_TRIGGER
         if mode == MeasurementMode.SOFTWARE_TRIGGER:
-            self.session.measure_when = nidcpower.MeasureWhen.ON_MEASURE_TRIGGER
-            self.session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
-            self.session.measure_record_length = 1
+            self._channels_session.measure_when = nidcpower.MeasureWhen.ON_MEASURE_TRIGGER
+            self._channels_session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
+            self._channels_session.measure_record_length = 1
         else:
-            self.session.measure_when = nidcpower.MeasureWhen.ON_DEMAND
+            self._channels_session.measure_when = nidcpower.MeasureWhen.ON_DEMAND
 
     def configure_export_signal(self, signal, output_terminal):
-        # self.session.export_signal () method not found.
+        # self._channels_session.export_signal () method not found.
         pass
 
     def send_software_edge_trigger(self, trigger_to_send=enums.SendSoftwareEdgeTriggerType.MEASURE):
-        return self.session.send_software_edge_trigger(trigger_to_send)
+        return self._channels_session.send_software_edge_trigger(trigger_to_send)
 
     def wait_for_event(self, event=nidcpower.Event.SOURCE_COMPLETE, timeout=10.0):
-        return self.session.wait_for_event(event, timeout)
+        return self._channels_session.wait_for_event(event, timeout)
 
     def configure_and_commit_waveform_acquisition(self, sample_rate, buffer_length=1.0):
         settings = self.get_measurement_settings()
-        self.session.aperture_time_units = enums.ApertureTimeUnits.SECONDS
-        self.session.aperture_time = 1 / sample_rate
-        self.session.measure_record_length_is_finite = False
-        self.session.measure_when = nidcpower.MeasureWhen.ON_MEASURE_TRIGGER
-        self.session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
-        self.session.commit()
+        self._channels_session.aperture_time_units = enums.ApertureTimeUnits.SECONDS
+        self._channels_session.aperture_time = 1 / sample_rate
+        self._channels_session.measure_record_length_is_finite = False
+        self._channels_session.measure_when = nidcpower.MeasureWhen.ON_MEASURE_TRIGGER
+        self._channels_session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
+        self._channels_session.commit()
         num_samples = int(
-            math.ceil(buffer_length / self.session.measure_record_delta_time)
+            math.ceil(buffer_length / self._channels_session.measure_record_delta_time)
         )
         # coerce num_samples to be between 1 and max value of I32 (2147483647)
         if num_samples < 1:
             num_samples = 1
         elif num_samples > 2147483647:
             num_samples = 2147483647
-        if self.session.measure_buffer_size < num_samples:
-            self.session.measure_buffer_size = num_samples
+        if self._channels_session.measure_buffer_size < num_samples:
+            self._channels_session.measure_buffer_size = num_samples
         return settings
 
     def get_measurement_settings(self):
         settings = {
-            "aperture_time_units": self.session.aperture_time_units,
-            "aperture_time": self.session.aperture_time,
-            "measure_when": self.session.measure_when,
-            "measure_trigger_type": self.session.measure_trigger_type,
-            "measure_record_length": self.session.measure_record_length,
-            "measure_record_length_is_finite": self.session.measure_record_length_is_finite,
+            "aperture_time_units": self._channels_session.aperture_time_units,
+            "aperture_time": self._channels_session.aperture_time,
+            "measure_when": self._channels_session.measure_when,
+            "measure_trigger_type": self._channels_session.measure_trigger_type,
+            "measure_record_length": self._channels_session.measure_record_length,
+            "measure_record_length_is_finite": self._channels_session.measure_record_length_is_finite,
         }
         return settings
 
     def set_measurement_settings(self, settings):
-        self.session.aperture_time = settings["aperture_time"]
-        self.session.aperture_time_units = settings["aperture_time_units"]
-        self.session.measure_when = settings["measure_when"]
-        self.session.measure_trigger_type = settings["measure_trigger_type"]
-        self.session.measure_record_length = settings["measure_record_length"]
-        self.session.measure_record_length_is_finite = settings[
+        self._channels_session.aperture_time = settings["aperture_time"]
+        self._channels_session.aperture_time_units = settings["aperture_time_units"]
+        self._channels_session.measure_when = settings["measure_when"]
+        self._channels_session.measure_trigger_type = settings["measure_trigger_type"]
+        self._channels_session.measure_record_length = settings["measure_record_length"]
+        self._channels_session.measure_record_length_is_finite = settings[
             "measure_record_length_is_finite"
         ]
 
@@ -627,17 +632,17 @@ class _NIDCPowerSSC:
         elif measurement_mode == MeasurementMode.SOFTWARE_TRIGGER:
             fetch_or_measure = not self.measure_multiple_only
         else:
-            fetch_or_measure = self.session.measure_when == enums.MeasureWhen.ON_MEASURE_TRIGGER
+            fetch_or_measure = self._channels_session.measure_when == enums.MeasureWhen.ON_MEASURE_TRIGGER
 
         if fetch_or_measure:
-            self.session.send_software_edge_trigger(enums.SendSoftwareEdgeTriggerType.MEASURE)
+            self._channels_session.send_software_edge_trigger(enums.SendSoftwareEdgeTriggerType.MEASURE)
         return fetch_or_measure
 
     def measure_execute(self, fetch_or_measure: bool):
         if fetch_or_measure:
-            samples = self.session.channels[self.channels].fetch_multiple(1, 1.0)
+            samples = self._channels_session.channels[self.channels].fetch_multiple(1, 1.0)
         else:
-            samples = self.session.channels[self.channels].measure_multiple()
+            samples = self._channels_session.channels[self.channels].measure_multiple()
         voltages = []
         currents = []
         in_compliance = []
@@ -1294,9 +1299,7 @@ def pins_to_sessions(
     pins_info = []
     pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
     if fill_pin_site_info:
-        pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(
-            tsm_context, pins
-        )
+        pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(tsm_context, pins)
     else:
         for pin in pins:
             a = ni_dt_common.PinInformation  # create instance of class
@@ -1305,9 +1308,9 @@ def pins_to_sessions(
     session_channel_list, _ = ni_dt_common.pin_query_context_to_channel_list(
         pin_query_context, pins_expanded, site_numbers
     )
-    sscs = [
-        _NIDCPowerSSC(session, channel) for session, channel in zip(sessions, session_channel_list)
-    ]
+    # sscs = [_NIDCPowerSSC(session, channel, pin-site )
+    # for session, channel in zip(sessions, channels, session_channel_list)]
+    sscs = [_NIDCPowerSSC(session, channel) for session, channel in zip(sessions, channels)]
     dc_power_tsm = _NIDCPowerTSM(sscs)
     return TSMDCPower(pin_query_context, dc_power_tsm, site_numbers, pins_info, pins_expanded)
 
