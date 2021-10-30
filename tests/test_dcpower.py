@@ -81,7 +81,7 @@ class TestDCPower:
 
     def test_get_max_current(self, dcpower_tsm_s):
         """TSM DC Power Get Max Current.vi"""
-        expected_currents = [3.0, 0.1, 0.1]
+        expected_currents = [3.0, 0.1, 0.1, 0.1, 0.1]
         index = 0
         for dcpower_tsm in dcpower_tsm_s:
             max_currents = dcpower_tsm.ssc.get_max_current()
@@ -136,7 +136,6 @@ class TestDCPower:
             dcpower_tsm.ssc.commit()
             dcpower_tsm.ssc.abort()
 
-
     def test_configure_settings(self, dcpower_tsm_s):
         """
         TSM SSC DCPower Configure Settings.vim
@@ -168,7 +167,6 @@ class TestDCPower:
             print(voltages, currents)
             dcpower_tsm.ssc.abort()
 
-
     def test_tsm_source_current(self, dcpower_tsm_s):
         """
         # TSM SSC DCPower Source Current.vim
@@ -191,11 +189,11 @@ class TestDCPower:
     def test_measure(self, dcpower_tsm_s):
         """# TSM SSC DCPower Measure.vi"""
         # # Do not call configure meas since the default is auto
-        v_Level = 2.0
+        v_level = 2.0
         for dcpower_tsm in dcpower_tsm_s:
-            dcpower_tsm.ssc.source_voltage(v_Level)
+            dcpower_tsm.ssc.source_voltage(v_level)
             measurements = dcpower_tsm.ssc.measure()[0]
-            assert measurements == v_Level
+            assert measurements == v_level
 
     @pytest.mark.skip
     def test_query_in_compliance(self, dcpower_tsm_s):

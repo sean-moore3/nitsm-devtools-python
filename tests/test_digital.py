@@ -15,7 +15,7 @@ import nidevtools.digital as ni_dt_digital
 
 # To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
-pin_file_names = ["I2C.pinmap", "I2C_Logic.pinmap"]
+pin_file_names = ["I2C.pinmap", "I2C_Logic_MultiSite.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 if SIMULATE_HARDWARE:
@@ -69,11 +69,6 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
     print("")
     print("exiting tsm_context fixture")
-
-
-#  @pytest.mark.sequence_file("/nites/nidigital.seq")
-#  def test_nidigital(system_test_runner):
-#    assert system_test_runner.run()
 
 
 @pytest.fixture
@@ -136,6 +131,7 @@ class TestNIDigital:
         This test may pass on simulated device as low is the default value.
         Test with write ZERO and read Low
         """
+
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[1])

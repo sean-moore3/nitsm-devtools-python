@@ -658,6 +658,8 @@ class _NIDCPowerSSC:
             samples = self._channels_session.fetch_multiple(1, 1.0)
         else:
             samples = self._channels_session.measure_multiple()
+
+        print(self._pin_list)
         voltages = []
         currents = []
         in_compliance = []
@@ -665,9 +667,7 @@ class _NIDCPowerSSC:
             voltages.append(s[0])
             currents.append(s[1])
             in_compliance.append(s[2])
-        voltage = voltages[0]
-        current = currents[0]
-        return voltage, current
+        return voltages, currents
 
 
 class _NIDCPowerTSM:
