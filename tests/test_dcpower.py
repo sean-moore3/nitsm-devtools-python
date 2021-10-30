@@ -121,7 +121,11 @@ class TestDCPower:
         """# SSC DCPower Reset Channels.vi"""
         # the below code needs refactoring after changes from driver.
         print("\ndcpower_tsm_s\n", dcpower_tsm_s)
-        custom_settings = {"aperture_time": 20e-03, "source_delay": 1.0, "sense": nidcpower.Sense.LOCAL}
+        custom_settings = {
+            "aperture_time": 20e-03,
+            "source_delay": 1.0,
+            "sense": nidcpower.Sense.LOCAL,
+        }
         for dcpower_tsm in dcpower_tsm_s:
             # print("\ndcpower_tsm\n", dcpower_tsm)
             # default_settings = dcpower_tsm.ssc.get_measurement_settings()
@@ -170,8 +174,7 @@ class TestDCPower:
             print("currents\n", currents)
             dcpower_tsm.ssc.abort()
             for voltage in voltages:
-                assert voltage_set_point-0.1 <= voltage <= voltage_set_point+0.1
-
+                assert voltage_set_point - 0.1 <= voltage <= voltage_set_point + 0.1
 
     def test_tsm_source_current(self, dcpower_tsm_s):
         """
@@ -189,10 +192,10 @@ class TestDCPower:
             print("compliance\n", compliance)
             voltages, currents = dcpower_tsm.ssc.measure()
             print("voltages\n", voltages)
-            print("currents\n",currents)
+            print("currents\n", currents)
             dcpower_tsm.ssc.abort()
             for current in currents:
-                assert current_set_point-0.1e-04<= current <= current_set_point+0.1e-04
+                assert current_set_point - 0.1e-04 <= current <= current_set_point + 0.1e-04
 
     def test_queries_status(self, dcpower_tsm_s):
         voltage_set_point = 1.0  #  we measured current consumed for this voltage.

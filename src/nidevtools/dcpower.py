@@ -921,25 +921,25 @@ class _NIDCPowerTSM:
         return
 
     def get_aperture_times_in_seconds(self):
-        temp_list =[]
+        temp_list = []
         for ssc in self._sessions_sites_channels:
             temp_list.append(ssc.get_aperture_time_in_seconds())
         return temp_list
 
     def get_power_line_frequencies(self):
-        temp_list =[]
+        temp_list = []
         for ssc in self._sessions_sites_channels:
             temp_list.append(ssc.get_power_line_frequency())
         return temp_list
 
     def query_in_compliance(self):
-        temp_list =[]
+        temp_list = []
         for ssc in self._sessions_sites_channels:
             temp_list += ssc.query_in_compliance()
         return temp_list
 
     def query_output_state(self, output_state: nidcpower.OutputStates):
-        temp_list =[]
+        temp_list = []
         for ssc in self._sessions_sites_channels:
             temp_list += ssc.query_output_state(output_state)
         return temp_list

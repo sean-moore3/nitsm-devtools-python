@@ -23,7 +23,7 @@ def test_pin_s(request):
         smu_system_pins = ["VCC"]
         input_dut_pins = ["A", "B"]
         output_dut_pins = ["C_Y", "Y"]
-        all_smu_pins = input_dut_pins+output_dut_pins
+        all_smu_pins = input_dut_pins + output_dut_pins
         pins_selected = [smu_system_pins, input_dut_pins, output_dut_pins, all_smu_pins]
     elif file_name == "test_digital.py":
         # for Digital pattern instrument driver i.e. nidigital Testing
