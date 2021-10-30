@@ -192,7 +192,7 @@ class TestDCPower:
             print("currents\n",currents)
             dcpower_tsm.ssc.abort()
             for current in currents:
-                assert current_set_point-0.1<= current <= current_set_point+0.1
+                assert current_set_point-0.1e-04<= current <= current_set_point+0.1e-04
 
     def test_queries_status(self, dcpower_tsm_s):
         voltage_set_point = 1.0  #  we measured current consumed for this voltage.
