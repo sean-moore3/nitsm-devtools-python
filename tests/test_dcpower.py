@@ -178,7 +178,9 @@ class TestDCPower:
             compliance = dcpower_tsm.ssc.query_in_compliance()
             print(compliance)
             voltages, currents = dcpower_tsm.ssc.measure()
-            print(voltages, currents)
+            print("voltages\n", voltages)
+            print("currents\n",currents)
+            print("Next")
             dcpower_tsm.ssc.abort()
         # c_Level = 0.5
         # # Do not call configure meas since the default is auto

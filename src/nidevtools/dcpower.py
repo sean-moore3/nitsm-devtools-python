@@ -1210,9 +1210,9 @@ class _NIDCPowerTSM:
             fetch_or_measure_array.append(ssc.measure_setup(measurement_mode))
         i = 0
         for ssc in self._sessions_sites_channels:
-            voltage, current = ssc.measure_execute(fetch_or_measure_array[i])
-            voltages.append(voltage)
-            currents.append(current)
+            voltages_new, currents_new = ssc.measure_execute(fetch_or_measure_array[i])
+            voltages += voltages_new
+            currents += currents_new
             i += 1
         return voltages, currents
 
