@@ -192,6 +192,7 @@ class _NIDCPowerSSC:
         self._pin_list = pin_list  # pin names mapped to the channels
         self._channels_session = session.channels[channels]
         # To operate on session on very specific channel(s)
+        self._ch_list = channels.split(",")  # channels in a list for internal operations
         self.power_line_frequency = 60.0  # To Do confirm global replaced with object attributes.
         self.measure_multiple_only = False  # To Do confirm global replaced with object attributes.
 
@@ -326,15 +327,18 @@ class _NIDCPowerSSC:
         return configured_power_line_frequency
 
     def query_in_compliance(self):
-        compliance = []
-        channels = self._channels.split(",")
-        for channel in channels:
-            comp = self.session.channels[channel].query_in_compliance()
-            compliance.append(comp)
-        return compliance
+        compliance_states = []
+        for ch in self._ch_list:
+            comp = self.session.channels[ch].query_in_compliance()
+            compliance_states.append(comp)
+        return compliance_states
 
     def query_output_state(self, output_state: nidcpower.OutputStates):
-        return self._channels_session.query_output_state(output_state)
+        output_states = []
+        for ch in self._ch_list:
+            state = self.session.channels[ch].query_output_state(output_state)
+            output_states.append(state)
+        return output_states
 
     def configure_current_level_range(self, current_level_range=0.0):
         self._channels_session.current_level_range = current_level_range  # To Do method or property
@@ -658,8 +662,6 @@ class _NIDCPowerSSC:
             samples = self._channels_session.fetch_multiple(1, 1.0)
         else:
             samples = self._channels_session.measure_multiple()
-
-        print(self._pin_list)
         voltages = []
         currents = []
         in_compliance = []
@@ -919,16 +921,28 @@ class _NIDCPowerTSM:
         return
 
     def get_aperture_times_in_seconds(self):
-        return [ssc.get_aperture_time_in_seconds() for ssc in self._sessions_sites_channels]
+        temp_list =[]
+        for ssc in self._sessions_sites_channels:
+            temp_list.append(ssc.get_aperture_time_in_seconds())
+        return temp_list
 
     def get_power_line_frequencies(self):
-        return [ssc.get_power_line_frequency() for ssc in self._sessions_sites_channels]
+        temp_list =[]
+        for ssc in self._sessions_sites_channels:
+            temp_list.append(ssc.get_power_line_frequency())
+        return temp_list
 
     def query_in_compliance(self):
-        return [ssc.query_in_compliance() for ssc in self._sessions_sites_channels]
+        temp_list =[]
+        for ssc in self._sessions_sites_channels:
+            temp_list += ssc.query_in_compliance()
+        return temp_list
 
     def query_output_state(self, output_state: nidcpower.OutputStates):
-        return [ssc.query_output_state(output_state) for ssc in self._sessions_sites_channels]
+        temp_list =[]
+        for ssc in self._sessions_sites_channels:
+            temp_list += ssc.query_output_state(output_state)
+        return temp_list
 
     def configure_transient_response(self, transient_response=enums.TransientResponse.NORMAL):
         for ssc in self._sessions_sites_channels:
@@ -974,7 +988,7 @@ class _NIDCPowerTSM:
             ssc.configure_source_mode(source_mode)
 
     def get_max_current(self):
-        return [ssc.get_max_current() for ssc in self._sessions_sites_channels]
+        return max([ssc.get_max_current() for ssc in self._sessions_sites_channels])
 
     def wait_for_event(self, event=nidcpower.Event.SOURCE_COMPLETE, timeout=10.0):
         for ssc in self._sessions_sites_channels:

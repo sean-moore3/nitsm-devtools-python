@@ -84,9 +84,9 @@ class TestDCPower:
         expected_currents = [3.0, 0.1, 0.1, 0.1, 0.1]
         index = 0
         for dcpower_tsm in dcpower_tsm_s:
-            max_currents = dcpower_tsm.ssc.get_max_current()
-            print("\nmax_current\n", max_currents)
-            assert max(max_currents) == expected_currents[index]
+            max_current = dcpower_tsm.ssc.get_max_current()
+            print("\nmax_current\n", max_current)
+            assert max_current == expected_currents[index]
             index += 1
 
     # model = dcpower_tsm_s.get_smu_model() #not sure what object to call to get this property
@@ -141,15 +141,14 @@ class TestDCPower:
         TSM SSC DCPower Configure Settings.vim
         dcpower_tsm.query_in_compliance()
         """
+        # custom_settings = {"aperture_time": 20e-03, "source_delay": 1.0, "sense": Sense.LOCAL}
         for dcpower_tsm in dcpower_tsm_s:
+
             dcpower_tsm.ssc.configure_settings(aperture_time=40e-03)
             dcpower_tsm.ssc.force_voltage_symmetric_limits(1.0, 1.0, 0.1, 0.1)
-            compliance = dcpower_tsm.ssc.query_in_compliance()
-            print(compliance)
             voltages, currents = dcpower_tsm.ssc.measure()
             print(voltages, currents)
             dcpower_tsm.ssc.abort()
-        # custom_settings = {"aperture_time": 20e-03, "source_delay": 1.0, "sense": Sense.LOCAL}
         # dcpower_tsm_s.configure_settings(custom_settings)
         # default_settings = dcpower_tsm_s.get_measurement_settings()
         # assert custom_settings == default_settings
@@ -159,47 +158,60 @@ class TestDCPower:
         # TSM SSC DCPower Source Voltage.vim
         Force_voltage_symmetric_limits is the python function name
         """
+        voltage_set_point = 1.0  #  we measured current consumed for this voltage.
         for dcpower_tsm in dcpower_tsm_s:
-            dcpower_tsm.ssc.force_voltage_symmetric_limits(1.0, 1.0, 0.1, 0.1)
+            # Where is the function to source voltage? is it force voltage?
+            # Yes, this is the standard name for it.
+            dcpower_tsm.ssc.force_voltage_symmetric_limits(voltage_set_point, 1.0, 0.1, 0.1)
             compliance = dcpower_tsm.ssc.query_in_compliance()
-            print(compliance)
+            print("compliance\n", compliance)
             voltages, currents = dcpower_tsm.ssc.measure()
-            print(voltages, currents)
+            print("voltages\n", voltages)
+            print("currents\n", currents)
             dcpower_tsm.ssc.abort()
+            for voltage in voltages:
+                assert voltage == voltage_set_point
+
 
     def test_tsm_source_current(self, dcpower_tsm_s):
         """
         # TSM SSC DCPower Source Current.vim
         # SSC DCPower Source Current.vim
         """
+        current_set_point = 0.1e-03  # This value is measured for a know voltage
         for dcpower_tsm in dcpower_tsm_s:
-            dcpower_tsm.ssc.configure_settings(aperture_time=20e-03)
-            dcpower_tsm.ssc.force_current_symmetric_limits(0.1e-03, 0.1e-03, 3.0, 5.0)
+            # # Do not call configure meas since the default is auto
+            # dcpower_tsm.ssc.configure_settings(aperture_time=20e-03)
+            # Where is the function to source current? is it force current?
+            # Yes, this is the standard name for it.
+            dcpower_tsm.ssc.force_current_symmetric_limits(current_set_point, 0.1e-03, 3.0, 5.0)
             compliance = dcpower_tsm.ssc.query_in_compliance()
-            print(compliance)
+            print("compliance\n", compliance)
             voltages, currents = dcpower_tsm.ssc.measure()
             print("voltages\n", voltages)
             print("currents\n",currents)
-            print("Next")
             dcpower_tsm.ssc.abort()
-        # c_Level = 0.5
-        # # Do not call configure meas since the default is auto
-        # ni_dt_dc_power.tsm_source_current(c_level)  # Where is the function to source? it force voltage?
-        # assert dcpower_tsm_s.measure()[1] == c_Level
+            for current in currents:
+                assert current == current_set_point
 
-    @pytest.mark.skip
-    def test_measure(self, dcpower_tsm_s):
-        """# TSM SSC DCPower Measure.vi"""
-        # # Do not call configure meas since the default is auto
-        v_level = 2.0
+    def test_queries_status(self, dcpower_tsm_s):
+        voltage_set_point = 1.0  #  we measured current consumed for this voltage.
         for dcpower_tsm in dcpower_tsm_s:
-            dcpower_tsm.ssc.source_voltage(v_level)
-            measurements = dcpower_tsm.ssc.measure()[0]
-            assert measurements == v_level
+            dcpower_tsm.ssc.force_voltage_symmetric_limits(voltage_set_point, 1.0, 0.1, 0.1)
 
-    @pytest.mark.skip
-    def test_query_in_compliance(self, dcpower_tsm_s):
-        for dcpower_tsm in dcpower_tsm_s:
-            print("\ndcpower_tsm\n", dcpower_tsm)
-            # dcpower_tsm.ssc.
-            dcpower_tsm.query_in_compliance()
+            compliance = dcpower_tsm.ssc.query_in_compliance()
+            print("compliance\n", compliance)
+
+            power_line_frequencies = dcpower_tsm.ssc.get_power_line_frequencies()
+            print("power_line_frequencies\n", power_line_frequencies)
+
+            output_state = dcpower_tsm.ssc.query_output_state(nidcpower.OutputStates.VOLTAGE)
+            print("output_state\n", output_state)
+
+            aperture_times_in_seconds = dcpower_tsm.ssc.get_aperture_times_in_seconds()
+            print("aperture_times_in_seconds\n", aperture_times_in_seconds)
+
+            voltages, currents = dcpower_tsm.ssc.measure()
+            print("voltages\n", voltages)
+            print("currents\n", currents)
+            dcpower_tsm.ssc.abort()
