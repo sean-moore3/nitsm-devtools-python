@@ -1749,65 +1749,30 @@ def tsm_initialize_sessions(
     tsm_context: SemiconductorModuleContext, options: dict = {}, file_paths: dict = {}
 ):
     pin_map_file_path = tsm_context.pin_map_file_path
-    specifications_files = tsm_context.nidigital_project_specifications_file_paths
-    levels_files = tsm_context.nidigital_project_levels_file_paths
-    timing_files = tsm_context.nidigital_project_timing_file_paths
-    pattern_files = tsm_context.nidigital_project_pattern_file_paths
-    source_waveform_files = tsm_context.nidigital_project_source_waveform_file_paths
-    capture_waveform_files = tsm_context.nidigital_project_capture_waveform_file_paths
-
-    instrument_names = tsm_context.get_all_nidigital_instrument_names()
-    for instrument_name in instrument_names:
-        session = nidigital.Session(instrument_name, options=options)
-        tsm_context.set_nidigital_session(instrument_name, session)
-        session.load_pin_map(pin_map_file_path)
-        session.load_specifications_levels_and_timing(
-            specifications_files, levels_files, timing_files
-        )
-        session.unload_all_patterns()
-        for pattern_file in pattern_files:
-            session.load_pattern(pattern_file)
-        for capture_waveform_file in capture_waveform_files:
-            filename = os.path.basename(capture_waveform_file)
-            waveform_name, _ = filename.split(".")
-            session.create_capture_waveform_from_file_digicapture(
-                waveform_name, capture_waveform_file
-            )
-        for source_waveform_file in source_waveform_files:
-            filename = os.path.basename(source_waveform_file)
-            waveform_name, _ = filename.split(".")
-            session.create_source_waveform_from_file_tdms(
-                waveform_name, source_waveform_file, False
-            )
-    """
+    specifications_files = []
+    levels_files = []
+    timing_files = []
+    pattern_files = []
+    source_waveform_files = []
+    capture_waveform_files = []
     instrument_names = tsm_context.get_all_nidigital_instrument_names()
     if instrument_names:
-        pin_map_file_path = tsm_context.pin_map_file_path
         try:
             specifications_files = tsm_context.nidigital_project_specifications_file_paths
-        except Exception:
-            specifications_files = file_paths.get("specifications", [])
-        try:
             levels_files = tsm_context.nidigital_project_levels_file_paths
-        except Exception:
-            levels_files = file_paths.get("levels", [])
-        try:
             timing_files = tsm_context.nidigital_project_timing_file_paths
-        except Exception:
-            timing_files = file_paths.get("timing", [])
-        try:
             pattern_files = tsm_context.nidigital_project_pattern_file_paths
-        except Exception:
-            pattern_files = file_paths.get("pattern", [])
-        try:
             source_waveform_files = tsm_context.nidigital_project_source_waveform_file_paths
-        except Exception:
-            source_waveform_files = file_paths.get("source_waveforms", [])
-        try:
             capture_waveform_files = tsm_context.nidigital_project_capture_waveform_file_paths
         except Exception:
-            capture_waveform_files = file_paths.get("capture_waveforms", [])
-
+            specifications_files = file_paths.get("specifications", specifications_files)
+            levels_files = file_paths.get("levels", levels_files)
+            timing_files = file_paths.get("timing", timing_files)
+            pattern_files = file_paths.get("pattern", pattern_files)
+            source_waveform_files = file_paths.get("source_waveforms", source_waveform_files)
+            capture_waveform_files = file_paths.get("capture_waveforms", capture_waveform_files)
+            """
+            pass"""
         for instrument_name in instrument_names:
             session = nidigital.Session(instrument_name, options=options)
             tsm_context.set_nidigital_session(instrument_name, session)
@@ -1829,7 +1794,7 @@ def tsm_initialize_sessions(
                 waveform_name, _ = filename.split(".")
                 session.create_source_waveform_from_file_tdms(
                     waveform_name, source_waveform_file, False
-                )"""
+                )
 
 
 @nitsm.codemoduleapi.code_module
