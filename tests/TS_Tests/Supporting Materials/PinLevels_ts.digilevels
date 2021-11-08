@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PinLevelsFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.0" xmlns="http://www.ni.com/Semiconductor/PinLevels">
+  <PinLevelsSheet>
+    <DigitalPinLevelSets>
+      <DigitalPinLevelSet pin="Inputs">
+        <Vil>0</Vil>
+        <Vih>3.3</Vih>
+        <Vol>0.3</Vol>
+        <Voh>0.8</Voh>
+        <Iol>0.01</Iol>
+        <Ioh>-0.01</Ioh>
+        <Vcom>0.01</Vcom>
+        <Vterm>0.01</Vterm>
+      </DigitalPinLevelSet>
+      <DigitalPinLevelSet pin="Outputs">
+        <Vil>0</Vil>
+        <Vih>3.3</Vih>
+        <Vol>0.3</Vol>
+        <Voh>0.8</Voh>
+        <Iol>0.01</Iol>
+        <Ioh>-0.01</Ioh>
+        <Vcom>0.01</Vcom>
+        <Vterm>0.01</Vterm>
+      </DigitalPinLevelSet>
+    </DigitalPinLevelSets>
+  </PinLevelsSheet>
+</PinLevelsFile>
