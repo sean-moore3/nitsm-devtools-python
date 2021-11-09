@@ -30,7 +30,7 @@
               <Off>t.SCL</Off>
             </ReturnToLow>
             <CompareStrobe>
-              <Strobe>t.SCL*0.7</Strobe>
+              <Strobe>(t.SU_STA + t.HD_STA)*0.9</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>Clock line START condition timing</Comment>
@@ -43,7 +43,7 @@
               <Off>t.SCL</Off>
             </ReturnToLow>
             <CompareStrobe>
-              <Strobe>t.SCL*0.7</Strobe>
+              <Strobe>t.SU_STA*0.9</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>Data line START condition timing</Comment>
@@ -61,7 +61,7 @@
               <Off>t.SCL</Off>
             </ReturnToLow>
             <CompareStrobe>
-              <Strobe>t.SCL*0.7</Strobe>
+              <Strobe>(t.SU_DAT + t.HIGH)*0.9</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>Clock line timing while transferring data</Comment>
@@ -103,7 +103,7 @@
               <Off>t.SCL + t.BUF</Off>
             </ReturnToHigh>
             <CompareStrobe>
-              <Strobe>(t.SCL + t.BUF)*0.7</Strobe>
+              <Strobe>(t.LOW + t.SU_STO)*0.9</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>Data line STOP condition timing</Comment>
