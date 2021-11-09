@@ -131,7 +131,7 @@ class TestNIDigital:
 
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
-        sleep(5)
+        sleep(1)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[1])
         print(per_site_per_pin_data)
         for per_site_data in per_site_per_pin_data:
