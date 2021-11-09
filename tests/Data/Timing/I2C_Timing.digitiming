@@ -30,7 +30,7 @@
               <Off>t.SCL</Off>
             </ReturnToLow>
             <CompareStrobe>
-              <Strobe>0</Strobe>
+              <Strobe>t.SCL*0.7</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>Clock line START condition timing</Comment>
@@ -43,7 +43,7 @@
               <Off>t.SCL</Off>
             </ReturnToLow>
             <CompareStrobe>
-              <Strobe>0</Strobe>
+              <Strobe>t.SCL*0.7</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>Data line START condition timing</Comment>
@@ -61,7 +61,7 @@
               <Off>t.SCL</Off>
             </ReturnToLow>
             <CompareStrobe>
-              <Strobe>0</Strobe>
+              <Strobe>t.SCL*0.7</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>Clock line timing while transferring data</Comment>
@@ -73,7 +73,7 @@
               <Off>t.SCL</Off>
             </DriveNonReturn>
             <CompareStrobe>
-              <Strobe>t.SU_DAT + t.HIGH/2</Strobe>
+              <Strobe>t.SCL*0.7</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>Data line timing while transferring data</Comment>
@@ -90,7 +90,7 @@
               <Off>t.SCL + t.BUF</Off>
             </DriveNonReturn>
             <CompareStrobe>
-              <Strobe>0</Strobe>
+              <Strobe>(t.SCL + t.BUF)*0.7</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>Clock line STOP condition timing</Comment>
@@ -103,7 +103,7 @@
               <Off>t.SCL + t.BUF</Off>
             </ReturnToHigh>
             <CompareStrobe>
-              <Strobe>0</Strobe>
+              <Strobe>(t.SCL + t.BUF)*0.7</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>Data line STOP condition timing</Comment>
@@ -120,7 +120,7 @@
               <Off>0</Off>
             </DriveNonReturn>
             <CompareStrobe>
-              <Strobe>0</Strobe>
+              <Strobe>t.SCL*0.7</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>Timing while the bus is idle</Comment>
@@ -137,7 +137,7 @@
               <Off>0</Off>
             </DriveNonReturn>
             <CompareStrobe>
-              <Strobe>0</Strobe>
+              <Strobe>2 µs</Strobe>
             </CompareStrobe>
             <DataSource>Pattern</DataSource>
             <Comment>A setup delay required by the source_start opcode</Comment>
