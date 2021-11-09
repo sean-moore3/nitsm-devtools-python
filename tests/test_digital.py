@@ -46,9 +46,7 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     The fixture provides the digital project files necessary for initialisation of sessions
     in a dictionary format.
     """
-    print("")
-    print("entering tsm_context fixture")
-    print("Test is running on Simulated driver?", SIMULATE_HARDWARE)
+    print("\nTest is running on Simulated driver?", SIMULATE_HARDWARE)
     if SIMULATE_HARDWARE:
         options = {"Simulate": True, "driver_setup": {"Model": "6571"}}
     else:
@@ -61,14 +59,13 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
         "capture_waveforms": [cap_wfm],
         "source_waveforms": [src_wfm1, src_wfm2, src_wfm3],
     }
-    print(digital_project_files)
     ni_dt_digital.tsm_initialize_sessions(
         standalone_tsm_context, options=options, file_paths=digital_project_files
     )
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
-    print("")
-    print("exiting tsm_context fixture")
+
+
 
 
 @pytest.fixture
@@ -113,7 +110,6 @@ class TestNIDigital:
 
     def test_tsm_ssc_n_pins_to_m_sessions(self, digital_tsm_s, test_pin_s):
         """TSM SSC Digital N Pins To M Sessions.vi"""
-        print(test_pin_s)
         for digital_tsm in digital_tsm_s:
             assert isinstance(digital_tsm, ni_dt_digital.TSMDigital)
 
@@ -165,7 +161,6 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
-        print(per_site_per_pin_data)
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
@@ -180,7 +175,6 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
         _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
-        print(per_site_per_pin_data)
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)

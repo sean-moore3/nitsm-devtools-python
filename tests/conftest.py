@@ -17,7 +17,6 @@ def test_pin_s(request):
     using @pytest.mark.parametrize
     """
     _, file_name = os.path.split(request.module.__file__)
-    print(file_name)
     if file_name == "test_dcpower.py":  # overriding the pin_select as it is inside dcpower module
         # for SMU driver i.e. nidcpower Testing
         smu_system_pins = ["VCC"]
@@ -34,7 +33,6 @@ def test_pin_s(request):
         pins_selected = [test_dut_pins, read_dut_pins, all_dut_pins]
     else:
         pins_selected = []
-    print(pins_selected)
     return pins_selected
 
 
