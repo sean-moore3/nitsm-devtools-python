@@ -139,11 +139,7 @@ class TestNIDigital:
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
-                if per_pin_data == enums.PinState.M:
-                    print("value of per_site_data is midvalue M")
-                    assert per_pin_data == enums.PinState.M
-                else:
-                    assert per_pin_data == enums.PinState.L
+                assert per_pin_data == enums.PinState.L
 
     def test_tsm_ssc_write_read_static_loop_back_pin_high(self, digital_tsm_s):
         """TSM SSC Digital Write Static.vi
