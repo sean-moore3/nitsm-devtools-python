@@ -5,3 +5,7 @@
 __pycache__
 *.pyc
 .venv/
+# Project specific
+*.exists
+*.zip
+*.xml
