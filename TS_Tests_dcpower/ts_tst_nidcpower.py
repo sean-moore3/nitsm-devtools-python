@@ -6,8 +6,11 @@ import os.path
 import ctypes
 import nidcpower
 import nitsm.codemoduleapi
+import importlib
 #from nidcpower import enums
 from nitsm.codemoduleapi import SemiconductorModuleContext
+import nidevtools
+importlib.reload(nidevtools)
 from nidevtools import dcpower as ni_dt_dcpower
 
 
