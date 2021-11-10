@@ -9,3 +9,5 @@ __pycache__
 *.exists
 *.zip
 *.xml
+*.digiprojcache
+.cache/

@@ -33,7 +33,7 @@ def configure_pins(tsm_context=SemiconductorModuleContext):
     tsm_i = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["Inputs"])
     ni_dt_digital.tsm_ssc_select_function(tsm_o, ni_dt_digital.enums.SelectedFunction.DIGITAL)
     ni_dt_digital.tsm_ssc_select_function(tsm_i, ni_dt_digital.enums.SelectedFunction.DIGITAL)
-    ni_dt_digital.tsm_ssc_write_static(tsm_o, ni_dt_digital.enums.WriteStaticPinState.ZERO)
+    ni_dt_digital.tsm_ssc_write_static(tsm_o, ni_dt_digital.enums.WriteStaticPinState.ONE)
     _, data = ni_dt_digital.tsm_ssc_read_static(tsm_i)
     print(data)
 
