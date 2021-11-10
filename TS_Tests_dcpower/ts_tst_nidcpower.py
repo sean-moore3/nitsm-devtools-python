@@ -9,9 +9,9 @@ import nitsm.codemoduleapi
 import importlib
 #from nidcpower import enums
 from nitsm.codemoduleapi import SemiconductorModuleContext
-import nidevtools
-importlib.reload(nidevtools)
-from nidevtools import dcpower as ni_dt_dcpower
+import nidevtools.dcpower as ni_dt_dcpower
+# importlib.reload(nidevtools.dcpower as ni_dt_dcpower)
+# from nidevtools import dcpower as ni_dt_dcpower
 
 
 @nitsm.codemoduleapi.code_module
@@ -46,7 +46,7 @@ def configure_measurements_waveform(tsm_context=SemiconductorModuleContext):
 @nitsm.codemoduleapi.code_module
 def fetch_waveform(tsm_context=SemiconductorModuleContext):
     tsminfo = ni_dt_dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA1"])
-    volt_wf, curr_wf=tsminfo.ssc.fetch_waveform(waveform_length_s= 1e-3)
+    volt_wf, curr_wf=tsminfo.ssc.fetch_waveform(0, waveform_length_s= 1e-3)
     print(volt_wf, curr_wf)
 
 
