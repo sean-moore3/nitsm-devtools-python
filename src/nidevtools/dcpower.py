@@ -609,7 +609,7 @@ class _NIDCPowerSSC:
         self._channels_session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
         self.session.commit()
         num_samples = int(
-            math.ceil(buffer_length / self._channels_session.measure_record_delta_time)
+            math.ceil(buffer_length / self._channels_session.measure_record_delta_time.total_seconds())
         )
         # coerce num_samples to be between 1 and max value of I32 (2147483647)
         if num_samples < 1:

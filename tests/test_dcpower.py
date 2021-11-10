@@ -162,7 +162,7 @@ class TestDCPower:
         # TSM SSC DCPower Source Voltage.vim
         Force_voltage_symmetric_limits is the python function name
         """
-        voltage_set_point = 1.0  #  we measured current consumed for this voltage.
+        voltage_set_point = 1.0  # we measured current consumed for this voltage.
         for dcpower_tsm in dcpower_tsm_s:
             # Where is the function to source voltage? is it force voltage?
             # Yes, this is the standard name for it.
@@ -198,7 +198,7 @@ class TestDCPower:
                 assert current_set_point - 0.1e-04 <= current <= current_set_point + 0.1e-04
 
     def test_queries_status(self, dcpower_tsm_s):
-        voltage_set_point = 1.0  #  we measured current consumed for this voltage.
+        voltage_set_point = 1.0  # we measured current consumed for this voltage.
         for dcpower_tsm in dcpower_tsm_s:
             dcpower_tsm.ssc.force_voltage_symmetric_limits(voltage_set_point, 1.0, 0.1, 0.1)
 
