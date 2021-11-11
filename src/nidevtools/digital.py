@@ -1502,7 +1502,14 @@ def _ssc_initiate(ssc: typing.List[SSCDigital]):
 
 
 # Static #
-def tsm_ssc_read_static(tsm: TSMDigital):
+def tsm_ssc_read_static(tsm: TSMDigital, auto_select=True):
+    """
+    auto_select=True, specifies this function to configures the output function as digital automatically.
+    auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
+    Without configuring as digital and auto_select as false, this function will not work as expected.
+    """
+    if auto_select:
+        tsm_ssc_select_function(tsm, enums.SelectedFunction.DIGITAL)
     initialized_array = [[enums.PinState.ZERO for _ in tsm.pins] for _ in tsm.site_numbers]
     per_instrument_to_per_site_per_pin_lut = _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
         tsm.ssc, tsm.site_numbers, tsm.pins
@@ -1517,7 +1524,15 @@ def tsm_ssc_read_static(tsm: TSMDigital):
 def tsm_ssc_write_static_per_site_per_pin(
     tsm: TSMDigital,
     per_site_per_pin_state: typing.List[typing.List[enums.WriteStaticPinState]],
+    auto_select=True
 ):
+    """
+    auto_select=True, specifies this function to configures the output function as digital automatically.
+    auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
+    Without configuring as digital and auto_select as false, this function will not work as expected.
+    """
+    if auto_select:
+        tsm_ssc_select_function(tsm, enums.SelectedFunction.DIGITAL)
     (
         per_site_per_pin_to_per_instrument_lut,
         instrument_count,
@@ -1537,8 +1552,16 @@ def tsm_ssc_write_static_per_site_per_pin(
 
 
 def tsm_ssc_write_static_per_site(
-    tsm: TSMDigital, per_site_state: typing.List[enums.WriteStaticPinState]
+    tsm: TSMDigital, per_site_state: typing.List[enums.WriteStaticPinState],
+    auto_select=True
 ):
+    """
+    auto_select=True, specifies this function to configures the output function as digital automatically.
+    auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
+    Without configuring as digital and auto_select as false, this function will not work as expected.
+    """
+    if auto_select:
+        tsm_ssc_select_function(tsm, enums.SelectedFunction.DIGITAL)
     (
         per_site_to_per_instrument_lut,
         instrument_count,
@@ -1555,7 +1578,14 @@ def tsm_ssc_write_static_per_site(
     return tsm
 
 
-def tsm_ssc_write_static(tsm: TSMDigital, state: enums.WriteStaticPinState):
+def tsm_ssc_write_static(tsm: TSMDigital, state: enums.WriteStaticPinState, auto_select=True):
+    """
+    auto_select=True, specifies this function to configures the output function as digital automatically.
+    auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
+    Without configuring as digital and auto_select as false, this function will not work as expected.
+    """
+    if auto_select:
+        tsm_ssc_select_function(tsm, enums.SelectedFunction.DIGITAL)
     _ssc_write_static(tsm.ssc, state)
     return tsm
 
