@@ -200,6 +200,7 @@ class TestDCPower:
     def test_queries_status(self, dcpower_tsm_s):
         voltage_set_point = 1.0  # we measured current consumed for this voltage.
         for dcpower_tsm in dcpower_tsm_s:
+            dcpower_tsm.ssc.configure_output_connected(output_connected=True)
             dcpower_tsm.ssc.force_voltage_symmetric_limits(voltage_set_point, 1.0, 0.1, 0.1)
 
             compliance = dcpower_tsm.ssc.query_in_compliance()
