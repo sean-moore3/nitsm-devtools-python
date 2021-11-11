@@ -208,7 +208,7 @@ class _NIDCPowerSSC:
         return self._channels_session.abort()
 
     def commit(self):
-        return self.session.commit()
+        return self._channels_session.commit()
 
     def initiate(self):
         return self._channels_session.initiate()
@@ -420,7 +420,7 @@ class _NIDCPowerSSC:
             voltage_limit_low,
             voltage_limit_range,
         )
-        self.session.commit()
+        self._channels_session.commit()
 
     def force_current_symmetric_limits(
         self, current_level=0.0, current_level_range=0.0, voltage_limit=0.0, voltage_limit_range=0.0
@@ -429,7 +429,7 @@ class _NIDCPowerSSC:
         self.configure_single_point_force_dc_current_symmetric_limits(
             current_level, current_level_range, voltage_limit, voltage_limit_range
         )
-        self.session.commit()
+        self._channels_session.commit()
 
     def configure_current_limit_range(self, current_limit_range=0.0):
         self._channels_session.current_limit_range = current_limit_range
@@ -503,7 +503,7 @@ class _NIDCPowerSSC:
             current_limit_low,
             current_limit_range,
         )
-        self.session.commit()
+        self._channels_session.commit()
 
     def force_voltage_symmetric_limits(
         self, voltage_level=0.0, voltage_level_range=0.0, current_limit=0.0, current_limit_range=0.0
@@ -607,7 +607,7 @@ class _NIDCPowerSSC:
         self._channels_session.measure_record_length_is_finite = False
         self._channels_session.measure_when = nidcpower.MeasureWhen.ON_MEASURE_TRIGGER
         self._channels_session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
-        self.session.commit()
+        self._channels_session.commit()
         num_samples = int(
             math.ceil(buffer_length / self._channels_session.measure_record_delta_time.total_seconds())
         )
@@ -1026,13 +1026,13 @@ class _NIDCPowerTSM:
         voltage_waveforms = []
         current_waveforms = []
         for ssc in self._sessions_sites_channels:
-            record_dt = ssc.session.measure_record_delta_time.total_seconds()
-            fetch_backlog = ssc.session.fetch_backlog
+            record_dt = ssc._channels_session.measure_record_delta_time.total_seconds()
+            fetch_backlog = ssc._channels_session.fetch_backlog
             if waveform_length_s == 0.0:
                 fetch_samples = fetch_backlog
             else:
                 fetch_samples = int(waveform_length_s / record_dt)
-            samples = ssc.session.channels[ssc.channels].fetch_multiple(
+            samples = ssc._channels_session.fetch_multiple(
                 fetch_samples, timeout=waveform_length_s + 1
             )
             voltages = []
