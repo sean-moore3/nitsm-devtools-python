@@ -212,7 +212,6 @@ class TestDCPower:
             output_state = dcpower_tsm.ssc.query_output_state(nidcpower.OutputStates.VOLTAGE)
             print("output_state\n", output_state)
 
-
             aperture_times_in_seconds = dcpower_tsm.ssc.get_aperture_times_in_seconds()
             print("aperture_times_in_seconds\n", aperture_times_in_seconds)
 
