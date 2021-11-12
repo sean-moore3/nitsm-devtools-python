@@ -739,7 +739,7 @@ class _NIDCPowerTSM:
             aperture_time_units,
             transient_responses,
         ):
-            ssc.configure_settings(
+            ssc.cs_configure_settings(
                 aperture_time, source_delay, sense, aperture_time_unit, transient_response
             )
 
