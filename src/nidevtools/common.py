@@ -9,28 +9,28 @@ _pins = []  # pin cache
 _pin_types = []  # pin type cache
 
 
-class _Pin:
-    def __init__(self, name):
-        self._name = name
-
-    @property
-    def name(self):
-        return self._name
-
-    def __eq__(self, other):
-        return self.name == other.name
-
-
-class DutPin(_Pin):
-    pass
-
-
-class SystemPin(_Pin):
-    pass
-
-
-class PinGroup(_Pin):
-    pass
+# class _Pin:
+#     def __init__(self, name):
+#         self._name = name
+#
+#     @property
+#     def name(self):
+#         return self._name
+#
+#     def __eq__(self, other):
+#         return self.name == other.name
+#
+#
+# class DutPin(_Pin):
+#     pass
+#
+#
+# class SystemPin(_Pin):
+#     pass
+#
+#
+# class PinGroup(_Pin):
+#     pass
 
 
 class PinType(enum.Enum):
@@ -53,13 +53,15 @@ class PinType(enum.Enum):
 
 
 class PinInformation(typing.NamedTuple):
-    pin: _Pin
+    # pin: _Pin
+    pin: str
     type: PinType
     count: int
 
 
 class ExpandedPinInformation(typing.NamedTuple):
-    pin: _Pin
+    # pin: _Pin
+    pin: str
     type: PinType
     index: int
 
@@ -132,12 +134,12 @@ def expand_pin_groups_and_identify_pin_types(tsm_context: SemiconductorModuleCon
             pins_expanded.append(pin_expanded)
         else:
             d_pin_type = PinType.PIN_GROUP
-            temp_exp_pins = tsm_context.get_pins_in_pin_groups(d_pin)
+            temp_exp_pins = tsm_context.get_pins_in_pin_groups(d_pin)  # This works fine
             count = len(temp_exp_pins)
             for a_pin in temp_exp_pins:
                 index_a = pins_temp.index(a_pin)
                 a_pin_type = pin_types_temp[index_a]
-                pin_expanded = ExpandedPinInformation(_Pin(a_pin), a_pin_type, i)
+                pin_expanded = ExpandedPinInformation(a_pin, a_pin_type, i)  # Found bug here due to class & fixed it.
                 pins_expanded.append(pin_expanded)
         pin_info = PinInformation(d_pin, d_pin_type, count)
         pins_info.append(pin_info)
@@ -184,13 +186,14 @@ def pin_query_context_to_channel_list(
     site_numbers: typing.List[int],
 ):
     """
-    To do - find a way to fix the site number issue.For now assume that if site number is not passed
+    Todo - find a way to fix the site number issue.For now assume that if site number is not passed
     no site is selected i.e. empty site array.
     """
     tsm_context = pin_query_context._tsm_context
     if not site_numbers:
         try:
             site_numbers = list(tsm_context.site_numbers())
+            # print(site_numbers)  # Need to test this case after bug fix
         except Exception:
             site_numbers = []
     if expanded_pin_info:

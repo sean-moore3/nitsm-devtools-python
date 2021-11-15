@@ -1331,14 +1331,14 @@ def pins_to_sessions(
     fill_pin_site_info=True,
 ):
     if len(site_numbers) == 0:
-        site_numbers = list(tsm_context.site_numbers)
+        site_numbers = list(tsm_context.site_numbers)  # This is tested and works
     pins_expanded = []
     pins_info = []
     pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
     if fill_pin_site_info:
         pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(
             tsm_context, pins
-        )
+        )  # This is tested and working fine.
     else:
         for pin in pins:
             a = ni_dt_common.PinInformation  # create instance of class
