@@ -81,6 +81,8 @@ class TestDCPower:
     def test_get_max_current(self, dcpower_tsm_s):
         """TSM DC Power Get Max Current.vi"""
         expected_currents = [3.0, 0.1, 0.1, 0.1, 0.1]
+        if SIMULATE_HARDWARE:
+            expected_currents = [0.1, 0.1, 0.1, 0.1, 0.1]
         index = 0
         for dcpower_tsm in dcpower_tsm_s:
             max_current = dcpower_tsm.ssc.get_max_current()
