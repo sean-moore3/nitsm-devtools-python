@@ -41,7 +41,6 @@ def dcpower_tsm_s(tsm_context, test_pin_s):
         dcpower_tsms.append(
             ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True)
         )
-        # print(dcpower_tsms)
     return dcpower_tsms
 
 
@@ -127,7 +126,7 @@ class TestDCPower:
             "sense": nidcpower.Sense.LOCAL,
         }
         for dcpower_tsm in dcpower_tsm_s:
-            # print("\ndcpower_tsm\n", dcpower_tsm)
+            # print("\n dcpower_tsm\n", dcpower_tsm)
             # default_settings = dcpower_tsm.ssc.get_measurement_settings()
             # dcpower_tsm.ssc.configure_settings(custom_settings)
             # # assert custom_settings != default_settings
@@ -199,6 +198,7 @@ class TestDCPower:
 
     def test_queries_status(self, dcpower_tsm_s):
         voltage_set_point = 1.0  # we measured current consumed for this voltage.
+        i = 0
         for dcpower_tsm in dcpower_tsm_s:
             dcpower_tsm.ssc.configure_output_connected(output_connected=True)
             dcpower_tsm.ssc.force_voltage_symmetric_limits(voltage_set_point, 1.0, 0.1, 0.1)
@@ -218,6 +218,9 @@ class TestDCPower:
             voltages, currents = dcpower_tsm.ssc.measure()
             print("voltages\n", voltages)
             print("currents\n", currents)
-            dcpower_tsm.ssc.configure_output_connected(output_connected=False)
             dcpower_tsm.ssc.abort()
             dcpower_tsm.ssc.reset()
+            print("Iteration number", i)
+            dcpower_tsm.ssc.configure_output_connected(output_connected=False)
+            dcpower_tsm.ssc.configure_output_enabled_and_connected(output_enabled_and_connected=False)
+            i += 1
