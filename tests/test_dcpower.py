@@ -1,8 +1,12 @@
 import pytest
-import nidcpower
-import nidevtools.dcpower as ni_dt_dc_power
-from nitsm.codemoduleapi import SemiconductorModuleContext
 import os.path
+import nidcpower
+from nitsm.codemoduleapi import SemiconductorModuleContext
+import sys
+sys.path.append('./../src')
+import nidevtools.dcpower  as ni_dt_dc_power
+
+
 
 # import os
 

@@ -10,6 +10,8 @@ from nidigital import enums
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import nidigital
+import sys
+sys.path.append('./../src')
 import nidevtools.digital as ni_dt_digital
 
 # from nitsm.pinquerycontexts import PinQueryContext

@@ -9,6 +9,8 @@ import nitsm.codemoduleapi
 import importlib
 #from nidcpower import enums
 from nitsm.codemoduleapi import SemiconductorModuleContext
+import sys
+sys.path.append('./../src')
 import nidevtools.dcpower as ni_dt_dcpower
 # importlib.reload(nidevtools.dcpower as ni_dt_dcpower)
 # from nidevtools import dcpower as ni_dt_dcpower
