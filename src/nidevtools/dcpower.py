@@ -8,7 +8,7 @@ import nidcpower.enums as enums
 import nidcpower.errors
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext
-import nidevtools.common as ni_dt_common
+import common as ni_dt_common
 
 
 class _ModelSupport:
