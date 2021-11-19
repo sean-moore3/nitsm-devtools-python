@@ -9,18 +9,16 @@ from nidigital import enums
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import nidigital
-# import sys
-# sys.path.append('./../src')
 import nidevtools.digital as ni_dt_digital
 
 
 # To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
-pin_file_names = ["I2C.pinmap", "I2C_Logic_MultiSite.pinmap"]
+pin_file_names = ["I2C.pinmap", "I2C_Logic_SingleSite.pinmap", "I2C_Logic_MultiSite.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 if SIMULATE_HARDWARE:
-    pin_file_name = pin_file_names[1]
+    pin_file_name = pin_file_names[2]
     pass
 
 
