@@ -227,6 +227,6 @@ class TestDCPower:
             dcpower_tsm.ssc.abort()
             dcpower_tsm.ssc.reset()
             print("Iteration number", i)
-            dcpower_tsm.ssc.configure_output_connected(output_connected=False)
-            dcpower_tsm.ssc.configure_output_enabled_and_connected(output_enabled_and_connected=False)
+            # dcpower_tsm.ssc.configure_output_connected(output_connected=False)
+            # dcpower_tsm.ssc.configure_output_enabled_and_connected(output_enabled_and_connected=False)
             i += 1
