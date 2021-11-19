@@ -4,17 +4,15 @@ import os
 import os.path
 import math
 import numpy
-from time import sleep
 import nitsm.codemoduleapi
 from nidigital import enums
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import nidigital
-import sys
-sys.path.append('./../src')
+# import sys
+# sys.path.append('./../src')
 import nidevtools.digital as ni_dt_digital
 
-# from nitsm.pinquerycontexts import PinQueryContext
 
 # To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
@@ -24,21 +22,6 @@ pin_file_name = pin_file_names[0]
 if SIMULATE_HARDWARE:
     pin_file_name = pin_file_names[1]
     pass
-data_dir = os.path.join(os.path.dirname(__file__), "Data")
-specification1 = os.path.join(
-    os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs"
-)
-specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
-level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
-timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C_Timing.digitiming")
-pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write_Loop.digipat")
-pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read_Loop.digipat")
-pattern3 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
-pattern4 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read.digipat")
-cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
-src_wfm1 = os.path.join(os.path.join(data_dir, "Waveforms"), "Broadcast.tdms")
-src_wfm2 = os.path.join(os.path.join(data_dir, "Waveforms"), "SiteUnique.tdms")
-src_wfm3 = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
 
 
 @pytest.fixture
@@ -54,21 +37,12 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
         options = {"Simulate": True, "driver_setup": {"Model": "6571"}}
     else:
         options = {}  # empty dict options to run on real hardware.
-    digital_project_files = {
-        "specifications": [specification1, specification2],
-        "levels": [level],
-        "timing": [timing],
-        "pattern": [pattern1, pattern2, pattern3, pattern4],
-        "capture_waveforms": [cap_wfm],
-        "source_waveforms": [src_wfm1, src_wfm2, src_wfm3],
-    }
+
     ni_dt_digital.tsm_initialize_sessions(
-        standalone_tsm_context, options=options, file_paths=digital_project_files
+        standalone_tsm_context, options=options
     )
     yield standalone_tsm_context
     ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
-
-
 
 
 @pytest.fixture
@@ -216,11 +190,17 @@ class TestNIDigital:
                     assert isinstance(per_pin_measurement, float)
                     assert test_voltage - 0.1 <= per_pin_measurement <= test_voltage + 0.1
 
-    def test_tsm_ssc_burst_pattern_pass_fail(self, digital_tsm_s):
+    def test_tsm_ssc_burst_pattern_pass_fail(self, tsm_context, digital_tsm_s):
         """
         TSM SSC Digital Burst Pattern [Pass Fail].vi
         TSM SSC Digital Apply Levels and Timing.vi
         """
+        level = tsm_context.nidigital_project_levels_file_paths[0]
+        timing = tsm_context.nidigital_project_timing_file_paths[0]
+        print(level)
+        print(timing)
+        print(str(level))
+        print(str(timing))
         ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2], str(level), str(timing))
         _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(
             digital_tsm_s[2], "I2C_Write_Loop"
@@ -230,11 +210,17 @@ class TestNIDigital:
             assert isinstance(per_pass, bool)
             assert per_pass
 
-    def test_tsm_ssc_burst_pattern(self, digital_tsm_s):
+    def test_tsm_ssc_burst_pattern(self, tsm_context, digital_tsm_s):
         """
         TSM SSC Digital Apply Levels and Timing.vi
         TSM SSC Digital Configure Time Set Period.vi
         """
+        level = tsm_context.nidigital_project_levels_file_paths[0]
+        timing = tsm_context.nidigital_project_timing_file_paths[0]
+        print(level)
+        print(timing)
+        print(str(level))
+        print(str(timing))
         ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2], str(level), str(timing))
         _, configured_period = ni_dt_digital.tsm_ssc_configure_time_set_period(
             digital_tsm_s[0], "Idle", 40e-6

@@ -2,8 +2,8 @@ import pytest
 import os.path
 import nidcpower
 from nitsm.codemoduleapi import SemiconductorModuleContext
-import sys
-sys.path.append('./../src')
+# import sys
+# sys.path.append('./../src')
 import nidevtools.dcpower  as ni_dt_dc_power
 
 

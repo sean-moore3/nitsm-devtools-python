@@ -10,50 +10,6 @@ _standalone_tsm_context_tlb = win32com.client.selecttlb.FindTlbsWithDescription(
 )[0]
 
 
-@pytest.fixture
-def test_pin_s(request):
-    """
-    Need to improve this logic for supplying test pins
-    using @pytest.mark.parametrize
-    """
-    _, file_name = os.path.split(request.module.__file__)
-    if file_name == "test_dcpower.py":  # overriding the pin_select as it is inside dcpower module
-        # for SMU driver i.e. nidcpower Testing
-        smu_system_pins = ["VCC"]
-        input_dut_pins = ["A", "B"]
-        output_dut_pins = ["C_Y", "Y"]
-        all_smu_pins = ["Logic"]  # pin group name
-        pins_selected = [smu_system_pins, input_dut_pins, output_dut_pins, all_smu_pins]
-    elif file_name == "test_digital.py":
-        # for Digital pattern instrument driver i.e. nidigital Testing
-        test_dut_pins = ["SCL", "SDA"]
-        read_dut_pins = ["R_SCL", "R_SDA"]
-        all_dut_pins = test_dut_pins + read_dut_pins
-        dpi_system_pins = ["VDD", "VDDIO"]
-        pins_selected = [test_dut_pins, read_dut_pins, all_dut_pins]
-    else:
-        pins_selected = []
-    return pins_selected
-
-
-@pytest.fixture
-def _published_data_reader_factory(request):
-    # get absolute path of the pin map file which is assumed to be relative to the test module
-    pin_map_path = request.node.get_closest_marker("pin_map").args[0]
-    module_directory = os.path.join(os.path.dirname(request.module.__file__), "Data")
-    pin_map_path = os.path.join(module_directory, pin_map_path)
-
-    published_data_reader_factory = win32com.client.Dispatch(
-        "NationalInstruments.TestStand.SemiconductorModule.Restricted.PublishedDataReaderFactory"
-    )
-    return published_data_reader_factory.NewSemiconductorModuleContext(pin_map_path)
-
-
-@pytest.fixture
-def standalone_tsm_context(_published_data_reader_factory):
-    return nitsm.codemoduleapi.SemiconductorModuleContext(_published_data_reader_factory[0])
-
-
 class PublishedData:
     def __init__(self, published_data_com_obj):
         self._published_data = win32com.client.CastTo(
@@ -103,6 +59,117 @@ class PublishedDataReader:
         return [PublishedData(published_data_point) for published_data_point in published_data]
 
 
+class StandaloneSMC(nitsm.codemoduleapi.SemiconductorModuleContext):
+    def __init__(self, tsm_com_obj, file_paths: dict = {}):
+        super().__init__(tsm_com_obj)
+        self.specifications_files = []
+        self.levels_files = []
+        self.timing_files = []
+        self.pattern_files = []
+        self.source_waveform_files = []
+        self.capture_waveform_files = []
+        self.specifications_files = file_paths.get("specifications", self.specifications_files)
+        self.levels_files = file_paths.get("levels", self.levels_files)
+        self.timing_files = file_paths.get("timing", self.timing_files)
+        self.pattern_files = file_paths.get("pattern", self.pattern_files)
+        self.source_waveform_files = file_paths.get("source_waveforms", self.source_waveform_files)
+        self.capture_waveform_files = file_paths.get("capture_waveforms", self.capture_waveform_files)
+
+    @property
+    def nidigital_project_specifications_file_paths(self):
+        return self.specifications_files
+
+    @property
+    def nidigital_project_levels_file_paths(self):
+        return self.levels_files
+
+    @property
+    def nidigital_project_timing_file_paths(self):
+        return self.timing_files
+
+    @property
+    def nidigital_project_pattern_file_paths(self):
+        return self.pattern_files
+
+    @property
+    def nidigital_project_source_waveform_file_paths(self):
+        return self.source_waveform_files
+
+    @property
+    def nidigital_project_capture_waveform_file_paths(self):
+        return self.capture_waveform_files
+
+
+@pytest.fixture
+def _published_data_reader_factory(request):
+    # get absolute path of the pin map file which is assumed to be relative to the test module
+    pin_map_path = request.node.get_closest_marker("pin_map").args[0]
+    module_directory = os.path.join(os.path.dirname(request.module.__file__), "Data")
+    pin_map_path = os.path.join(module_directory, pin_map_path)
+
+    published_data_reader_factory = win32com.client.Dispatch(
+        "NationalInstruments.TestStand.SemiconductorModule.Restricted.PublishedDataReaderFactory"
+    )
+    return published_data_reader_factory.NewSemiconductorModuleContext(pin_map_path)
+
+
 @pytest.fixture
 def published_data_reader(_published_data_reader_factory):
     return PublishedDataReader(_published_data_reader_factory[1])
+
+
+data_dir = os.path.join(os.path.dirname(__file__), "Data")
+specification1 = os.path.join(
+    os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs"
+)
+specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
+level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
+timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C_Timing.digitiming")
+pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write_Loop.digipat")
+pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read_Loop.digipat")
+pattern3 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
+pattern4 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read.digipat")
+cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
+src_wfm1 = os.path.join(os.path.join(data_dir, "Waveforms"), "Broadcast.tdms")
+src_wfm2 = os.path.join(os.path.join(data_dir, "Waveforms"), "SiteUnique.tdms")
+src_wfm3 = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
+digital_project_files = {
+    "specifications": [specification1, specification2],
+    "levels": [level],
+    "timing": [timing],
+    "pattern": [pattern1, pattern2, pattern3, pattern4],
+    "capture_waveforms": [cap_wfm],
+    "source_waveforms": [src_wfm1, src_wfm2, src_wfm3],
+}
+
+
+@pytest.fixture
+def standalone_tsm_context(_published_data_reader_factory):
+    # return nitsm.codemoduleapi.SemiconductorModuleContext(_published_data_reader_factory[0])
+    return StandaloneSMC(_published_data_reader_factory[0], file_paths=digital_project_files)
+
+
+@pytest.fixture
+def test_pin_s(request):
+    """
+    Need to improve this logic for supplying test pins
+    using @pytest.mark.parametrize
+    """
+    _, file_name = os.path.split(request.module.__file__)
+    if file_name == "test_dcpower.py":  # overriding the pin_select as it is inside dcpower module
+        # for SMU driver i.e. nidcpower Testing
+        smu_system_pins = ["VCC"]
+        input_dut_pins = ["A", "B"]
+        output_dut_pins = ["C_Y", "Y"]
+        all_smu_pins = ["Logic"]  # pin group name
+        pins_selected = [smu_system_pins, input_dut_pins, output_dut_pins, all_smu_pins]
+    elif file_name == "test_digital.py":
+        # for Digital pattern instrument driver i.e. nidigital Testing
+        test_dut_pins = ["SCL", "SDA"]
+        read_dut_pins = ["R_SCL", "R_SDA"]
+        all_dut_pins = test_dut_pins + read_dut_pins
+        dpi_system_pins = ["VDD", "VDDIO"]
+        pins_selected = [test_dut_pins, read_dut_pins, all_dut_pins]
+    else:
+        pins_selected = []
+    return pins_selected
