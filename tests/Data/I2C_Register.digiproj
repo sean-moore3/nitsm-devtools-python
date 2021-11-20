@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="2C5BA5F28E43824EB0E72991F6275C8A" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="2AD94B0B23DC9B65FA6D44DCF2702B38" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
@@ -12,7 +12,6 @@
 		</EmbeddedDefinitionReference>
 		<NameScopingEnvoy Id="3" ModelDefinitionType="DefaultTarget" Name="DefaultTarget">
 			<DefaultTarget />
-			<FileReference Id="11" ModelDefinitionType="PinMap" Name="I2C\.pinmap" StoragePath="I2C.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
 			<FileReference Id="12" ModelDefinitionType="SpecificationsDefinition" Name="Electrical\ Characteristics\.specs" StoragePath="Specifications\Electrical Characteristics.specs" />
 			<FileReference Id="19" ModelDefinitionType="TimingDefinition" Name="I2C_Timing\.digitiming" StoragePath="Timing\I2C_Timing.digitiming" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
 			<FileReference Id="20" ModelDefinitionType="PinLevelsDefinition" Name="PinLevels\.digilevels" StoragePath="Levels\PinLevels.digilevels" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
@@ -38,6 +37,7 @@
 			<FileReference Id="281" ModelDefinitionType="SourceWaveformDefinition" Name="SiteUnique\.tdms" StoragePath="Waveforms\SiteUnique.tdms" />
 			<FileReference Id="282" ModelDefinitionType="SourceWaveformDefinition" Name="Broadcast\.tdms" StoragePath="Waveforms\Broadcast.tdms" />
 			<FileReference Id="285" ModelDefinitionType="PinMap" Name="I2C_Logic_SingleSite\.pinmap" StoragePath="I2C_Logic_SingleSite.pinmap" />
+			<FileReference Id="288" ModelDefinitionType="PinMap" Name="I2C_Logic_MultiSite\.pinmap" StoragePath="I2C_Logic_MultiSite.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
 		</NameScopingEnvoy>
 		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">
 			<ProjectPropertiesDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
