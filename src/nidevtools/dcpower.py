@@ -8,8 +8,6 @@ import nidcpower.enums as enums
 import nidcpower.errors
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext
-import sys
-sys.path.append('./..')
 import nidevtools.common as ni_dt_common
 
 
