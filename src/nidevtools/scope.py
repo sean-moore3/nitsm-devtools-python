@@ -5,6 +5,7 @@ import niscope
 from nitsm.codemoduleapi import SemiconductorModuleContext
 from nitsm.pinquerycontexts import PinQueryContext
 from enum import Enum
+import nidevtools.common as ni_dt_common
 
 
 class SSCScope(typing.NamedTuple):
@@ -425,9 +426,13 @@ def tsm_ssc_scope_pins_to_sessions(
 ):
     ssc: typing.List[SSCScope] = []
     pin_query_context, sessions, channels = tsm_context.pins_to_niscope_sessions(pins)
-    site_numbers_out, channel_list_per_session = _pin_query_context_to_channel_list(
-        [], site_numbers, pin_query_context, tsm_context
+    # site_numbers_out, channel_list_per_session = _pin_query_context_to_channel_list(
+    #     [], site_numbers, pin_query_context, tsm_context
+    # )
+    channel_list_per_session, site_numbers_out = ni_dt_common.pin_query_context_to_channel_list(
+    pin_query_context, [], site_numbers
     )
+
     for session, channel, channel_list in zip(sessions, channels, channel_list_per_session):
         ssc.append(SSCScope(session=session, channels=channel, channel_list=channel_list))
     return TSMScope(pin_query_context, site_numbers_out, ssc)
