@@ -792,7 +792,8 @@ def tsm_scope_initialize_sessions(tsm_context: SemiconductorModuleContext, optio
             session.commit()
         except:
             session.reset_device()
-        session.channels[0, 1, 2, 3, 4, 5, 6, 7].configure_chan_characteristics(1e6, -1)
+        # session.channels[0, 1, 2, 3, 4, 5, 6, 7].configure_chan_characteristics(1e6, -1)
+        session.channels[0, 1].configure_chan_characteristics(1e6, -1)
         session.commit()
         tsm_context.set_niscope_session(instrument_name, session)
 

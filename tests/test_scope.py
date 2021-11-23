@@ -8,7 +8,7 @@ import nidevtools.scope as scope
 
 # To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
-pin_file_names = ["simulated.pinmap", "scope.pinmap"]
+pin_file_names = ["scope.pinmap", "scope.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[1]
 if SIMULATE_HARDWARE:
@@ -47,7 +47,7 @@ def scope_tsm_s(tsm_context, test_pin_s):
     multiple pins in list of string format"""
     scope_tsms = []
     for test_pin in test_pin_s:
-        scope_tsms.append(scope.tsm_ssc_scope_pins_to_sessions(tsm_context, test_pin))
+        scope_tsms.append(scope.tsm_ssc_scope_pins_to_sessions(tsm_context, test_pin,[0]))
     return scope_tsms
 
 
@@ -65,9 +65,10 @@ class TestNIScope:
             assert isinstance(session, niscope.Session)
         assert len(queried_sessions) == len(tsm_context.get_all_niscope_instrument_names())
 
-
-
-
+    def test_tsm_ssc_n_pins_to_m_sessions(self, scope_tsm_s, test_pin_s):
+        """TSM SSC Digital N Pins To M Sessions.vi"""
+        for scope_tsm in scope_tsm_s:
+            assert isinstance(scope_tsm, scope.TSMScope)
 
 class SSCScope(typing.NamedTuple):
     session: niscope.Session

@@ -160,8 +160,8 @@ def test_pin_s(request):
     if file_name == "test_dcpower.py":  # overriding the pin_select as it is inside dcpower module
         # for SMU driver i.e. nidcpower Testing
         smu_system_pins = ["VCC"]
-        input_dut_pins = ["A", "B"]
-        output_dut_pins = ["C_Y", "Y"]
+        input_dut_pins = ["A"]
+        output_dut_pins = ["Y"]
         all_smu_pins = ["Logic"]  # pin group name
         pins_selected = [smu_system_pins, input_dut_pins, output_dut_pins, all_smu_pins]
     elif file_name == "test_digital.py":
@@ -171,6 +171,11 @@ def test_pin_s(request):
         all_dut_pins = test_dut_pins + read_dut_pins
         dpi_system_pins = ["VDD", "VDDIO"]
         pins_selected = [test_dut_pins, read_dut_pins, all_dut_pins]
+    elif file_name == "test_scope.py":
+        # for scope driver i.e. niscope testing
+        input_dut_pins = ["A"]
+        output_dut_pins = ["Y"]
+        pins_selected = [input_dut_pins, output_dut_pins]
     else:
         pins_selected = []
     return pins_selected
