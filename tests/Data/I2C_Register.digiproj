@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="3D1D992490BFC272C61B8AF03FF99AFD" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="BB65ED3EE90C37F05D8584A5BEDD1905" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
@@ -33,12 +33,12 @@
 			<FileReference Id="278" ModelDefinitionType="DigitalPatternEditor.PatternDefinition" Name="I2C_Write_Loop\.digipat" StoragePath="Patterns\I2C_Write_Loop.digipat" />
 			<FileReference Id="281" ModelDefinitionType="SourceWaveformDefinition" Name="SiteUnique\.tdms" StoragePath="Waveforms\SiteUnique.tdms" />
 			<FileReference Id="282" ModelDefinitionType="SourceWaveformDefinition" Name="Broadcast\.tdms" StoragePath="Waveforms\Broadcast.tdms" />
-			<FileReference Id="291" ModelDefinitionType="PinMap" Name="dcpower\.pinmap" StoragePath="Pinmaps\dcpower.pinmap" />
-			<FileReference Id="292" ModelDefinitionType="PinMap" Name="digital\.pinmap" StoragePath="Pinmaps\digital.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
-			<FileReference Id="293" ModelDefinitionType="PinMap" Name="I2C_Logic_SingleSite\.pinmap" StoragePath="Pinmaps\I2C_Logic_SingleSite.pinmap" />
 			<FileReference Id="294" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}DutBringupDefinition" Name="I2C\ Bringup\.dutbringup" StoragePath="Misc\I2C Bringup.dutbringup" />
 			<FileReference Id="295" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}RegisterMapDefinition" Name="I2C\ Register\ Map\.digireg" StoragePath="Misc\I2C Register Map.digireg" />
 			<SourceFileReference Id="296" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}SystemViewDefinition" Name="SystemView\.digisysview" StoragePath="Misc\SystemView.digisysview" />
+			<FileReference Id="299" ModelDefinitionType="PinMap" Name="dcpower\.pinmap" StoragePath="dcpower.pinmap" p4:IsActive="False" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
+			<FileReference Id="300" ModelDefinitionType="PinMap" Name="digital\.pinmap" StoragePath="digital.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
+			<FileReference Id="301" ModelDefinitionType="PinMap" Name="scope\.pinmap" StoragePath="scope.pinmap" />
 		</NameScopingEnvoy>
 		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">
 			<ProjectPropertiesDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
