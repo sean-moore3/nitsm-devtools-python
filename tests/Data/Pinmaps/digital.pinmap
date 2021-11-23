@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.6">
+	<Instruments>
+		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Digital1" />
+		<NIDCPowerInstrument name="SMU1" numberOfChannels="1">
+			<ChannelGroup name="VCC_G_SY" channels="0" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU2" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU3" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU4" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU5" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU6" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU7" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU8" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+	</Instruments>
+	<Pins>
+		<SystemPin name="VCC" />
+		<SystemPin name="VDD" />
+		<SystemPin name="R_VDD" />
+		<SystemPin name="VDDIO" />
+		<SystemPin name="R_VDDIO" />
+		<DUTPin name="SCL" />
+		<DUTPin name="R_SCL" />
+		<DUTPin name="SDA" />
+		<DUTPin name="R_SDA" />
+		<DUTPin name="A" />
+		<DUTPin name="B" />
+		<DUTPin name="C_Y" />
+		<DUTPin name="Y" />
+	</Pins>
+	<PinGroups>
+		<PinGroup name="SGL">
+			<PinReference pin="SCL" />
+			<PinReference pin="SDA" />
+		</PinGroup>
+		<PinGroup name="R_SGL">
+			<PinReference pin="R_SCL" />
+			<PinReference pin="R_SDA" />
+		</PinGroup>
+		<PinGroup name="Mix">
+			<PinReference pin="SCL" />
+			<PinReference pin="R_SDA" />
+			<PinReference pin="VDD" />
+			<PinReference pin="VDDIO" />
+		</PinGroup>
+		<PinGroup name="Pwr">
+			<PinReference pin="VDD" />
+			<PinReference pin="VDDIO" />
+			<PinReference pin="VCC" />
+		</PinGroup>
+		<PinGroup name="SMU">
+			<PinReference pin="VCC" />
+		</PinGroup>
+		<PinGroup name="Logic">
+			<PinReference pin="A" />
+			<PinReference pin="B" />
+			<PinReference pin="Y" />
+			<PinReference pin="C_Y" />
+		</PinGroup>
+		<PinGroup name="AllPins">
+			<PinReference pin="SCL" />
+			<PinReference pin="SDA" />
+			<PinReference pin="R_SCL" />
+			<PinReference pin="R_SDA" />
+		</PinGroup>
+	</PinGroups>
+	<Sites>
+		<Site siteNumber="0" />
+		<Site siteNumber="1" />
+		<Site siteNumber="2" />
+		<Site siteNumber="3" />
+		<Site siteNumber="4" />
+		<Site siteNumber="5" />
+		<Site siteNumber="6" />
+	</Sites>
+	<Connections>
+		<SystemConnection pin="VCC" instrument="SMU1" channel="0" />
+		<SystemConnection pin="VDD" instrument="DPI1" channel="0" />
+		<SystemConnection pin="R_VDD" instrument="DPI1" channel="1" />
+		<SystemConnection pin="VDDIO" instrument="DPI1" channel="2" />
+		<SystemConnection pin="R_VDDIO" instrument="DPI1" channel="3" />
+		<Connection pin="SCL" siteNumber="0" instrument="DPI1" channel="4" />
+		<Connection pin="R_SCL" siteNumber="0" instrument="DPI1" channel="5" />
+		<Connection pin="SDA" siteNumber="0" instrument="DPI1" channel="6" />
+		<Connection pin="R_SDA" siteNumber="0" instrument="DPI1" channel="7" />
+		<Connection pin="SCL" siteNumber="1" instrument="DPI1" channel="8" />
+		<Connection pin="R_SCL" siteNumber="1" instrument="DPI1" channel="9" />
+		<Connection pin="SDA" siteNumber="1" instrument="DPI1" channel="10" />
+		<Connection pin="R_SDA" siteNumber="1" instrument="DPI1" channel="11" />
+		<Connection pin="SCL" siteNumber="2" instrument="DPI1" channel="12" />
+		<Connection pin="R_SCL" siteNumber="2" instrument="DPI1" channel="13" />
+		<Connection pin="SDA" siteNumber="2" instrument="DPI1" channel="14" />
+		<Connection pin="R_SDA" siteNumber="2" instrument="DPI1" channel="15" />
+		<Connection pin="SCL" siteNumber="3" instrument="DPI1" channel="16" />
+		<Connection pin="R_SCL" siteNumber="3" instrument="DPI1" channel="17" />
+		<Connection pin="SDA" siteNumber="3" instrument="DPI1" channel="18" />
+		<Connection pin="R_SDA" siteNumber="3" instrument="DPI1" channel="19" />
+		<Connection pin="SCL" siteNumber="4" instrument="DPI1" channel="20" />
+		<Connection pin="R_SCL" siteNumber="4" instrument="DPI1" channel="21" />
+		<Connection pin="SDA" siteNumber="4" instrument="DPI1" channel="22" />
+		<Connection pin="R_SDA" siteNumber="4" instrument="DPI1" channel="23" />
+		<Connection pin="SCL" siteNumber="5" instrument="DPI1" channel="24" />
+		<Connection pin="R_SCL" siteNumber="5" instrument="DPI1" channel="25" />
+		<Connection pin="SDA" siteNumber="5" instrument="DPI1" channel="26" />
+		<Connection pin="R_SDA" siteNumber="5" instrument="DPI1" channel="27" />
+		<Connection pin="SCL" siteNumber="6" instrument="DPI1" channel="28" />
+		<Connection pin="R_SCL" siteNumber="6" instrument="DPI1" channel="29" />
+		<Connection pin="SDA" siteNumber="6" instrument="DPI1" channel="30" />
+		<Connection pin="R_SDA" siteNumber="6" instrument="DPI1" channel="31" />
+		<Connection pin="A" siteNumber="0" instrument="SMU2" channel="0" />
+		<Connection pin="B" siteNumber="0" instrument="SMU2" channel="1" />
+		<Connection pin="C_Y" siteNumber="0" instrument="SMU2" channel="2" />
+		<Connection pin="Y" siteNumber="0" instrument="SMU2" channel="3" />
+		<Connection pin="A" siteNumber="1" instrument="SMU3" channel="0" />
+		<Connection pin="B" siteNumber="1" instrument="SMU3" channel="1" />
+		<Connection pin="C_Y" siteNumber="1" instrument="SMU3" channel="2" />
+		<Connection pin="Y" siteNumber="1" instrument="SMU3" channel="3" />
+		<Connection pin="A" siteNumber="2" instrument="SMU4" channel="0" />
+		<Connection pin="B" siteNumber="2" instrument="SMU4" channel="1" />
+		<Connection pin="C_Y" siteNumber="2" instrument="SMU4" channel="2" />
+		<Connection pin="Y" siteNumber="2" instrument="SMU4" channel="3" />
+		<Connection pin="A" siteNumber="3" instrument="SMU5" channel="0" />
+		<Connection pin="B" siteNumber="3" instrument="SMU5" channel="1" />
+		<Connection pin="C_Y" siteNumber="3" instrument="SMU5" channel="2" />
+		<Connection pin="Y" siteNumber="3" instrument="SMU5" channel="3" />
+		<Connection pin="A" siteNumber="4" instrument="SMU6" channel="0" />
+		<Connection pin="B" siteNumber="4" instrument="SMU6" channel="1" />
+		<Connection pin="C_Y" siteNumber="4" instrument="SMU6" channel="2" />
+		<Connection pin="Y" siteNumber="4" instrument="SMU6" channel="3" />
+		<Connection pin="A" siteNumber="5" instrument="SMU7" channel="0" />
+		<Connection pin="B" siteNumber="5" instrument="SMU7" channel="1" />
+		<Connection pin="C_Y" siteNumber="5" instrument="SMU7" channel="2" />
+		<Connection pin="Y" siteNumber="5" instrument="SMU7" channel="3" />
+		<Connection pin="A" siteNumber="6" instrument="SMU8" channel="0" />
+		<Connection pin="B" siteNumber="6" instrument="SMU8" channel="1" />
+		<Connection pin="C_Y" siteNumber="6" instrument="SMU8" channel="2" />
+		<Connection pin="Y" siteNumber="6" instrument="SMU8" channel="3" />
+	</Connections>
+</PinMap>
