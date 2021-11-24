@@ -789,10 +789,10 @@ def tsm_ssc_scope_fetch_meas_stats_per_channel(
 # Open session
 
 
-def tsm_scope_initialize_sessions(tsm_context: SemiconductorModuleContext, options_input: str):
+def tsm_scope_initialize_sessions(tsm_context: SemiconductorModuleContext, options: dict = {}):
     instrument_names = tsm_context.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
-        session = niscope.Session(instrument_name, reset_device=True, options=options_input)
+        session = niscope.Session(instrument_name, reset_device=True, options=options)
         try:
             session.commit()
         except:

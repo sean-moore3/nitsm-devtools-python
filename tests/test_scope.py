@@ -15,7 +15,7 @@ if SIMULATE_HARDWARE:
     pin_file_name = pin_file_names[0]
     pass
 
-OPTIONS = "Simulate = true, DriverSetup = Model : 5105"
+OPTIONS = {"Simulate": True, "driver_setup": {"Model": "5105"}}
 
 
 @pytest.fixture
@@ -28,12 +28,11 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     """
     print("\nTest is running on Simulated driver?", SIMULATE_HARDWARE)
     if SIMULATE_HARDWARE:
-        # options = {"Simulate": True, "driver_setup": {"Model": "5122"}}
         options = OPTIONS
     else:
         options = {}  # empty dict options to run on real hardware.
 
-    scope.tsm_scope_initialize_sessions(standalone_tsm_context, options_input=options)
+    scope.tsm_scope_initialize_sessions(standalone_tsm_context, options=options)
     yield standalone_tsm_context
     scope.tsm_scope_close_sessions(standalone_tsm_context)
 
@@ -45,7 +44,7 @@ def scope_tsm_s(tsm_context, test_pin_s):
     multiple pins in list of string format"""
     scope_tsms = []
     for test_pin in test_pin_s:
-        scope_tsms.append(scope.tsm_ssc_scope_pins_to_sessions(tsm_context, test_pin,[0]))
+        scope_tsms.append(scope.tsm_ssc_scope_pins_to_sessions(tsm_context, test_pin, []))
     return scope_tsms
 
 
