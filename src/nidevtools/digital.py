@@ -314,12 +314,12 @@ def tsm_ssc_log_hram_results(
             + ".csv"
         )
         files_generated.append(filename)
-        filehandle = open(filename, "w")
+        file_handle = open(filename, "w")
         for row in results:
             for col in row:
-                filehandle.write("%s\t" % col)
-            filehandle.write("\n")
-        filehandle.close()
+                file_handle.write("%s\t" % col)
+            file_handle.write("\n")
+        file_handle.close()
     return tsm, files_generated
 
 

@@ -179,12 +179,3 @@ def test_pin_s(request):
     else:
         pins_selected = []
     return pins_selected
-
-
-@pytest.fixture
-def Simulated_Option(request):
-    """ To generate the simulated hardware option.
-    Need to revisit later"""
-    _, file_name = os.path.split(request.module.__file__)
-    OPTIONS = "Simulate = true, DriverSetup = Model : 5122"
-    return OPTIONS

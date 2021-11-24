@@ -448,11 +448,11 @@ def configure_impedance(tsm: TSMScope, input_impedance: float):
     return tsm
 
 
-def configure_reference_level(tsm: TSMScope):
+def configure_reference_level(tsm: TSMScope, channel_based_mid_ref_level=50.0):
     for ssc in tsm.ssc:
         channels = ssc.session.channels[ssc.channels]
         channels.meas_ref_level_units = niscope.RefLevelUnits.PERCENTAGE
-        channels.meas_chan_mid_ref_level = 50.0
+        channels.meas_chan_mid_ref_level = channel_based_mid_ref_level
         channels.meas_percentage_method = niscope.PercentageMethod.BASETOP
     return tsm
 
@@ -544,11 +544,11 @@ def configure_vertical_per_channel(
 
 def configure_timing(
     tsm: TSMScope,
-    min_sample_rate: float,
-    min_num_pts: int,
-    ref_position: float,
-    num_records: int,
-    enforce_realtime: bool,
+    min_sample_rate: float = 20e6,
+    min_num_pts: int = 1000,
+    ref_position: float = 50.0,
+    num_records: int = 1,
+    enforce_realtime: bool = True,
 ):
     for ssc in tsm.ssc:
         ssc.session.configure_horizontal_timing(
@@ -581,7 +581,7 @@ def abort(tsm: TSMScope):
 
 def commit(tsm: TSMScope):
     for ssc in tsm.ssc:
-        ssc.session.commit
+        ssc.session.commit()
     return tsm
 
 
