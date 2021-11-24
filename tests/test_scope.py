@@ -33,9 +33,7 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     else:
         options = {}  # empty dict options to run on real hardware.
 
-    scope.tsm_scope_initialize_sessions(
-        standalone_tsm_context, options_input=options
-    )
+    scope.tsm_scope_initialize_sessions(standalone_tsm_context, options_input=options)
     yield standalone_tsm_context
     scope.tsm_scope_close_sessions(standalone_tsm_context)
 
