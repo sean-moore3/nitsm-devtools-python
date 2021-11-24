@@ -2,6 +2,7 @@ import re
 import typing
 import numpy
 import niscope
+import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext
 from nitsm.pinquerycontexts import PinQueryContext
 from enum import Enum
@@ -788,7 +789,7 @@ def tsm_ssc_scope_fetch_meas_stats_per_channel(
 
 # Open session
 
-
+@nitsm.codemoduleapi.code_module
 def tsm_scope_initialize_sessions(tsm_context: SemiconductorModuleContext, options: dict = {}):
     instrument_names = tsm_context.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
@@ -805,7 +806,7 @@ def tsm_scope_initialize_sessions(tsm_context: SemiconductorModuleContext, optio
 
 # Close session
 
-
+@nitsm.codemoduleapi.code_module
 def tsm_scope_close_sessions(tsm_context: SemiconductorModuleContext):
     sessions = tsm_context.get_all_niscope_sessions()
     for session in sessions:
