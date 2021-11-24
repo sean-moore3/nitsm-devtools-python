@@ -15,7 +15,7 @@ if SIMULATE_HARDWARE:
     pin_file_name = pin_file_names[0]
     pass
 
-OPTIONS = "Simulate = true, DriverSetup = Model : 5122"
+OPTIONS = "Simulate = true, DriverSetup = Model : 5105"
 
 
 @pytest.fixture
@@ -29,7 +29,7 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     print("\nTest is running on Simulated driver?", SIMULATE_HARDWARE)
     if SIMULATE_HARDWARE:
         # options = {"Simulate": True, "driver_setup": {"Model": "5122"}}
-        options = "Simulate = true, DriverSetup = Model : 5122"
+        options = OPTIONS
     else:
         options = {}  # empty dict options to run on real hardware.
 
@@ -63,10 +63,35 @@ class TestNIScope:
             assert isinstance(session, niscope.Session)
         assert len(queried_sessions) == len(tsm_context.get_all_niscope_instrument_names())
 
-    def test_tsm_ssc_n_pins_to_m_sessions(self, scope_tsm_s, test_pin_s):
-        """TSM SSC Digital N Pins To M Sessions.vi"""
+    def test_tsm_pins_to_sessions(self, scope_tsm_s, test_pin_s):
+        """"""
         for scope_tsm in scope_tsm_s:
             assert isinstance(scope_tsm, scope.TSMScope)
+
+    def test_configure_vertical(self, scope_tsm_s, test_pin_s, ):
+        for tsm_scope in scope_tsm_s:
+            scope.configure_impedance(tsm_scope, 0.5)
+            scope.configure_reference_level(tsm_scope)
+            scope.configure_vertical(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
+            scope.configure(
+                tsm_scope,
+                5.0,
+                1.0,
+                0.0,
+                niscope.VerticalCoupling.DC,
+                10e6,
+                1000,
+                0.0,
+                0.0,
+                1e6,
+                1,
+                True,
+            )
+            scope.configure_vertical_per_channel(
+                tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True
+            )
+            scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
+
 
 class SSCScope(typing.NamedTuple):
     session: niscope.Session
