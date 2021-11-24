@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.5">
 	<Instruments>
-		<NIScopeInstrument name="SCOPE1" numberOfChannels="4" group="Scope" />
-		<NIScopeInstrument name="SCOPE2" numberOfChannels="4" group="Scope" />
+		<NIScopeInstrument name="SCOPE1" numberOfChannels="8" group="Scope" />
+		<NIScopeInstrument name="SCOPE2" numberOfChannels="8" group="Scope" />
+		<NIScopeInstrument name="SCOPE3" numberOfChannels="2" group="Scope" />
 	</Instruments>
 	<Pins>
 		<DUTPin name="A" />
@@ -22,9 +23,33 @@
 	</PinGroups>
 	<Sites>
 		<Site siteNumber="0" />
+		<Site siteNumber="1" />
+		<Site siteNumber="2" />
+		<Site siteNumber="3" />
+		<Site siteNumber="4" />
+		<Site siteNumber="5" />
+		<Site siteNumber="6" />
+		<Site siteNumber="7" />
+		<Site siteNumber="8" />
 	</Sites>
 	<Connections>
 		<Connection pin="A" siteNumber="0" instrument="SCOPE1" channel="0" />
+		<Connection pin="A" siteNumber="1" instrument="SCOPE1" channel="2" />
+		<Connection pin="A" siteNumber="2" instrument="SCOPE1" channel="4" />
+		<Connection pin="A" siteNumber="3" instrument="SCOPE1" channel="6" />
+		<Connection pin="A" siteNumber="4" instrument="SCOPE2" channel="0" />
+		<Connection pin="A" siteNumber="5" instrument="SCOPE2" channel="2" />
+		<Connection pin="A" siteNumber="6" instrument="SCOPE2" channel="4" />
+		<Connection pin="A" siteNumber="7" instrument="SCOPE2" channel="6" />
+		<Connection pin="A" siteNumber="8" instrument="SCOPE3" channel="0" />
 		<Connection pin="Y" siteNumber="0" instrument="SCOPE1" channel="1" />
+		<Connection pin="Y" siteNumber="1" instrument="SCOPE1" channel="3" />
+		<Connection pin="Y" siteNumber="2" instrument="SCOPE1" channel="5" />
+		<Connection pin="Y" siteNumber="3" instrument="SCOPE1" channel="7" />
+		<Connection pin="Y" siteNumber="4" instrument="SCOPE2" channel="1" />
+		<Connection pin="Y" siteNumber="5" instrument="SCOPE2" channel="3" />
+		<Connection pin="Y" siteNumber="6" instrument="SCOPE2" channel="5" />
+		<Connection pin="Y" siteNumber="7" instrument="SCOPE2" channel="7" />
+		<Connection pin="Y" siteNumber="8" instrument="SCOPE3" channel="1" />
 	</Connections>
 </PinMap>
