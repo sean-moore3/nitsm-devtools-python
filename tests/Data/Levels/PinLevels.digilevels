@@ -24,7 +24,7 @@
         <TerminationMode>ActiveLoad</TerminationMode>
         <Comment>DUT data pin electrical parameters</Comment>
       </DigitalPinLevelSet>
-      <DigitalPinLevelSet pin="R_SCL">
+      <DigitalPinLevelSet pin="SCL_R">
         <Vil>DC.Vil</Vil>
         <Vih>DC.Vih</Vih>
         <Vol>DC.Vol</Vol>
@@ -35,7 +35,7 @@
         <Vterm>0</Vterm>
         <TerminationMode>HighZ</TerminationMode>
       </DigitalPinLevelSet>
-      <DigitalPinLevelSet pin="R_SDA">
+      <DigitalPinLevelSet pin="SDA_R">
         <Vil>DC.Vil</Vil>
         <Vih>DC.Vih</Vih>
         <Vol>DC.Vol</Vol>
