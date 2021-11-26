@@ -236,14 +236,12 @@ def _ssc_scope_obtain_trigger_path(tsm: TSMScope, trigger_source: str, setup_typ
             trigger_path = "/" + timing_card + "/" + "PFI0"
             trigger_paths.append(trigger_path)
     else:
-        for ssc in tsm.ssc:
+        for _ in tsm.ssc:
             trigger_paths.append(trigger_source)
     return trigger_paths
 
 
 # TSM Pin Abstraction Sub routines
-
-
 def _pin_query_context_to_channel_list(
     expanded_pins_information: typing.List[ExpandedPinInformation],
     site_numbers: typing.List[int],
@@ -326,7 +324,7 @@ def _check_for_pin_group(
     pins_or_pins_group: typing.Union[str, typing.Sequence[str]],
 ):
     pins_types, pin_group_found = _identify_pin_types(tsm_context, pins_or_pins_group)
-    if pin_group_found == True:
+    if pin_group_found:
         pins: typing.Union[str, typing.Sequence[str]] = tsm_context.get_pins_in_pin_group(
             pins_or_pins_group
         )
@@ -361,7 +359,7 @@ def _get_all_pin_names(
 ):
     pin_names: typing.Union[str, typing.Sequence[str]] = []
     pin_types: typing.List[PinType] = []
-    if len(pin_names) == 0 or reload_cache == True:
+    if len(pin_names) == 0 or reload_cache:
         dut_pins, system_pins = tsm_context.get_pin_names("", "")
         dut_pins_type = [PinType.DUT_Pin] * len(dut_pins)
         system_pins_type = [PinType.System_Pin] * len(system_pins)
@@ -431,8 +429,7 @@ def tsm_ssc_scope_pins_to_sessions(
     #     [], site_numbers, pin_query_context, tsm_context
     # )
     channel_list_per_session, site_numbers_out = ni_dt_common.pin_query_context_to_channel_list(
-    pin_query_context, [], site_numbers
-    )
+        pin_query_context, [], site_numbers)
 
     for session, channel, channel_list in zip(sessions, channels, channel_list_per_session):
         ssc.append(SSCScope(session=session, channels=channel, channel_list=channel_list))
@@ -595,7 +592,7 @@ def scope_get_session_properties(tsm: TSMScope):
     sampling_rate: float
     input_impedance: float
     trigger_channel: str
-    ScopeProperties: typing.List[ScopeSessionProperties] = []
+    scope_properties: typing.List[ScopeSessionProperties] = []
     for ssc in tsm.ssc:
         instrument_name = ssc.session.io_resource_descriptor
         pin = ssc.channel_list
@@ -619,7 +616,7 @@ def scope_get_session_properties(tsm: TSMScope):
             edge = "Positive"
         else:
             edge = "Unsupported"
-        ScopeProperties.append(
+        scope_properties.append(
             ScopeSessionProperties(
                 instrument_name,
                 channel,
@@ -633,7 +630,7 @@ def scope_get_session_properties(tsm: TSMScope):
                 edge,
             )
         )
-    return tsm, ScopeProperties
+    return tsm, scope_properties
 
 
 # Trigger
@@ -688,21 +685,44 @@ def tsm_ssc_scope_clear_triggers(tsm: TSMScope):
 
 def tsm_ssc_scope_export_start_triggers(tsm: TSMScope, output_terminal: str):
     start_trigger: str = ""
-    if tsm.ssc != []:
-        for ssc in tsm.ssc:
-            if tsm.ssc.index(ssc) == 0:
-                ssc.session.configure_trigger_immediate()
-                ssc.session.exported_start_trigger_output_terminal = output_terminal
-                ssc.session.commit()
-                start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
-            else:
-                ssc.session.configure_trigger_digital(
-                    start_trigger,
-                    niscope.TriggerSlope.POSITIVE,
-                    holdoff=0.0,
-                    delay=0.0,
-                )
-                ssc.session.initiate()
+    for ssc in tsm.ssc:
+        if tsm.ssc.index(ssc) == 0:
+            ssc.session.configure_trigger_immediate()
+            ssc.session.exported_start_trigger_output_terminal = output_terminal
+            ssc.session.commit()
+            start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
+        else:
+            ssc.session.configure_trigger_digital(
+                start_trigger,
+                niscope.TriggerSlope.POSITIVE,
+                holdoff=0.0,
+                delay=0.0,
+            )
+            ssc.session.initiate()
+    return tsm, start_trigger
+
+
+def tsm_ssc_scope_export_analog_edge_start_trigger(tsm: TSMScope, analog_trigger_pin_name: str, output_terminal: str):
+    """Export Analog Edge Start Trigger.vi"""
+    start_trigger: str = ""
+    for ssc in tsm.ssc:
+        if analog_trigger_pin_name in ssc.channel_list:
+            pass
+
+    for ssc in tsm.ssc:
+        if tsm.ssc.index(ssc) == 0:
+            ssc.session.configure_trigger_immediate()
+            ssc.session.exported_start_trigger_output_terminal = output_terminal
+            ssc.session.commit()
+            start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
+        else:
+            ssc.session.configure_trigger_digital(
+                start_trigger,
+                niscope.TriggerSlope.POSITIVE,
+                holdoff=0.0,
+                delay=0.0,
+            )
+            ssc.session.initiate()
     return tsm, start_trigger
 
 
@@ -714,8 +734,6 @@ def tsm_ssc_scope_start_acquisition(tsm: TSMScope):
 
 
 # Measure
-
-
 def scope_fetch_measurement(
     tsm: TSMScope,
     scalar_meas_function: niscope.ScalarMeasurement,
@@ -745,7 +763,7 @@ def scope_fetch_waveform(
         )
         waveform_info.append(waveform)
         for wfm in waveform:
-            waveforms.append(list(wfm.samples))  # waveform in memoryview
+            waveforms.append(list(wfm.samples))  # waveform in memory view
     return tsm, waveform_info, waveforms
 
 
