@@ -702,26 +702,30 @@ def tsm_ssc_scope_export_start_triggers(tsm: TSMScope, output_terminal: str):
     return tsm, start_trigger
 
 
-def tsm_ssc_scope_export_analog_edge_start_trigger(tsm: TSMScope, analog_trigger_pin_name: str, output_terminal: str):
+def tsm_ssc_scope_export_analog_edge_start_trigger(tsm: TSMScope, analog_trigger_pin_name: str, output_terminal: str,
+                                                   trigger_level: float = 0.0,
+                                                   trigger_slope = niscope.TriggerSlope.POSITIVE):
     """Export Analog Edge Start Trigger.vi"""
     start_trigger: str = ""
+    temp_channel_name: str = ""
+    i = 0
     for ssc in tsm.ssc:
-        if analog_trigger_pin_name in ssc.channel_list:
-            pass
-
+        if analog_trigger_pin_name in ssc.channel_list.split(","):
+            temp_channel_name = analog_trigger_pin_name
+            break
+    i += 1
+    data = tsm.ssc.pop(i)
+    tsm.ssc.insert(0,data)
     for ssc in tsm.ssc:
         if tsm.ssc.index(ssc) == 0:
-            ssc.session.configure_trigger_immediate()
+            ssc.session.configure_trigger_edge(temp_channel_name, trigger_level, niscope.TriggerCoupling.DC,
+                                               trigger_slope)
             ssc.session.exported_start_trigger_output_terminal = output_terminal
             ssc.session.commit()
             start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
         else:
-            ssc.session.configure_trigger_digital(
-                start_trigger,
-                niscope.TriggerSlope.POSITIVE,
-                holdoff=0.0,
-                delay=0.0,
-            )
+            ssc.session.configure_trigger_digital(start_trigger, niscope.TriggerSlope.POSITIVE, holdoff=0.0,
+                delay=0.0 )
             ssc.session.initiate()
     return tsm, start_trigger
 
@@ -766,6 +770,25 @@ def scope_fetch_waveform(
             waveforms.append(list(wfm.samples))  # waveform in memory view
     return tsm, waveform_info, waveforms
 
+
+def scope_fetch_multirecord_waveform(
+    tsm: TSMScope,
+    num_records: int = -1,
+):
+    waveforms: typing.Any = []
+    waveform_info: typing.List[niscope.WaveformInfo] = []
+    for ssc in tsm.ssc:
+        channels, pins, sites = _channel_list_to_pins(
+            ssc.channel_list
+        )  # Unused no waveform attribute in python
+        ssc.session._fetch_num_records(num_records)
+        waveform = ssc.session.channels[ssc.channels].fetch(
+            -1, relative_to=niscope.FetchRelativeTo.PRETRIGGER
+        )
+        waveform_info.append(waveform)
+        for wfm in waveform:
+            waveforms.append(list(wfm.samples))  # waveform in memory view
+    return tsm, waveform_info, waveforms
 
 def scope_measure_statistics(
     tsm: TSMScope,
