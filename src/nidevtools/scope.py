@@ -773,7 +773,7 @@ def scope_fetch_waveform(
 
 def scope_fetch_multirecord_waveform(
     tsm: TSMScope,
-    num_records: int = -1,
+    num_records =-1,
 ):
     waveforms: typing.Any = []
     waveform_info: typing.List[niscope.WaveformInfo] = []
@@ -781,7 +781,7 @@ def scope_fetch_multirecord_waveform(
         channels, pins, sites = _channel_list_to_pins(
             ssc.channel_list
         )  # Unused no waveform attribute in python
-        ssc.session._fetch_num_records(num_records)
+        ssc.session._fetch_num_records = num_records
         waveform = ssc.session.channels[ssc.channels].fetch(
             -1, relative_to=niscope.FetchRelativeTo.PRETRIGGER
         )
