@@ -97,14 +97,14 @@ class TestNIScope:
             scope.tsm_ssc_scope_start_acquisition(tsm_scope)
             _, props=scope.scope_get_session_properties(tsm_scope)
             print("\n",props)
-            _,measurement1=scope.scope_fetch_measurement(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
+            _, measurement1=scope.scope_fetch_measurement(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
             print(measurement1)
-            _,measurement2=scope.scope_measure_statistics(tsm_scope, niscope.ScalarMeasurement.AVERAGE_PERIOD)
+            _, measurement2=scope.scope_measure_statistics(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
             print(measurement2)
             scope.ssc_scope_fetch_clear_stats(tsm_scope.ssc)
-            scope.tsm_ssc_scope_fetch_meas_stats_per_channel(
-                tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT
-            )
+            _, data3=scope.tsm_ssc_scope_fetch_meas_stats_per_channel(tsm_scope,
+                                                                     niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
+            print(data3)
             _, data1, data2 = scope.scope_fetch_waveform(tsm_scope, 1)
             print(data1, data2,"\n")
             # print(scope.scope_fetch_multirecord_waveform(tsm_scope, 1))
