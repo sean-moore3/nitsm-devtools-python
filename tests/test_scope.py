@@ -252,7 +252,7 @@ def fetch_waveform(
 ):
     tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
     print(scope.scope_fetch_waveform(tsm_scope, 1))
-    #print(scope.scope_fetch_multirecord_waveform(tsm_scope, 1))
+    # print(scope.scope_fetch_multirecord_waveform(tsm_scope, 1))
 
 
 @nitsm.codemoduleapi.code_module

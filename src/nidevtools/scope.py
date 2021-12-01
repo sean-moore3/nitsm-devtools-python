@@ -81,35 +81,11 @@ class OutputTerminal(typing.NamedTuple):
     AUX0_PFI7: str
 
 
-OUTPUT_TERMINAL = OutputTerminal(
-    "VAL_NO_SOURCE",
-    "VAL_RTSI_0",
-    "VAL_RTSI_1",
-    "VAL_RTSI_2",
-    "VAL_RTSI_3",
-    "VAL_RTSI_4",
-    "VAL_RTSI_5",
-    "VAL_RTSI_6",
-    "VAL_RTSI_7",
-    "VAL_PXI_STAR",
-    "VAL_PFI_0",
-    "VAL_PFI_1",
-    "VAL_PFI_2",
-    "VAL_PFI_3",
-    "VAL_PFI_4",
-    "VAL_PFI_5",
-    "VAL_PFI_6",
-    "VAL_PFI_7",
-    "VAL_CLK_OUT",
-    "VAL_AUX_0_PFI_0",
-    "VAL_AUX_0_PFI_1",
-    "VAL_AUX_0_PFI_2",
-    "VAL_AUX_0_PFI_3",
-    "VAL_AUX_0_PFI_4",
-    "VAL_AUX_0_PFI_5",
-    "VAL_AUX_0_PFI_6",
-    "VAL_AUX_0_PFI_7",
-)
+OUTPUT_TERMINAL = OutputTerminal( "VAL_NO_SOURCE", "VAL_RTSI_0", "VAL_RTSI_1", "VAL_RTSI_2", "VAL_RTSI_3",
+    "VAL_RTSI_4", "VAL_RTSI_5", "VAL_RTSI_6", "VAL_RTSI_7", "VAL_PXI_STAR", "VAL_PFI_0", "VAL_PFI_1",
+    "VAL_PFI_2", "VAL_PFI_3", "VAL_PFI_4", "VAL_PFI_5", "VAL_PFI_6", "VAL_PFI_7", "VAL_CLK_OUT",
+    "VAL_AUX_0_PFI_0", "VAL_AUX_0_PFI_1", "VAL_AUX_0_PFI_2", "VAL_AUX_0_PFI_3",
+    "VAL_AUX_0_PFI_4", "VAL_AUX_0_PFI_5", "VAL_AUX_0_PFI_6", "VAL_AUX_0_PFI_7" )
 
 
 class TriggerSource(typing.NamedTuple):
@@ -139,37 +115,13 @@ class TriggerSource(typing.NamedTuple):
     AUX0_PFI7: str
 
 
-TRIGGER_SOURCE = TriggerSource(
-    "VAL_RTSI_0",
-    "VAL_RTSI_1",
-    "VAL_RTSI_2",
-    "VAL_RTSI_3",
-    "VAL_RTSI_4",
-    "VAL_RTSI_5",
-    "VAL_RTSI_6",
-    "VAL_PFI_0",
-    "VAL_PFI_1",
-    "VAL_PFI_2",
-    "VAL_PFI_3",
-    "VAL_PFI_4",
-    "VAL_PFI_5",
-    "VAL_PFI_6",
-    "VAL_PFI_7",
-    "VAL_PXI_STAR",
-    "VAL_AUX_0_PFI_0",
-    "VAL_AUX_0_PFI_1",
-    "VAL_AUX_0_PFI_2",
-    "VAL_AUX_0_PFI_3",
-    "VAL_AUX_0_PFI_4",
-    "VAL_AUX_0_PFI_5",
-    "VAL_AUX_0_PFI_6",
-    "VAL_AUX_0_PFI_7",
-)
+TRIGGER_SOURCE = TriggerSource("VAL_RTSI_0", "VAL_RTSI_1", "VAL_RTSI_2", "VAL_RTSI_3", "VAL_RTSI_4", "VAL_RTSI_5",
+    "VAL_RTSI_6", "VAL_PFI_0", "VAL_PFI_1", "VAL_PFI_2", "VAL_PFI_3", "VAL_PFI_4", "VAL_PFI_5", "VAL_PFI_6",
+    "VAL_PFI_7", "VAL_PXI_STAR", "VAL_AUX_0_PFI_0", "VAL_AUX_0_PFI_1", "VAL_AUX_0_PFI_2", "VAL_AUX_0_PFI_3",
+    "VAL_AUX_0_PFI_4", "VAL_AUX_0_PFI_5", "VAL_AUX_0_PFI_6", "VAL_AUX_0_PFI_7")
 
 
 # Scope Sub routines
-
-
 def _expand_ssc_to_ssc_per_channel(ssc: typing.List[SSCScope]):
     return [
         SSCScope(scope_ssc.session, channel, channel_list)
@@ -369,8 +321,6 @@ def _get_all_pin_names(
 
 
 # Digital Sub routines
-
-
 def _channel_list_to_pins(channel_list: str):
     channels = re.split(r"\s*,\s*", channel_list)
     sites = [-1] * len(channels)
@@ -386,8 +336,6 @@ def _channel_list_to_pins(channel_list: str):
 
 
 # DCPower Sub routines
-
-
 def _expand_to_requested_array_size(
     data_in: typing.Any,
     requested_size: int,
@@ -416,8 +364,6 @@ def _expand_to_requested_array_size(
 
 
 # Pinmap
-
-
 def tsm_ssc_scope_pins_to_sessions(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
@@ -437,8 +383,6 @@ def tsm_ssc_scope_pins_to_sessions(
 
 
 # Configure
-
-
 def configure_impedance(tsm: TSMScope, input_impedance: float):
     for ssc in tsm.ssc:
         ssc.session.channels[ssc.channels].configure_chan_characteristics(input_impedance, -1.0)
@@ -537,8 +481,6 @@ def configure_vertical_per_channel(
 
 
 # Configure Timing
-
-
 def configure_timing(
     tsm: TSMScope,
     min_sample_rate: float = 20e6,
@@ -559,8 +501,6 @@ def configure_timing(
 
 
 # Acquisition
-
-
 def initiate(tsm: TSMScope):
     for ssc in tsm.ssc:
         ssc.session.initiate()
@@ -568,8 +508,6 @@ def initiate(tsm: TSMScope):
 
 
 # Control
-
-
 def abort(tsm: TSMScope):
     for ssc in tsm.ssc:
         ssc.session.abort()
@@ -583,8 +521,6 @@ def commit(tsm: TSMScope):
 
 
 # Session Properties
-
-
 def scope_get_session_properties(tsm: TSMScope):
     instrument_name: str
     voltage_range: float
@@ -634,8 +570,6 @@ def scope_get_session_properties(tsm: TSMScope):
 
 
 # Trigger
-
-
 def scope_configure_digital_edge_trigger(
     tsm: TSMScope,
     trigger_source: str,
@@ -829,7 +763,6 @@ def tsm_ssc_scope_fetch_meas_stats_per_channel(
 
 
 # Open session
-
 @nitsm.codemoduleapi.code_module
 def tsm_scope_initialize_sessions(tsm_context: SemiconductorModuleContext, options: dict = {}):
     instrument_names = tsm_context.get_all_niscope_instrument_names()
@@ -846,7 +779,6 @@ def tsm_scope_initialize_sessions(tsm_context: SemiconductorModuleContext, optio
 
 
 # Close session
-
 @nitsm.codemoduleapi.code_module
 def tsm_scope_close_sessions(tsm_context: SemiconductorModuleContext):
     sessions = tsm_context.get_all_niscope_sessions()
