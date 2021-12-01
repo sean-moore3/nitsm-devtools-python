@@ -244,7 +244,7 @@ def pin_query_context_to_channel_list(
                 else:
                     row_data = row_data + "," + column
         per_session_pin_list.append(row_data.strip())
-    return per_session_pin_list, site_numbers
+    return site_numbers, per_session_pin_list
 
 
 @nitsm.codemoduleapi.code_module

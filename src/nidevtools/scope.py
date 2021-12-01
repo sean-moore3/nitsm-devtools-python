@@ -81,11 +81,12 @@ class OutputTerminal(typing.NamedTuple):
     AUX0_PFI7: str
 
 
-OUTPUT_TERMINAL = OutputTerminal( "VAL_NO_SOURCE", "VAL_RTSI_0", "VAL_RTSI_1", "VAL_RTSI_2", "VAL_RTSI_3",
-    "VAL_RTSI_4", "VAL_RTSI_5", "VAL_RTSI_6", "VAL_RTSI_7", "VAL_PXI_STAR", "VAL_PFI_0", "VAL_PFI_1",
-    "VAL_PFI_2", "VAL_PFI_3", "VAL_PFI_4", "VAL_PFI_5", "VAL_PFI_6", "VAL_PFI_7", "VAL_CLK_OUT",
-    "VAL_AUX_0_PFI_0", "VAL_AUX_0_PFI_1", "VAL_AUX_0_PFI_2", "VAL_AUX_0_PFI_3",
-    "VAL_AUX_0_PFI_4", "VAL_AUX_0_PFI_5", "VAL_AUX_0_PFI_6", "VAL_AUX_0_PFI_7" )
+OUTPUT_TERMINAL = OutputTerminal("VAL_NO_SOURCE", "VAL_RTSI_0", "VAL_RTSI_1", "VAL_RTSI_2", "VAL_RTSI_3",
+                                 "VAL_RTSI_4", "VAL_RTSI_5", "VAL_RTSI_6", "VAL_RTSI_7", "VAL_PXI_STAR", "VAL_PFI_0",
+                                 "VAL_PFI_1", "VAL_PFI_2", "VAL_PFI_3", "VAL_PFI_4", "VAL_PFI_5", "VAL_PFI_6",
+                                 "VAL_PFI_7", "VAL_CLK_OUT", "VAL_AUX_0_PFI_0", "VAL_AUX_0_PFI_1", "VAL_AUX_0_PFI_2",
+                                 "VAL_AUX_0_PFI_3", "VAL_AUX_0_PFI_4", "VAL_AUX_0_PFI_5", "VAL_AUX_0_PFI_6",
+                                 "VAL_AUX_0_PFI_7")
 
 
 class TriggerSource(typing.NamedTuple):
@@ -116,9 +117,10 @@ class TriggerSource(typing.NamedTuple):
 
 
 TRIGGER_SOURCE = TriggerSource("VAL_RTSI_0", "VAL_RTSI_1", "VAL_RTSI_2", "VAL_RTSI_3", "VAL_RTSI_4", "VAL_RTSI_5",
-    "VAL_RTSI_6", "VAL_PFI_0", "VAL_PFI_1", "VAL_PFI_2", "VAL_PFI_3", "VAL_PFI_4", "VAL_PFI_5", "VAL_PFI_6",
-    "VAL_PFI_7", "VAL_PXI_STAR", "VAL_AUX_0_PFI_0", "VAL_AUX_0_PFI_1", "VAL_AUX_0_PFI_2", "VAL_AUX_0_PFI_3",
-    "VAL_AUX_0_PFI_4", "VAL_AUX_0_PFI_5", "VAL_AUX_0_PFI_6", "VAL_AUX_0_PFI_7")
+                               "VAL_RTSI_6", "VAL_PFI_0", "VAL_PFI_1", "VAL_PFI_2", "VAL_PFI_3", "VAL_PFI_4",
+                               "VAL_PFI_5", "VAL_PFI_6", "VAL_PFI_7", "VAL_PXI_STAR", "VAL_AUX_0_PFI_0",
+                               "VAL_AUX_0_PFI_1", "VAL_AUX_0_PFI_2", "VAL_AUX_0_PFI_3", "VAL_AUX_0_PFI_4",
+                               "VAL_AUX_0_PFI_5", "VAL_AUX_0_PFI_6", "VAL_AUX_0_PFI_7")
 
 
 # Scope Sub routines
@@ -195,11 +197,11 @@ def _ssc_scope_obtain_trigger_path(tsm: TSMScope, trigger_source: str, setup_typ
 
 # TSM Pin Abstraction Sub routines
 def _pin_query_context_to_channel_list(
-    expanded_pins_information: typing.List[ExpandedPinInformation],
-    site_numbers: typing.List[int],
-    pin_query_context: PinQueryContext,
-    tsm_context: SemiconductorModuleContext,
+        pin_query_context: PinQueryContext,
+        expanded_pins_information: typing.List[ExpandedPinInformation],
+        site_numbers: typing.List[int]
 ):
+    tsm_context = pin_query_context._tsm_context
     pins_array_for_session_input: typing.List[PinsCluster] = []
     channel_list_per_session = ()
     pin_types_return: typing.List[PinType] = []
@@ -209,7 +211,7 @@ def _pin_query_context_to_channel_list(
         number_of_pins_per_channel,
         channel_group_indices,
         channel_indices,
-    ) = pin_query_context.get_channel_group_and_channel_index(pins)
+    ) = tsm_context.GetChannelGroupAndChannelIndex(pins)
     for number_of_pins in number_of_pins_per_channel:
         """
         Create a pins list for each session of the correct size
@@ -220,7 +222,11 @@ def _pin_query_context_to_channel_list(
         """
         Get site numbers if not provided
         """
-        site_numbers_out: typing.List[int] = list(tsm_context.site_numbers)
+        try:
+            site_numbers_out: typing.List[int] = list(tsm_context.site_numbers)
+            # print(site_numbers)  # Need to test this case after bug fix
+        except Exception:
+            site_numbers_out = []
     else:
         site_numbers_out = site_numbers
     if len(expanded_pins_information) == 0:
@@ -277,7 +283,7 @@ def _check_for_pin_group(
 ):
     pins_types, pin_group_found = _identify_pin_types(tsm_context, pins_or_pins_group)
     if pin_group_found:
-        pins: typing.Union[str, typing.Sequence[str]] = tsm_context.get_pins_in_pin_group(
+        pins: typing.Union[str, typing.Sequence[str]] = tsm_context.get_pins_in_pin_groups(
             pins_or_pins_group
         )
         pins_types, _ = _identify_pin_types(tsm_context, pins)
@@ -299,7 +305,6 @@ def _identify_pin_types(
             filtered_pin_types.append(pin_types[index])
             pin_group_found = False
         except ValueError:
-            index = -1
             filtered_pin_types.append(PinType.Pin_Group)
             pin_group_found = True
     return filtered_pin_types, pin_group_found
@@ -312,7 +317,7 @@ def _get_all_pin_names(
     pin_names: typing.Union[str, typing.Sequence[str]] = []
     pin_types: typing.List[PinType] = []
     if len(pin_names) == 0 or reload_cache:
-        dut_pins, system_pins = tsm_context.get_pin_names("", "")
+        dut_pins, system_pins = tsm_context.get_pin_names()
         dut_pins_type = [PinType.DUT_Pin] * len(dut_pins)
         system_pins_type = [PinType.System_Pin] * len(system_pins)
         pin_names = dut_pins + system_pins
@@ -372,10 +377,10 @@ def tsm_ssc_scope_pins_to_sessions(
     ssc: typing.List[SSCScope] = []
     pin_query_context, sessions, channels = tsm_context.pins_to_niscope_sessions(pins)
     # site_numbers_out, channel_list_per_session = _pin_query_context_to_channel_list(
-    #     [], site_numbers, pin_query_context, tsm_context
-    # )
-    channel_list_per_session, site_numbers_out = ni_dt_common.pin_query_context_to_channel_list(
+    #     pin_query_context, [], site_numbers)
+    site_numbers_out, channel_list_per_session = ni_dt_common.pin_query_context_to_channel_list(
         pin_query_context, [], site_numbers)
+
 
     for session, channel, channel_list in zip(sessions, channels, channel_list_per_session):
         ssc.append(SSCScope(session=session, channels=channel, channel_list=channel_list))
@@ -638,7 +643,7 @@ def tsm_ssc_scope_export_start_triggers(tsm: TSMScope, output_terminal: str):
 
 def tsm_ssc_scope_export_analog_edge_start_trigger(tsm: TSMScope, analog_trigger_pin_name: str, output_terminal: str,
                                                    trigger_level: float = 0.0,
-                                                   trigger_slope = niscope.TriggerSlope.POSITIVE):
+                                                   trigger_slope=niscope.TriggerSlope.POSITIVE):
     """Export Analog Edge Start Trigger.vi"""
     start_trigger: str = ""
     temp_channel_name: str = ""
@@ -649,7 +654,7 @@ def tsm_ssc_scope_export_analog_edge_start_trigger(tsm: TSMScope, analog_trigger
             break
     i += 1
     data = tsm.ssc.pop(i)
-    tsm.ssc.insert(0,data)
+    tsm.ssc.insert(0, data)
     for ssc in tsm.ssc:
         if tsm.ssc.index(ssc) == 0:
             ssc.session.configure_trigger_edge(temp_channel_name, trigger_level, niscope.TriggerCoupling.DC,
@@ -659,7 +664,7 @@ def tsm_ssc_scope_export_analog_edge_start_trigger(tsm: TSMScope, analog_trigger
             start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
         else:
             ssc.session.configure_trigger_digital(start_trigger, niscope.TriggerSlope.POSITIVE, holdoff=0.0,
-                delay=0.0 )
+                                                  delay=0.0)
             ssc.session.initiate()
     return tsm, start_trigger
 
@@ -707,7 +712,7 @@ def scope_fetch_waveform(
 
 def scope_fetch_multirecord_waveform(
     tsm: TSMScope,
-    num_records =-1,
+    num_records=-1,
 ):
     waveforms: typing.Any = []
     waveform_info: typing.List[niscope.WaveformInfo] = []
@@ -723,6 +728,7 @@ def scope_fetch_multirecord_waveform(
         for wfm in waveform:
             waveforms.append(list(wfm.samples))  # waveform in memory view
     return tsm, waveform_info, waveforms
+
 
 def scope_measure_statistics(
     tsm: TSMScope,
@@ -770,7 +776,7 @@ def tsm_scope_initialize_sessions(tsm_context: SemiconductorModuleContext, optio
         session = niscope.Session(instrument_name, reset_device=True, options=options)
         try:
             session.commit()
-        except:
+        except Exception:
             session.reset_device()
         # session.channels[0, 1, 2, 3, 4, 5, 6, 7].configure_chan_characteristics(1e6, -1)
         session.configure_chan_characteristics(1e6, -1)

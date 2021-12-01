@@ -1344,7 +1344,7 @@ def pins_to_sessions(
             a = ni_dt_common.PinInformation  # create instance of class
             a.pin = pin
             pins_info.append(a)
-    pin_lists, _ = ni_dt_common.pin_query_context_to_channel_list(
+    _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(
         pin_query_context, pins_expanded, site_numbers
     )
 
