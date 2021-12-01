@@ -72,23 +72,8 @@ class TestNIScope:
             scope.configure_impedance(tsm_scope, 0.5)
             scope.configure_reference_level(tsm_scope)
             scope.configure_vertical(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
-            scope.configure(
-                tsm_scope,
-                5.0,
-                1.0,
-                0.0,
-                niscope.VerticalCoupling.DC,
-                10e6,
-                1000,
-                0.0,
-                0.0,
-                1e6,
-                1,
-                True,
-            )
-            scope.configure_vertical_per_channel(
-                tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True
-            )
+            scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
+            scope.configure_vertical_per_channel(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
 
 
@@ -103,29 +88,14 @@ class TestNIScope:
         for tsm_scope in scope_tsm_s:
             scope.configure_impedance(tsm_scope, 0.5)
             scope.configure_reference_level(tsm_scope)
-            scope.configure_vertical(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
-            scope.configure(
-                tsm_scope,
-                5.0,
-                1.0,
-                0.0,
-                niscope.VerticalCoupling.DC,
-                10e6,
-                1000,
-                0.0,
-                0.0,
-                1e6,
-                1,
-                True,
-            )
-            scope.configure_vertical_per_channel(
-                tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True
-            )
+            # scope.configure_vertical(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
+            scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
+            # scope.configure_vertical_per_channel(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
-            scope.initiate(tsm_scope)
-            scope.commit(tsm_scope)
-            scope.abort(tsm_scope)
-            scope.scope_get_session_properties(tsm_scope)
+            # scope.initiate(tsm_scope)
+            # scope.commit(tsm_scope)
+            # scope.abort(tsm_scope)
+            # scope.scope_get_session_properties(tsm_scope)
             scope.scope_configure_digital_edge_trigger(
                 tsm_scope, "/OSC1/PXI_Trig0", niscope.TriggerSlope.POSITIVE)
             scope.scope_configure_trigger(
@@ -187,23 +157,8 @@ def configure(
     scope.configure_impedance(tsm_scope, 0.5)
     scope.configure_reference_level(tsm_scope)
     scope.configure_vertical(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
-    scope.configure(
-        tsm_scope,
-        5.0,
-        1.0,
-        0.0,
-        niscope.VerticalCoupling.DC,
-        10e6,
-        1000,
-        0.0,
-        0.0,
-        1e6,
-        1,
-        True,
-    )
-    scope.configure_vertical_per_channel(
-        tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True
-    )
+    scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
+    scope.configure_vertical_per_channel(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
     scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
 
 
