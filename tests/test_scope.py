@@ -111,11 +111,8 @@ class TestNIScope:
 
     def test_multirecord_waveform_fetch(self,scope_tsm_s):
         for tsm_scope in scope_tsm_s:
-            scope.configure_impedance(tsm_scope, 0.5)
             scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
-            scope.scope_configure_trigger(tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
-            scope.tsm_ssc_scope_clear_triggers(tsm_scope)
             scope.tsm_ssc_scope_start_acquisition(tsm_scope)
             _, data1, data2 = scope.scope_fetch_waveform(tsm_scope, 1)
             print(data1, data2,"\n")
