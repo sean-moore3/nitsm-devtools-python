@@ -83,7 +83,7 @@ class TestNIScope:
         scope.abort(tsm_scope)
 
 
-    def test_triggered_acquition(self,scope_tsm_s):
+    def test_all_scope_apis(self,scope_tsm_s):
         for tsm_scope in scope_tsm_s:
             scope.configure_impedance(tsm_scope, 0.5)
             scope.configure_reference_level(tsm_scope)
@@ -114,7 +114,7 @@ class TestNIScope:
             scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
             scope.tsm_ssc_scope_start_acquisition(tsm_scope)
-            _, data1, data2 = scope.scope_fetch_waveform(tsm_scope, 1)
+            _, data1, data2 = scope.scope_fetch_multirecord_waveform(tsm_scope, 1)
             print(data1, data2,"\n")
 
 
