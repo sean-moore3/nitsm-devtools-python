@@ -414,9 +414,7 @@ def pin_levels_and_timing(tsm_context: SemiconductorModuleContext, pins: typing.
     ni_dt_digital.tsm_ssc_apply_tdr_offsets_per_site_per_pin(tsm, [[1e-9, 1e-9]] * 3)
     ni_dt_digital.tsm_ssc_apply_tdr_offsets(tsm, [[1e-9, 1e-9, 1e-9]] * 2)
     ni_dt_digital.tsm_ssc_configure_active_load(tsm, 0.0015, 0.0015, -0.0015)
-    ni_dt_digital.tsm_ssc_configure_single_level_per_site(
-        tsm, ni_dt_digital.LevelTypeToSet.VIL, [0.0015, 0.0015, 0.0015]
-    )
+    ni_dt_digital.tsm_ssc_configure_single_level_per_site(tsm, ni_dt_digital.LevelTypeToSet.VIL, [0.0015, 0.0015, 0.0015])
     ni_dt_digital.tsm_ssc_configure_single_level(tsm, ni_dt_digital.LevelTypeToSet.VIL, 0.0015)
     ni_dt_digital.tsm_ssc_configure_termination_mode(tsm, enums.TerminationMode.HIGH_Z)
     ni_dt_digital.tsm_ssc_configure_time_set_compare_edge_per_site_per_pin(tsm, "time_set", [[40e-6, 40e-6]] * 3)
@@ -482,9 +480,7 @@ def sequencer_flags_and_registers(tsm_context: SemiconductorModuleContext, pins:
     assert numpy.shape(per_instrument_state) == (2,)
     for state in per_instrument_state:
         assert isinstance(state, bool)
-    _, per_instrument_register_values = ni_dt_digital.tsm_ssc_read_sequencer_register(
-        tsm, enums.SequencerRegister.REGISTER1
-    )
+    _, per_instrument_register_values = ni_dt_digital.tsm_ssc_read_sequencer_register(tsm, enums.SequencerRegister.REGISTER1)
     assert isinstance(per_instrument_register_values, list)
     assert numpy.shape(per_instrument_register_values) == (2,)
     for register_value in per_instrument_register_values:
@@ -531,9 +527,7 @@ def static(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
 
     ni_dt_digital.tsm_ssc_write_static(tsm, enums.WriteStaticPinState.ONE)
     ni_dt_digital.tsm_ssc_write_static_per_site(tsm, [enums.WriteStaticPinState.ONE] * 3)
-    ni_dt_digital.tsm_ssc_write_static_per_site_per_pin(
-        tsm, [[enums.WriteStaticPinState.ONE, enums.WriteStaticPinState.ONE]] * 3
-    )
+    ni_dt_digital.tsm_ssc_write_static_per_site_per_pin(tsm, [[enums.WriteStaticPinState.ONE, enums.WriteStaticPinState.ONE]] * 3)
     _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(tsm)
     assert isinstance(per_site_per_pin_data, list)
     assert numpy.shape(per_site_per_pin_data) == (3, 2)
@@ -557,9 +551,7 @@ def misc(tsm_context: SemiconductorModuleContext, pins: typing.List[str]):
         assert ssc.site_list == "site2"
     ni_dt_digital.tsm_ssc_initiate(tsm)
     ni_dt_digital.tsm_ssc_abort(tsm)
-    per_instrument_to_per_site_lut = ni_dt_digital._ssc_calculate_per_instrument_to_per_site_lut(
-        tsm.ssc, tsm.site_numbers
-    )
+    per_instrument_to_per_site_lut = ni_dt_digital._ssc_calculate_per_instrument_to_per_site_lut(tsm.ssc, tsm.site_numbers)
     per_site_data = ni_dt_digital._apply_lut_per_instrument_to_per_site(
         [False, False, False],
         per_instrument_to_per_site_lut,

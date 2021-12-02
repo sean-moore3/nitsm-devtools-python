@@ -12,9 +12,7 @@ _standalone_tsm_context_tlb = win32com.client.selecttlb.FindTlbsWithDescription(
 
 class PublishedData:
     def __init__(self, published_data_com_obj):
-        self._published_data = win32com.client.CastTo(
-            published_data_com_obj, "IPublishedData", _standalone_tsm_context_tlb
-        )
+        self._published_data = win32com.client.CastTo(published_data_com_obj, "IPublishedData", _standalone_tsm_context_tlb)
         self._published_data._oleobj_ = self._published_data._oleobj_.QueryInterface(
             self._published_data.CLSID, pythoncom.IID_IDispatch
         )

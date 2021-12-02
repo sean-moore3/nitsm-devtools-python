@@ -187,9 +187,7 @@ def _ssc_configure_vertical_per_channel_arrays(
     probes_drop: typing.List[float],
     enabled_s: typing.List[bool],
 ):
-    for (ssc, v_range, coupling, offset, probe_drop, enabled) in zip(
-        ssc_s, ranges, couplings, offsets, probes_drop, enabled_s
-    ):
+    for (ssc, v_range, coupling, offset, probe_drop, enabled) in zip(ssc_s, ranges, couplings, offsets, probes_drop, enabled_s):
         ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, probe_drop, enabled)
 
 
@@ -279,9 +277,7 @@ def _pin_query_context_to_channel_list(
             pin_types_return,
         ):
             if pin_type.value == 1:
-                pins_array_for_session_input[per_pin_transposed_channel_group_index].Pins[
-                    per_pin_transposed_channel_index
-                ] = pin
+                pins_array_for_session_input[per_pin_transposed_channel_group_index].Pins[per_pin_transposed_channel_index] = pin
             else:
                 pins_array_for_session_input[per_pin_transposed_channel_group_index].Pins[
                     per_pin_transposed_channel_index
@@ -446,9 +442,7 @@ def configure(
         channels = ssc.session.channels[ssc.channels]
         channels.configure_vertical(vertical_range, coupling, offset, probe_attenuation)
         channels.configure_chan_characteristics(input_impedance, max_input_frequency)
-        ssc.session.configure_horizontal_timing(
-            min_sample_rate, min_record_length, ref_position, num_records, enforce_realtime
-        )
+        ssc.session.configure_horizontal_timing(min_sample_rate, min_record_length, ref_position, num_records, enforce_realtime)
     return tsm
 
 
@@ -647,9 +641,7 @@ def tsm_ssc_scope_export_analog_edge_start_trigger(
     tsm.ssc.insert(0, data)
     for ssc in tsm.ssc:
         if tsm.ssc.index(ssc) == 0:
-            ssc.session.configure_trigger_edge(
-                temp_channel_name, trigger_level, niscope.TriggerCoupling.DC, trigger_slope
-            )
+            ssc.session.configure_trigger_edge(temp_channel_name, trigger_level, niscope.TriggerCoupling.DC, trigger_slope)
             ssc.session.exported_start_trigger_output_terminal = output_terminal
             ssc.session.commit()
             start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
@@ -689,9 +681,7 @@ def scope_fetch_waveform(
     waveform_info: typing.List[niscope.WaveformInfo] = []
     for ssc in tsm.ssc:
         channels, pins, sites = _channel_list_to_pins(ssc.channel_list)  # Unused no waveform attribute in python
-        waveform = ssc.session.channels[ssc.channels].fetch(
-            meas_num_samples, relative_to=niscope.FetchRelativeTo.PRETRIGGER
-        )
+        waveform = ssc.session.channels[ssc.channels].fetch(meas_num_samples, relative_to=niscope.FetchRelativeTo.PRETRIGGER)
         waveform_info.append(waveform)
         for wfm in waveform:
             waveforms.append(list(wfm.samples))  # waveform in memory view
