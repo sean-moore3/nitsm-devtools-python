@@ -218,8 +218,12 @@ def pin_query_context_to_channel_list(
         pins_array = pin_str * pin_count
         data.append(pins_array)
 
-    for site_number, channel_group_index_s, channel_index_s in zip(site_numbers, channel_group_indices, channel_indices):
-        for channel_group_index, channel_index, pin, pin_type in zip(channel_group_index_s, channel_index_s, pins, pin_types):
+    for site_number, channel_group_index_s, channel_index_s in zip(
+        site_numbers, channel_group_indices, channel_indices
+    ):
+        for channel_group_index, channel_index, pin, pin_type in zip(
+            channel_group_index_s, channel_index_s, pins, pin_types
+        ):
             if pin_type == PinType.SYSTEM_PIN:
                 data[channel_group_index][channel_index] = str(pin)
             else:

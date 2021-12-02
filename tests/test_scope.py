@@ -86,20 +86,7 @@ class TestNIScope:
         for tsm_scope in scope_tsm_s:
             scope.configure_impedance(tsm_scope, 0.5)
             scope.configure_reference_level(tsm_scope)
-            scope.configure(
-                tsm_scope,
-                5.0,
-                1.0,
-                0.0,
-                niscope.VerticalCoupling.DC,
-                10e6,
-                1000,
-                0.0,
-                0.0,
-                1e6,
-                1,
-                True,
-            )
+            scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
             self.subroutine_init_commit_abort(tsm_scope)
             scope.scope_configure_digital_edge_trigger(tsm_scope, "/OSC1/PXI_Trig0", niscope.TriggerSlope.POSITIVE)
@@ -114,7 +101,9 @@ class TestNIScope:
             _, measurement2 = scope.scope_measure_statistics(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
             print(measurement2)
             scope.ssc_scope_fetch_clear_stats(tsm_scope.ssc)
-            _, data3 = scope.tsm_ssc_scope_fetch_meas_stats_per_channel(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
+            _, data3 = scope.tsm_ssc_scope_fetch_meas_stats_per_channel(
+                tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
+            )
             print(data3)
             _, data1, data2 = scope.scope_fetch_waveform(tsm_scope, 1)
             print(data1, data2, "\n")

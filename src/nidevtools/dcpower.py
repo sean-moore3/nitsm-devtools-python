@@ -305,7 +305,9 @@ class _NIDCPowerSSC:
         actual_aperture_time = self._channels_session.aperture_time_units
         if match in all_supported_models + ["4112", "4113", "4132"]:
             if self._channels_session.aperture_time_units == enums.ApertureTimeUnits.POWER_LINE_CYCLES:
-                actual_aperture_time = self._channels_session.aperture_time_units / self._channels_session.power_line_frequency
+                actual_aperture_time = (
+                    self._channels_session.aperture_time_units / self._channels_session.power_line_frequency
+                )
 
         if match in ["4110", "4130"]:
             actual_aperture_time = self._channels_session.samples_to_average / 3000
@@ -683,7 +685,9 @@ class _NIDCPowerTSM:
     def sessions_sites_channels(self):
         return self._sessions_sites_channels
 
-    def _configure_settings_array(self, aperture_times, source_delays, senses, aperture_time_units, transient_responses):
+    def _configure_settings_array(
+        self, aperture_times, source_delays, senses, aperture_time_units, transient_responses
+    ):
         for (ssc, aperture_time, source_delay, sense, aperture_time_unit, transient_response,) in zip(
             self._sessions_sites_channels,
             aperture_times,
@@ -714,7 +718,9 @@ class _NIDCPowerTSM:
             i += 1
         self.initiate()
 
-    def _force_current_symmetric_limits_array(self, current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges):
+    def _force_current_symmetric_limits_array(
+        self, current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges
+    ):
         i = 0
         for ssc in self._sessions_sites_channels:
             ssc.cs_force_current_symmetric_limits(
@@ -746,7 +752,9 @@ class _NIDCPowerTSM:
             i += 1
         self.initiate()
 
-    def _force_voltage_symmetric_limits_array(self, voltage_levels, voltage_level_ranges, current_limits, current_limit_ranges):
+    def _force_voltage_symmetric_limits_array(
+        self, voltage_levels, voltage_level_ranges, current_limits, current_limit_ranges
+    ):
         i = 0
         for ssc in self._sessions_sites_channels:
             ssc.cs_force_voltage_symmetric_limits(
@@ -800,7 +808,9 @@ class _NIDCPowerTSM:
         current_level_ranges = self._expand_to_requested_array_size(current_level_range, size)
         voltage_limits = self._expand_to_requested_array_size(voltage_limit, size)
         voltage_limit_ranges = self._expand_to_requested_array_size(voltage_limit_range, size)
-        self._force_current_symmetric_limits_array(current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges)
+        self._force_current_symmetric_limits_array(
+            current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges
+        )
 
     def _force_voltage_asymmetric_limits(
         self,
@@ -834,7 +844,9 @@ class _NIDCPowerTSM:
         voltage_level_ranges = self._expand_to_requested_array_size(voltage_level_range, size)
         current_limits = self._expand_to_requested_array_size(current_limit, size)
         current_limit_ranges = self._expand_to_requested_array_size(current_limit_range, size)
-        self._force_voltage_symmetric_limits_array(voltage_levels, voltage_level_ranges, current_limits, current_limit_ranges)
+        self._force_voltage_symmetric_limits_array(
+            voltage_levels, voltage_level_ranges, current_limits, current_limit_ranges
+        )
 
     def abort(self):
         for ssc in self._sessions_sites_channels:
@@ -1117,7 +1129,9 @@ class _NIDCPowerTSM:
         current_level_ranges = self._expand_array_to_sessions(current_level_range)
         voltage_limits = self._expand_array_to_sessions(voltage_limit)
         voltage_limit_ranges = self._expand_array_to_sessions(voltage_limit_range)
-        self._force_current_symmetric_limits_array(current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges)
+        self._force_current_symmetric_limits_array(
+            current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges
+        )
 
     def force_voltage_asymmetric_limits(
         self,
@@ -1147,7 +1161,9 @@ class _NIDCPowerTSM:
         voltage_level_ranges = self._expand_array_to_sessions(voltage_level_range)
         current_limits = self._expand_array_to_sessions(current_limit)
         current_limit_ranges = self._expand_array_to_sessions(current_limit_range)
-        self._force_voltage_symmetric_limits_array(voltage_levels, voltage_level_ranges, current_limits, current_limit_ranges)
+        self._force_voltage_symmetric_limits_array(
+            voltage_levels, voltage_level_ranges, current_limits, current_limit_ranges
+        )
 
     def measure(self, measurement_mode=MeasurementMode.AUTO):
         fetch_or_measure_array = []
@@ -1266,7 +1282,9 @@ def pins_to_sessions(
             pins_info.append(a)
     _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, site_numbers)
 
-    sscs = [_NIDCPowerSSC(session, channel, pin_list) for session, channel, pin_list in zip(sessions, channels, pin_lists)]
+    sscs = [
+        _NIDCPowerSSC(session, channel, pin_list) for session, channel, pin_list in zip(sessions, channels, pin_lists)
+    ]
     dc_power_tsm = _NIDCPowerTSM(sscs)
     return TSMDCPower(pin_query_context, dc_power_tsm, site_numbers, pins_info, pins_expanded)
 
