@@ -229,15 +229,11 @@ class _NIDCPowerSSC:
         self._channels_session.aperture_time(aperture_time, aperture_time_units)
         self._channels_session.initiate()
 
-    def cs_configure_aperture_time(
-        self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS
-    ):
+    def cs_configure_aperture_time(self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS):
         return self._channels_session.configure_aperture_time(aperture_time, aperture_time_units)
 
     def cs_configure_power_line_frequency(self, power_line_frequency=60.0):
-        self.power_line_frequency = (
-            power_line_frequency  # Todo - confirm global replaced with object attributes.
-        )
+        self.power_line_frequency = power_line_frequency
         self._channels_session.power_line_frequency = power_line_frequency
 
     def cs_configure_sense(self, sense=enums.Sense.LOCAL):
@@ -371,9 +367,7 @@ class _NIDCPowerSSC:
         if v_value == 0.0:
             v_value = max(abs(voltage_limit_high), abs(voltage_limit_low))
         self._channels_session.voltage_limit_range = v_value
-        self._channels_session.compliance_limit_symmetry = (
-            nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
-        )  # Todo method?
+        self._channels_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
 
     def configure_single_point_force_dc_current_symmetric_limits(
         self, current_level=0.0, current_level_range=0.0, voltage_limit=0.0, voltage_limit_range=0.0
@@ -390,9 +384,7 @@ class _NIDCPowerSSC:
         if v_value == 0.0:
             v_value = abs(voltage_limit)
         self._channels_session.voltage_limit_range = v_value
-        self._channels_session.compliance_limit_symmetry = (
-            nidcpower.ComplianceLimitSymmetry.SYMMETRIC
-        )  # Todo method?
+        self._channels_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.SYMMETRIC
 
     def cs_configure_voltage_limit_range(self, voltage_limit_range=0.0):
         self._channels_session.voltage_limit_range = voltage_limit_range
@@ -471,9 +463,7 @@ class _NIDCPowerSSC:
         if c_value == 0.0:
             c_value = abs(current_limit)
         self._channels_session.current_limit_range = c_value
-        self._channels_session.compliance_limit_symmetry = (
-            nidcpower.ComplianceLimitSymmetry.SYMMETRIC
-        )  # Todo method?
+        self._channels_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.SYMMETRIC
 
     def cs_configure_voltage_level_range(self, voltage_level_range=0.0):
         self._channels_session.voltage_level_range = voltage_level_range
@@ -508,9 +498,7 @@ class _NIDCPowerSSC:
         )
         self._channels_session.commit()
 
-    def cs_configure_source_adapt(
-        self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse
-    ):
+    def cs_configure_source_adapt(self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse):
         self._channels_session.transient_response = enums.TransientResponse.CUSTOM
         self._channels_session.voltage_gain_bandwidth = voltage_ctr.gain_bandwidth
         self._channels_session.voltage_compensation_frequency = voltage_ctr.compensation_frequency
@@ -602,9 +590,7 @@ class _NIDCPowerSSC:
         self._channels_session.measure_when = nidcpower.MeasureWhen.ON_MEASURE_TRIGGER
         self._channels_session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
         self._channels_session.commit()
-        num_samples = int(
-            math.ceil(buffer_length / self._channels_session.measure_record_delta_time.total_seconds())
-        )
+        num_samples = int(math.ceil(buffer_length / self._channels_session.measure_record_delta_time.total_seconds()))
         # coerce num_samples to be between 1 and max value of I32 (2147483647)
         if num_samples < 1:
             num_samples = 1
@@ -710,9 +696,7 @@ class _NIDCPowerTSM:
             aperture_time_units,
             transient_responses,
         ):
-            ssc.cs_configure_settings(
-                aperture_time, source_delay, sense, aperture_time_unit, transient_response
-            )
+            ssc.cs_configure_settings(aperture_time, source_delay, sense, aperture_time_unit, transient_response)
 
     def _force_current_asymmetric_limits_array(
         self,
@@ -816,9 +800,7 @@ class _NIDCPowerTSM:
             voltage_limit_ranges,
         )
 
-    def _force_current_symmetric_limits(
-        self, current_level, current_level_range, voltage_limit, voltage_limit_range
-    ):
+    def _force_current_symmetric_limits(self, current_level, current_level_range, voltage_limit, voltage_limit_range):
         size = 0
         for _ in self._sessions_sites_channels:
             size += 1
@@ -854,9 +836,7 @@ class _NIDCPowerTSM:
             current_limit_ranges,
         )
 
-    def _force_voltage_symmetric_limits(
-        self, voltage_level, voltage_level_range, current_limit, current_limit_range
-    ):
+    def _force_voltage_symmetric_limits(self, voltage_level, voltage_level_range, current_limit, current_limit_range):
         size = 0
         for _ in self._sessions_sites_channels:
             size += 1
@@ -993,9 +973,7 @@ class _NIDCPowerTSM:
             ssc.cs_send_software_edge_trigger(trigger_to_send)
 
     def finish_waveform_acquisition(self, settings, fetch_waveform_length_s=0.0):
-        voltage_waveforms, current_waveforms = self.fetch_waveform(
-            settings["start_time"], fetch_waveform_length_s
-        )
+        voltage_waveforms, current_waveforms = self.fetch_waveform(settings["start_time"], fetch_waveform_length_s)
         self.abort()
         self.set_measurement_settings(settings["previous_settings"])
         self.initiate()
@@ -1065,9 +1043,7 @@ class _NIDCPowerTSM:
         aperture_times = self._expand_array_to_sessions(aperture_time)
         source_delays = self._expand_array_to_sessions(source_delay)
         senses = self._expand_array_to_sessions(sense)
-        self._configure_settings_array(
-            aperture_times, source_delays, senses, aperture_time_units, transient_responses
-        )
+        self._configure_settings_array(aperture_times, source_delays, senses, aperture_time_units, transient_responses)
 
     def configure_current_level_range(self, current_level_range=0.0):
         for ssc in self._sessions_sites_channels:
@@ -1148,9 +1124,7 @@ class _NIDCPowerTSM:
             voltage_limit_ranges,
         )
 
-    def force_current_symmetric_limits(
-        self, current_level, current_level_range, voltage_limit, voltage_limit_range
-    ):
+    def force_current_symmetric_limits(self, current_level, current_level_range, voltage_limit, voltage_limit_range):
         current_levels = self._expand_array_to_sessions(current_level)
         current_level_ranges = self._expand_array_to_sessions(current_level_range)
         voltage_limits = self._expand_array_to_sessions(voltage_limit)
@@ -1205,9 +1179,7 @@ class _NIDCPowerTSM:
             i += 1
         return voltages, currents
 
-    def configure_source_adapt(
-        self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse
-    ):
+    def configure_source_adapt(self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse):
         for ssc in self._sessions_sites_channels:
             ssc.cs_configure_source_adapt(voltage_ctr, current_ctr)
 
@@ -1308,13 +1280,10 @@ def pins_to_sessions(
             a = ni_dt_common.PinInformation  # create instance of class
             a.pin = pin
             pins_info.append(a)
-    _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(
-        pin_query_context, pins_expanded, site_numbers
-    )
+    _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, site_numbers)
 
     sscs = [
-        _NIDCPowerSSC(session, channel, pin_list)
-        for session, channel, pin_list in zip(sessions, channels, pin_lists)
+        _NIDCPowerSSC(session, channel, pin_list) for session, channel, pin_list in zip(sessions, channels, pin_lists)
     ]
     dc_power_tsm = _NIDCPowerTSM(sscs)
     return TSMDCPower(pin_query_context, dc_power_tsm, site_numbers, pins_info, pins_expanded)

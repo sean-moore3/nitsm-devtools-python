@@ -424,9 +424,7 @@ def configure_vertical(
     enabled: bool = True,
 ):
     for ssc in tsm.ssc:
-        ssc.session.channels[ssc.channels].configure_vertical(
-            range, coupling, offset, probe_attenuation, enabled
-        )
+        ssc.session.channels[ssc.channels].configure_vertical(range, coupling, offset, probe_attenuation, enabled)
     return tsm
 
 
@@ -469,9 +467,7 @@ def configure_vertical_per_channel(
     ranges = _expand_to_requested_array_size(vertical_range, size)
     offsets = _expand_to_requested_array_size(offset, size)
     enabled_out = _expand_to_requested_array_size(channel_enabled, size)
-    _ssc_configure_vertical_per_channel_arrays(
-        ssc_per_channel, ranges, couplings, offsets, probe_drops, enabled_out
-    )
+    _ssc_configure_vertical_per_channel_arrays(ssc_per_channel, ranges, couplings, offsets, probe_drops, enabled_out)
     return tsm
 
 
@@ -658,9 +654,7 @@ def tsm_ssc_scope_export_analog_edge_start_trigger(
             ssc.session.commit()
             start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
         else:
-            ssc.session.configure_trigger_digital(
-                start_trigger, niscope.TriggerSlope.POSITIVE, holdoff=0.0, delay=0.0
-            )
+            ssc.session.configure_trigger_digital(start_trigger, niscope.TriggerSlope.POSITIVE, holdoff=0.0, delay=0.0)
             ssc.session.initiate()
     return tsm, start_trigger
 
@@ -694,9 +688,7 @@ def scope_fetch_waveform(
     waveforms: typing.Any = []
     waveform_info: typing.List[niscope.WaveformInfo] = []
     for ssc in tsm.ssc:
-        channels, pins, sites = _channel_list_to_pins(
-            ssc.channel_list
-        )  # Unused no waveform attribute in python
+        channels, pins, sites = _channel_list_to_pins(ssc.channel_list)  # Unused no waveform attribute in python
         waveform = ssc.session.channels[ssc.channels].fetch(
             meas_num_samples, relative_to=niscope.FetchRelativeTo.PRETRIGGER
         )
@@ -713,9 +705,7 @@ def scope_fetch_multirecord_waveform(
     waveforms: typing.Any = []
     waveform_info: typing.List[niscope.WaveformInfo] = []
     for ssc in tsm.ssc:
-        channels, pins, sites = _channel_list_to_pins(
-            ssc.channel_list
-        )  # Unused no waveform attribute in python
+        channels, pins, sites = _channel_list_to_pins(ssc.channel_list)  # Unused no waveform attribute in python
         ssc.session._fetch_num_records = num_records
         waveform = ssc.session.channels[ssc.channels].fetch(-1, relative_to=niscope.FetchRelativeTo.PRETRIGGER)
         waveform_info.append(waveform)
@@ -734,9 +724,7 @@ def scope_measure_statistics(
             clearable_measurement_function=niscope.ClearableMeasurement.ALL_MEASUREMENTS
         )
         ssc.session.initiate()
-        measurement_stats.append(
-            ssc.session.channels[ssc.channels].fetch_measurement_stats(scalar_meas_function)
-        )
+        measurement_stats.append(ssc.session.channels[ssc.channels].fetch_measurement_stats(scalar_meas_function))
     return tsm, measurement_stats
 
 

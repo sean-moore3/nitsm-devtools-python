@@ -139,9 +139,7 @@ def expand_pin_groups_and_identify_pin_types(tsm_context: SemiconductorModuleCon
             for a_pin in temp_exp_pins:
                 index_a = pins_temp.index(a_pin)
                 a_pin_type = pin_types_temp[index_a]
-                pin_expanded = ExpandedPinInformation(
-                    a_pin, a_pin_type, i
-                )  # Found bug here due to class & fixed it.
+                pin_expanded = ExpandedPinInformation(a_pin, a_pin_type, i)  # Found bug here due to class & fixed it.
                 pins_expanded.append(pin_expanded)
         pin_info = PinInformation(d_pin, d_pin_type, count)
         pins_info.append(pin_info)
