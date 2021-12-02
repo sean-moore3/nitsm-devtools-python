@@ -139,7 +139,9 @@ def expand_pin_groups_and_identify_pin_types(tsm_context: SemiconductorModuleCon
             for a_pin in temp_exp_pins:
                 index_a = pins_temp.index(a_pin)
                 a_pin_type = pin_types_temp[index_a]
-                pin_expanded = ExpandedPinInformation(a_pin, a_pin_type, i)  # Found bug here due to class & fixed it.
+                pin_expanded = ExpandedPinInformation(
+                    a_pin, a_pin_type, i
+                )  # Found bug here due to class & fixed it.
                 pins_expanded.append(pin_expanded)
         pin_info = PinInformation(d_pin, d_pin_type, count)
         pins_info.append(pin_info)
@@ -229,9 +231,7 @@ def pin_query_context_to_channel_list(
             else:
                 if data[channel_group_index][channel_index]:
                     temp = data[channel_group_index][channel_index].split("/")
-                    data[channel_group_index][channel_index] = (
-                        temp[0] + "+" + str(site_number) + "/" + temp[1]
-                    )
+                    data[channel_group_index][channel_index] = temp[0] + "+" + str(site_number) + "/" + temp[1]
                 else:
                     data[channel_group_index][channel_index] = "Site" + str(site_number) + "/" + pin
     per_session_pin_list = []

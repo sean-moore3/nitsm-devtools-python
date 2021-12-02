@@ -32,9 +32,9 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     else:
         options = {}  # empty dict options to run on real hardware.
 
-    scope.tsm_scope_initialize_sessions(standalone_tsm_context, options=options)
+    scope.tsm_initialize_sessions(standalone_tsm_context, options=options)
     yield standalone_tsm_context
-    scope.tsm_scope_close_sessions(standalone_tsm_context)
+    scope.tsm_close_sessions(standalone_tsm_context)
 
 
 @pytest.fixture
@@ -71,53 +71,86 @@ class TestNIScope:
         for tsm_scope in scope_tsm_s:
             scope.configure_impedance(tsm_scope, 0.5)
             scope.configure_reference_level(tsm_scope)
-            scope.configure_vertical(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
-            scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
-            scope.configure_vertical_per_channel(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
+            scope.configure_vertical(tsm_scope, 5.0, niscope.VerticalCoupling.DC, 0.0, 1.0, True)
+            scope.configure(
+                tsm_scope,
+                5.0,
+                1.0,
+                0.0,
+                niscope.VerticalCoupling.DC,
+                10e6,
+                1000,
+                0.0,
+                0.0,
+                1e6,
+                1,
+                True,
+            )
+            scope.configure_vertical_per_channel(tsm_scope, 5.0, 0.0, 1.0, niscope.VerticalCoupling.DC, True)
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
 
-
-    def subroutine_init_commit_abort(self, tsm_scope):
+    @staticmethod
+    def subroutine_init_commit_abort(tsm_scope):
         scope.initiate(tsm_scope)
         scope.commit(tsm_scope)
         scope.abort(tsm_scope)
 
-
-    def test_all_scope_apis(self,scope_tsm_s):
+    def test_all_scope_apis(self, scope_tsm_s):
         for tsm_scope in scope_tsm_s:
             scope.configure_impedance(tsm_scope, 0.5)
             scope.configure_reference_level(tsm_scope)
-            scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
+            scope.configure(
+                tsm_scope,
+                5.0,
+                1.0,
+                0.0,
+                niscope.VerticalCoupling.DC,
+                10e6,
+                1000,
+                0.0,
+                0.0,
+                1e6,
+                1,
+                True,
+            )
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
             self.subroutine_init_commit_abort(tsm_scope)
-            scope.scope_configure_digital_edge_trigger(tsm_scope, "/OSC1/PXI_Trig0", niscope.TriggerSlope.POSITIVE)
-            scope.scope_configure_trigger(tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
+            scope.scope_configure_digital_edge_trigger(
+                tsm_scope, "/OSC1/PXI_Trig0", niscope.TriggerSlope.POSITIVE
+            )
+            scope.scope_configure_trigger(
+                tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE
+            )
             scope.tsm_ssc_scope_clear_triggers(tsm_scope)
             scope.tsm_ssc_scope_export_start_triggers(tsm_scope, "/OSC1/PXI_Trig1")
             scope.tsm_ssc_scope_start_acquisition(tsm_scope)
-            _, props=scope.scope_get_session_properties(tsm_scope)
-            print("\n",props)
-            _, measurement1=scope.scope_fetch_measurement(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
+            _, props = scope.scope_get_session_properties(tsm_scope)
+            print("\n", props)
+            _, measurement1 = scope.scope_fetch_measurement(
+                tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
+            )
             print(measurement1)
-            _, measurement2=scope.scope_measure_statistics(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
+            _, measurement2 = scope.scope_measure_statistics(
+                tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
+            )
             print(measurement2)
             scope.ssc_scope_fetch_clear_stats(tsm_scope.ssc)
-            _, data3=scope.tsm_ssc_scope_fetch_meas_stats_per_channel(tsm_scope,
-                                                                     niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
+            _, data3 = scope.tsm_ssc_scope_fetch_meas_stats_per_channel(
+                tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
+            )
             print(data3)
             _, data1, data2 = scope.scope_fetch_waveform(tsm_scope, 1)
-            print(data1, data2,"\n")
+            print(data1, data2, "\n")
 
-
-    def test_multirecord_waveform_fetch(self,scope_tsm_s):
+    def test_multirecord_waveform_fetch(self, scope_tsm_s):
         for tsm_scope in scope_tsm_s:
-            scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
+            # scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
+            scope.configure_vertical(tsm_scope, 5.0, niscope.VerticalCoupling.DC, 0.0, 1.0, True)
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
-            scope.tsm_ssc_scope_start_acquisition(tsm_scope)
+            # scope.tsm_ssc_scope_start_acquisition(tsm_scope)
+            scope.initiate(tsm_scope)
             _, data1, data2 = scope.scope_fetch_multirecord_waveform(tsm_scope, 1)
-            print(data1, data2,"\n")
-
-
+            print(data1, data2, "\n")
 
 
 class SSCScope(typing.NamedTuple):
@@ -139,7 +172,7 @@ class TSMScope(typing.NamedTuple):
 
 @nitsm.codemoduleapi.code_module
 def open_sessions(tsm_context: SemiconductorModuleContext):
-    scope.tsm_scope_initialize_sessions(tsm_context, OPTIONS)
+    scope.tsm_initialize_sessions(tsm_context, OPTIONS)
 
 
 @nitsm.codemoduleapi.code_module
@@ -160,9 +193,9 @@ def configure(
     tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
     scope.configure_impedance(tsm_scope, 0.5)
     scope.configure_reference_level(tsm_scope)
-    scope.configure_vertical(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
+    scope.configure_vertical(tsm_scope, 5.0, niscope.VerticalCoupling.DC, 0.0, 1.0, True)
     scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
-    scope.configure_vertical_per_channel(tsm_scope, 5.0, 0.0, niscope.VerticalCoupling.DC, 1.0, True)
+    scope.configure_vertical_per_channel(tsm_scope, 5.0, 0.0, 1.0, niscope.VerticalCoupling.DC, True)
     scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
 
 
@@ -207,9 +240,7 @@ def trigger(
     scope.scope_configure_digital_edge_trigger(
         tsm_scope, scope.TRIGGER_SOURCE.RTSI0, niscope.TriggerSlope.POSITIVE
     )
-    scope.scope_configure_trigger(
-        tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE
-    )
+    scope.scope_configure_trigger(tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
     scope.tsm_ssc_scope_clear_triggers(tsm_scope)
     scope.tsm_ssc_scope_export_start_triggers(tsm_scope, scope.OUTPUT_TERMINAL.NONE)
     scope.tsm_ssc_scope_start_acquisition(tsm_scope)
@@ -252,9 +283,7 @@ def fetch_measurement_stats_per_channel(
     site_numbers: typing.List[int],
 ):
     tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
-    scope.tsm_ssc_scope_fetch_meas_stats_per_channel(
-        tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT
-    )
+    scope.tsm_ssc_scope_fetch_meas_stats_per_channel(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
 @nitsm.codemoduleapi.code_module
@@ -270,4 +299,4 @@ def fetch_waveform(
 
 @nitsm.codemoduleapi.code_module
 def close_sessions(tsm_context: SemiconductorModuleContext):
-    scope.tsm_scope_close_sessions(tsm_context)
+    scope.tsm_close_sessions(tsm_context)

@@ -36,9 +36,7 @@ def dcpower_tsm_s(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data"""
     dcpower_tsms = []
     for test_pin in test_pin_s:
-        dcpower_tsms.append(
-            ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True)
-        )
+        dcpower_tsms.append(ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True))
     return dcpower_tsms
 
 

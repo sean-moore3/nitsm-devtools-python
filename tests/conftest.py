@@ -119,9 +119,7 @@ def published_data_reader(_published_data_reader_factory):
 
 
 data_dir = os.path.join(os.path.dirname(__file__), "Data")
-specification1 = os.path.join(
-    os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs"
-)
+specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs")
 specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
 level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
 timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C_Timing.digitiming")

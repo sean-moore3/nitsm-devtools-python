@@ -81,12 +81,35 @@ class OutputTerminal(typing.NamedTuple):
     AUX0_PFI7: str
 
 
-OUTPUT_TERMINAL = OutputTerminal("VAL_NO_SOURCE", "VAL_RTSI_0", "VAL_RTSI_1", "VAL_RTSI_2", "VAL_RTSI_3",
-                                 "VAL_RTSI_4", "VAL_RTSI_5", "VAL_RTSI_6", "VAL_RTSI_7", "VAL_PXI_STAR", "VAL_PFI_0",
-                                 "VAL_PFI_1", "VAL_PFI_2", "VAL_PFI_3", "VAL_PFI_4", "VAL_PFI_5", "VAL_PFI_6",
-                                 "VAL_PFI_7", "VAL_CLK_OUT", "VAL_AUX_0_PFI_0", "VAL_AUX_0_PFI_1", "VAL_AUX_0_PFI_2",
-                                 "VAL_AUX_0_PFI_3", "VAL_AUX_0_PFI_4", "VAL_AUX_0_PFI_5", "VAL_AUX_0_PFI_6",
-                                 "VAL_AUX_0_PFI_7")
+OUTPUT_TERMINAL = OutputTerminal(
+    "VAL_NO_SOURCE",
+    "VAL_RTSI_0",
+    "VAL_RTSI_1",
+    "VAL_RTSI_2",
+    "VAL_RTSI_3",
+    "VAL_RTSI_4",
+    "VAL_RTSI_5",
+    "VAL_RTSI_6",
+    "VAL_RTSI_7",
+    "VAL_PXI_STAR",
+    "VAL_PFI_0",
+    "VAL_PFI_1",
+    "VAL_PFI_2",
+    "VAL_PFI_3",
+    "VAL_PFI_4",
+    "VAL_PFI_5",
+    "VAL_PFI_6",
+    "VAL_PFI_7",
+    "VAL_CLK_OUT",
+    "VAL_AUX_0_PFI_0",
+    "VAL_AUX_0_PFI_1",
+    "VAL_AUX_0_PFI_2",
+    "VAL_AUX_0_PFI_3",
+    "VAL_AUX_0_PFI_4",
+    "VAL_AUX_0_PFI_5",
+    "VAL_AUX_0_PFI_6",
+    "VAL_AUX_0_PFI_7",
+)
 
 
 class TriggerSource(typing.NamedTuple):
@@ -116,11 +139,32 @@ class TriggerSource(typing.NamedTuple):
     AUX0_PFI7: str
 
 
-TRIGGER_SOURCE = TriggerSource("VAL_RTSI_0", "VAL_RTSI_1", "VAL_RTSI_2", "VAL_RTSI_3", "VAL_RTSI_4", "VAL_RTSI_5",
-                               "VAL_RTSI_6", "VAL_PFI_0", "VAL_PFI_1", "VAL_PFI_2", "VAL_PFI_3", "VAL_PFI_4",
-                               "VAL_PFI_5", "VAL_PFI_6", "VAL_PFI_7", "VAL_PXI_STAR", "VAL_AUX_0_PFI_0",
-                               "VAL_AUX_0_PFI_1", "VAL_AUX_0_PFI_2", "VAL_AUX_0_PFI_3", "VAL_AUX_0_PFI_4",
-                               "VAL_AUX_0_PFI_5", "VAL_AUX_0_PFI_6", "VAL_AUX_0_PFI_7")
+TRIGGER_SOURCE = TriggerSource(
+    "VAL_RTSI_0",
+    "VAL_RTSI_1",
+    "VAL_RTSI_2",
+    "VAL_RTSI_3",
+    "VAL_RTSI_4",
+    "VAL_RTSI_5",
+    "VAL_RTSI_6",
+    "VAL_PFI_0",
+    "VAL_PFI_1",
+    "VAL_PFI_2",
+    "VAL_PFI_3",
+    "VAL_PFI_4",
+    "VAL_PFI_5",
+    "VAL_PFI_6",
+    "VAL_PFI_7",
+    "VAL_PXI_STAR",
+    "VAL_AUX_0_PFI_0",
+    "VAL_AUX_0_PFI_1",
+    "VAL_AUX_0_PFI_2",
+    "VAL_AUX_0_PFI_3",
+    "VAL_AUX_0_PFI_4",
+    "VAL_AUX_0_PFI_5",
+    "VAL_AUX_0_PFI_6",
+    "VAL_AUX_0_PFI_7",
+)
 
 
 # Scope Sub routines
@@ -135,48 +179,28 @@ def _expand_ssc_to_ssc_per_channel(ssc: typing.List[SSCScope]):
     ]
 
 
-def _ssc_scope_configure_vertical_per_channel_arrays(
-    ssc: typing.List[SSCScope],
-    vertical_ranges: typing.List[float],
-    vertical_offsets: typing.List[float],
-    vertical_couplings: typing.List[niscope.VerticalCoupling],
-    probes_attenuation: typing.List[float],
-    channels_enabled: typing.List[bool],
+def _ssc_configure_vertical_per_channel_arrays(
+    ssc_s: typing.List[SSCScope],
+    ranges: typing.List[float],
+    couplings: typing.List[niscope.VerticalCoupling],
+    offsets: typing.List[float],
+    probes_drop: typing.List[float],
+    enabled_s: typing.List[bool],
 ):
-    for (
-        scope_ssc,
-        vertical_range,
-        vertical_offset,
-        vertical_coupling,
-        probe_attenuation,
-        channel_enabled,
-    ) in zip(
-        ssc,
-        vertical_ranges,
-        vertical_offsets,
-        vertical_couplings,
-        probes_attenuation,
-        channels_enabled,
+    for (ssc, v_range, coupling, offset, probe_drop, enabled) in zip(
+        ssc_s, ranges, couplings, offsets, probes_drop, enabled_s
     ):
-        scope_ssc.session.channels[scope_ssc.channels].configure_vertical(
-            vertical_range,
-            vertical_coupling,
-            vertical_offset,
-            probe_attenuation,
-            channel_enabled,
-        )
+        ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, probe_drop, enabled)
 
 
-def _ssc_scope_fetch_measurement_stats_arrays(
+def _ssc_fetch_measurement_stats_arrays(
     ssc: typing.List[SSCScope],
     scalar_measurements: typing.List[niscope.ScalarMeasurement],
 ):
     stats: typing.List[niscope.MeasurementStats] = []
     for scope_ssc, scalar_meas_function in zip(ssc, scalar_measurements):
         stats.append(
-            scope_ssc.session.channels[scope_ssc.channels].fetch_measurement_stats(
-                scalar_meas_function
-            )
+            scope_ssc.session.channels[scope_ssc.channels].fetch_measurement_stats(scalar_meas_function)
         )  # function with unknown type
     return stats
 
@@ -197,9 +221,9 @@ def _ssc_scope_obtain_trigger_path(tsm: TSMScope, trigger_source: str, setup_typ
 
 # TSM Pin Abstraction Sub routines
 def _pin_query_context_to_channel_list(
-        pin_query_context: PinQueryContext,
-        expanded_pins_information: typing.List[ExpandedPinInformation],
-        site_numbers: typing.List[int]
+    pin_query_context: PinQueryContext,
+    expanded_pins_information: typing.List[ExpandedPinInformation],
+    site_numbers: typing.List[int],
 ):
     tsm_context = pin_query_context._tsm_context
     pins_array_for_session_input: typing.List[PinsCluster] = []
@@ -243,21 +267,12 @@ def _pin_query_context_to_channel_list(
         for expanded_pin_information in expanded_pins_information:
             pin_names_return.append(expanded_pin_information.Pin)
             pin_types_return.append(expanded_pin_information.Type)
-    for (
-        per_site_transposed_channel_group_indices,
-        per_site_transposed_channel_indices,
-        site_number,
-    ) in zip(
+    for (per_site_transposed_channel_group_indices, per_site_transposed_channel_indices, site_number,) in zip(
         numpy.transpose(channel_group_indices),
         numpy.transpose(channel_indices),
         site_numbers_out,
     ):
-        for (
-            per_pin_transposed_channel_group_index,
-            per_pin_transposed_channel_index,
-            pin,
-            pin_type,
-        ) in zip(
+        for (per_pin_transposed_channel_group_index, per_pin_transposed_channel_index, pin, pin_type,) in zip(
             per_site_transposed_channel_group_indices,
             per_site_transposed_channel_indices,
             pin_names_return,
@@ -283,9 +298,7 @@ def _check_for_pin_group(
 ):
     pins_types, pin_group_found = _identify_pin_types(tsm_context, pins_or_pins_group)
     if pin_group_found:
-        pins: typing.Union[str, typing.Sequence[str]] = tsm_context.get_pins_in_pin_groups(
-            pins_or_pins_group
-        )
+        pins: typing.Union[str, typing.Sequence[str]] = tsm_context.get_pins_in_pin_groups(pins_or_pins_group)
         pins_types, _ = _identify_pin_types(tsm_context, pins)
     else:
         pins = pins_or_pins_group
@@ -379,9 +392,8 @@ def tsm_ssc_scope_pins_to_sessions(
     # site_numbers_out, channel_list_per_session = _pin_query_context_to_channel_list(
     #     pin_query_context, [], site_numbers)
     site_numbers_out, channel_list_per_session = ni_dt_common.pin_query_context_to_channel_list(
-        pin_query_context, [], site_numbers)
-
-
+        pin_query_context, [], site_numbers
+    )
     for session, channel, channel_list in zip(sessions, channels, channel_list_per_session):
         ssc.append(SSCScope(session=session, channels=channel, channel_list=channel_list))
     return TSMScope(pin_query_context, site_numbers_out, ssc)
@@ -405,19 +417,15 @@ def configure_reference_level(tsm: TSMScope, channel_based_mid_ref_level=50.0):
 
 def configure_vertical(
     tsm: TSMScope,
-    vertical_range: float,
-    vertical_offset: float,
-    vertical_coupling: niscope.VerticalCoupling,
-    probe_attenuation: float,
-    channel_enabled: bool,
+    range: float,
+    coupling: niscope.VerticalCoupling = niscope.VerticalCoupling.DC,
+    offset: float = 0.0,
+    probe_attenuation: float = 1.0,
+    enabled: bool = True,
 ):
     for ssc in tsm.ssc:
         ssc.session.channels[ssc.channels].configure_vertical(
-            vertical_range,
-            vertical_coupling,
-            vertical_offset,
-            probe_attenuation,
-            channel_enabled,
+            range, coupling, offset, probe_attenuation, enabled
         )
     return tsm
 
@@ -426,8 +434,8 @@ def configure(
     tsm: TSMScope,
     vertical_range: float = 5.0,
     probe_attenuation: float = 1.0,
-    vertical_offset: float = 0.0,
-    vertical_coupling: niscope.VerticalCoupling = niscope.VerticalCoupling.DC,
+    offset: float = 0.0,
+    coupling: niscope.VerticalCoupling = niscope.VerticalCoupling.DC,
     min_sample_rate: float = 10e6,
     min_record_length: int = 1000,
     ref_position: float = 0.0,
@@ -438,16 +446,10 @@ def configure(
 ):
     for ssc in tsm.ssc:
         channels = ssc.session.channels[ssc.channels]
-        channels.configure_vertical(
-            vertical_range, vertical_coupling, vertical_offset, probe_attenuation
-        )
+        channels.configure_vertical(vertical_range, coupling, offset, probe_attenuation)
         channels.configure_chan_characteristics(input_impedance, max_input_frequency)
         ssc.session.configure_horizontal_timing(
-            min_sample_rate,
-            min_record_length,
-            ref_position,
-            num_records,
-            enforce_realtime,
+            min_sample_rate, min_record_length, ref_position, num_records, enforce_realtime
         )
     return tsm
 
@@ -455,32 +457,20 @@ def configure(
 def configure_vertical_per_channel(
     tsm: TSMScope,
     vertical_range: float,
-    vertical_offset: float,
-    vertical_coupling: niscope.VerticalCoupling,
+    offset: float,
     probe_attenuation: float,
+    coupling: niscope.VerticalCoupling,
     channel_enabled: bool,
 ):
-    scope_ssc_per_channel = _expand_ssc_to_ssc_per_channel(tsm.ssc)
-    probe_attenuation_out = _expand_to_requested_array_size(
-        probe_attenuation, len(scope_ssc_per_channel)
-    )
-    vertical_coupling_out = _expand_to_requested_array_size(
-        vertical_coupling, len(scope_ssc_per_channel)
-    )
-    vertical_range_out = _expand_to_requested_array_size(vertical_range, len(scope_ssc_per_channel))
-    vertical_offset_out = _expand_to_requested_array_size(
-        vertical_offset, len(scope_ssc_per_channel)
-    )
-    channel_enabled_out = _expand_to_requested_array_size(
-        channel_enabled, len(scope_ssc_per_channel)
-    )
-    _ssc_scope_configure_vertical_per_channel_arrays(
-        scope_ssc_per_channel,
-        vertical_range_out,
-        vertical_offset_out,
-        vertical_coupling_out,
-        probe_attenuation_out,
-        channel_enabled_out,
+    ssc_per_channel = _expand_ssc_to_ssc_per_channel(tsm.ssc)
+    size = len(ssc_per_channel)
+    probe_drops = _expand_to_requested_array_size(probe_attenuation, size)
+    couplings = _expand_to_requested_array_size(coupling, size)
+    ranges = _expand_to_requested_array_size(vertical_range, size)
+    offsets = _expand_to_requested_array_size(offset, size)
+    enabled_out = _expand_to_requested_array_size(channel_enabled, size)
+    _ssc_configure_vertical_per_channel_arrays(
+        ssc_per_channel, ranges, couplings, offsets, probe_drops, enabled_out
     )
     return tsm
 
@@ -641,9 +631,13 @@ def tsm_ssc_scope_export_start_triggers(tsm: TSMScope, output_terminal: str):
     return tsm, start_trigger
 
 
-def tsm_ssc_scope_export_analog_edge_start_trigger(tsm: TSMScope, analog_trigger_pin_name: str, output_terminal: str,
-                                                   trigger_level: float = 0.0,
-                                                   trigger_slope=niscope.TriggerSlope.POSITIVE):
+def tsm_ssc_scope_export_analog_edge_start_trigger(
+    tsm: TSMScope,
+    analog_trigger_pin_name: str,
+    output_terminal: str,
+    trigger_level: float = 0.0,
+    trigger_slope=niscope.TriggerSlope.POSITIVE,
+):
     """Export Analog Edge Start Trigger.vi"""
     start_trigger: str = ""
     temp_channel_name: str = ""
@@ -657,14 +651,16 @@ def tsm_ssc_scope_export_analog_edge_start_trigger(tsm: TSMScope, analog_trigger
     tsm.ssc.insert(0, data)
     for ssc in tsm.ssc:
         if tsm.ssc.index(ssc) == 0:
-            ssc.session.configure_trigger_edge(temp_channel_name, trigger_level, niscope.TriggerCoupling.DC,
-                                               trigger_slope)
+            ssc.session.configure_trigger_edge(
+                temp_channel_name, trigger_level, niscope.TriggerCoupling.DC, trigger_slope
+            )
             ssc.session.exported_start_trigger_output_terminal = output_terminal
             ssc.session.commit()
             start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
         else:
-            ssc.session.configure_trigger_digital(start_trigger, niscope.TriggerSlope.POSITIVE, holdoff=0.0,
-                                                  delay=0.0)
+            ssc.session.configure_trigger_digital(
+                start_trigger, niscope.TriggerSlope.POSITIVE, holdoff=0.0, delay=0.0
+            )
             ssc.session.initiate()
     return tsm, start_trigger
 
@@ -721,9 +717,7 @@ def scope_fetch_multirecord_waveform(
             ssc.channel_list
         )  # Unused no waveform attribute in python
         ssc.session._fetch_num_records = num_records
-        waveform = ssc.session.channels[ssc.channels].fetch(
-            -1, relative_to=niscope.FetchRelativeTo.PRETRIGGER
-        )
+        waveform = ssc.session.channels[ssc.channels].fetch(-1, relative_to=niscope.FetchRelativeTo.PRETRIGGER)
         waveform_info.append(waveform)
         for wfm in waveform:
             waveforms.append(list(wfm.samples))  # waveform in memory view
@@ -759,18 +753,14 @@ def tsm_ssc_scope_fetch_meas_stats_per_channel(
     scalar_measurement: niscope.ScalarMeasurement,
 ):
     scope_ssc_per_channel = _expand_ssc_to_ssc_per_channel(tsm.ssc)
-    scalar_measurements = _expand_to_requested_array_size(
-        scalar_measurement, len(scope_ssc_per_channel)
-    )
-    measurement_stats = _ssc_scope_fetch_measurement_stats_arrays(
-        scope_ssc_per_channel, scalar_measurements
-    )
+    scalar_measurements = _expand_to_requested_array_size(scalar_measurement, len(scope_ssc_per_channel))
+    measurement_stats = _ssc_fetch_measurement_stats_arrays(scope_ssc_per_channel, scalar_measurements)
     return tsm, measurement_stats
 
 
 # Open session
 @nitsm.codemoduleapi.code_module
-def tsm_scope_initialize_sessions(tsm_context: SemiconductorModuleContext, options: dict = {}):
+def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: dict = {}):
     instrument_names = tsm_context.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
         session = niscope.Session(instrument_name, reset_device=True, options=options)
@@ -786,7 +776,7 @@ def tsm_scope_initialize_sessions(tsm_context: SemiconductorModuleContext, optio
 
 # Close session
 @nitsm.codemoduleapi.code_module
-def tsm_scope_close_sessions(tsm_context: SemiconductorModuleContext):
+def tsm_close_sessions(tsm_context: SemiconductorModuleContext):
     sessions = tsm_context.get_all_niscope_sessions()
     for session in sessions:
         session.reset()
