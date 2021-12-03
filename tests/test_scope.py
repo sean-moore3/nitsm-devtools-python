@@ -91,16 +91,16 @@ class TestNIScope:
             self.subroutine_init_commit_abort(tsm_scope)
             scope.scope_configure_digital_edge_trigger(tsm_scope, "/OSC1/PXI_Trig0", niscope.TriggerSlope.POSITIVE)
             scope.scope_configure_trigger(tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
-            scope.tsm_ssc_scope_clear_triggers(tsm_scope)
-            scope.tsm_ssc_scope_export_start_triggers(tsm_scope, "/OSC1/PXI_Trig1")
-            scope.tsm_ssc_scope_start_acquisition(tsm_scope)
+            scope.tsm_ssc_clear_triggers(tsm_scope)
+            scope.tsm_ssc_export_start_triggers(tsm_scope, "/OSC1/PXI_Trig1")
+            scope.tsm_ssc_start_acquisition(tsm_scope)
             _, props = scope.scope_get_session_properties(tsm_scope)
             print("\n", props)
             _, measurement1 = scope.scope_fetch_measurement(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
             print(measurement1)
             _, measurement2 = scope.scope_measure_statistics(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
             print(measurement2)
-            scope.ssc_scope_fetch_clear_stats(tsm_scope.ssc)
+            scope.ssc_fetch_clear_stats(tsm_scope.ssc)
             _, data3 = scope.tsm_ssc_fetch_meas_stats_per_channel(
                 tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
             )
@@ -113,7 +113,7 @@ class TestNIScope:
             # scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
             scope.configure_vertical(tsm_scope, 5.0, niscope.VerticalCoupling.DC, 0.0, 1.0, True)
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
-            # scope.tsm_ssc_scope_start_acquisition(tsm_scope)
+            # scope.tsm_ssc_start_acquisition(tsm_scope)
             scope.initiate(tsm_scope)
             _, data1, data2 = scope.scope_fetch_multirecord_waveform(tsm_scope, 1)
             print(data1, data2, "\n")
@@ -205,9 +205,9 @@ def trigger(
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
     scope.scope_configure_digital_edge_trigger(tsm_scope, scope.TRIGGER_SOURCE.RTSI0, niscope.TriggerSlope.POSITIVE)
     scope.scope_configure_trigger(tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
-    scope.tsm_ssc_scope_clear_triggers(tsm_scope)
-    scope.tsm_ssc_scope_export_start_triggers(tsm_scope, scope.OUTPUT_TERMINAL.NONE)
-    scope.tsm_ssc_scope_start_acquisition(tsm_scope)
+    scope.tsm_ssc_clear_triggers(tsm_scope)
+    scope.tsm_ssc_export_start_triggers(tsm_scope, scope.OUTPUT_TERMINAL.NONE)
+    scope.tsm_ssc_start_acquisition(tsm_scope)
 
 
 @nitsm.codemoduleapi.code_module
@@ -237,7 +237,7 @@ def clear_stats(
     site_numbers: typing.List[int],
 ):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
-    scope.ssc_scope_fetch_clear_stats(tsm_scope.ssc)
+    scope.ssc_fetch_clear_stats(tsm_scope.ssc)
 
 
 @nitsm.codemoduleapi.code_module

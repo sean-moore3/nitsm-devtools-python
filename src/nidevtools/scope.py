@@ -599,7 +599,7 @@ def scope_configure_trigger(
     return tsm
 
 
-def tsm_ssc_scope_clear_triggers(tsm: TSMScope):
+def tsm_ssc_clear_triggers(tsm: TSMScope):
     for ssc in tsm.ssc:
         ssc.session.abort()
         ssc.session.configure_trigger_immediate()
@@ -608,7 +608,7 @@ def tsm_ssc_scope_clear_triggers(tsm: TSMScope):
     return tsm
 
 
-def tsm_ssc_scope_export_start_triggers(tsm: TSMScope, output_terminal: str):
+def tsm_ssc_export_start_triggers(tsm: TSMScope, output_terminal: str):
     start_trigger: str = ""
     for ssc in tsm.ssc:
         if tsm.ssc.index(ssc) == 0:
@@ -627,7 +627,7 @@ def tsm_ssc_scope_export_start_triggers(tsm: TSMScope, output_terminal: str):
     return tsm, start_trigger
 
 
-def tsm_ssc_scope_export_analog_edge_start_trigger(
+def tsm_ssc_export_analog_edge_start_trigger(
     tsm: TSMScope,
     analog_trigger_pin_name: str,
     output_terminal: str,
@@ -659,7 +659,7 @@ def tsm_ssc_scope_export_analog_edge_start_trigger(
     return tsm, start_trigger
 
 
-def tsm_ssc_scope_start_acquisition(tsm: TSMScope):
+def tsm_ssc_start_acquisition(tsm: TSMScope):
     for ssc in reversed(tsm.ssc):
         ssc.session.abort()
         ssc.session.initiate()
@@ -728,7 +728,7 @@ def scope_measure_statistics(
     return tsm, measurement_stats
 
 
-def ssc_scope_fetch_clear_stats(ssc: typing.List[SSCScope]):
+def ssc_fetch_clear_stats(ssc: typing.List[SSCScope]):
     for scope_ssc in ssc:
         scope_ssc.session.channels[scope_ssc.channels].clear_waveform_measurement_stats(
             clearable_measurement_function=niscope.ClearableMeasurement.ALL_MEASUREMENTS
