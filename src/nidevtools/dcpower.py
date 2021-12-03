@@ -195,8 +195,8 @@ class _NIDCPowerSSC:
         self._channels_session = session.channels[channels]
         # To operate on session on very specific channel(s)
         self._ch_list = channels.split(",")  # channels in a list for internal operations
-        self.power_line_frequency = 60.0  # Todo confirm global replaced with object attributes.
-        self.measure_multiple_only = False  # Todo confirm global replaced with object attributes.
+        self.power_line_frequency = 60.0
+        self.measure_multiple_only = False
 
     @property
     def session(self):
@@ -327,16 +327,14 @@ class _NIDCPowerSSC:
     def cs_query_in_compliance(self):
         compliance_states = []
         for ch in self._ch_list:
-            comp = self.session.channels[ch].query_in_compliance()
-            # we have to access this info alone by one channel at a time.
+            comp = self.session.channels[ch].query_in_compliance() # access one channel at a time.
             compliance_states.append(comp)
         return compliance_states
 
     def cs_query_output_state(self, output_state: nidcpower.OutputStates):
         output_states = []
         for ch in self._ch_list:
-            state = self.session.channels[ch].query_output_state(output_state)
-            # we have to access this info alone by one channel at a time.
+            state = self.session.channels[ch].query_output_state(output_state) # access one channel at a time.
             output_states.append(state)
         return output_states
 

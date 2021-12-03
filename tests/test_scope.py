@@ -127,7 +127,7 @@ class SSCScope(typing.NamedTuple):
 
 class TSMScope(typing.NamedTuple):
     pin_query_context: typing.Any
-    site_numbers: typing.List[int]
+    sites: typing.List[int]
     ssc: typing.List[SSCScope]
 
 
@@ -145,18 +145,18 @@ def open_sessions(tsm_context: SemiconductorModuleContext):
 def pins_to_sessions(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    return scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    return scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
 
 
 @nitsm.codemoduleapi.code_module
 def configure(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.configure_impedance(tsm_scope, 0.5)
     scope.configure_reference_level(tsm_scope)
     scope.configure_vertical(tsm_scope, 5.0, niscope.VerticalCoupling.DC, 0.0, 1.0, True)
@@ -169,9 +169,9 @@ def configure(
 def acquisition(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.initiate(tsm_scope)
 
 
@@ -179,9 +179,9 @@ def acquisition(
 def control(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.commit(tsm_scope)
     scope.abort(tsm_scope)
 
@@ -190,9 +190,9 @@ def control(
 def session_properties(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.scope_get_session_properties(tsm_scope)
 
 
@@ -200,9 +200,9 @@ def session_properties(
 def trigger(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.scope_configure_digital_edge_trigger(tsm_scope, scope.TRIGGER_SOURCE.RTSI0, niscope.TriggerSlope.POSITIVE)
     scope.scope_configure_trigger(tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
     scope.tsm_ssc_clear_triggers(tsm_scope)
@@ -214,9 +214,9 @@ def trigger(
 def measure_results(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.scope_fetch_measurement(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
@@ -224,9 +224,9 @@ def measure_results(
 def measure_stats(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.scope_measure_statistics(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
@@ -234,9 +234,9 @@ def measure_stats(
 def clear_stats(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.ssc_fetch_clear_stats(tsm_scope.ssc)
 
 
@@ -244,9 +244,9 @@ def clear_stats(
 def fetch_measurement_stats_per_channel(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.tsm_ssc_fetch_meas_stats_per_channel(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
@@ -254,9 +254,9 @@ def fetch_measurement_stats_per_channel(
 def fetch_waveform(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     print(scope.scope_fetch_waveform(tsm_scope, 1))
     # print(scope.scope_fetch_multirecord_waveform(tsm_scope, 1))
 

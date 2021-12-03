@@ -168,13 +168,13 @@ TRIGGER_SOURCE = TriggerSource(
 
 
 # Scope Sub routines
-def _expand_ssc_to_ssc_per_channel(ssc: typing.List[SSCScope]):
+def _expand_ssc_to_ssc_per_channel(ssc_s: typing.List[SSCScope]):
     return [
-        SSCScope(scope_ssc.session, channel, channel_list)
-        for scope_ssc in ssc
+        SSCScope(ssc.session, channel, channel_list)
+        for ssc in ssc_s
         for channel, channel_list in zip(
-            re.split(r"\s*,\s*", scope_ssc.channels),
-            re.split(r"\s*,\s*", scope_ssc.channel_list),
+            re.split(r"\s*,\s*", ssc.channels),
+            re.split(r"\s*,\s*", ssc.channel_list),
         )
     ]
 
@@ -194,13 +194,13 @@ def _ssc_configure_vertical_per_channel_arrays(
 
 
 def _ssc_fetch_measurement_stats_arrays(
-    ssc: typing.List[SSCScope],
+    ssc_s: typing.List[SSCScope],
     scalar_measurements: typing.List[niscope.ScalarMeasurement],
 ):
     stats: typing.List[niscope.MeasurementStats] = []
-    for scope_ssc, scalar_meas_function in zip(ssc, scalar_measurements):
+    for ssc, scalar_meas_function in zip(ssc_s, scalar_measurements):
         stats.append(
-            scope_ssc.session.channels[scope_ssc.channels].fetch_measurement_stats(scalar_meas_function)
+            ssc.session.channels[ssc.channels].fetch_measurement_stats(scalar_meas_function)
         )  # function with unknown type
     return stats
 
@@ -223,7 +223,7 @@ def _ssc_obtain_trigger_path(tsm: TSMScope, trigger_source: str, setup_type: str
 def _pin_query_context_to_channel_list(
     pin_query_context: PinQueryContext,
     expanded_pins_information: typing.List[ExpandedPinInformation],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
     tsm_context = pin_query_context._tsm_context
     pins_array_for_session_input: typing.List[PinsCluster] = []
@@ -242,17 +242,17 @@ def _pin_query_context_to_channel_list(
         """
         initialized_pins: typing.List[str] = [""] * number_of_pins
         pins_array_for_session_input.append(PinsCluster(Pins=initialized_pins))
-    if len(site_numbers) == 0:
+    if len(sites) == 0:
         """
         Get site numbers if not provided
         """
         try:
-            site_numbers_out: typing.List[int] = list(tsm_context.site_numbers)
-            # print(site_numbers)  # Need to test this case after bug fix
+            sites_out: typing.List[int] = list(tsm_context.sites)
+            # print(sites)  # Need to test this case after bug fix
         except Exception:
-            site_numbers_out = []
+            sites_out = []
     else:
-        site_numbers_out = site_numbers
+        sites_out = sites
     if len(expanded_pins_information) == 0:
         """
         The list of pins from Pin Query Context Read Pins
@@ -270,7 +270,7 @@ def _pin_query_context_to_channel_list(
     for (per_site_transposed_channel_group_indices, per_site_transposed_channel_indices, site_number,) in zip(
         numpy.transpose(channel_group_indices),
         numpy.transpose(channel_indices),
-        site_numbers_out,
+        sites_out,
     ):
         for (per_pin_transposed_channel_group_index, per_pin_transposed_channel_index, pin, pin_type,) in zip(
             per_site_transposed_channel_group_indices,
@@ -289,7 +289,7 @@ def _pin_query_context_to_channel_list(
     for pins_array_for_session in pins_array_for_session_input:
         channel_list = ",".join(pins_array_for_session.Pins)
         channel_list_per_session += (channel_list,)
-    return site_numbers_out, channel_list_per_session
+    return sites_out, channel_list_per_session
 
 
 def _check_for_pin_group(
@@ -385,18 +385,18 @@ def _expand_to_requested_array_size(
 def tsm_ssc_pins_to_sessions(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
-    site_numbers: typing.List[int],
+    sites: typing.List[int],
 ):
-    ssc: typing.List[SSCScope] = []
+    ssc_s: typing.List[SSCScope] = []
     pin_query_context, sessions, channels = tsm_context.pins_to_niscope_sessions(pins)
-    # site_numbers_out, channel_list_per_session = _pin_query_context_to_channel_list(
-    #     pin_query_context, [], site_numbers)
-    site_numbers_out, channel_list_per_session = ni_dt_common.pin_query_context_to_channel_list(
-        pin_query_context, [], site_numbers
+    # sites_out, channel_list_per_session = _pin_query_context_to_channel_list(
+    #     pin_query_context, [], sites)
+    sites_out, channel_list_per_session = ni_dt_common.pin_query_context_to_channel_list(
+        pin_query_context, [], sites
     )
     for session, channel, channel_list in zip(sessions, channels, channel_list_per_session):
-        ssc.append(SSCScope(session=session, channels=channel, channel_list=channel_list))
-    return TSMScope(pin_query_context, site_numbers_out, ssc)
+        ssc_s.append(SSCScope(session=session, channels=channel, channel_list=channel_list))
+    return TSMScope(pin_query_context, sites_out, ssc_s)
 
 
 # Configure
@@ -728,27 +728,24 @@ def scope_measure_statistics(
     return tsm, measurement_stats
 
 
-def ssc_fetch_clear_stats(ssc: typing.List[SSCScope]):
-    for scope_ssc in ssc:
-        scope_ssc.session.channels[scope_ssc.channels].clear_waveform_measurement_stats(
+def ssc_fetch_clear_stats(ssc_s: typing.List[SSCScope]):
+    for ssc in ssc_s:
+        ssc.session.channels[ssc.channels].clear_waveform_measurement_stats(
             clearable_measurement_function=niscope.ClearableMeasurement.ALL_MEASUREMENTS
         )
-    return ssc
+    return ssc_s
 
 
-def tsm_ssc_fetch_meas_stats_per_channel(
-    tsm: TSMScope,
-    scalar_measurement: niscope.ScalarMeasurement,
-):
+def tsm_ssc_fetch_meas_stats_per_channel(tsm: TSMScope, scalar_measurement: niscope.ScalarMeasurement):
     ssc_per_channel = _expand_ssc_to_ssc_per_channel(tsm.ssc)
     scalar_measurements = _expand_to_requested_array_size(scalar_measurement, len(ssc_per_channel))
     measurement_stats = _ssc_fetch_measurement_stats_arrays(ssc_per_channel, scalar_measurements)
     return tsm, measurement_stats
 
 
-# Open session
 @nitsm.codemoduleapi.code_module
 def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: dict = {}):
+    """ Opens sessions for all instrument channels that are associated with the tsm context"""
     instrument_names = tsm_context.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
         session = niscope.Session(instrument_name, reset_device=True, options=options)
@@ -756,15 +753,14 @@ def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: di
             session.commit()
         except Exception:
             session.reset_device()
-        # session.channels[0, 1, 2, 3, 4, 5, 6, 7].configure_chan_characteristics(1e6, -1)
         session.configure_chan_characteristics(1e6, -1)
         session.commit()
         tsm_context.set_niscope_session(instrument_name, session)
 
 
-# Close session
 @nitsm.codemoduleapi.code_module
 def tsm_close_sessions(tsm_context: SemiconductorModuleContext):
+    """Closes the sessions associated with the tsm context"""
     sessions = tsm_context.get_all_niscope_sessions()
     for session in sessions:
         session.reset()
