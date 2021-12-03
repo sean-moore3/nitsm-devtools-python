@@ -205,7 +205,7 @@ def _ssc_fetch_measurement_stats_arrays(
     return stats
 
 
-def _ssc_scope_obtain_trigger_path(tsm: TSMScope, trigger_source: str, setup_type: str):
+def _ssc_obtain_trigger_path(tsm: TSMScope, trigger_source: str, setup_type: str):
     trigger_paths: typing.List[str] = []
     if setup_type == "STSM1":
         for ssc in tsm.ssc:
@@ -382,7 +382,7 @@ def _expand_to_requested_array_size(
 
 
 # Pinmap
-def tsm_ssc_scope_pins_to_sessions(
+def tsm_ssc_pins_to_sessions(
     tsm_context: SemiconductorModuleContext,
     pins: typing.List[str],
     site_numbers: typing.List[int],
@@ -736,13 +736,13 @@ def ssc_scope_fetch_clear_stats(ssc: typing.List[SSCScope]):
     return ssc
 
 
-def tsm_ssc_scope_fetch_meas_stats_per_channel(
+def tsm_ssc_fetch_meas_stats_per_channel(
     tsm: TSMScope,
     scalar_measurement: niscope.ScalarMeasurement,
 ):
-    scope_ssc_per_channel = _expand_ssc_to_ssc_per_channel(tsm.ssc)
-    scalar_measurements = _expand_to_requested_array_size(scalar_measurement, len(scope_ssc_per_channel))
-    measurement_stats = _ssc_fetch_measurement_stats_arrays(scope_ssc_per_channel, scalar_measurements)
+    ssc_per_channel = _expand_ssc_to_ssc_per_channel(tsm.ssc)
+    scalar_measurements = _expand_to_requested_array_size(scalar_measurement, len(ssc_per_channel))
+    measurement_stats = _ssc_fetch_measurement_stats_arrays(ssc_per_channel, scalar_measurements)
     return tsm, measurement_stats
 
 

@@ -44,7 +44,7 @@ def scope_tsm_s(tsm_context, test_pin_s):
     multiple pins in list of string format"""
     scope_tsms = []
     for test_pin in test_pin_s:
-        scope_tsms.append(scope.tsm_ssc_scope_pins_to_sessions(tsm_context, test_pin, []))
+        scope_tsms.append(scope.tsm_ssc_pins_to_sessions(tsm_context, test_pin, []))
     return scope_tsms
 
 
@@ -101,8 +101,9 @@ class TestNIScope:
             _, measurement2 = scope.scope_measure_statistics(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
             print(measurement2)
             scope.ssc_scope_fetch_clear_stats(tsm_scope.ssc)
-            _, data3 = scope.tsm_ssc_scope_fetch_meas_stats_per_channel(tsm_scope,
-                                                                        niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
+            _, data3 = scope.tsm_ssc_fetch_meas_stats_per_channel(
+                tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
+            )
             print(data3)
             _, data1, data2 = scope.scope_fetch_waveform(tsm_scope, 1)
             print(data1, data2, "\n")
@@ -146,7 +147,7 @@ def pins_to_sessions(
     pins: typing.List[str],
     site_numbers: typing.List[int],
 ):
-    return scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
+    return scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
 
 
 @nitsm.codemoduleapi.code_module
@@ -155,7 +156,7 @@ def configure(
     pins: typing.List[str],
     site_numbers: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
     scope.configure_impedance(tsm_scope, 0.5)
     scope.configure_reference_level(tsm_scope)
     scope.configure_vertical(tsm_scope, 5.0, niscope.VerticalCoupling.DC, 0.0, 1.0, True)
@@ -170,7 +171,7 @@ def acquisition(
     pins: typing.List[str],
     site_numbers: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
     scope.initiate(tsm_scope)
 
 
@@ -180,7 +181,7 @@ def control(
     pins: typing.List[str],
     site_numbers: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
     scope.commit(tsm_scope)
     scope.abort(tsm_scope)
 
@@ -191,7 +192,7 @@ def session_properties(
     pins: typing.List[str],
     site_numbers: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
     scope.scope_get_session_properties(tsm_scope)
 
 
@@ -201,7 +202,7 @@ def trigger(
     pins: typing.List[str],
     site_numbers: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
     scope.scope_configure_digital_edge_trigger(tsm_scope, scope.TRIGGER_SOURCE.RTSI0, niscope.TriggerSlope.POSITIVE)
     scope.scope_configure_trigger(tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
     scope.tsm_ssc_scope_clear_triggers(tsm_scope)
@@ -215,7 +216,7 @@ def measure_results(
     pins: typing.List[str],
     site_numbers: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
     scope.scope_fetch_measurement(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
@@ -225,7 +226,7 @@ def measure_stats(
     pins: typing.List[str],
     site_numbers: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
     scope.scope_measure_statistics(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
@@ -235,7 +236,7 @@ def clear_stats(
     pins: typing.List[str],
     site_numbers: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
     scope.ssc_scope_fetch_clear_stats(tsm_scope.ssc)
 
 
@@ -245,8 +246,8 @@ def fetch_measurement_stats_per_channel(
     pins: typing.List[str],
     site_numbers: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
-    scope.tsm_ssc_scope_fetch_meas_stats_per_channel(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
+    scope.tsm_ssc_fetch_meas_stats_per_channel(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
 @nitsm.codemoduleapi.code_module
@@ -255,7 +256,7 @@ def fetch_waveform(
     pins: typing.List[str],
     site_numbers: typing.List[int],
 ):
-    tsm_scope = scope.tsm_ssc_scope_pins_to_sessions(tsm_context, pins, site_numbers)
+    tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, site_numbers)
     print(scope.scope_fetch_waveform(tsm_scope, 1))
     # print(scope.scope_fetch_multirecord_waveform(tsm_scope, 1))
 
