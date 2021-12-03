@@ -101,9 +101,8 @@ class TestNIScope:
             _, measurement2 = scope.scope_measure_statistics(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
             print(measurement2)
             scope.ssc_scope_fetch_clear_stats(tsm_scope.ssc)
-            _, data3 = scope.tsm_ssc_scope_fetch_meas_stats_per_channel(
-                tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
-            )
+            _, data3 = scope.tsm_ssc_scope_fetch_meas_stats_per_channel(tsm_scope,
+                                                                        niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
             print(data3)
             _, data1, data2 = scope.scope_fetch_waveform(tsm_scope, 1)
             print(data1, data2, "\n")
