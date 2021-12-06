@@ -23,6 +23,7 @@ import nidevtools.dcpower as ni_dt_dcpower
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm_context=SemiconductorModuleContext):
     # ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
+
     ni_dt_dcpower.initialize_sessions(tsm_context)
     tsminfo = ni_dt_dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2", "DUTPin_IN_ANA1"])
     tsminfo[1].reset()
@@ -31,9 +32,11 @@ def initialize_sessions(tsm_context=SemiconductorModuleContext):
 
 @nitsm.codemoduleapi.code_module
 def configure_measurements(tsm_context=SemiconductorModuleContext):
+    ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
     tsminfo = ni_dt_dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2"])
     tsminfo.ssc.abort()
-    tsminfo.ssc.configure_settings(20e-3, 0.0, ni_dt_dcpower.enums.Sense.LOCAL)
+    tsminfo.ssc.configure_aperture_time_with_abort_and_initiate()
+    # tsminfo.ssc.configure_settings(20e-3, 0.0, ni_dt_dcpower.enums.Sense.LOCAL)
     # ap_time = tsminfo.ssc.get_aperture_times_in_seconds()
     # output_state = tsminfo.ssc.query_output_state
     # max_curr = tsminfo.ssc.get_max_current
@@ -94,5 +97,5 @@ def close_sessions(tsm_context: SemiconductorModuleContext, settings):
     tsminfo = ni_dt_dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2", "DUTPin_IN_ANA1"])
     tsminfo.ssc.abort()
     tsminfo.ssc.configure_output_connected(output_connected=True)
-    tsminfo.ssc.set_measurement_settings(settings)
+    # tsminfo.ssc.set_measurement_settings(settings)
     ni_dt_dcpower.close_sessions(tsm_context)

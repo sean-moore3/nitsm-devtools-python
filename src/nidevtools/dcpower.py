@@ -226,7 +226,8 @@ class _NIDCPowerSSC:
         self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS
     ):
         self._channels_session.abort()
-        self._channels_session.aperture_time(aperture_time, aperture_time_units)
+        self._channels_session.aperture_time = aperture_time
+        self._channels_session.aperture_time_units = aperture_time_units
         self._channels_session.initiate()
 
     def cs_configure_aperture_time(self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS):
