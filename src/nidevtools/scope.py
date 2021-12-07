@@ -512,7 +512,7 @@ def commit(tsm: TSMScope):
 
 
 # Session Properties
-def scope_get_session_properties(tsm: TSMScope):
+def get_session_properties(tsm: TSMScope):
     instrument_name: str
     voltage_range: float
     attenuation: float
@@ -561,7 +561,7 @@ def scope_get_session_properties(tsm: TSMScope):
 
 
 # Trigger
-def scope_configure_digital_edge_trigger(
+def configure_digital_edge_trigger(
     tsm: TSMScope,
     trigger_source: str,
     slope: niscope.TriggerSlope,
@@ -579,7 +579,7 @@ def scope_configure_digital_edge_trigger(
     return tsm
 
 
-def scope_configure_trigger(
+def configure_trigger(
     tsm: TSMScope,
     level: float,
     trigger_coupling: niscope.TriggerCoupling,
@@ -667,7 +667,7 @@ def tsm_ssc_start_acquisition(tsm: TSMScope):
 
 
 # Measure
-def scope_fetch_measurement(
+def fetch_measurement(
     tsm: TSMScope,
     scalar_meas_function: niscope.ScalarMeasurement,
 ):
@@ -681,7 +681,7 @@ def scope_fetch_measurement(
     return tsm, measurements
 
 
-def scope_fetch_waveform(
+def fetch_waveform(
     tsm: TSMScope,
     meas_num_samples: int,
 ):
@@ -698,7 +698,7 @@ def scope_fetch_waveform(
     return tsm, waveform_info, waveforms
 
 
-def scope_fetch_multirecord_waveform(
+def fetch_multirecord_waveform(
     tsm: TSMScope,
     num_records=-1,
 ):
@@ -714,7 +714,7 @@ def scope_fetch_multirecord_waveform(
     return tsm, waveform_info, waveforms
 
 
-def scope_measure_statistics(
+def measure_statistics(
     tsm: TSMScope,
     scalar_meas_function: niscope.ScalarMeasurement,
 ):
