@@ -7,8 +7,7 @@ from nitsm.pinquerycontexts import PinQueryContext
 from enum import Enum
 import typing
 
-
-#Types
+#Types Definition
 PinsArg = typing.Union[str, typing.Sequence[str]]
 Any = typing.Any
 StringTuple=typing.Tuple[str]
@@ -37,7 +36,7 @@ def tsm_set_daqmx_task(tsm_context: SemiconductorModuleContext, input_voltage_ra
         for task_id in range(id):
             task_name = task_names[task_id]
             physical_channel = channel_lists[task_id]
-            task = nidaqmx.Task()
+            #task = nidaqmx.Task()
             task.ai_channels.add_ai_voltage_chan(physical_channel, "", TerminalConfiguration.DIFFERENTIAL, -input_voltage_range, input_voltage_range)
             task.timing.samp_timing_type.SAMPLE_CLOCK
             task.start()
@@ -92,17 +91,21 @@ def daqmx_set_session(tsm_context: SemiconductorModuleContext,
 #Read
 @nitsm.codemoduleapi.code_module
 def daqmx_read_waveform_multichannel(daqmx_sessions: DAQmxSessions):
-    for daqmx_session in daqmx_sessions:
+    waveform=[]
+    for daqmx_task in daqmx_sessions:
         daqmx_task = daqmx_session[0]
-        daqmx_task.read() # Review function
-    return daqmx_sessions
+        data=daqmx_task.read()
+        waveform.append(data)
+    return daqmx_sessions, waveform
 
 @nitsm.codemoduleapi.code_module
 def daqmx_read_waveform(daqmx_sessions: DAQmxSessions):
+    waveform=[]
     for daqmx_task in daqmx_sessions:
         daqmx_task = daqmx_session[0]
-        daqmx_task.read() # Review function
-    return daqmx_sessions
+        data=daqmx_task.read()
+        waveform.append(data)
+    return daqmx_sessions, waveform
 
 #Read Configuration
 @nitsm.codemoduleapi.code_module
@@ -138,11 +141,10 @@ def daqmx_get_task_properties(daq_tasks: DAQmxSessions):
         pins = daq_task[2].split(",")
         qty = min(len(pins),len(channel_list))
         for count in range(qty):
-            pin=pins[count]
-            channel=channel_list[count].split("/")
+            pin = pins[count]
+            channel = channel_list[count].split("/")
             instrument_name = channel[0]
             channel = channel[1]
-            daqmx_task=nidaqmx.Task()
             voltage_range_max = 0
             voltage_range_min = 0
             #daqmx_task.ai_channels.ai_max not in library https://nidaqmx-python.readthedocs.io/en/latest/ai_channel.html
@@ -193,6 +195,3 @@ def daqmx_reference_analog_edge(daqmx_sessions: DAQmxSessions, trigger_source : 
             level_v
         )
     return daqmx_sessions
-
-
-
