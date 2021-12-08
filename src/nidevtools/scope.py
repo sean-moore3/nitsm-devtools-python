@@ -731,7 +731,7 @@ def tsm_ssc_fetch_meas_stats_per_channel(tsm: TSMScope, scalar_measurement: nisc
 
 
 @nitsm.codemoduleapi.code_module
-def tsm_initialize_sessions(tsm_context: TSMContext, options: dict = {}):
+def initialize_sessions(tsm_context: TSMContext, options: dict = {}):
     """ Opens sessions for all instrument channels that are associated with the tsm context"""
     instrument_names = tsm_context.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
@@ -746,7 +746,7 @@ def tsm_initialize_sessions(tsm_context: TSMContext, options: dict = {}):
 
 
 @nitsm.codemoduleapi.code_module
-def tsm_close_sessions(tsm_context: TSMContext):
+def close_sessions(tsm_context: TSMContext):
     """Closes the sessions associated with the tsm context"""
     sessions = tsm_context.get_all_niscope_sessions()
     for session in sessions:

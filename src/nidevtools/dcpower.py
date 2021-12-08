@@ -189,10 +189,10 @@ class _NIDCPowerSSC:
     External module should not use these methods with prefix 'cs_' directly.  
     """
 
-    def __init__(self, session: nidcpower.Session, channels: str, pin_list: str):
+    def __init__(self, session: nidcpower.Session, channels: str, pins: str):
         self._session = session  # mostly shared session  (very rarely unique session) depends on pinmap file.
         self._channels = channels  # specific channel(s) of that session
-        self._pin_list = pin_list  # pin names mapped to the channels
+        self._pins = pins  # pin names mapped to the channels
         self._channels_session = session.channels[channels]
         # To operate on session on very specific channel(s)
         self._ch_list = channels.split(",")  # channels in a list for internal operations
@@ -1221,9 +1221,62 @@ class _NIDCPowerTSM:
 class TSMDCPower(typing.NamedTuple):
     pin_query_context: typing.Any
     ssc: _NIDCPowerTSM
-    site_numbers: typing.List[int]
+    sites: typing.List[int]
     pins_info: typing.List[ni_dt_common.PinInformation]
     pins_expanded: typing.List[ni_dt_common.ExpandedPinInformation]
+
+
+
+@nitsm.codemoduleapi.code_module
+def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int] = [],
+                     fill_pin_site_info=True):
+    if len(sites) == 0:
+        sites = list(tsm_context.site_numbers)  # This is tested and works
+    pins_expanded = []
+    pins_info = []
+    pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
+    if fill_pin_site_info:
+        pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(
+            tsm_context, pins
+        )  # This is tested and working fine.
+    else:
+        for pin in pins:
+            a = ni_dt_common.PinInformation  # create instance of class
+            a.pin = pin
+            pins_info.append(a)
+    _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, sites)
+
+    sscs = [
+        _NIDCPowerSSC(session, channel, pin_list) for session, channel, pin_list in zip(sessions, channels, pin_lists)
+    ]
+    dc_power_tsm = _NIDCPowerTSM(sscs)
+    return TSMDCPower(pin_query_context, dc_power_tsm, sites, pins_info, pins_expanded)
+
+
+def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
+    dc_power_tsm.ssc.filter_pins(desired_pins)
+    all_pins = ni_dt_common.get_pin_names_from_expanded_pin_information(dc_power_tsm.pins_expanded)
+    i = 0
+    pins_expand_new = []
+    for d_pin in desired_pins:
+        index_d = all_pins.index(d_pin)
+        data = dc_power_tsm.pins_expanded[index_d]
+        output = ni_dt_common.PinInformation(data.pin, data.type, 1)
+        data.index = i
+        dc_power_tsm.pins_info.append(output)
+        if index_d >= 0:
+            pins_expand_new.append(data)
+        i += 1
+    dut_pins, system_pins = ni_dt_common.get_dut_pins_and_system_pins_from_expanded_pin_list(pins_expand_new)
+    pins_to_query_ctx = ni_dt_common.get_pin_names_from_expanded_pin_information(dut_pins + system_pins)
+    dc_power_tsm.pin_query_context.Pins = pins_to_query_ctx
+    return dc_power_tsm
+
+
+def filter_sites(dc_power_tsm: TSMDCPower, sites):
+    dc_power_tsm.ssc = dc_power_tsm.ssc.filter_sites(sites)
+    dc_power_tsm.site_numbers = sites
+    return dc_power_tsm
 
 
 @nitsm.codemoduleapi.code_module
@@ -1260,64 +1313,8 @@ def initialize_sessions(tsm_context: TSMContext, power_line_frequency=60.0, **kw
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions(
-    tsm_context: TSMContext,
-    pins: typing.List[str],
-    site_numbers: typing.List[int] = [],
-    fill_pin_site_info=True,
-):
-    if len(site_numbers) == 0:
-        site_numbers = list(tsm_context.site_numbers)  # This is tested and works
-    pins_expanded = []
-    pins_info = []
-    pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
-    if fill_pin_site_info:
-        pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(
-            tsm_context, pins
-        )  # This is tested and working fine.
-    else:
-        for pin in pins:
-            a = ni_dt_common.PinInformation  # create instance of class
-            a.pin = pin
-            pins_info.append(a)
-    _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, site_numbers)
-
-    sscs = [
-        _NIDCPowerSSC(session, channel, pin_list) for session, channel, pin_list in zip(sessions, channels, pin_lists)
-    ]
-    dc_power_tsm = _NIDCPowerTSM(sscs)
-    return TSMDCPower(pin_query_context, dc_power_tsm, site_numbers, pins_info, pins_expanded)
-
-
-def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
-    dc_power_tsm.ssc.filter_pins(desired_pins)
-    all_pins = ni_dt_common.get_pin_names_from_expanded_pin_information(dc_power_tsm.pins_expanded)
-    i = 0
-    pins_expand_new = []
-    for d_pin in desired_pins:
-        index_d = all_pins.index(d_pin)
-        data = dc_power_tsm.pins_expanded[index_d]
-        output = ni_dt_common.PinInformation(data.pin, data.type, 1)
-        data.index = i
-        dc_power_tsm.pins_info.append(output)
-        if index_d >= 0:
-            pins_expand_new.append(data)
-        i += 1
-    dut_pins, system_pins = ni_dt_common.get_dut_pins_and_system_pins_from_expanded_pin_list(pins_expand_new)
-    pins_to_query_ctx = ni_dt_common.get_pin_names_from_expanded_pin_information(dut_pins + system_pins)
-    dc_power_tsm.pin_query_context.Pins = pins_to_query_ctx
-    return dc_power_tsm
-
-
-def filter_sites(dc_power_tsm: TSMDCPower, sites):
-    dc_power_tsm.ssc = dc_power_tsm.ssc.filter_sites(sites)
-    dc_power_tsm.site_numbers = sites
-    return dc_power_tsm
-
-
-@nitsm.codemoduleapi.code_module
 def close_sessions(tsm_context: TSMContext):
-    """Todo(smooresni): Future docstring."""
+    """Closes the sessions associated with the tsm context"""
     sessions = tsm_context.get_all_nidcpower_sessions()
     for session in sessions:
         session.abort()

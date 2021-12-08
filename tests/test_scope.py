@@ -32,9 +32,9 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     else:
         options = {}  # empty dict options to run on real hardware.
 
-    scope.tsm_initialize_sessions(standalone_tsm_context, options=options)
+    scope.initialize_sessions(standalone_tsm_context, options=options)
     yield standalone_tsm_context
-    scope.tsm_close_sessions(standalone_tsm_context)
+    scope.close_sessions(standalone_tsm_context)
 
 
 @pytest.fixture
@@ -138,7 +138,7 @@ class TSMScope(typing.NamedTuple):
 
 @nitsm.codemoduleapi.code_module
 def open_sessions(tsm_context: SemiconductorModuleContext):
-    scope.tsm_initialize_sessions(tsm_context, OPTIONS)
+    scope.initialize_sessions(tsm_context, OPTIONS)
 
 
 @nitsm.codemoduleapi.code_module
@@ -263,4 +263,4 @@ def fetch_waveform(
 
 @nitsm.codemoduleapi.code_module
 def close_sessions(tsm_context: SemiconductorModuleContext):
-    scope.tsm_close_sessions(tsm_context)
+    scope.close_sessions(tsm_context)
