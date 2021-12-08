@@ -7,7 +7,8 @@ import nidcpower
 import nidcpower.enums as enums
 import nidcpower.errors
 import nitsm.codemoduleapi
-from nitsm.codemoduleapi import SemiconductorModuleContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
+
 import nidevtools.common as ni_dt_common
 
 
@@ -328,14 +329,14 @@ class _NIDCPowerSSC:
     def cs_query_in_compliance(self):
         compliance_states = []
         for ch in self._ch_list:
-            comp = self.session.channels[ch].query_in_compliance() # access one channel at a time.
+            comp = self.session.channels[ch].query_in_compliance()  # access one channel at a time.
             compliance_states.append(comp)
         return compliance_states
 
     def cs_query_output_state(self, output_state: nidcpower.OutputStates):
         output_states = []
         for ch in self._ch_list:
-            state = self.session.channels[ch].query_output_state(output_state) # access one channel at a time.
+            state = self.session.channels[ch].query_output_state(output_state)  # access one channel at a time.
             output_states.append(state)
         return output_states
 
@@ -1226,7 +1227,7 @@ class TSMDCPower(typing.NamedTuple):
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: SemiconductorModuleContext, power_line_frequency=60.0, **kwargs):
+def initialize_sessions(tsm_context: TSMContext, power_line_frequency=60.0, **kwargs):
     """Creates the sessions for all the nidcpower resource string available in the tsm_context for instruments"""
     # cache kwargs
     reset = kwargs["reset"] if "reset" in kwargs.keys() else False
@@ -1260,7 +1261,7 @@ def initialize_sessions(tsm_context: SemiconductorModuleContext, power_line_freq
 
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
-    tsm_context: SemiconductorModuleContext,
+    tsm_context: TSMContext,
     pins: typing.List[str],
     site_numbers: typing.List[int] = [],
     fill_pin_site_info=True,
@@ -1315,7 +1316,7 @@ def filter_sites(dc_power_tsm: TSMDCPower, sites):
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: SemiconductorModuleContext):
+def close_sessions(tsm_context: TSMContext):
     """Todo(smooresni): Future docstring."""
     sessions = tsm_context.get_all_nidcpower_sessions()
     for session in sessions:
