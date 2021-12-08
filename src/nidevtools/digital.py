@@ -9,7 +9,7 @@ from nidigital import enums
 from datetime import datetime
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 import nitsm.codemoduleapi
-from nitsm.codemoduleapi import SemiconductorModuleContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 
 
 class SSCDigital(typing.NamedTuple):
@@ -1552,9 +1552,8 @@ def _ssc_calculate_per_instrument_to_per_site_lut(ssc: typing.List[SSCDigital], 
     return per_instrument_to_per_site_lut
 
 
-def _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
-    ssc: typing.List[SSCDigital], sites: typing.List[int], pins: typing.List[str]
-):
+def _ssc_calculate_per_instrument_to_per_site_per_pin_lut(ssc: typing.List[SSCDigital], sites: typing.List[int],
+                                                          pins: typing.List[str]):
     per_instrument_to_per_site_per_pin_lut: typing.List[Location_2D_Array] = []
     for _ssc in ssc:
         _, _pins, _sites = _channel_list_to_pins(_ssc.channel_list)
@@ -1615,9 +1614,9 @@ def _ssc_calculate_per_site_to_per_instrument_lut(ssc: typing.List[SSCDigital], 
 # End of Subroutines #
 
 
-# TSM #
+# TSMContext #
 @nitsm.codemoduleapi.code_module
-def tsm_close_sessions(tsm_context: SemiconductorModuleContext):
+def tsm_close_sessions(tsm_context: TSMContext):
     sessions = tsm_context.get_all_nidigital_sessions()
     for session in sessions:
         session.reset()
@@ -1625,7 +1624,7 @@ def tsm_close_sessions(tsm_context: SemiconductorModuleContext):
 
 
 @nitsm.codemoduleapi.code_module
-def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: dict = {}):
+def tsm_initialize_sessions(tsm_context: TSMContext, options: dict = {}):
     pin_map_file_path = tsm_context.pin_map_file_path
     instrument_names = tsm_context.get_all_nidigital_instrument_names()
     if instrument_names:
@@ -1654,20 +1653,16 @@ def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: di
 
 
 @nitsm.codemoduleapi.code_module
-def tsm_ssc_1_pin_to_n_sessions(tsm_context: SemiconductorModuleContext, pin: str):
+def tsm_ssc_1_pin_to_n_sessions(tsm_context: TSMContext, pin: str):
     tsm = tsm_ssc_n_pins_to_m_sessions(tsm_context, [pin])
     return tsm
 
 
 @nitsm.codemoduleapi.code_module
-def tsm_ssc_n_pins_to_m_sessions(
-    tsm_context: SemiconductorModuleContext,
-    pins: typing.List[str],
-    site_numbers: typing.List[int] = [],
-    turn_pin_groups_to_pins: bool = True,
-):
-    if len(site_numbers) == 0:
-        site_numbers = list(tsm_context.site_numbers)
+def tsm_ssc_n_pins_to_m_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int] = [],
+                                 turn_pin_groups_to_pins: bool = True):
+    if len(sites) == 0:
+        sites = list(tsm_context.site_numbers)
     if turn_pin_groups_to_pins:
         pins = list(tsm_context.get_pins_in_pin_groups(pins))
     ssc: typing.List[SSCDigital] = []
@@ -1679,7 +1674,7 @@ def tsm_ssc_n_pins_to_m_sessions(
     _, _, site_lists = tsm_context.pins_to_nidigital_sessions_for_pattern(pins)
     for session, pin_set_string, site_list in zip(sessions, pin_set_strings, site_lists):
         ssc.append(SSCDigital(session, pin_set_string, site_list))
-    tsm = TSMDigital(pin_query_context, ssc, site_numbers, pins)
+    tsm = TSMDigital(pin_query_context, ssc, sites, pins)
     return tsm
 
 
@@ -1694,11 +1689,7 @@ def tsm_ssc_initiate(tsm: TSMDigital):
     return tsm
 
 
-def tsm_ssc_publish(
-    tsm: TSMDigital,
-    data_to_publish: typing.List[typing.Any],
-    published_data_id: str = "",
-):
+def tsm_ssc_publish(tsm: TSMDigital, data_to_publish: typing.List[typing.Any], published_data_id: str = ""):
     if len(numpy.shape(data_to_publish)) == 1:
         (
             per_site_to_per_instrument_lut,
@@ -1727,4 +1718,4 @@ def tsm_ssc_publish(
         raise TypeError("Unexpected data_to_publish array dimension.")
 
 
-# End of TSM #
+# End of TSMContext #

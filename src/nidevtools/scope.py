@@ -3,7 +3,7 @@ import typing
 import numpy
 import niscope
 import nitsm.codemoduleapi
-from nitsm.codemoduleapi import SemiconductorModuleContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 from nitsm.pinquerycontexts import PinQueryContext
 from enum import Enum
 import nidevtools.common as ni_dt_common
@@ -219,7 +219,7 @@ def _ssc_obtain_trigger_path(tsm: TSMScope, trigger_source: str, setup_type: str
     return trigger_paths
 
 
-# TSM Pin Abstraction Sub routines
+# TSMContext Pin Abstraction Sub routines
 def _pin_query_context_to_channel_list(
     pin_query_context: PinQueryContext,
     expanded_pins_information: typing.List[ExpandedPinInformation],
@@ -293,7 +293,7 @@ def _pin_query_context_to_channel_list(
 
 
 def _check_for_pin_group(
-    tsm_context: SemiconductorModuleContext,
+    tsm_context: TSMContext,
     pins_or_pins_group: typing.Union[str, typing.Sequence[str]],
 ):
     pins_types, pin_group_found = _identify_pin_types(tsm_context, pins_or_pins_group)
@@ -306,7 +306,7 @@ def _check_for_pin_group(
 
 
 def _identify_pin_types(
-    tsm_context: SemiconductorModuleContext,
+    tsm_context: TSMContext,
     pins_or_pins_group: typing.Union[str, typing.Sequence[str]],
 ):
     filtered_pin_types: typing.List[PinType] = []
@@ -324,7 +324,7 @@ def _identify_pin_types(
 
 
 def _get_all_pin_names(
-    tsm_context: SemiconductorModuleContext,
+    tsm_context: TSMContext,
     reload_cache: bool = False,
 ):
     pin_names: typing.Union[str, typing.Sequence[str]] = []
@@ -382,18 +382,11 @@ def _expand_to_requested_array_size(
 
 
 # Pinmap
-def tsm_ssc_pins_to_sessions(
-    tsm_context: SemiconductorModuleContext,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def tsm_ssc_pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int]):
     ssc_s: typing.List[SSCScope] = []
     pin_query_context, sessions, channels = tsm_context.pins_to_niscope_sessions(pins)
-    # sites_out, channel_list_per_session = _pin_query_context_to_channel_list(
-    #     pin_query_context, [], sites)
-    sites_out, channel_list_per_session = ni_dt_common.pin_query_context_to_channel_list(
-        pin_query_context, [], sites
-    )
+    # sites_out, channel_list_per_session = _pin_query_context_to_channel_list(pin_query_context, [], sites)
+    sites_out, channel_list_per_session = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
     for session, channel, channel_list in zip(sessions, channels, channel_list_per_session):
         ssc_s.append(SSCScope(session=session, channels=channel, channel_list=channel_list))
     return TSMScope(pin_query_context, sites_out, ssc_s)
@@ -698,10 +691,7 @@ def fetch_waveform(
     return tsm, waveform_info, waveforms
 
 
-def fetch_multirecord_waveform(
-    tsm: TSMScope,
-    num_records=-1,
-):
+def fetch_multirecord_waveform(tsm: TSMScope, num_records=-1):
     waveforms: typing.Any = []
     waveform_info: typing.List[niscope.WaveformInfo] = []
     for ssc in tsm.ssc:
@@ -714,10 +704,7 @@ def fetch_multirecord_waveform(
     return tsm, waveform_info, waveforms
 
 
-def measure_statistics(
-    tsm: TSMScope,
-    scalar_meas_function: niscope.ScalarMeasurement,
-):
+def measure_statistics(tsm: TSMScope, scalar_meas_function: niscope.ScalarMeasurement):
     measurement_stats: typing.List[niscope.MeasurementStats] = []
     for ssc in tsm.ssc:
         ssc.session.channels[ssc.channels].clear_waveform_measurement_stats(
@@ -744,7 +731,7 @@ def tsm_ssc_fetch_meas_stats_per_channel(tsm: TSMScope, scalar_measurement: nisc
 
 
 @nitsm.codemoduleapi.code_module
-def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: dict = {}):
+def tsm_initialize_sessions(tsm_context: TSMContext, options: dict = {}):
     """ Opens sessions for all instrument channels that are associated with the tsm context"""
     instrument_names = tsm_context.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
@@ -759,7 +746,7 @@ def tsm_initialize_sessions(tsm_context: SemiconductorModuleContext, options: di
 
 
 @nitsm.codemoduleapi.code_module
-def tsm_close_sessions(tsm_context: SemiconductorModuleContext):
+def tsm_close_sessions(tsm_context: TSMContext):
     """Closes the sessions associated with the tsm context"""
     sessions = tsm_context.get_all_niscope_sessions()
     for session in sessions:
