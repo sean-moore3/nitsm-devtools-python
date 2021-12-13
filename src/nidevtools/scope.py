@@ -697,7 +697,8 @@ def fetch_multirecord_waveform(tsm: TSMScope, num_records=-1):
     for ssc in tsm.ssc:
         channels, pins, sites = _channel_list_to_pins(ssc.channel_list)  # Unused no waveform attribute in python
         ssc.session._fetch_num_records = num_records
-        waveform = ssc.session.channels[ssc.channels].fetch(-1, relative_to=niscope.FetchRelativeTo.PRETRIGGER)
+        waveform = ssc.session.channels[ssc.channels].fetch(relative_to=niscope.FetchRelativeTo.PRETRIGGER,
+                                                            num_records=num_records,)
         waveform_info.append(waveform)
         for wfm in waveform:
             waveforms.append(list(wfm.samples))  # waveform in memory view
