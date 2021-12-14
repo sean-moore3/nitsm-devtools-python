@@ -174,6 +174,9 @@ def test_pin_s(request):
         input_dut_pins = ["P_In"]
         output_dut_pins = ["P_Out"]
         pins_selected = [input_dut_pins, output_dut_pins]
+    elif file_name == "test_daqmx.py":
+        # for daqmx driver i.e. nidaqmx testing
+        pass
     else:
         pins_selected = []
     return pins_selected

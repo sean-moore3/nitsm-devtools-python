@@ -13,6 +13,12 @@ Any = typing.Any
 StringTuple = typing.Tuple[str]
 
 
+class Task(typing.NamedTuple):
+    Ref: nidaqmx.Task
+    AI_min: int
+    AI_max: int
+
+
 class TaskProperties(typing.NamedTuple):
     InstrumentName: str
     Channel: str
@@ -25,28 +31,28 @@ class TaskProperties(typing.NamedTuple):
 
 
 class Session(typing.NamedTuple):
-    Task: nidaqmx.Task
+    Task: Task
     ChannelList: str
     Pins: str
     Site: int
 
 # Read
     def _st_read_wave_multi_chan(self):
-        return self.Task.read(number_of_samples_per_channel=2)
+        return self.Task.Ref.read(number_of_samples_per_channel=2)
 
     def _st_read_wave_single_chan(self):
-        return self.Task.read(number_of_samples_per_channel=8)
+        return self.Task.Ref.read(number_of_samples_per_channel=8)
 
 # Read Configuration
     def _st_cnfg_chan_to_read(self):
-        self.Task.in_stream.channels_to_read(self.ChannelList)
+        self.Task.Ref.in_stream.channels_to_read(self.ChannelList)
 
 # Task Control
     def _st_ctrl_start(self):
-        self.Task.start()
+        self.Task.Ref.start()
 
     def _st_ctrl_stop(self):
-        self.Task.stop()
+        self.Task.Ref.stop()
 
 # Task Properties
     def _st_property(self):
@@ -60,13 +66,11 @@ class Session(typing.NamedTuple):
             channel_ref = channel_list[sel].split("/")
             instrument_name = channel_ref[0]
             channel = channel_ref[1]
-            voltage_range_max = 0
-            voltage_range_min = 0
-            # task.ai_channels.ai_max
-            # task.ai_channels.ai_min
-            sampling_rate = task.timing.samp_clk_rate
-            trigger_channel = task.triggers.reference_trigger.anlg_edge_src
-            slope = int(task.triggers.reference_trigger.anlg_edge_slope)
+            voltage_range_max = task.AI_max
+            voltage_range_min = task.AI_min
+            sampling_rate = task.Ref.timing.samp_clk_rate
+            trigger_channel = task.Ref.triggers.reference_trigger.anlg_edge_src
+            slope = int(task.Ref.triggers.reference_trigger.anlg_edge_slope)
             if slope == 10171:
                 edge = nidaqmx.constants.Edge.FALLING
             elif slope == 10280:
@@ -86,7 +90,7 @@ class Session(typing.NamedTuple):
 
 # Timing Configuration
     def _st_timing(self, samples_per_channel: int, sampling_rate_hz: float, clock_source: str):
-        self.Task.timing.cfg_samp_clk_timing(
+        self.Task.Ref.timing.cfg_samp_clk_timing(
             sampling_rate_hz,
             clock_source,
             nidaqmx.constants.Edge.RISING,
@@ -99,10 +103,10 @@ class Session(typing.NamedTuple):
                             edge: Enum,
                             level_v: float,
                             pre_trigger_samples_per_channel: int):
-        self.Task.triggers.reference_trigger.cfg_anlg_edge_ref_trig(trigger_source,
-                                                                    pre_trigger_samples_per_channel,
-                                                                    edge,
-                                                                    level_v)
+        self.Task.Ref.triggers.reference_trigger.cfg_anlg_edge_ref_trig(trigger_source,
+                                                                        pre_trigger_samples_per_channel,
+                                                                        edge,
+                                                                        level_v)
 
 
 class Sessions(typing.NamedTuple):
@@ -181,24 +185,26 @@ def set_task(tsm_context: TSMContext,
     for sel in range(qty):
         task_name = task_names[sel]
         physical_channel = channel_lists[sel]
-        task = nidaqmx.Task()
+        task = Task(nidaqmx.Task(), 0, 0)
         try:
-            task.ai_channels.add_ai_voltage_chan(physical_channel,
-                                                 "",
-                                                 TerminalConfiguration.DIFFERENTIAL,
-                                                 -input_voltage_range,
-                                                 input_voltage_range)
-            task.timing.samp_timing_type.SAMPLE_CLOCK()
-            task.start()
+            channel = task.Ref.ai_channels.add_ai_voltage_chan(physical_channel,
+                                                               "",
+                                                               TerminalConfiguration.DIFFERENTIAL,
+                                                               -input_voltage_range,
+                                                               input_voltage_range)
+            task.Ref.timing.samp_timing_type.SAMPLE_CLOCK()
+            task.Ref.start()
         except:
-            devices = task.devices
-            task.close()
+            devices = task.Ref.devices
+            task.Ref.close()
             for device in devices:
                 device.reset_device()
-            task.ai_channels.add_ai_voltage_chan(physical_channel)
-            task.timing.samp_timing_type.SAMPLE_CLOCK()
-            task.start()
+            channel = task.Ref.ai_channels.add_ai_voltage_chan(physical_channel)
+            task.Ref.timing.samp_timing_type.SAMPLE_CLOCK()
+            task.Ref.start()
         finally:
+            task.AI_min = channel.ai_min
+            task.AI_max = channel.ai_max
             tsm_context.set_nidaqmx_task(task_name, task)
 
 
@@ -211,7 +217,6 @@ def get_all_instrument_names(tsm_context: TSMContext):
     instrument_type = instrument_type_id()
     instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(instrument_type)
     return instrument_names, channel_group_ids, channel_lists
-
 
 def get_all_sessions(tsm_context: TSMContext):
     instrument_type = instrument_type_id()
