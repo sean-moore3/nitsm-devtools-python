@@ -1,7 +1,7 @@
 import pytest
-import typing
 import os
 import nidaqmx
+import typing
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
 import nidevtools.daqmx as ni_daqmx
@@ -18,17 +18,17 @@ if SIMULATE_HARDWARE:
     pin_file_name = pin_file_names[0]
     print("With DAQmx Pinmap")
 
+OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "6224"}}
 
 @pytest.fixture
 def tsm_context(standalone_tsm_context: TSM_Context):
-
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE_HARDWARE)
     if SIMULATE_HARDWARE:
-        options = {"Simulate": True, "DriverSetup": {"Model": "6224"}}
+        options = OPTIONS
     else:
         options = {}  # empty options to run on real hardware.
 
@@ -58,7 +58,8 @@ def daqmx_tsm_s(standalone_tsm_context, test_pin_s):
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestDaqmx:
     def test_set_task(self, tsm_context):
-        queried_tasks = tsm_context.get_all_nidaqmx_tasks("ALL")
+        queried_tasks = tsm_context.get_all_nidaqmx_tasks("AI")
+        print("queried tasks", queried_tasks)
         assert isinstance(queried_tasks, tuple)  # Type verification
         for task in queried_tasks:
             print("\nTest_session\n", task)

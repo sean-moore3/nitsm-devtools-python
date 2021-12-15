@@ -182,19 +182,23 @@ def clear_task(tsm_context: TSMContext):
 
 def set_task(tsm_context: TSMContext,
              input_voltage_range: float = 10):
-    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AnalogInput")
+    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AI")
     # qty = min(len(task_names), len(channel_lists))
+    ch_list_str = channel_lists[0]
+    ch_list = ch_list_str.split(",")
+    print(channel_lists, task_names)
+    task = Task(nidaqmx.Task(), 0, 0)
     for task_name, physical_channel in zip(task_names, channel_lists):
         # task_name = task_names[sel]
-        # physical_channel = channel_lists[sel]
-        task = Task(nidaqmx.Task(), 0, 0)
+        # physical_channel = channel_lists[sel] 'Dev1/ai0, Dev1/ai1, Dev1/ai2, Dev1/ai3, Dev1/ai4, Dev1/ai5, Dev1/ai6, Dev1/ai7, Dev1/ai8, Dev1/ai9, Dev1/ai10, Dev1/ai11, Dev1/ai12, Dev1/ai13'
         try:
+            print(type(physical_channel), physical_channel)
             channel = task.Ref.ai_channels.add_ai_voltage_chan(physical_channel,
                                                                "",
                                                                TerminalConfiguration.DIFFERENTIAL,
                                                                -input_voltage_range,
                                                                input_voltage_range)
-            task.Ref.timing.samp_timing_type.SAMPLE_CLOCK()
+            # task.Ref.timing.cfg_samp_clk_timing(task.Ref.timing.samp_timing_type.SAMPLE_CLOCK)
             task.Ref.start()
         except:
             devices = task.Ref.devices
@@ -236,8 +240,9 @@ def pins_to_session_sessions_info(tsm_context: TSMContext,
     task,
     channel_group_id,
     channel_list
-    ) = tsm_context.pins_to_custom_session(InstrumentTypeIdConstants.NI_DAQMX, pin_list)
-    sites = tsm_context.get_site_data(channel_group_id)
+    ) = tsm_context.pins_to_nidaqmx_task(pin_list)
+    sites = tsm_context.site_numbers
+    # sites = tsm_context.get_site_data(channel_group_id)
     multiple_session_info = MultipleSessions(pin_query_context)
     for site in sites:
         session = Session(task, channel_list, ','.join(pin_list), site)
