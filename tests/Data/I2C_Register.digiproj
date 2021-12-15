@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="726C7AFF3497373C5DB7FA4574983503" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="219ECECB4FFB24F1BDD4C96B3C5EC273" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
@@ -40,6 +40,7 @@
 			<FileReference Id="300" ModelDefinitionType="PinMap" Name="digital\.pinmap" StoragePath="digital.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
 			<FileReference Id="301" ModelDefinitionType="PinMap" Name="scope\.pinmap" StoragePath="scope.pinmap" />
 			<FileReference Id="304" ModelDefinitionType="PinMap" Name="simulated\.pinmap" StoragePath="simulated.pinmap" />
+			<FileReference Id="307" ModelDefinitionType="PinMap" Name="PinMap\.pinmap" StoragePath="PinMap.pinmap" />
 		</NameScopingEnvoy>
 		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">
 			<ProjectPropertiesDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
