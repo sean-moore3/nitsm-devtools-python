@@ -59,11 +59,13 @@ class Session(typing.NamedTuple):
         task = self.Task
         channel_list = self.ChannelList.split(",")
         pins = self.Pins.split(",")
-        qty = min(len(pins), len(channel_list))
+        # qty = min(len(pins), len(channel_list))
         property_list = []
-        for sel in range(qty):
-            pin = pins[sel]
-            channel_ref = channel_list[sel].split("/")
+        # for sel in range(qty):
+        for pin, cha in zip(pins, channel_list):
+            # pin = pins[sel]
+            # channel_ref = channel_list[sel].split("/")
+            channel_ref = cha.split("/")
             instrument_name = channel_ref[0]
             channel = channel_ref[1]
             voltage_range_max = task.AI_max
@@ -181,10 +183,10 @@ def clear_task(tsm_context: TSMContext):
 def set_task(tsm_context: TSMContext,
              input_voltage_range: float = 10):
     task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AnalogInput")
-    qty = min(len(task_names), len(channel_lists))
-    for sel in range(qty):
-        task_name = task_names[sel]
-        physical_channel = channel_lists[sel]
+    # qty = min(len(task_names), len(channel_lists))
+    for task_name, physical_channel in zip(task_names, channel_lists):
+        # task_name = task_names[sel]
+        # physical_channel = channel_lists[sel]
         task = Task(nidaqmx.Task(), 0, 0)
         try:
             channel = task.Ref.ai_channels.add_ai_voltage_chan(physical_channel,
@@ -229,8 +231,12 @@ def pins_to_session_sessions_info(tsm_context: TSMContext,
     pin_list = tsm_context.filter_pins_by_instrument_type(pins,
                                                           InstrumentTypeIdConstants.NI_DAQMX,
                                                           Capability.ALL)
-    pin_query_context, task, channel_group_id, channel_list =\
-        tsm_context.pins_to_custom_session(InstrumentTypeIdConstants.NI_DAQMX, pin_list)
+    (
+    pin_query_context,
+    task,
+    channel_group_id,
+    channel_list
+    ) = tsm_context.pins_to_custom_session(InstrumentTypeIdConstants.NI_DAQMX, pin_list)
     sites = tsm_context.get_site_data(channel_group_id)
     multiple_session_info = MultipleSessions(pin_query_context)
     for site in sites:
@@ -242,8 +248,7 @@ def pins_to_session_sessions_info(tsm_context: TSMContext,
 def pins_to_sessions_sessions(tsm_context: TSMContext,
                               pins: PinsArg):
     instrument_type = instrument_type_id()
-    pin_query_context, task, channel_group_ids, channel_lists =\
-        tsm_context.pins_to_custom_sessions(instrument_type, pins)
+    pin_query_context, task, channel_group_ids, channel_lists = tsm_context.pins_to_custom_sessions(instrument_type, pins)
     return pin_query_context, task, channel_group_ids, channel_lists
 
 
