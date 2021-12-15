@@ -38,10 +38,10 @@ def tsm_context(standalone_tsm_context: TSM_Context):
 
 @pytest.fixture
 def simulated_nidaqmx_tasks(tsm_context):
-    task_names, channel_lists = standalone_tsm_context.get_all_nidaqmx_task_names("")
+    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("")
     tasks = [nidaqmx.Task(tsk_name) for tsk_name in task_names]
     for task_name, task in zip(task_names, tasks):
-        standalone_tsm_context.set_nidaqmx_task(task_name, task)
+        tsm_context.set_nidaqmx_task(task_name, task)
     yield tasks
     for task in tasks:
         task.close()
@@ -56,7 +56,7 @@ def daqmx_tsm_s(standalone_tsm_context, test_pin_s):
 
 @pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
-class TestDCPower:
+class TestDaqmx:
     def test_set_task(self, tsm_context):
         queried_tasks = tsm_context.get_all_nidaqmx_tasks("ALL")
         assert isinstance(queried_tasks, tuple)  # Type verification
