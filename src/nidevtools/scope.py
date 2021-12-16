@@ -631,23 +631,31 @@ def tsm_ssc_export_analog_edge_start_trigger(
     start_trigger: str = ""
     temp_channel_name: str = ""
     i = 0
+    flag = 0
     for ssc in tsm.ssc:
-        if analog_trigger_pin_name in ssc.channel_list.split(","):
-            temp_channel_name = analog_trigger_pin_name
+        j = 0
+        for channel in ssc.channel_list.split(","):
+            if analog_trigger_pin_name in channel:
+                temp_channel_name = analog_trigger_pin_name
+                flag = 1
+                break
+            j += 1
+        if flag == 1:
             break
-    i += 1
+        i += 1
     data = tsm.ssc.pop(i)
     tsm.ssc.insert(0, data)
     for ssc in tsm.ssc:
         if tsm.ssc.index(ssc) == 0:
-            ssc.session.configure_trigger_edge(
-                temp_channel_name, trigger_level, niscope.TriggerCoupling.DC, trigger_slope
-            )
+            channel = ssc.channel_list.split(",")[j]
+            channel = channel.strip()
+            print(channel, temp_channel_name)
+            ssc.session.configure_trigger_edge(channel, trigger_level, niscope.TriggerCoupling.DC, trigger_slope)
             ssc.session.exported_start_trigger_output_terminal = output_terminal
             ssc.session.commit()
             start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
         else:
-            ssc.session.configure_trigger_digital(start_trigger, niscope.TriggerSlope.POSITIVE, holdoff=0.0, delay=0.0)
+            ssc.session.configure_trigger_digital(start_trigger, trigger_slope, holdoff=0.0, delay=0.0)
             ssc.session.initiate()
     return tsm, start_trigger
 
