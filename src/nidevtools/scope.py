@@ -705,8 +705,10 @@ def fetch_multirecord_waveform(tsm: TSMScope, num_records=-1):
     for ssc in tsm.ssc:
         channels, pins, sites = _channel_list_to_pins(ssc.channel_list)  # Unused no waveform attribute in python
         ssc.session._fetch_num_records = num_records
-        waveform = ssc.session.channels[ssc.channels].fetch(relative_to=niscope.FetchRelativeTo.PRETRIGGER,
-                                                            num_records=num_records,)
+        waveform = ssc.session.channels[ssc.channels].fetch(
+            relative_to=niscope.FetchRelativeTo.PRETRIGGER,
+            num_records=num_records,
+        )
         waveform_info.append(waveform)
         for wfm in waveform:
             waveforms.append(list(wfm.samples))  # waveform in memory view
@@ -741,7 +743,7 @@ def tsm_ssc_fetch_meas_stats_per_channel(tsm: TSMScope, scalar_measurement: nisc
 
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm_context: TSMContext, options: dict = {}):
-    """ Opens sessions for all instrument channels that are associated with the tsm context"""
+    """Opens sessions for all instrument channels that are associated with the tsm context"""
     instrument_names = tsm_context.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
         session = niscope.Session(instrument_name, reset_device=True, options=options)

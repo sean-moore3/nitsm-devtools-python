@@ -1226,10 +1226,10 @@ class TSMDCPower(typing.NamedTuple):
     pins_expanded: typing.List[ni_dt_common.ExpandedPinInformation]
 
 
-
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int] = [],
-                     fill_pin_site_info=True):
+def pins_to_sessions(
+    tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int] = [], fill_pin_site_info=True
+):
     if len(sites) == 0:
         sites = list(tsm_context.site_numbers)  # This is tested and works
     pins_expanded = []

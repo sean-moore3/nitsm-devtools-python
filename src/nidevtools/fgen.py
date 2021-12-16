@@ -56,10 +56,17 @@ class _NIFGenTSM:
             waveform_data.append(math.sin(i * angle_per_sample) * math.sin(i * angle_per_sample * 20))
         return waveform_data
 
-    def generate_sine_wave(self, frequency: float, amplitude: float, offset: float,
-                           wfm_len_min: int, wfm_len_inc: int, generation_rate: float):
+    def generate_sine_wave(
+        self,
+        frequency: float,
+        amplitude: float,
+        offset: float,
+        wfm_len_min: int,
+        wfm_len_inc: int,
+        generation_rate: float,
+    ):
         # generate waveform here
-        f_inv = 1/frequency
+        f_inv = 1 / frequency
         pts = int(math.ceil(f_inv * generation_rate))
         if pts < 2:
             pts = 2
@@ -68,7 +75,7 @@ class _NIFGenTSM:
         else:
             pass
         calc_samples = wfm_len_inc * pts
-        min_wav_samples = int(wfm_len_min/(2*wfm_len_inc)) * calc_samples
+        min_wav_samples = int(wfm_len_min / (2 * wfm_len_inc)) * calc_samples
         if calc_samples >= wfm_len_min:
             samples = calc_samples
         else:
@@ -77,7 +84,7 @@ class _NIFGenTSM:
         waveform_data *= amplitude
         waveform_data += offset
         gain = max([abs(data) for data in waveform_data])
-        normalised_waveform = [data/gain for data in waveform_data]
+        normalised_waveform = [data / gain for data in waveform_data]
         for ssc in self._sessions_sites_channels:
             ssc.cs_generate_sine_wave(normalised_waveform, gain)
         return waveform_data
@@ -102,7 +109,7 @@ def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typ
 
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm_context: TSMContext, options: dict = {}):
-    """ Opens sessions for all instrument channels that are associated with the tsm context"""
+    """Opens sessions for all instrument channels that are associated with the tsm context"""
     instrument_names = tsm_context.get_all_nifgen_instrument_names()
     for instrument_name in instrument_names:
         session = nifgen.Session(instrument_name, reset_device=True, options=options)

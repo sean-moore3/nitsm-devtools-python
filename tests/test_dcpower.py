@@ -137,8 +137,6 @@ class TestDCPower:
             dcpower_tsm.ssc.commit()
             dcpower_tsm.ssc.abort()
 
-
-
     def test_configure_settings(self, dcpower_tsm_s):
         """
         TSM SSC DCPower Configure Settings.vim

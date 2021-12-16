@@ -1552,8 +1552,9 @@ def _ssc_calculate_per_instrument_to_per_site_lut(ssc: typing.List[SSCDigital], 
     return per_instrument_to_per_site_lut
 
 
-def _ssc_calculate_per_instrument_to_per_site_per_pin_lut(ssc: typing.List[SSCDigital], sites: typing.List[int],
-                                                          pins: typing.List[str]):
+def _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
+    ssc: typing.List[SSCDigital], sites: typing.List[int], pins: typing.List[str]
+):
     per_instrument_to_per_site_per_pin_lut: typing.List[Location_2D_Array] = []
     for _ssc in ssc:
         _, _pins, _sites = _channel_list_to_pins(_ssc.channel_list)
@@ -1659,8 +1660,9 @@ def tsm_ssc_1_pin_to_n_sessions(tsm_context: TSMContext, pin: str):
 
 
 @nitsm.codemoduleapi.code_module
-def tsm_ssc_n_pins_to_m_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int] = [],
-                                 turn_pin_groups_to_pins: bool = True):
+def tsm_ssc_n_pins_to_m_sessions(
+    tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int] = [], turn_pin_groups_to_pins: bool = True
+):
     if len(sites) == 0:
         sites = list(tsm_context.site_numbers)
     if turn_pin_groups_to_pins:
