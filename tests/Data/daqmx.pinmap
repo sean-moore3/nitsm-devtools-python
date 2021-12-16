@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.1">
 	<Instruments>
-		<NIDAQmxTask name="Dev1" taskType="AI" channelList="ai0, ai1, ai2, ai3, ai4, ai5, ai6, ai7" />
-		<NIDAQmxTask name="Dev2" taskType="AO" channelList="ao0, ao1" />
+		<NIDAQmxTask name="Dev1" taskType="AI" channelList="Dev1/ai0,Dev1/ai1,Dev1/ai2,Dev1/ai3,Dev1/ai4,Dev1/ai5,Dev1/ai6,Dev1/ai7" />
+		<NIDAQmxTask name="Dev2" taskType="AO" channelList="Dev2/ao0,Dev2/ao1" />
 	</Instruments>
 	<Pins>
 		<DUTPin name="SGL1" />
@@ -22,14 +22,14 @@
 		<Site siteNumber="3" />
 	</Sites>
 	<Connections>
-		<Connection pin="SGL1" siteNumber="0" instrument="Dev1" channel="ai0" />
-		<Connection pin="SGL1" siteNumber="1" instrument="Dev1" channel=" ai2" />
-		<Connection pin="SGL1" siteNumber="2" instrument="Dev1" channel=" ai4" />
-		<Connection pin="SGL1" siteNumber="3" instrument="Dev1" channel=" ai6" />
-		<Connection pin="SGL2" siteNumber="0" instrument="Dev1" channel=" ai1" />
-		<Connection pin="SGL2" siteNumber="1" instrument="Dev1" channel=" ai3" />
-		<Connection pin="SGL2" siteNumber="2" instrument="Dev1" channel=" ai5" />
-		<Connection pin="SGL2" siteNumber="3" instrument="Dev1" channel=" ai7" />
-		<SystemConnection pin="RefSGL" instrument="Dev2" channel="ao0" />
+		<Connection pin="SGL1" siteNumber="0" instrument="Dev1" channel="Dev1/ai0" />
+		<Connection pin="SGL1" siteNumber="1" instrument="Dev1" channel="Dev1/ai1" />
+		<Connection pin="SGL1" siteNumber="2" instrument="Dev1" channel="Dev1/ai2" />
+		<Connection pin="SGL1" siteNumber="3" instrument="Dev1" channel="Dev1/ai3" />
+		<Connection pin="SGL2" siteNumber="0" instrument="Dev1" channel="Dev1/ai4" />
+		<Connection pin="SGL2" siteNumber="1" instrument="Dev1" channel="Dev1/ai5" />
+		<Connection pin="SGL2" siteNumber="2" instrument="Dev1" channel="Dev1/ai6" />
+		<Connection pin="SGL2" siteNumber="3" instrument="Dev1" channel="Dev1/ai7" />
+		<SystemConnection pin="RefSGL" instrument="Dev2" channel="Dev2/ao0" />
 	</Connections>
 </PinMap>
