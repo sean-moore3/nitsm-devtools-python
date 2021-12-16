@@ -36,7 +36,8 @@
 		<NIScopeInstrument name="OSC1" numberOfChannels="8" group="Scope8" />
 		<NIScopeInstrument name="OSC2" numberOfChannels="8" group="Scope8" />
 		<NIScopeInstrument name="OSC3" numberOfChannels="2" group="Scope2" />
-		<NIDAQmxTask name="Dev1" taskType="AI" channelList="Dev1/ai0,Dev1/ai1,Dev1/ai2,Dev1/ai3,Dev1/ai4,Dev1/ai5,Dev1/ai6,Dev1/ai7,Dev1/ai8,Dev1/ai9,Dev1/ai10,Dev1/ai11,Dev1/ai12,Dev1/ai13,Dev1/ai14,Dev1/ai15" />
+		<NIDAQmxTask name="Dev1" taskType="AI" channelList="Dev1/ai0,Dev1/ai1,Dev1/ai2,Dev1/ai3,Dev1/ai4,Dev1/ai5,Dev1/ai6,Dev1/ai7" />
+		<NIDAQmxTask name="Dev2" taskType="AI" channelList="Dev2/ai0,Dev2/ai1,Dev2/ai2,Dev2/ai3,Dev2/ai4,Dev2/ai5,Dev2/ai6,Dev2/ai7" />
 	</Instruments>
 	<Pins>
 		<DUTPin name="SCL" />
@@ -154,12 +155,12 @@
 		<Connection pin="SGL1" siteNumber="4" instrument="Dev1" channel="Dev1/ai4" />
 		<Connection pin="SGL1" siteNumber="5" instrument="Dev1" channel="Dev1/ai5" />
 		<Connection pin="SGL1" siteNumber="6" instrument="Dev1" channel="Dev1/ai6" />
-		<Connection pin="SGL2" siteNumber="0" instrument="Dev1" channel="Dev1/ai7" />
-		<Connection pin="SGL2" siteNumber="1" instrument="Dev1" channel="Dev1/ai8" />
-		<Connection pin="SGL2" siteNumber="2" instrument="Dev1" channel="Dev1/ai9" />
-		<Connection pin="SGL2" siteNumber="3" instrument="Dev1" channel="Dev1/ai10" />
-		<Connection pin="SGL2" siteNumber="4" instrument="Dev1" channel="Dev1/ai11" />
-		<Connection pin="SGL2" siteNumber="5" instrument="Dev1" channel="Dev1/ai12" />
-		<Connection pin="SGL2" siteNumber="6" instrument="Dev1" channel="Dev1/ai13" />
+		<Connection pin="SGL2" siteNumber="0" instrument="Dev2" channel="Dev2/ai0" />
+		<Connection pin="SGL2" siteNumber="1" instrument="Dev2" channel="Dev2/ai1" />
+		<Connection pin="SGL2" siteNumber="2" instrument="Dev2" channel="Dev2/ai2" />
+		<Connection pin="SGL2" siteNumber="3" instrument="Dev2" channel="Dev2/ai3" />
+		<Connection pin="SGL2" siteNumber="4" instrument="Dev2" channel="Dev2/ai4" />
+		<Connection pin="SGL2" siteNumber="5" instrument="Dev2" channel="Dev2/ai5" />
+		<Connection pin="SGL2" siteNumber="6" instrument="Dev2" channel="Dev2/ai6" />
 	</Connections>
 </PinMap>
