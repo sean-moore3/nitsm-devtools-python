@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.1">
+	<Instruments>
+		<NIFGenInstrument name="FGEN1" numberOfChannels="1" />
+	</Instruments>
+	<Pins>
+		<SystemPin name="RefSGL" />
+	</Pins>
+	<PinGroups>
+		<PinGroup name="Signal">
+			<PinReference pin="RefSGL" />
+		</PinGroup>
+	</PinGroups>
+	<Sites>
+		<Site siteNumber="0" />
+	</Sites>
+	<Connections>
+		<SystemConnection pin="RefSGL" instrument="FGEN1" channel="0" />
+	</Connections>
+</PinMap>

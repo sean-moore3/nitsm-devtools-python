@@ -49,11 +49,13 @@ class _NIFGenTSM:
         self._sessions_sites_channels = sessions_sites_channels
 
     @staticmethod
-    def create_waveform_data(number_of_samples):
+    def create_waveform_data(samples=128, frequency=7.8125e-3, phase_degree=0):
         waveform_data = []
-        angle_per_sample = (2 * math.pi) / number_of_samples
-        for i in range(number_of_samples):
-            waveform_data.append(math.sin(i * angle_per_sample) * math.sin(i * angle_per_sample * 20))
+        angle_offset = phase_degree*math.pi/180  # in radians
+        angle_per_sample = 2 * math.pi * frequency
+        for i in range(samples):
+            angle = angle_offset + angle_per_sample*i
+            waveform_data.append(math.sin(angle))
         return waveform_data
 
     def generate_sine_wave(
@@ -80,9 +82,11 @@ class _NIFGenTSM:
             samples = calc_samples
         else:
             samples = min_wav_samples
-        waveform_data = self.create_waveform_data(samples)
+        sine_fr = 1 / pts
+        waveform_data = self.create_waveform_data(samples=samples, frequency=sine_fr, phase_degree=90)
         waveform_data *= amplitude
         waveform_data += offset
+        waveform_dt = 1 / (pts*frequency)
         gain = max([abs(data) for data in waveform_data])
         normalised_waveform = [data / gain for data in waveform_data]
         for ssc in self._sessions_sites_channels:
@@ -135,4 +139,5 @@ def close_sessions(tsm_context: TSMContext):
 
 
 if __name__ == "__main__":
+    # _NIFGenTSM.create_waveform_data(128, 7.8125e-3, 90)
     pass

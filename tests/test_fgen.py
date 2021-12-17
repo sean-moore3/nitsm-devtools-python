@@ -2,12 +2,12 @@ import pytest
 import os.path
 import nidcpower
 from nitsm.codemoduleapi import SemiconductorModuleContext
-import nidevtools.dcpower as ni_dt_dc_power
+import nidevtools.fgen as ni_dt_fgen
 
 # To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
 
-pin_file_names = ["7DUT.pinmap", "dcpower.pinmap"]
+pin_file_names = ["7DUT.pinmap", "fgen.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[1]
 if SIMULATE_HARDWARE:
@@ -22,13 +22,13 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     """
     print("\nSimulated driver?", SIMULATE_HARDWARE)
     if SIMULATE_HARDWARE:
-        options = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
+        options = {"Simulate": True, "DriverSetup": {"Model": "5442", "BoardType": "PXIe"}}
     else:
         options = {}  # empty options to run on real hardware.
 
-    ni_dt_dc_power.initialize_sessions(standalone_tsm_context, options=options)
+    ni_dt_fgen.initialize_sessions(standalone_tsm_context, options=options)
     yield standalone_tsm_context
-    ni_dt_dc_power.close_sessions(standalone_tsm_context)
+    ni_dt_fgen.close_sessions(standalone_tsm_context)
 
 
 @pytest.fixture
@@ -36,7 +36,7 @@ def dcpower_tsm_s(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data"""
     dcpower_tsms = []
     for test_pin in test_pin_s:
-        dcpower_tsms.append(ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True))
+        dcpower_tsms.append(ni_dt_fgen.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True))
     return dcpower_tsms
 
 
@@ -72,7 +72,7 @@ class TestDCPower:
         # print("\nTest_pin_s\n", test_pin_s)
         for dcpower_tsm in dcpower_tsm_s:
             # print("\nTest_dcpower_tsm\n", dcpower_tsm)
-            assert isinstance(dcpower_tsm, ni_dt_dc_power.TSMDCPower)
+            assert isinstance(dcpower_tsm, ni_dt_fgen.TSMDCPower)
 
     def test_get_max_current(self, dcpower_tsm_s):
         """TSM DC Power Get Max Current.vi"""

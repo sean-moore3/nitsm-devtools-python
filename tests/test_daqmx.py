@@ -9,7 +9,7 @@ import nidevtools.daqmx as ni_daqmx
 SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
 # SIMULATE_HARDWARE = True
 
-pin_file_names = ["simulated.pinmap", "daqmx.pinmap"]
+pin_file_names = ["7DUT.pinmap", "daqmx.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[1]
 print("With Simulated Pinmap")

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="6166439345AD94ECD1DFAD89510E3B9E" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="2B0F9801B0E80C1130F5C983CE34ABB1" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
@@ -39,9 +39,9 @@
 			<FileReference Id="299" ModelDefinitionType="PinMap" Name="dcpower\.pinmap" StoragePath="dcpower.pinmap" />
 			<FileReference Id="300" ModelDefinitionType="PinMap" Name="digital\.pinmap" StoragePath="digital.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
 			<FileReference Id="301" ModelDefinitionType="PinMap" Name="scope\.pinmap" StoragePath="scope.pinmap" />
-			<FileReference Id="304" ModelDefinitionType="PinMap" Name="simulated\.pinmap" StoragePath="simulated.pinmap" />
-			<FileReference Id="307" ModelDefinitionType="PinMap" Name="PinMap\.pinmap" StoragePath="PinMap.pinmap" />
+			<FileReference Id="307" ModelDefinitionType="PinMap" Name="fgen\.pinmap" StoragePath="fgen.pinmap" />
 			<FileReference Id="310" ModelDefinitionType="PinMap" Name="daqmx\.pinmap" StoragePath="daqmx.pinmap" />
+			<FileReference Id="313" ModelDefinitionType="PinMap" Name="\7DUT\.pinmap" StoragePath="7DUT.pinmap" />
 		</NameScopingEnvoy>
 		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">
 			<ProjectPropertiesDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
