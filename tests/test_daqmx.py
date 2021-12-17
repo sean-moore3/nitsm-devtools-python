@@ -12,10 +12,11 @@ SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "
 pin_file_names = ["7DUT.pinmap", "daqmx.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[1]
-print("With Simulated Pinmap")
+message = "With DAQmx Pinmap"
 if SIMULATE_HARDWARE:
     pin_file_name = pin_file_names[0]
-    print("With DAQmx Pinmap")
+    message = "With 7DUT Pinmap"
+print( message)
 
 OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "6224"}}
 
