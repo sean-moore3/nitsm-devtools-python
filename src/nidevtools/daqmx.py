@@ -13,9 +13,8 @@ Any = typing.Any
 StringTuple = typing.Tuple[str]
 
 
-class _Task(nidaqmx.Task):
-    AI_min: float
-    AI_max: float
+class ChannelsToRead:
+    name: str
 
 
 class TaskProperties(typing.NamedTuple):
@@ -30,7 +29,7 @@ class TaskProperties(typing.NamedTuple):
 
 
 class _Session(typing.NamedTuple):
-    Task: _Task
+    Task: nidaqmx.Task
     ChannelList: str
     Pins: str
     Site: int
@@ -43,38 +42,36 @@ class _Session(typing.NamedTuple):
         return self.Task.read(number_of_samples_per_channel=8)
 
     # Read Configuration
-    def _st_cnfg_chan_to_read(self):
-        self.Task.in_stream.channels_to_read(self.ChannelList)
+    def st_cnfg_chan_to_read(self):
+        c_t_r = ChannelsToRead()
+        c_t_r.name = self.ChannelList
+        self.Task.in_stream.ChannelsToRead = c_t_r
 
     # Task Control
-    def _st_ctrl_start(self):
+    def st_ctrl_start(self):
         self.Task.start()
 
-    def _st_ctrl_stop(self):
+    def st_ctrl_stop(self):
         self.Task.stop()
 
     # Task Properties
-    def _st_property(self):
+    def st_property(self):
         task = self.Task
         channel_list = self.ChannelList.split(",")
         pins = self.Pins.split(",")
-        # qty = min(len(pins), len(channel_list))
         property_list = []
-        # for sel in range(qty):
         for pin, cha in zip(pins, channel_list):
-            # pin = pins[sel]
-            # channel_ref = channel_list[sel].split("/")
             channel_ref = cha.split("/")
             instrument_name = channel_ref[0]
             channel = channel_ref[1]
-            voltage_range_max = task.AI_max
-            voltage_range_min = task.AI_min
+            voltage_range_max = task.channels.ai_max
+            voltage_range_min = task.channels.ai_min
             sampling_rate = task.timing.samp_clk_rate
             trigger_channel = task.triggers.reference_trigger.anlg_edge_src
-            slope = int(task.triggers.reference_trigger.anlg_edge_slope)
-            if slope == 10171:
+            slope = task.triggers.reference_trigger.anlg_edge_slope
+            if slope == nidaqmx.constants.Slope.FALLING:
                 edge = nidaqmx.constants.Edge.FALLING
-            elif slope == 10280:
+            elif slope == nidaqmx.constants.Slope.RISING:
                 edge = nidaqmx.constants.Edge.RISING
             else:
                 edge = "Unsupported"
@@ -86,13 +83,12 @@ class _Session(typing.NamedTuple):
                 voltage_range_min,
                 sampling_rate,
                 trigger_channel,
-                edge,
-            )
+                edge)
             property_list.append(task_property)
         return property_list
 
     # Timing Configuration
-    def _st_timing(self, samples_per_channel: int, sampling_rate_hz: float, clock_source: str):
+    def st_timing(self, samples_per_channel: int, sampling_rate_hz: float, clock_source: str = ""):
         self.Task.timing.cfg_samp_clk_timing(
             sampling_rate_hz,
             clock_source,
@@ -102,68 +98,82 @@ class _Session(typing.NamedTuple):
         )
 
     # Trigger
-    def _st_ref_analog_edge(
-        self, trigger_source: str, edge: Enum, level_v: float, pre_trigger_samples_per_channel: int
+    def st_ref_analog_edge(
+            self,
+            trigger_source: str,
+            edge: Enum = nidaqmx.constants.Slope.RISING,
+            level_v: float = 0.0,
+            pre_trigger_samples_per_channel: int = 500
     ):
         self.Task.triggers.reference_trigger.cfg_anlg_edge_ref_trig(
             trigger_source, pre_trigger_samples_per_channel, edge, level_v
         )
 
 
-class _Sessions(typing.NamedTuple):
+class _Sessions:
     sessions: typing.List[_Session]
 
     # Read
     def read_waveform_multichannel(self):
         waveform = []
         for session in self.sessions:
-            waveform.append(session.st_read_wave_multi_chan())
+            data = session.st_read_wave_multi_chan()
+            waveform += data
+        print(waveform)
         return waveform
 
     def read_waveform(self):
         waveform = []
         for session in self.sessions:
-            waveform.append(session.st_read_wave_single_chan())
+            data = session.st_read_wave_single_chan()
+            waveform += data
+        print(waveform)
         return waveform
 
     # Read Configuration
     def configure_channels(self):
         for session in self.sessions:
-            session._st_cnfg_chan_to_read()
+            session.st_cnfg_chan_to_read()
 
     # Task Control
     def start_task(self):
         for session in self.sessions:
-            session._st_ctrl_start()
+            session.st_ctrl_start()
 
     def stop_task(self):
         for session in self.sessions:
-            session._st_ctrl_stop()
+            session.st_ctrl_stop()
 
     # Task Properties
     def get_task_properties(self):
         daq_properties = []
         for session in self.sessions:
-            properties = session._st_property()
-            daq_properties.append(properties)
+            properties = session.st_property()
+            daq_properties += properties
         return daq_properties
 
     # Timing Configuration
-    def timing(self, samples_per_channel: int, sampling_rate_hz: float, clock_source: str):
-        for session in self:
-            session._st_timing(samples_per_channel, sampling_rate_hz, clock_source)
+    def timing(self, samples_per_channel: int = 1000, sampling_rate_hz: float = 1000, clock_source: str = ""):
+        for session in self.sessions:
+            session.st_timing(samples_per_channel, sampling_rate_hz, clock_source)
 
     # Trigger
     def reference_analog_edge(
-        self, trigger_source: str, edge: Enum, level_v: float, pre_trigger_samples_per_channel: int
-    ):
+            self,
+            trigger_source: str,
+            edge: Enum = nidaqmx.constants.Slope.RISING,
+            level_v: float = 0.0,
+            pre_trigger_samples_per_channel: int = 500):
         for session in self.sessions:
-            session._st_ref_analog_edge(trigger_source, edge, level_v, pre_trigger_samples_per_channel)
+            session.st_ref_analog_edge(trigger_source, edge, level_v, pre_trigger_samples_per_channel)
 
 
-class MultipleSessions(typing.NamedTuple):
+class MultipleSessions(_Sessions):
     pin_query_contex: PinQueryContext
-    InstrumentSessions: _Sessions
+
+    def __init__(self, pin_query_contex, session):
+        self.pin_query_contex = pin_query_contex
+        self.sessions = session
 
 
 def clear_task(tsm_context: TSMContext):
@@ -180,21 +190,19 @@ def clear_task(tsm_context: TSMContext):
 def set_task(tsm_context: TSMContext, input_voltage_range: float = 10):
     task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AI")  # Replace String in case PinMap change
     for task_name, physical_channel in zip(task_names, channel_lists):
-        task = _Task(task_name)
-
+        task = nidaqmx.Task(task_name)
         try:
-            channel = task.ai_channels.add_ai_voltage_chan(
-                physical_channel, "", TerminalConfiguration.DIFFERENTIAL, -input_voltage_range, input_voltage_range
-            )
-            # task.timing.cfg_samp_clk_timing(task.Ref.timing.samp_timing_type.SAMPLE_CLOCK) # ToDO Fix Later
+            task.ai_channels.add_ai_voltage_chan(
+                physical_channel, "", TerminalConfiguration.DIFFERENTIAL, -input_voltage_range, input_voltage_range)
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
             task.start()
         except:
             devices = task.devices
             task.close()
             for device in devices:
                 device.reset_device()
-            channel = task.ai_channels.add_ai_voltage_chan(physical_channel)
-            # task.timing.samp_timing_type.SAMPLE_CLOCK # TODO Fix later
+            task.ai_channels.add_ai_voltage_chan(physical_channel)
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
             task.start()
         finally:
             task.AI_max = input_voltage_range
@@ -203,43 +211,32 @@ def set_task(tsm_context: TSMContext, input_voltage_range: float = 10):
 
 
 # Pin Map
-def instrument_type_id(instrument_type: str = "DAQmx"):
-    return "DAQmx"
-
-
-def get_all_instrument_names(tsm_context: TSMContext):  # TODO Review
-    instrument_type = instrument_type_id()
-    # instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(instrument_type)
-    instrument_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("")
-    channel_group_ids = ("Signal",)  # TODO <----Hard codded
-    return instrument_names, channel_group_ids, channel_lists
+def get_all_instrument_names(tsm_context: TSMContext):
+    instruments = tsm_context.get_all_nidaqmx_task_names("")
+    return instruments
 
 
 def get_all_sessions(tsm_context: TSMContext):
-    instrument_type = instrument_type_id()
     tasks = tsm_context.get_all_nidaqmx_tasks("")
     return tasks
 
 
 def pins_to_session_sessions_info(tsm_context: TSMContext, pins: PinsArg):
     pin_list = tsm_context.filter_pins_by_instrument_type(pins, InstrumentTypeIdConstants.NI_DAQMX, Capability.ALL)
-    (pin_query_context, task, channel_list) = tsm_context.pins_to_nidaqmx_task(pin_list)
+    (pin_query_contex, task, channel_list) = tsm_context.pins_to_nidaqmx_task(pin_list)
     sites = tsm_context.site_numbers
-    # sites = tsm_context.get_site_data(channel_group_id)
-    multiple_session_info = MultipleSessions(pin_query_context, _Sessions([]))
+    multiple_session_info = MultipleSessions(pin_query_contex, [])
     for site in sites:
-        session = _Session(task, channel_list, ",".join(pin_list), site)
-        multiple_session_info.InstrumentSessions.sessions.append(session)
+        pin_data = ",".join(pin_list)
+        session = _Session(task, channel_list, pin_data, site)
+        multiple_session_info.sessions.append(session)
     return multiple_session_info
 
 
 def pins_to_sessions_sessions(tsm_context: TSMContext, pins: PinsArg):
-    instrument_type = instrument_type_id()
-    pin_query_context, task, channel_group_ids, channel_lists = tsm_context.pins_to_nidaqmx_tasks(pins)
-    return pin_query_context, task, channel_group_ids, channel_lists
+    session = tsm_context.pins_to_nidaqmx_tasks(pins)  # pin_query_context, task, channel_lists
+    return session
 
 
-def set_session(tsm_context: TSMContext, instrument_name: str, channel_group_id: str, daqmx_session: Any):
-    instrument_type = instrument_type_id()
-    tsm_context.set_custom_session(instrument_type, instrument_name, channel_group_id, daqmx_session)
-    tsm_context.set_nidaqmx_task()
+def set_session(tsm_context: TSMContext, instrument_name: str, daqmx_session: nidaqmx.Task):
+    tsm_context.set_nidaqmx_task(instrument_name, daqmx_session)
