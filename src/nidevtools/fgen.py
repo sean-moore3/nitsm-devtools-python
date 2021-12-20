@@ -33,12 +33,13 @@ class _NIFGenSSC:
     def cs_channels(self):
         return self._channels
 
-    def cs_generate_sine_wave(self, waveform_data, gain: float, offset: float = 0.0):
+    def cs_generate_sine_wave(self, waveform_data, sample_rate=1.0, gain=1.0, offset=0.0, ):
         self.session.abort()
         self.session.clear_arb_memory()
         self.session.output_mode = nifgen.OutputMode.ARB
         waveform = self.session.create_waveform(waveform_data_array=waveform_data)
         self.session.configure_arb_waveform(waveform_handle=waveform, gain=gain, offset=offset)
+        self.session.arb_sample_rate = sample_rate
         self.session.digital_filter_enabled = True
         self.session.initiate()
         return
@@ -60,12 +61,12 @@ class _NIFGenTSM:
 
     def generate_sine_wave(
         self,
-        frequency: float,
-        amplitude: float,
-        offset: float,
-        wfm_len_min: int,
-        wfm_len_inc: int,
-        generation_rate: float,
+        frequency: float = 100e3,
+        amplitude: float = 1.0,
+        offset: float = 0.0,
+        wfm_len_min: int = 4,
+        wfm_len_inc: int = 16,
+        generation_rate: float = 100e6,
     ):
         # generate waveform here
         f_inv = 1 / frequency
@@ -86,11 +87,12 @@ class _NIFGenTSM:
         waveform_data = self.create_waveform_data(samples=samples, frequency=sine_fr, phase_degree=90)
         waveform_data *= amplitude
         waveform_data += offset
-        waveform_dt = 1 / (pts*frequency)
+        sample_rate = pts*frequency
+        # waveform_dt = 1 / (sample_rate)
         gain = max([abs(data) for data in waveform_data])
         normalised_waveform = [data / gain for data in waveform_data]
         for ssc in self._sessions_sites_channels:
-            ssc.cs_generate_sine_wave(normalised_waveform, gain)
+            ssc.cs_generate_sine_wave(normalised_waveform, sample_rate, gain, 0)
         return waveform_data
 
 

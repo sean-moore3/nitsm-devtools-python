@@ -55,7 +55,7 @@ class TestFGen:
         for session in queried_sessions:
             # print("\nTest_session\n", session)
             assert isinstance(session, nifgen.Session)
-        assert len(queried_sessions) == len(tsm_context.get_all_nifgen_resource_strings())
+        assert len(queried_sessions) == len(tsm_context.get_all_nifgen_instrument_names())
 
     def test_pin_to_sessions(self, fgen_tsm_s, test_pin_s):
         """TSM SSC fgen Pins to Sessions"""
@@ -67,4 +67,4 @@ class TestFGen:
     def test_generate_sine_wave(self, fgen_tsm_s):
         """Test initiate commit and abort"""
         for fgen_tsm in fgen_tsm_s:
-            fgen_tsm.generate_sine_wave(28, 1, 0, 5, 1, 6)
+            fgen_tsm.generate_sine_wave(7.8125e-3, 1, 0, 5, 1, 6)
