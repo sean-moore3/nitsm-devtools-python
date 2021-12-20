@@ -1,4 +1,5 @@
 import nidaqmx
+import nitsm.codemoduleapi
 from nitsm.enums import Capability
 from nidaqmx.constants import TerminalConfiguration
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
@@ -109,6 +110,17 @@ class _Session(typing.NamedTuple):
             trigger_source, pre_trigger_samples_per_channel, edge, level_v
         )
 
+    def st_ref_digital_edge(
+            self,
+            trigger_source: str,
+            edge: Enum = nidaqmx.constants.Slope.RISING,
+            pre_trigger_samples_per_channel: int = 500
+    ):
+        self.Task.triggers.reference_trigger.cfg_dig_edge_ref_trig(
+            trigger_source,
+            pre_trigger_samples_per_channel,
+            edge)
+
 
 class _Sessions:
     sessions: typing.List[_Session]
@@ -139,6 +151,7 @@ class _Sessions:
     def start_task(self):
         for session in self.sessions:
             session.st_ctrl_start()
+            print("completed")
 
     def stop_task(self):
         for session in self.sessions:
@@ -167,6 +180,14 @@ class _Sessions:
         for session in self.sessions:
             session.st_ref_analog_edge(trigger_source, edge, level_v, pre_trigger_samples_per_channel)
 
+    def reference_digital_edge(
+            self,
+            trigger_source: str,
+            edge: Enum = nidaqmx.constants.Slope.RISING,
+            pre_trigger_samples_per_channel: int = 500):
+        for session in self.sessions:
+            session.st_ref_digital_edge(trigger_source, edge, pre_trigger_samples_per_channel)
+
 
 class MultipleSessions(_Sessions):
     pin_query_contex: PinQueryContext
@@ -176,6 +197,7 @@ class MultipleSessions(_Sessions):
         self.sessions = session
 
 
+@nitsm.codemoduleapi.code_module
 def clear_task(tsm_context: TSMContext):
     tasks_ai = tsm_context.get_all_nidaqmx_tasks("AI")
     tasks_ao = tsm_context.get_all_nidaqmx_tasks("AO")
@@ -187,7 +209,9 @@ def clear_task(tsm_context: TSMContext):
         task.close()
 
 
-def set_task(tsm_context: TSMContext, input_voltage_range: float = 10):
+@nitsm.codemoduleapi.code_module
+def set_task(tsm_context: TSMContext):
+    input_voltage_range = 10.0
     task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AI")  # Replace String in case PinMap change
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
@@ -195,7 +219,7 @@ def set_task(tsm_context: TSMContext, input_voltage_range: float = 10):
             task.ai_channels.add_ai_voltage_chan(
                 physical_channel, "", TerminalConfiguration.DIFFERENTIAL, -input_voltage_range, input_voltage_range)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
-            task.start()
+            # task.start()
         except:
             devices = task.devices
             task.close()
@@ -203,7 +227,7 @@ def set_task(tsm_context: TSMContext, input_voltage_range: float = 10):
                 device.reset_device()
             task.ai_channels.add_ai_voltage_chan(physical_channel)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
-            task.start()
+            # task.start()
         finally:
             task.AI_max = input_voltage_range
             task.AI_min = -input_voltage_range
@@ -211,16 +235,19 @@ def set_task(tsm_context: TSMContext, input_voltage_range: float = 10):
 
 
 # Pin Map
+@nitsm.codemoduleapi.code_module
 def get_all_instrument_names(tsm_context: TSMContext):
     instruments = tsm_context.get_all_nidaqmx_task_names("")
-    return instruments
+    return instruments  # Instrument Names, Channel Lists per Instrument
 
 
+@nitsm.codemoduleapi.code_module
 def get_all_sessions(tsm_context: TSMContext):
     tasks = tsm_context.get_all_nidaqmx_tasks("")
     return tasks
 
 
+@nitsm.codemoduleapi.code_module
 def pins_to_session_sessions_info(tsm_context: TSMContext, pins: PinsArg):
     pin_list = tsm_context.filter_pins_by_instrument_type(pins, InstrumentTypeIdConstants.NI_DAQMX, Capability.ALL)
     (pin_query_contex, task, channel_list) = tsm_context.pins_to_nidaqmx_task(pin_list)
@@ -233,10 +260,28 @@ def pins_to_session_sessions_info(tsm_context: TSMContext, pins: PinsArg):
     return multiple_session_info
 
 
+@nitsm.codemoduleapi.code_module
 def pins_to_sessions_sessions(tsm_context: TSMContext, pins: PinsArg):
     session = tsm_context.pins_to_nidaqmx_tasks(pins)  # pin_query_context, task, channel_lists
     return session
 
 
+@nitsm.codemoduleapi.code_module
 def set_session(tsm_context: TSMContext, instrument_name: str, daqmx_session: nidaqmx.Task):
     tsm_context.set_nidaqmx_task(instrument_name, daqmx_session)
+
+
+@nitsm.codemoduleapi.code_module
+def pins_to_task_and_connect(tsm_context: TSMContext, task_name: PinsArg, pins: PinsArg):
+    pin_list = tsm_context.filter_pins_by_instrument_type(pins, InstrumentTypeIdConstants.NI_DAQMX, Capability.ALL)
+    multiple_session_info = pins_to_session_sessions_info(tsm_context, task_name)
+    array = []
+    for pin in pin_list:
+        # TODO Abstract Switch function?
+        data = ''
+        array += data
+    if len(array) == 0:
+        pass
+    else:
+        pass
+        # TODO Abstract Switch?

@@ -16,7 +16,7 @@ message = "With DAQmx Pinmap"
 if SIMULATE_HARDWARE:
     pin_file_name = pin_file_names[0]
     message = "With 7DUT Pinmap"
-print( message)
+print(message)
 
 OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "6224"}}
 
@@ -33,7 +33,7 @@ def tsm_context(standalone_tsm_context: TSM_Context):
     else:
         options = {}  # empty options to run on real hardware.
 
-    ni_daqmx.set_task(standalone_tsm_context, input_voltage_range=1)
+    ni_daqmx.set_task(standalone_tsm_context)
     yield standalone_tsm_context
     ni_daqmx.clear_task(standalone_tsm_context)
 
@@ -41,10 +41,14 @@ def tsm_context(standalone_tsm_context: TSM_Context):
 @pytest.fixture
 def daqmx_tsm_s(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data"""
+    print(test_pin_s)
     daqmx_tsms = []
+    pins = []
     for test_pin in test_pin_s:
-        data = ni_daqmx.pins_to_session_sessions_info(tsm_context, test_pin)
-        daqmx_tsms.append(data)
+        pins += test_pin
+    print(pins)
+    data = ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
+    daqmx_tsms.append(data)
     yield tsm_context, daqmx_tsms
 
 
@@ -65,8 +69,10 @@ class TestDaqmx:
         # print("\nTest_pin_s\n", test_pin_s)
         tsm_context = daqmx_tsm_s[0]
         list_daqmx_tsm = daqmx_tsm_s[1]
+        print(list_daqmx_tsm)
         for daqmx_tsm in list_daqmx_tsm:
             print("\nTest_pin_to_sessions\n", daqmx_tsm)
+            print(daqmx_tsm.sessions)
             assert isinstance(daqmx_tsm, ni_daqmx.MultipleSessions)
             assert isinstance(daqmx_tsm.pin_query_contex, ni_daqmx.PinQueryContext)
             assert isinstance(daqmx_tsm.sessions, typing.List)
@@ -91,8 +97,9 @@ class TestDaqmx:
     def test_properties(self, daqmx_tsm_s):
         list_daqmx_tsm = daqmx_tsm_s[1]
         print("\nTest Start All\n")
-        # for daqmx_tsm in list_daqmx_tsm: TODO Check why it is having conflicts with the names (Maybe the task that start in fixture causes some issues)
-        #     daqmx_tsm.start_task()
+        for daqmx_tsm in list_daqmx_tsm:
+            daqmx_tsm.start_task()
+            daqmx_tsm.stop_task()
         print("\nTest Stop All\n")
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.stop_task()
@@ -102,8 +109,11 @@ class TestDaqmx:
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.timing(samp_cha, samp_rate)
         print("\nTest Trigger Configuration\n")
-        # for daqmx_tsm in list_daqmx_tsm: #TODO similar conflict with names
-        #     daqmx_tsm.reference_analog_edge("/PXI1Slot3/ai/StartTrigger")
+        for daqmx_tsm in list_daqmx_tsm:
+            daqmx_tsm.reference_analog_edge("/PXI1Slot3/ai/StartTrigger")
+        for daqmx_tsm in list_daqmx_tsm:
+            daqmx_tsm.reference_digital_edge("/Dev1/ai0", nidaqmx.constants.Slope.RISING, 2)
+            print("TestTest")
         print("\nTest Configure Read Channels\n")
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.configure_channels()
