@@ -82,6 +82,17 @@ class TestNIScope:
         scope.commit(tsm_scope)
         scope.abort(tsm_scope)
 
+    def test_config_immediate_trigger(self, scope_tsm_s):
+        for tsm_scope in scope_tsm_s:
+            scope.configure_impedance(tsm_scope, 0.5)
+            scope.configure_reference_level(tsm_scope)
+            scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
+            scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
+            scope.configure_immediate_trigger(tsm_scope)
+            scope.tsm_ssc_start_acquisition(tsm_scope)
+            _, data1, data2 = scope.fetch_waveform(tsm_scope, 1)
+            print(data1, data2, "\n")
+
     def test_all_scope_apis(self, scope_tsm_s):
         for tsm_scope in scope_tsm_s:
             scope.configure_impedance(tsm_scope, 0.5)
@@ -205,6 +216,7 @@ def trigger(
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.configure_digital_edge_trigger(tsm_scope, scope.TRIGGER_SOURCE.RTSI0, niscope.TriggerSlope.POSITIVE)
     scope.configure_trigger(tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
+    scope.configure_immediate_trigger(tsm_scope)
     scope.tsm_ssc_clear_triggers(tsm_scope)
     scope.tsm_ssc_export_start_triggers(tsm_scope, scope.OUTPUT_TERMINAL.NONE)
     scope.tsm_ssc_start_acquisition(tsm_scope)

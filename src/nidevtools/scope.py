@@ -592,6 +592,12 @@ def configure_trigger(
     return tsm
 
 
+def configure_immediate_trigger(tsm: TSMScope):
+    for ssc in tsm.ssc:
+        ssc.session.configure_trigger_immediate()
+    return tsm
+
+
 def tsm_ssc_clear_triggers(tsm: TSMScope):
     for ssc in tsm.ssc:
         ssc.session.abort()
