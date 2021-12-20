@@ -22,7 +22,7 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     """
     print("\nSimulated driver?", SIMULATE_HARDWARE)
     if SIMULATE_HARDWARE:
-        options = {"Simulate": True, "DriverSetup": {"Model": "5442", "BoardType": "PXIe"}}
+        options = {"Simulate": True, "DriverSetup": {"Model": "5450", "BoardType": "PXIe"}}
     else:
         options = {}  # empty options to run on real hardware.
 

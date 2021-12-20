@@ -38,6 +38,10 @@
 		<NIScopeInstrument name="OSC3" numberOfChannels="2" group="Scope2" />
 		<NIDAQmxTask name="Dev1" taskType="AI" channelList="Dev1/ai0,Dev1/ai1,Dev1/ai2,Dev1/ai3,Dev1/ai4,Dev1/ai5,Dev1/ai6,Dev1/ai7" />
 		<NIDAQmxTask name="Dev2" taskType="AI" channelList="Dev2/ai0,Dev2/ai1,Dev2/ai2,Dev2/ai3,Dev2/ai4,Dev2/ai5,Dev2/ai6,Dev2/ai7" />
+		<NIFGenInstrument name="FGEN1" numberOfChannels="2" />
+		<NIFGenInstrument name="FGEN2" numberOfChannels="2" />
+		<NIFGenInstrument name="FGEN3" numberOfChannels="2" />
+		<NIFGenInstrument name="FGEN4" numberOfChannels="2" />
 	</Instruments>
 	<Pins>
 		<DUTPin name="SCL" />
@@ -53,6 +57,8 @@
 		<DUTPin name="P_Out" />
 		<DUTPin name="SGL1" />
 		<DUTPin name="SGL2" />
+		<SystemPin name="RefSGL" />
+		<DUTPin name="SGL_In" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="SGL">
@@ -162,5 +168,13 @@
 		<Connection pin="SGL2" siteNumber="4" instrument="Dev2" channel="Dev2/ai4" />
 		<Connection pin="SGL2" siteNumber="5" instrument="Dev2" channel="Dev2/ai5" />
 		<Connection pin="SGL2" siteNumber="6" instrument="Dev2" channel="Dev2/ai6" />
+		<Connection pin="SGL_In" siteNumber="0" instrument="FGEN1" channel="0" />
+		<Connection pin="SGL_In" siteNumber="1" instrument="FGEN1" channel="1" />
+		<Connection pin="SGL_In" siteNumber="2" instrument="FGEN2" channel="0" />
+		<Connection pin="SGL_In" siteNumber="3" instrument="FGEN2" channel="1" />
+		<Connection pin="SGL_In" siteNumber="4" instrument="FGEN3" channel="0" />
+		<Connection pin="SGL_In" siteNumber="5" instrument="FGEN3" channel="1" />
+		<Connection pin="SGL_In" siteNumber="6" instrument="FGEN4" channel="0" />
+		<SystemConnection pin="RefSGL" instrument="FGEN4" channel="1" />
 	</Connections>
 </PinMap>
