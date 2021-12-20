@@ -94,7 +94,7 @@ class _NIFGenTSM:
         return waveform_data
 
 
-class TSMFgen(typing.NamedTuple):
+class TSMFGen(typing.NamedTuple):
     pin_query_context: typing.Any
     ssc: _NIFGenTSM
     sites: typing.List[int]
@@ -108,7 +108,7 @@ def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typ
     for session, channel, pin_list in zip(sessions, channels, pin_list_per_session):
         sscs.append(_NIFGenSSC(session=session, channels=channel, pin_list=pin_list))
     fgen_tsm = _NIFGenTSM(sscs)
-    return TSMFgen(pin_query_context, fgen_tsm, sites_out)
+    return TSMFGen(pin_query_context, fgen_tsm, sites_out)
 
 
 @nitsm.codemoduleapi.code_module
