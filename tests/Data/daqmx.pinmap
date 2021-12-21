@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.5">
+<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.1">
 	<Instruments>
 		<NIDAQmxTask name="T0" taskType="AI" channelList="Dev1/ai0,Dev1/ai1" />
 		<NIDAQmxTask name="T1" taskType="AI" channelList="Dev1/ai2,Dev1/ai3" />
@@ -16,15 +16,15 @@
 			<PinReference pin="SGL2" />
 		</PinGroup>
 	</PinGroups>
-	<Relays></Relays>
-	<RelayGroups></RelayGroups>
-	<RelayConfigurations></RelayConfigurations>
 	<Sites>
 		<Site siteNumber="0" />
+		<Site siteNumber="1" />
 	</Sites>
 	<Connections>
 		<Connection pin="SGL1" siteNumber="0" instrument="T0" channel="Dev1/ai0" />
+		<Connection pin="SGL1" siteNumber="1" instrument="T1" channel="Dev1/ai2" />
 		<Connection pin="SGL2" siteNumber="0" instrument="T0" channel="Dev1/ai1" />
+		<Connection pin="SGL2" siteNumber="1" instrument="T1" channel="Dev1/ai3" />
 		<SystemConnection pin="RefSGL" instrument="Dev2" channel="Dev2/ai0" />
 	</Connections>
 </PinMap>

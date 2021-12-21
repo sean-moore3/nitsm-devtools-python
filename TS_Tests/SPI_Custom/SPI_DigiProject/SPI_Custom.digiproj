@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="8D5F3D33A3379830DA73F2B950369BD8" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="8459479D0F805A7EB1BC32BB02DEE27B" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
-		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
-		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
-		<ApplicationVersionInfo Build="5.3.2.54637" Name="Digital Pattern Editor" Version="21.0.0" />
+		<ParsableNamespace AssemblyFileVersion="5.3.2.50247" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
+		<ParsableNamespace AssemblyFileVersion="5.3.2.50247" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
+		<ApplicationVersionInfo Build="5.3.2.50247" Name="Digital Pattern Editor" Version="20.6.0" />
 	</SourceModelFeatureSet>
 	<Project xmlns="http://www.ni.com/PlatformFramework">
 		<ProjectSettings Id="1" ModelDefinitionType="ProjectSettings" Name="ZProjectSettings" />
@@ -25,14 +25,15 @@
 			<EmbeddedDefinitionReference Id="217" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}DigitalScopeDefinition" Name="DigitalScope">
 				<DigitalScopeDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
 			</EmbeddedDefinitionReference>
-			<FileReference Id="225" ModelDefinitionType="CaptureWaveformDefinition" Name="Capture\ Memory\ Buffer\.digicapture" StoragePath="Waveforms\Capture Memory Buffer.digicapture" />
+			<FileReference Id="225" ModelDefinitionType="CaptureWaveformDefinition" Name="capture_buffer\.digicapture" StoragePath="Waveforms\capture_buffer.digicapture" />
 			<FileReference Id="226" ModelDefinitionType="DigitalPatternEditor.PatternDefinition" Name="SPI_read\.digipat" StoragePath="Patterns\SPI_read.digipat" />
 			<FileReference Id="227" ModelDefinitionType="DigitalPatternEditor.PatternDefinition" Name="SPI_write\.digipat" StoragePath="Patterns\SPI_write.digipat" />
-			<FileReference Id="228" ModelDefinitionType="SourceWaveformDefinition" Name="Source\ Memory\ Buffer\.tdms" StoragePath="Waveforms\Source Memory Buffer.tdms" />
+			<FileReference Id="228" ModelDefinitionType="SourceWaveformDefinition" Name="source_buffer\.tdms" StoragePath="Waveforms\source_buffer.tdms" />
 			<FileReference Id="229" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}RegisterMapDefinition" Name="SPI_Reg\.digireg" StoragePath="SPI_Reg.digireg" />
 			<FileReference Id="232" ModelDefinitionType="SpecificationsDefinition" Name="SPI\ Characteristic\.specs" StoragePath="Specifications\SPI Characteristic.specs" />
 			<FileReference Id="235" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}DutBringupDefinition" Name="SPI_Bringup\.dutbringup" StoragePath="SPI_Bringup.dutbringup" />
 			<FileReference Id="238" ModelDefinitionType="DigitalPatternEditor.PatternDefinition" Name="SPI_sync_write\.digipat" StoragePath="Patterns\SPI_sync_write.digipat" />
+			<FileReference Id="241" ModelDefinitionType="SourceWaveformDefinition" Name="source_sync\.tdms" StoragePath="Waveforms\source_sync.tdms" />
 		</NameScopingEnvoy>
 		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">
 			<ProjectPropertiesDefinition xmlns="http://www.ni.com/PatternBasedDigital" />

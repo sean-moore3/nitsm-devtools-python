@@ -30,11 +30,11 @@
 	</Sites>
 	<Connections>
 		<Connection pin="CS" siteNumber="0" instrument="DPI1" channel="0" />
-		<Connection pin="SCK" siteNumber="0" instrument="DPI1" channel="3" />
-		<Connection pin="MISO" siteNumber="0" instrument="DPI1" channel="1" />
-		<Connection pin="MOSI" siteNumber="0" instrument="DPI1" channel="2" />
-		<Connection pin="SYNC" siteNumber="0" instrument="DPI1" channel="4" />
-		<SystemConnection pin="VDD" instrument="DPI1" channel="5" />
-		<SystemConnection pin="VDDIO" instrument="DPI1" channel="6" />
+		<Connection pin="SCK" siteNumber="0" instrument="DPI1" channel="6" />
+		<Connection pin="MISO" siteNumber="0" instrument="DPI1" channel="2" />
+		<Connection pin="MOSI" siteNumber="0" instrument="DPI1" channel="4" />
+		<Connection pin="SYNC" siteNumber="0" instrument="DPI1" channel="8" />
+		<SystemConnection pin="VDD" instrument="DPI1" channel="10" />
+		<SystemConnection pin="VDDIO" instrument="DPI1" channel="12" />
 	</Connections>
 </PinMap>
