@@ -68,4 +68,4 @@ class TestFGen:
         """"""
         for fgen_tsm in fgen_tsm_s:
             fgen_tsm.ssc.generate_sine_wave(enable_filter=False)
-            # fgen_tsm.ssc.generate_sine_wave(10e3, 1, 0, 5, 1, 100e6, enable_filter=False)
+            fgen_tsm.ssc.generate_sine_wave(10e3, 1, 0, 5, 1, 100e6, enable_filter=True)
