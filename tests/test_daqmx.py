@@ -110,10 +110,10 @@ class TestDaqmx:
             daqmx_tsm.timing(samp_cha, samp_rate)
         print("\nTest Trigger Configuration\n")
         for daqmx_tsm in list_daqmx_tsm:
-            daqmx_tsm.reference_analog_edge("/PXI1Slot3/ai/StartTrigger")
-        for daqmx_tsm in list_daqmx_tsm:
-            daqmx_tsm.reference_digital_edge("/Dev1/ai0", nidaqmx.constants.Slope.RISING, 2)
-            print("TestTest")
+            daqmx_tsm.reference_analog_edge("/Dev1/ai/StartTrigger")
+        # for daqmx_tsm in list_daqmx_tsm:
+        #     daqmx_tsm.reference_digital_edge("/Dev1/ai0", nidaqmx.constants.Slope.RISING, 2)
+        #     print("TestTest")
         print("\nTest Configure Read Channels\n")
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.configure_channels()
