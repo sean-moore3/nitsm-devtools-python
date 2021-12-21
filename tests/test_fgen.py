@@ -22,7 +22,7 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     """
     print("\nSimulated driver?", SIMULATE_HARDWARE)
     if SIMULATE_HARDWARE:
-        options = {"Simulate": True, "DriverSetup": {"Model": "5450", "BoardType": "PXIe"}}
+        options = {"Simulate": True, "DriverSetup": {"Model": "5451", "BoardType": "PXIe"}}
     else:
         options = {}  # empty options to run on real hardware.
 
@@ -36,7 +36,7 @@ def fgen_tsm_s(tsm_context, test_pin_s):
     """Returns LabVIEW Cluster equivalent data"""
     fgen_tsms = []
     for test_pin in test_pin_s:
-        fgen_tsms.append(ni_dt_fgen.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True))
+        fgen_tsms.append(ni_dt_fgen.pins_to_sessions(tsm_context, test_pin, sites=[]))
     return fgen_tsms
 
 
@@ -65,6 +65,7 @@ class TestFGen:
             assert isinstance(fgen_tsm, ni_dt_fgen.TSMFGen)
 
     def test_generate_sine_wave(self, fgen_tsm_s):
-        """Test initiate commit and abort"""
+        """"""
         for fgen_tsm in fgen_tsm_s:
-            fgen_tsm.generate_sine_wave(7.8125e-3, 1, 0, 5, 1, 6)
+            fgen_tsm.ssc.generate_sine_wave(enable_filter=False)
+            # fgen_tsm.ssc.generate_sine_wave(10e3, 1, 0, 5, 1, 100e6, enable_filter=False)
