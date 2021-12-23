@@ -1,3 +1,4 @@
+import nitsm
 import typing
 import nidaqmx
 import pytest
@@ -109,8 +110,8 @@ class TestDaqmx:
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.timing(samp_cha, samp_rate)
         print("\nTest Trigger Configuration\n")
-        for daqmx_tsm in list_daqmx_tsm:
-            daqmx_tsm.reference_analog_edge("/Dev1/ai/StartTrigger")
+        # for daqmx_tsm in list_daqmx_tsm:
+        #    daqmx_tsm.reference_analog_edge("/Dev1/ai/StartTrigger")
         # for daqmx_tsm in list_daqmx_tsm:
         #     daqmx_tsm.reference_digital_edge("/Dev1/ai0", nidaqmx.constants.Slope.RISING, 2)
         #     print("TestTest")
@@ -120,9 +121,13 @@ class TestDaqmx:
         print("\nTest Read\n")
         for daqmx_tsm in list_daqmx_tsm:
             print("\nTest Read Single Channel\n")
+            daqmx_tsm.start_task()
             daqmx_tsm.read_waveform()
+            daqmx_tsm.stop_task()
             print("\nTest Read Multiple Channels\n")
+            daqmx_tsm.start_task()
             daqmx_tsm.read_waveform_multichannel()
+            daqmx_tsm.stop_task()
         print("\nVerify Properties\n")
         for daqmx_tsm in list_daqmx_tsm:
             data = daqmx_tsm.get_task_properties()
@@ -130,3 +135,78 @@ class TestDaqmx:
             for task_property in data:
                 assert isinstance(task_property, ni_daqmx.TaskProperties)
                 assert task_property.SamplingRate == samp_rate
+
+
+@nitsm.codemoduleapi.code_module
+def open_sessions(tsm_context: TSM_Context):
+    ni_daqmx.set_task(tsm_context)
+
+
+@nitsm.codemoduleapi.code_module
+def close_sessions(tsm_context: TSM_Context):
+    ni_daqmx.clear_task(tsm_context)
+
+
+@nitsm.codemoduleapi.code_module
+def pins_to_sessions(
+    tsm_context: TSM_Context,
+    pins: typing.List[str],
+):
+    return ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
+
+
+@nitsm.codemoduleapi.code_module
+def configure(
+    tsm_context: TSM_Context,
+    pins: typing.List[str],
+):
+    tsm_multi_session: ni_daqmx.MultipleSessions
+    tsm_multi_session = ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
+    # Timing Configuration
+    tsm_multi_session.timing(500, 500)
+    # Trigger Configuration
+    # tsm_multi_session.reference_analog_edge() TODO Solve trigger issue
+    # tsm_multi_session.reference_digital_edge()
+    # Configure Read Channels
+    tsm_multi_session.configure_channels()
+    # Get Properties
+    data = tsm_multi_session.get_task_properties()
+    return data
+
+
+@nitsm.codemoduleapi.code_module
+def acquisition_single_ch(
+    tsm_context: TSM_Context,
+    pins: typing.List[str],
+):
+    tsm_multi_session: ni_daqmx.MultipleSessions
+    tsm_multi_session = ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
+    tsm_multi_session.start_task()
+    yield tsm_multi_session.read_waveform()
+    tsm_multi_session.stop_task()
+
+
+@nitsm.codemoduleapi.code_module
+def acquisition_multi_ch(
+    tsm_context: TSM_Context,
+    pins: typing.List[str],
+):
+    tsm_multi_session: ni_daqmx.MultipleSessions
+    tsm_multi_session = ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
+    tsm_multi_session.start_task()
+    yield tsm_multi_session.read_waveform_multichannel()
+    tsm_multi_session.stop_task()
+
+
+@nitsm.codemoduleapi.code_module
+def initialize_sessions(tsm_context: TSM_Context):
+    print("opening sessions")
+    ni_daqmx.set_session(tsm_context)
+    tsmdaqmx = ni_daqmx.pins_to_session_sessions_info(tsm_context, ["SGL1", "SGL2"])
+
+
+@nitsm.codemoduleapi.code_module
+def close_sessions(tsm_context: TSM_Context):
+    print(" Closing sessions")
+    tsmdaqmx = ni_daqmx.pins_to_session_sessions_info(tsm_context, ["SGL1", "SGL2"])
+    ni_daqmx.clear_task(tsm_context)
