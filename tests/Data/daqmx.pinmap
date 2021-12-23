@@ -18,13 +18,10 @@
 	</PinGroups>
 	<Sites>
 		<Site siteNumber="0" />
-		<Site siteNumber="1" />
 	</Sites>
 	<Connections>
 		<Connection pin="SGL1" siteNumber="0" instrument="T0" channel="Dev1/ai0" />
-		<Connection pin="SGL1" siteNumber="1" instrument="T1" channel="Dev1/ai2" />
 		<Connection pin="SGL2" siteNumber="0" instrument="T0" channel="Dev1/ai1" />
-		<Connection pin="SGL2" siteNumber="1" instrument="T1" channel="Dev1/ai3" />
 		<SystemConnection pin="RefSGL" instrument="Dev2" channel="Dev2/ai0" />
 	</Connections>
 </PinMap>
