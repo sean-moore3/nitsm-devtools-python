@@ -4,8 +4,8 @@ import nidcpower
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import nidevtools.dcpower as ni_dt_dc_power
 
-# To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
-SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
+# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
+SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
 pin_file_names = ["7DUT.pinmap", "dcpower.pinmap"]
 # Change index below to change the pinmap to use

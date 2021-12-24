@@ -6,8 +6,8 @@ import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import nidevtools.scope as scope
 
-# To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
-SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
+# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
+SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 pin_file_names = ["7DUT.pinmap", "scope.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[1]

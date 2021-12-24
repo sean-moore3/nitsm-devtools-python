@@ -6,9 +6,8 @@ import os
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
 import nidevtools.daqmx as ni_daqmx
 
-# To run the code on real hardware create a dummy file named "Hardware.exists" to flag SIMULATE_HARDWARE boolean.
-SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Hardware.exists"))
-# SIMULATE_HARDWARE = True
+# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
+SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
 pin_file_names = ["7DUT.pinmap", "daqmx.pinmap"]
 # Change index below to change the pinmap to use
