@@ -32,6 +32,7 @@ class TaskProperties(typing.NamedTuple):
             TriggerChannel: str
             Edge: str
     """
+
     InstrumentName: str
     Channel: str
     Pin: str
@@ -53,6 +54,7 @@ class _Session(typing.NamedTuple):
         Pins: Pins assigned to the specific task
         Site: Site in which the task is running
     """
+
     Task: nidaqmx.Task
     ChannelList: str
     Pins: str
@@ -130,7 +132,8 @@ class _Session(typing.NamedTuple):
                 voltage_range_min,
                 sampling_rate,
                 trigger_channel,
-                edge)
+                edge,
+            )
             property_list.append(task_property)
         return property_list
 
@@ -160,11 +163,11 @@ class _Session(typing.NamedTuple):
 
     # Trigger
     def st_ref_analog_edge(
-            self,
-            trigger_source: str,
-            edge: Enum = nidaqmx.constants.Edge.RISING,
-            level_v: float = 0.0,
-            pre_trigger_samples_per_channel: int = 500
+        self,
+        trigger_source: str,
+        edge: Enum = nidaqmx.constants.Edge.RISING,
+        level_v: float = 0.0,
+        pre_trigger_samples_per_channel: int = 500,
     ):
         """
         Configures the task to stop the acquisition when the device acquires all pre-trigger samples;
@@ -191,10 +194,10 @@ class _Session(typing.NamedTuple):
         )
 
     def st_ref_digital_edge(
-            self,
-            trigger_source: str,
-            edge: Enum = nidaqmx.constants.Slope.RISING,
-            pre_trigger_samples_per_channel: int = 500
+        self,
+        trigger_source: str,
+        edge: Enum = nidaqmx.constants.Slope.RISING,
+        pre_trigger_samples_per_channel: int = 500,
     ):
         """
         Configures the task in this session to stop the acquisition when the device acquires all
@@ -214,15 +217,15 @@ class _Session(typing.NamedTuple):
                 channel.
         """
         self.Task.triggers.reference_trigger.cfg_dig_edge_ref_trig(
-            trigger_source,
-            pre_trigger_samples_per_channel,
-            edge)
+            trigger_source, pre_trigger_samples_per_channel, edge
+        )
 
 
 class _Sessions:
     """
     Class that contains a list of DAQmx sessions with methods to control all sessions inside the object
     """
+
     sessions: typing.List[_Session]
 
     # Read
@@ -309,11 +312,12 @@ class _Sessions:
 
     # Trigger
     def reference_analog_edge(
-            self,
-            trigger_source: str,
-            edge: Enum = nidaqmx.constants.Slope.RISING,
-            level_v: float = 0.0,
-            pre_trigger_samples_per_channel: int = 500):
+        self,
+        trigger_source: str,
+        edge: Enum = nidaqmx.constants.Slope.RISING,
+        level_v: float = 0.0,
+        pre_trigger_samples_per_channel: int = 500,
+    ):
         """
         Configures each task  in the session list to stop the acquisition when the device acquires all pre-trigger
         samples; an analog signal reaches the level you specify; and the device acquires all post-trigger samples.
@@ -338,10 +342,11 @@ class _Sessions:
             session.st_ref_analog_edge(trigger_source, edge, level_v, pre_trigger_samples_per_channel)
 
     def reference_digital_edge(
-            self,
-            trigger_source: str,
-            edge: Enum = nidaqmx.constants.Slope.RISING,
-            pre_trigger_samples_per_channel: int = 500):
+        self,
+        trigger_source: str,
+        edge: Enum = nidaqmx.constants.Slope.RISING,
+        pre_trigger_samples_per_channel: int = 500,
+    ):
         """
         Configures each task in this session list to stop the acquisition when the device acquires all
         pre-trigger samples, detects a rising or falling edge of a digital signal, and acquires
@@ -368,6 +373,7 @@ class MultipleSessions(_Sessions):
     Class that contains a list of DAQmx sessions with methods to control all sessions inside the object.
     It also contains the pin query contex that can be related to each of the sessions inside the sessions list.
     """
+
     pin_query_contex: PinQueryContext
 
     def __init__(self, pin_query_contex, sessions):
@@ -385,7 +391,7 @@ class MultipleSessions(_Sessions):
 @nitsm.codemoduleapi.code_module
 def clear_task(tsm_context: TSMContext):
     """
-    Clears all the tasks in the TSMContext. Before clearing, this method will abort all tasks, if necesary,
+    Clears all the tasks in the TSMContext. Before clearing, this method will abort all tasks, if necessary,
     and will release any resources the tasks reserved. You cannot use a task after you clear it unless you
     set it again.
     """
@@ -429,9 +435,10 @@ def set_task(tsm_context: TSMContext):
         task = nidaqmx.Task(task_name)
         try:
             task.ai_channels.add_ai_voltage_chan(
-                physical_channel, "", TerminalConfiguration.DIFFERENTIAL, -input_voltage_range, input_voltage_range)
+                physical_channel, "", TerminalConfiguration.DIFFERENTIAL, -input_voltage_range, input_voltage_range
+            )
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
-        except:
+        except Exception:
             task = reset_devices(task)
             task.ai_channels.add_ai_voltage_chan(physical_channel)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
@@ -444,7 +451,7 @@ def set_task(tsm_context: TSMContext):
         try:
             task.ai_channels.add_ai_voltage_chan(physical_channel)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
-        except:
+        except Exception:
             task = reset_devices(task)
             task.ai_channels.add_ai_voltage_chan(physical_channel)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
@@ -457,7 +464,7 @@ def set_task(tsm_context: TSMContext):
         try:
             task.ao_channels.add_ao_voltage_chan(physical_channel)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
-        except:
+        except Exception:
             task = reset_devices(task)
             task.ao_channels.add_ao_voltage_chan(physical_channel)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
@@ -468,21 +475,22 @@ def set_task(tsm_context: TSMContext):
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
         try:
-            task.do_channels.add_do_chan(physical_channel,"",nidaqmx.constants.LineGrouping.CHAN_PER_LINE)
+            task.do_channels.add_do_chan(physical_channel, "", nidaqmx.constants.LineGrouping.CHAN_PER_LINE)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
-        except:
+        except Exception:
             task = reset_devices(task)
-            task.do_channels.add_do_chan(physical_channel,"",nidaqmx.constants.LineGrouping.CHAN_PER_LINE)
+            task.do_channels.add_do_chan(physical_channel, "", nidaqmx.constants.LineGrouping.CHAN_PER_LINE)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         finally:
             tsm_context.set_nidaqmx_task(task_name, task)
+
 
 # Pin Map
 @nitsm.codemoduleapi.code_module
 def get_all_instrument_names(tsm_context: TSMContext):
     """
     Returns the channel group ID and associated instrument names and channel lists of all instruments
-    of type Instrument Type Id defined in the Semiconductor Module context. You can use instrument names,
+    of type Instrument Type ID defined in the Semiconductor Module context. You can use instrument names,
     channel group IDs, and channel lists to open driver sessions. The Instrument Names and Channel Lists
     parameters always return the same number of elements. Instrument names repeat in the Instrument Names
     parameter if the instrument has multiple channel groups.
@@ -494,7 +502,7 @@ def get_all_instrument_names(tsm_context: TSMContext):
 @nitsm.codemoduleapi.code_module
 def get_all_sessions(tsm_context: TSMContext):
     """
-    Returns all sessions in the Semiconductor Module Context that belong to instruments of the type DAQmx.
+    Returns all sessions in the Semiconductor Module Context that belong to multiple instruments of the type DAQmx.
     """
     tasks = tsm_context.get_all_nidaqmx_tasks("")
     return tasks
@@ -536,13 +544,11 @@ def pins_to_sessions_sessions(tsm_context: TSMContext, pins: PinsArg):
 def pins_to_task_and_connect(tsm_context: TSMContext, task_name: PinsArg, pins: PinsArg):
     pin_list = tsm_context.filter_pins_by_instrument_type(pins, InstrumentTypeIdConstants.NI_DAQMX, Capability.ALL)
     multiple_session_info = pins_to_session_sessions_info(tsm_context, task_name)
-    array = []
+    sessions = []
     for pin in pin_list:
-        # TODO Abstract Switch function?
-        data = ''
-        array += data
-    if len(array) == 0:
+        # sessions += abstract_switch.pin_to_session(pin)    # TODO Abstract Switch function?
         pass
-    else:
+    if len(sessions) != 0:
+        # abstract_switch.connect_session_info(sessions)     # TODO Abstract Switch?
         pass
-        # TODO Abstract Switch?
+    return multiple_session_info
