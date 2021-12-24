@@ -315,8 +315,8 @@ class _Sessions:
             level_v: float = 0.0,
             pre_trigger_samples_per_channel: int = 500):
         """
-        Configures each task  in the session list to stop the acquisition when the device acquires all pre-trigger samples;
-        an analog signal reaches the level you specify; and the device acquires all post-trigger samples.
+        Configures each task  in the session list to stop the acquisition when the device acquires all pre-trigger
+        samples; an analog signal reaches the level you specify; and the device acquires all post-trigger samples.
         When you use a Reference Trigger, the default for the read RelativeTo property is First Pre-trigger
         Sample with a read Offset of 0.
         Args:
@@ -389,14 +389,32 @@ def clear_task(tsm_context: TSMContext):
     and will release any resources the tasks reserved. You cannot use a task after you clear it unless you
     set it again.
     """
-    tasks_ai = tsm_context.get_all_nidaqmx_tasks("AI")
-    tasks_ao = tsm_context.get_all_nidaqmx_tasks("AO")
+    tasks_ai = tsm_context.get_all_nidaqmx_tasks("AnalogInput")
+    tasks_ai_dsa = tsm_context.get_all_nidaqmx_tasks("AnalogInputDSA")
+    tasks_ao_dsa = tsm_context.get_all_nidaqmx_tasks("AnalogOutputDSA")
+    tasks_do = tsm_context.get_all_nidaqmx_tasks("DigitalOutput")
+
     for task in tasks_ai:
         task.stop()
         task.close()
-    for task in tasks_ao:
+    for task in tasks_ai_dsa:
         task.stop()
         task.close()
+    for task in tasks_ao_dsa:
+        task.stop()
+        task.close()
+    for task in tasks_do:
+        task.stop()
+        task.close()
+
+
+def reset_devices(task: nidaqmx.Task):
+    devices = task.devices
+    task_name = task.name
+    task.close()
+    for device in devices:
+        device.reset_device()
+    return nidaqmx.Task(task_name)
 
 
 @nitsm.codemoduleapi.code_module
@@ -406,27 +424,58 @@ def set_task(tsm_context: TSMContext):
     set all the sessions accordingly
     """
     input_voltage_range = 10.0
-    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AI")  # Replace String in case PinMap change
+    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AnalogInput")  # Replace String if PinMap change
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
         try:
             task.ai_channels.add_ai_voltage_chan(
                 physical_channel, "", TerminalConfiguration.DIFFERENTIAL, -input_voltage_range, input_voltage_range)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
-            # task.start()
         except:
-            devices = task.devices
-            task.close()
-            for device in devices:
-                device.reset_device()
+            task = reset_devices(task)
             task.ai_channels.add_ai_voltage_chan(physical_channel)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
-            # task.start()
         finally:
-            task.AI_max = input_voltage_range
-            task.AI_min = -input_voltage_range
             tsm_context.set_nidaqmx_task(task_name, task)
 
+    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AnalogInputDSA")  # Replace String if PM change
+    for task_name, physical_channel in zip(task_names, channel_lists):
+        task = nidaqmx.Task(task_name)
+        try:
+            task.ai_channels.add_ai_voltage_chan(physical_channel)
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
+        except:
+            task = reset_devices(task)
+            task.ai_channels.add_ai_voltage_chan(physical_channel)
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
+        finally:
+            tsm_context.set_nidaqmx_task(task_name, task)
+
+    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AnalogOutputDSA")  # Replace String if PM change
+    for task_name, physical_channel in zip(task_names, channel_lists):
+        task = nidaqmx.Task(task_name)
+        try:
+            task.ao_channels.add_ao_voltage_chan(physical_channel)
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
+        except:
+            task = reset_devices(task)
+            task.ao_channels.add_ao_voltage_chan(physical_channel)
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
+        finally:
+            tsm_context.set_nidaqmx_task(task_name, task)
+
+    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("DigitalOutput")  # Replace String if PM change
+    for task_name, physical_channel in zip(task_names, channel_lists):
+        task = nidaqmx.Task(task_name)
+        try:
+            task.do_channels.add_do_chan(physical_channel,"",nidaqmx.constants.LineGrouping.CHAN_PER_LINE)
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
+        except:
+            task = reset_devices(task)
+            task.do_channels.add_do_chan(physical_channel,"",nidaqmx.constants.LineGrouping.CHAN_PER_LINE)
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
+        finally:
+            tsm_context.set_nidaqmx_task(task_name, task)
 
 # Pin Map
 @nitsm.codemoduleapi.code_module

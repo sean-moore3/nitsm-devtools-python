@@ -201,7 +201,7 @@ def acquisition_multi_ch(
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm_context: TSM_Context):
     print("opening sessions")
-    ni_daqmx.set_session(tsm_context)
+    ni_daqmx.set_task(tsm_context)
     tsmdaqmx = ni_daqmx.pins_to_session_sessions_info(tsm_context, ["SGL1", "SGL2"])
 
 
@@ -210,3 +210,7 @@ def close_sessions(tsm_context: TSM_Context):
     print(" Closing sessions")
     tsmdaqmx = ni_daqmx.pins_to_session_sessions_info(tsm_context, ["SGL1", "SGL2"])
     ni_daqmx.clear_task(tsm_context)
+
+@nitsm.codemoduleapi.code_module
+def Baku_Scenario(tsm_context: TSM_Context):
+    ni_daqmx.set_task(tsm_context)
