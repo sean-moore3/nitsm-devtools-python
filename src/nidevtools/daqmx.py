@@ -61,19 +61,19 @@ class _Session(typing.NamedTuple):
     Site: int
 
     # Read
-    def st_read_wave_multi_chan(self):
+    def st_read_wave_multi_chan(self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10):
         """
         Reads one or more waveforms from the task specified in the session that contains
         one or more analog input channels.
         """
-        return self.Task.read(number_of_samples_per_channel=2)
+        return self.Task.read(samples_per_channel, timeout)
 
-    def st_read_wave_single_chan(self):
+    def st_read_wave_single_chan(self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10):
         """
         Reads one or more waveforms from the task specified in the session that contains
         one or more analog input channels.
         """
-        return self.Task.read(number_of_samples_per_channel=8)
+        return self.Task.read(samples_per_channel, timeout)
 
     # Read Configuration
     def st_cnfg_chan_to_read(self):
@@ -102,7 +102,7 @@ class _Session(typing.NamedTuple):
     def st_property(self):
         """
         Get the configuration properties of each pair channel-pin assigned to the task in
-        this session in the pinmap, and store them in a **TaskProperties object**.
+        this session in the pin map, and store them in a **TaskProperties object**.
         It then returns a list of **TaskProperties object** per pair channel-pin.
         """
         task = self.Task
@@ -229,28 +229,66 @@ class _Sessions:
     sessions: typing.List[_Session]
 
     # Read
-    def read_waveform_multichannel(self):
+    def read_waveform_multichannel(self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10):
         """
-        Reads one or more waveforms from each task specified in the list of session that contains
-        one or more analog input channels.
-        """
+         Reads one or more waveforms from each task specified in the list of session that contains
+         one or more analog input channels.
+         Args:
+             samples_per_channel: Specifies the number of samples to read. If this input is not set,
+                 assumes samples to read is 1. Conversely, if this input is set, assumes there are
+                 multiple samples to read.
+                 If you set this input to nidaqmx.constants. READ_ALL_AVAILABLE, NI-DAQmx determines
+                 how many samples to read based on if the task acquires samples continuously or
+                 acquires a finite number of samples.
+                 If the task acquires samples continuously, and you set this input to
+                 nidaqmx.constants.READ_ALL_AVAILABLE, this method reads all the samples currently
+                 available in the buffer.
+                 If the task acquires a finite number of samples, and you set this input
+                 to nidaqmx.constants.READ_ALL_AVAILABLE, the method waits for the task to acquire all requested
+                 samples, then reads those samples. If you set the “read_all_avail_samp” property to True, the
+                 method reads the samples currently available in the buffer and does not wait for the task to
+                 acquire all requested samples.
+             timeout:  Specifies the amount of time in seconds to wait for samples to become available. If the time
+                 elapses, the method returns an error and any samples read before the timeout elapsed. The default
+                 timeout is 10 seconds. If you set timeout to nidaqmx.constants.WAIT_INFINITELY, the method waits
+                 indefinitely. If you set timeout to 0, the method tries once to read the requested samples and
+                 returns an error if it is unable to.
+         """
         waveform = []
         for session in self.sessions:
-            data = session.st_read_wave_multi_chan()
+            data = session.st_read_wave_multi_chan(samples_per_channel, timeout)
             waveform += data
-        print(waveform)
         return waveform
 
-    def read_waveform(self):
+    def read_waveform(self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10):
         """
         Reads one or more waveforms from each task specified in the list of session that contains
         one or more analog input channels.
+        Args:
+            samples_per_channel: Specifies the number of samples to read. If this input is not set,
+                assumes samples to read is 1. Conversely, if this input is set, assumes there are
+                multiple samples to read.
+                If you set this input to nidaqmx.constants. READ_ALL_AVAILABLE, NI-DAQmx determines
+                how many samples to read based on if the task acquires samples continuously or
+                acquires a finite number of samples.
+                If the task acquires samples continuously, and you set this input to
+                nidaqmx.constants.READ_ALL_AVAILABLE, this method reads all the samples currently
+                available in the buffer.
+                If the task acquires a finite number of samples, and you set this input
+                to nidaqmx.constants.READ_ALL_AVAILABLE, the method waits for the task to acquire all requested
+                samples, then reads those samples. If you set the “read_all_avail_samp” property to True, the
+                method reads the samples currently available in the buffer and does not wait for the task to
+                acquire all requested samples.
+            timeout:  Specifies the amount of time in seconds to wait for samples to become available. If the time
+                elapses, the method returns an error and any samples read before the timeout elapsed. The default
+                timeout is 10 seconds. If you set timeout to nidaqmx.constants.WAIT_INFINITELY, the method waits
+                indefinitely. If you set timeout to 0, the method tries once to read the requested samples and
+                returns an error if it is unable to.
         """
         waveform = []
         for session in self.sessions:
-            data = session.st_read_wave_single_chan()
+            data = session.st_read_wave_single_chan(samples_per_channel, timeout)
             waveform += data
-        print(waveform)
         return waveform
 
     # Read Configuration
@@ -374,17 +412,17 @@ class MultipleSessions(_Sessions):
     It also contains the pin query contex that can be related to each of the sessions inside the sessions list.
     """
 
-    pin_query_contex: PinQueryContext
+    pin_query_context: PinQueryContext
 
-    def __init__(self, pin_query_contex, sessions):
+    def __init__(self, pin_query_context, sessions):
         """
         Returns an object with type MultipleSessions.
 
         Args:
-            pin_query_contex: Pin query context related to all the sessions in the sessions list
+            pin_query_context: Pin query context related to all the sessions in the sessions list
             sessions: List of the different sessions that can be related to the pin query context
         """
-        self.pin_query_contex = pin_query_contex
+        self.pin_query_context = pin_query_context
         self.sessions = sessions
 
 
@@ -415,6 +453,9 @@ def clear_task(tsm_context: TSMContext):
 
 
 def reset_devices(task: nidaqmx.Task):
+    """
+    Reset all devices, clear the task and returns a new empty task with the same name.
+    """
     devices = task.devices
     task_name = task.name
     task.close()
@@ -487,24 +528,34 @@ def set_task(tsm_context: TSMContext):
 
 # Pin Map
 @nitsm.codemoduleapi.code_module
-def get_all_instrument_names(tsm_context: TSMContext):
+def get_all_instrument_names(tsm_context: TSMContext, task_type: str = ""):
     """
     Returns the channel group ID and associated instrument names and channel lists of all instruments
     of type Instrument Type ID defined in the Semiconductor Module context. You can use instrument names,
     channel group IDs, and channel lists to open driver sessions. The Instrument Names and Channel Lists
     parameters always return the same number of elements. Instrument names repeat in the Instrument Names
     parameter if the instrument has multiple channel groups.
+    Args:
+        tsm_context: Pin context defined by pin map
+        task_type: Specifies the type of NI-DAQmx task to return. Use an empty string to obtain the names of all
+        tasks regardless of task type.
+    Returns:
+        Returns a tuple of the NI-DAQmx task names.
     """
-    instruments = tsm_context.get_all_nidaqmx_task_names("")
+    instruments = tsm_context.get_all_nidaqmx_task_names(task_type)
     return instruments  # Instrument Names, Channel Lists per Instrument
 
 
 @nitsm.codemoduleapi.code_module
-def get_all_sessions(tsm_context: TSMContext):
+def get_all_sessions(tsm_context: TSMContext, task_type: str = ""):
     """
     Returns all sessions in the Semiconductor Module Context that belong to multiple instruments of the type DAQmx.
+    Args:
+        tsm_context: Pin context defined by pin map
+        task_type: Specifies the type of NI-DAQmx task to return. Use an empty string to obtain the names of all
+        tasks regardless of task type
     """
-    tasks = tsm_context.get_all_nidaqmx_tasks("")
+    tasks = tsm_context.get_all_nidaqmx_tasks(task_type)
     return tasks
 
 
@@ -513,6 +564,12 @@ def pins_to_session_sessions_info(tsm_context: TSMContext, pins: PinsArg):
     """
     Returns a properly filled object of the type MultipleSessions with a session per each
     site defined in the pin map
+    Args:
+        tsm_context: Pin context defined by pin map
+        pins: The name of the pin(s) or pin group(s) to translate to a task.
+    Return:
+        Multiple_Sessions: An object that tracks the task associated with this pin query. Use this object
+        to publish measurements and extract data from a set of measurements.
     """
     pin_list = tsm_context.filter_pins_by_instrument_type(pins, InstrumentTypeIdConstants.NI_DAQMX, Capability.ALL)
     (pin_query_contex, task, channel_list) = tsm_context.pins_to_nidaqmx_task(pin_list)
@@ -530,12 +587,17 @@ def pins_to_sessions_sessions(tsm_context: TSMContext, pins: PinsArg):
     """
     Returns a pin query contex and a list of properties defined in the pin map.
     The list of properties returned can be used to fill a new object type MultipleSessions
+    Args:
+        tsm_context: Pin context defined by pin map
+        pins: The name of the pin(s) or pin group(s) to translate to a set of tasks.
+    Returns:
+        session: An object that tracks the tasks associated with this pin query. Use this object to publish
+        measurements and extract data from a set of measurements.
     """
     session = tsm_context.pins_to_nidaqmx_tasks(pins)  # pin_query_context, task, channel_lists
     return session
 
 
-# @nitsm.codemoduleapi.code_module
 # def set_session(tsm_context: TSMContext, instrument_name: str, daqmx_session: nidaqmx.Task):
 #     tsm_context.set_nidaqmx_task(instrument_name, daqmx_session)
 
