@@ -1,6 +1,7 @@
 import nitsm
 import typing
 import nidaqmx
+import nidaqmx.constants as constant
 import pytest
 import os
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
@@ -56,6 +57,7 @@ def daqmx_tsm_s(tsm_context, test_pin_s):
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestDaqmx:
     def test_set_task(self, tsm_context):
+        print(tsm_context.pin_map_file_path)
         queried_tasks = tsm_context.get_all_nidaqmx_tasks("AI")
         assert isinstance(queried_tasks, tuple)  # Type verification
         for task in queried_tasks:
@@ -110,10 +112,10 @@ class TestDaqmx:
             daqmx_tsm.timing(samp_cha, samp_rate)
         print("\nTest Trigger Configuration\n")
         # for daqmx_tsm in list_daqmx_tsm:
-        #    daqmx_tsm.reference_analog_edge("/Dev1/ai/StartTrigger")
-        # for daqmx_tsm in list_daqmx_tsm:
-        #     daqmx_tsm.reference_digital_edge("/Dev1/ai0", nidaqmx.constants.Slope.RISING, 2)
-        #     print("TestTest")
+        #     daqmx_tsm.reference_analog_edge("PXI_Trig0") #TODO find Analog Trigger Source
+        for daqmx_tsm in list_daqmx_tsm:
+            daqmx_tsm.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+            print("TestTest")
         print("\nTest Configure Read Channels\n")
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.configure_channels()
@@ -165,7 +167,7 @@ def configure(
     tsm_multi_session.timing(500, 500)
     # Trigger Configuration
     # tsm_multi_session.reference_analog_edge() TODO Solve trigger issue
-    # tsm_multi_session.reference_digital_edge()
+    tsm_multi_session.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
     # Configure Read Channels
     tsm_multi_session.configure_channels()
     # Get Properties
@@ -212,5 +214,46 @@ def close_sessions(tsm_context: TSM_Context):
 
 
 @nitsm.codemoduleapi.code_module
-def Baku_Scenario(tsm_context: TSM_Context):
-    ni_daqmx.set_task(tsm_context)
+def baku_scenario(tsm_context: TSM_Context):
+    #ni_daqmx.set_task(tsm_context)
+    daq_pins1 = [
+        "ACTIVE_READY_DAQ",
+        "BUTTON1_DAQ",
+        "BUTTON2_DAQ",
+        "GPIO17_DAQ",
+        "GPIO18_DAQ",
+        "GPIO20_DAQ",
+        "GPIO21_DAQ",
+        "GPIO22_DAQ",
+        "GPIO23_DAQ",
+        "GPIO24_DAQ",
+        "GPIO25_DAQ",
+        "RESET_L_DAQ",
+        "SHDN_DAQ",
+        "SYS_ALIVE_DAQ"]
+    daq_pins2 = [
+        "GPIO6_DAQ",
+        "GPIO7_DAQ",
+        "GPIO8_DAQ",
+        "GPIO9_DAQ",
+        "GPIO10_DAQ",
+        "GPIO11_DAQ",
+        "GPIO12_DAQ",
+        "GPIO13_DAQ",
+        "GPIO14_DAQ",
+        "GPIO15_DAQ",
+        "GPIO16_DAQ",
+        "GPIO19_DAQ",
+        "OUT32K_DAQ",
+        "SLEEP_32K_DAQ"]
+    daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
+    daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
+    daq_sessions_all = ni_daqmx.MultipleSessions(sessions=daq_sessions_1.sessions + daq_sessions_2.sessions)
+    daq_sessions_all.stop_task()
+    daq_sessions_all.timing()
+    daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+    daq_sessions_all.start_task()
+    daq_sessions_all.read_waveform_multichannel()
+    daq_sessions_all.stop_task()
+
+
