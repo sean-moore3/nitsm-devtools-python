@@ -7,6 +7,11 @@ import os
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
 import nidevtools.daqmx as ni_daqmx
 
+# Types Definition
+PinsArg = typing.Union[str, typing.Sequence[str]]
+Any = typing.Any
+StringTuple = typing.Tuple[str]
+
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
@@ -108,14 +113,17 @@ class TestDaqmx:
             for session in daqmx_tsm.sessions:
                 assert(samp_rate == session.Task.timing.samp_clk_rate)
         print("\nTest Trigger Configuration\n")
-        # for daqmx_tsm in list_daqmx_tsm:
-        #   daqmx_tsm.reference_analog_edge("PXI_Trig0") #TODO find Analog Trigger Source
-        #   for session in daqmx_tsm.sessions:
-        #       assert ("PXI_Trig0" in session.Task.triggers.reference_trigger.dig_edge_src)
+        source = "APFI0"
         for daqmx_tsm in list_daqmx_tsm:
-            daqmx_tsm.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+            daqmx_tsm.reference_analog_edge(source, constant.Slope.FALLING, 0.0, 400) #TODO Review case SPC=500
             for session in daqmx_tsm.sessions:
-                assert("PXI_Trig0" in session.Task.triggers.reference_trigger.dig_edge_src)
+                #print(session.Task.triggers.reference_trigger.anlg_edge_src)
+                assert (source in session.Task.triggers.reference_trigger.anlg_edge_src)
+        source="PXI_Trig0"
+        for daqmx_tsm in list_daqmx_tsm:
+            daqmx_tsm.reference_digital_edge(source, constant.Slope.FALLING, 10)
+            for session in daqmx_tsm.sessions:
+                assert(source in session.Task.triggers.reference_trigger.dig_edge_src)
         print("\nTest Configure Read Channels\n")
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.configure_channels()
@@ -142,45 +150,20 @@ class TestDaqmx:
                 assert task_property.SamplingRate == samp_rate
 
     def test_baku_power_sequence(self, tsm_context):
-        daq_pins1 = [
-            "ACTIVE_READY_DAQ",
-            "BUTTON1_DAQ",
-            "BUTTON2_DAQ",
-            "GPIO17_DAQ",
-            "GPIO18_DAQ",
-            "GPIO20_DAQ",
-            "GPIO21_DAQ",
-            "GPIO22_DAQ",
-            "GPIO23_DAQ",
-            "GPIO24_DAQ",
-            "GPIO25_DAQ",
-            "RESET_L_DAQ",
-            "SHDN_DAQ",
-            "SYS_ALIVE_DAQ"]
-        daq_pins2 = [
-            "GPIO6_DAQ",
-            "GPIO7_DAQ",
-            "GPIO8_DAQ",
-            "GPIO9_DAQ",
-            "GPIO10_DAQ",
-            "GPIO11_DAQ",
-            "GPIO12_DAQ",
-            "GPIO13_DAQ",
-            "GPIO14_DAQ",
-            "GPIO15_DAQ",
-            "GPIO16_DAQ",
-            "GPIO19_DAQ",
-            "OUT32K_DAQ",
-            "SLEEP_32K_DAQ"]
+        daq_pins1 = ["DAQ_Pins1"]
+        daq_pins2 = ["DAQ_Pins2"]
         daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
         daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
+        sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
         daq_sessions_all = ni_daqmx.MultipleSessions(pin_query_context=daq_sessions_1.pin_query_context,
-                                                     sessions=daq_sessions_1.sessions + daq_sessions_2.sessions)
+                                                     sessions=sessions_all)
+        print((daq_sessions_all.sessions))
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
         daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
         daq_sessions_all.start_task()
-        daq_sessions_all.read_waveform_multichannel()
+        data = daq_sessions_all.read_waveform_multichannel(2)
+        print("\n",(data))
         daq_sessions_all.stop_task()
 
 
@@ -212,7 +195,7 @@ def configure(
     # Timing Configuration
     tsm_multi_session.timing(500, 500)
     # Trigger Configuration
-    # tsm_multi_session.reference_analog_edge() TODO Solve trigger issue
+    tsm_multi_session.reference_analog_edge()
     tsm_multi_session.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
     # Configure Read Channels
     tsm_multi_session.configure_channels()

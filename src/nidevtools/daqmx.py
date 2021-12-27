@@ -167,7 +167,7 @@ class _Session(typing.NamedTuple):
         trigger_source: str,
         edge: Enum = nidaqmx.constants.Edge.RISING,
         level_v: float = 0.0,
-        pre_trigger_samples_per_channel: int = 500,
+        pre_trigger_samples_per_channel: int = 400,
     ):
         """
         Configures the task to stop the acquisition when the device acquires all pre-trigger samples;
@@ -187,7 +187,7 @@ class _Session(typing.NamedTuple):
             pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per channel before
             recognizing the Reference Trigger. The number of post-trigger samples per channel is equal to number
             of samples per channel in the DAQmx Timing VI minus pre-trigger samples per channel. If not specified it
-            has value = 500.
+            has value = 400.
         """
         self.Task.triggers.reference_trigger.cfg_anlg_edge_ref_trig(
             trigger_source, pre_trigger_samples_per_channel, edge, level_v
@@ -197,7 +197,7 @@ class _Session(typing.NamedTuple):
         self,
         trigger_source: str,
         edge: Enum = nidaqmx.constants.Slope.RISING,
-        pre_trigger_samples_per_channel: int = 500,
+        pre_trigger_samples_per_channel: int = 400,
     ):
         """
         Configures the task in this session to stop the acquisition when the device acquires all
@@ -354,7 +354,7 @@ class _Sessions:
         trigger_source: str,
         edge: Enum = nidaqmx.constants.Slope.RISING,
         level_v: float = 0.0,
-        pre_trigger_samples_per_channel: int = 500,
+        pre_trigger_samples_per_channel: int = 400,
     ):
         """
         Configures each task  in the session list to stop the acquisition when the device acquires all pre-trigger
@@ -374,7 +374,7 @@ class _Sessions:
             pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per channel before
                 recognizing the Reference Trigger. The number of post-trigger samples per channel is equal to number
                 of samples per channel in the DAQmx Timing VI minus pre-trigger samples per channel. If not specified it
-                has value = 500.
+                has value = 400.
         """
         for session in self.sessions:
             session.st_ref_analog_edge(trigger_source, edge, level_v, pre_trigger_samples_per_channel)
@@ -383,7 +383,7 @@ class _Sessions:
         self,
         trigger_source: str,
         edge: Enum = nidaqmx.constants.Slope.RISING,
-        pre_trigger_samples_per_channel: int = 500,
+        pre_trigger_samples_per_channel: int = 400,
     ):
         """
         Configures each task in this session list to stop the acquisition when the device acquires all
