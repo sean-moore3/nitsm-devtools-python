@@ -106,7 +106,7 @@ class TestDaqmx:
             daqmx_tsm.read_waveform(samples_per_channel=1)
             daqmx_tsm.stop_task()
         print("\nTest Timing Configuration\n")
-        samp_cha = 500
+        samp_cha = 1000
         samp_rate = 500
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.timing(samp_cha, samp_rate)
@@ -115,9 +115,8 @@ class TestDaqmx:
         print("\nTest Trigger Configuration\n")
         source = "APFI0"
         for daqmx_tsm in list_daqmx_tsm:
-            daqmx_tsm.reference_analog_edge(source, constant.Slope.FALLING, 0.0, 400) #TODO Review case SPC=500
+            daqmx_tsm.reference_analog_edge(source, constant.Slope.FALLING, 0.0, 500)
             for session in daqmx_tsm.sessions:
-                #print(session.Task.triggers.reference_trigger.anlg_edge_src)
                 assert (source in session.Task.triggers.reference_trigger.anlg_edge_src)
         source="PXI_Trig0"
         for daqmx_tsm in list_daqmx_tsm:
@@ -193,9 +192,9 @@ def configure(
     tsm_multi_session: ni_daqmx.MultipleSessions
     tsm_multi_session = ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
     # Timing Configuration
-    tsm_multi_session.timing(500, 500)
+    tsm_multi_session.timing(1000, 500)
     # Trigger Configuration
-    tsm_multi_session.reference_analog_edge()
+    tsm_multi_session.reference_analog_edge("APFI0")
     tsm_multi_session.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
     # Configure Read Channels
     tsm_multi_session.configure_channels()
@@ -245,21 +244,7 @@ def scenario1(tsm_context: TSM_Context):
         "RESET_L_DAQ",
         "SHDN_DAQ",
         "SYS_ALIVE_DAQ"]
-    daq_pins2 = [
-        "GPIO6_DAQ",
-        "GPIO7_DAQ",
-        "GPIO8_DAQ",
-        "GPIO9_DAQ",
-        "GPIO10_DAQ",
-        "GPIO11_DAQ",
-        "GPIO12_DAQ",
-        "GPIO13_DAQ",
-        "GPIO14_DAQ",
-        "GPIO15_DAQ",
-        "GPIO16_DAQ",
-        "GPIO19_DAQ",
-        "OUT32K_DAQ",
-        "SLEEP_32K_DAQ"]
+    daq_pins2 = ["DAQ_Pins2"]
     daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
     daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
     daq_sessions_all = ni_daqmx.MultipleSessions(
