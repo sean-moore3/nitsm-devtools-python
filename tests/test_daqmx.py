@@ -34,10 +34,6 @@ def tsm_context(standalone_tsm_context: TSM_Context):
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE_HARDWARE)
-    if SIMULATE_HARDWARE:
-        options = OPTIONS
-    else:
-        options = {}  # empty options to run on real hardware.
     ni_daqmx.set_task(standalone_tsm_context)
     yield standalone_tsm_context
     ni_daqmx.clear_task(standalone_tsm_context)
@@ -118,7 +114,7 @@ class TestDaqmx:
             daqmx_tsm.reference_analog_edge(source, constant.Slope.FALLING, 0.0, 500)
             for session in daqmx_tsm.sessions:
                 assert (source in session.Task.triggers.reference_trigger.anlg_edge_src)
-        source="PXI_Trig0"
+        source = "PXI_Trig0"
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.reference_digital_edge(source, constant.Slope.FALLING, 10)
             for session in daqmx_tsm.sessions:
@@ -156,13 +152,12 @@ class TestDaqmx:
         sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
         daq_sessions_all = ni_daqmx.MultipleSessions(pin_query_context=daq_sessions_1.pin_query_context,
                                                      sessions=sessions_all)
-        print((daq_sessions_all.sessions))
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
         daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
         daq_sessions_all.start_task()
         data = daq_sessions_all.read_waveform_multichannel(2)
-        print("\n",(data))
+        print("\n", data)
         daq_sessions_all.stop_task()
 
 
