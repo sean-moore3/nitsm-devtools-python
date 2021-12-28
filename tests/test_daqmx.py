@@ -1,16 +1,22 @@
 import nitsm
 import typing
 import nidaqmx
+import nidaqmx.constants as constant
 import pytest
 import os
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
 import nidevtools.daqmx as ni_daqmx
 
+# Types Definition
+PinsArg = typing.Union[str, typing.Sequence[str]]
+Any = typing.Any
+StringTuple = typing.Tuple[str]
+
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
 pin_file_names = ["7DUT.pinmap", "daqmx.pinmap"]
-# Change index below to change the pinmap to use
+# Change index below to change the pin map to use
 pin_file_name = pin_file_names[1]
 message = "With DAQmx Pinmap"
 if SIMULATE_HARDWARE:
@@ -32,7 +38,6 @@ def tsm_context(standalone_tsm_context: TSM_Context):
         options = OPTIONS
     else:
         options = {}  # empty options to run on real hardware.
-
     ni_daqmx.set_task(standalone_tsm_context)
     yield standalone_tsm_context
     ni_daqmx.clear_task(standalone_tsm_context)
@@ -56,6 +61,7 @@ def daqmx_tsm_s(tsm_context, test_pin_s):
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestDaqmx:
     def test_set_task(self, tsm_context):
+        print(tsm_context.pin_map_file_path)
         queried_tasks = tsm_context.get_all_nidaqmx_tasks("AI")
         assert isinstance(queried_tasks, tuple)  # Type verification
         for task in queried_tasks:
@@ -65,8 +71,6 @@ class TestDaqmx:
             assert len(queried_tasks) >= 1  # Matching quantity
 
     def test_pin_to_sessions_info(self, daqmx_tsm_s):
-        """TSM SSC DCPower Pins to Sessions.vi"""
-        # print("\nTest_pin_s\n", test_pin_s)
         tsm_context = daqmx_tsm_s[0]
         list_daqmx_tsm = daqmx_tsm_s[1]
         print(list_daqmx_tsm)
@@ -74,13 +78,13 @@ class TestDaqmx:
             print("\nTest_pin_to_sessions\n", daqmx_tsm)
             print(daqmx_tsm.sessions)
             assert isinstance(daqmx_tsm, ni_daqmx.MultipleSessions)
-            assert isinstance(daqmx_tsm.pin_query_contex, ni_daqmx.PinQueryContext)
+            assert isinstance(daqmx_tsm.pin_query_context, ni_daqmx.PinQueryContext)
             assert isinstance(daqmx_tsm.sessions, typing.List)
             assert len(daqmx_tsm.sessions) == len(tsm_context.site_numbers)
 
     def test_get_all_instrument_names(self, tsm_context):
         data = ni_daqmx.get_all_instrument_names(tsm_context)
-        print("\nInstrument Names: \n", data)
+        print("\nTest Instrument Names: \n", data)
         assert type(data) == tuple
         for element in data:
             assert type(element) == tuple
@@ -88,7 +92,7 @@ class TestDaqmx:
 
     def test_get_all_sessions(self, tsm_context):
         data = ni_daqmx.get_all_sessions(tsm_context)
-        print("\nSessions: \n", data)
+        print("\nTest Sessions: \n", data)
         assert type(data) == tuple
         assert len(data) != 0
         for element in data:
@@ -96,24 +100,30 @@ class TestDaqmx:
 
     def test_properties(self, daqmx_tsm_s):
         list_daqmx_tsm = daqmx_tsm_s[1]
-        print("\nTest Start All\n")
+        print("\nTest Start/Stop All\n")
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.start_task()
-            daqmx_tsm.stop_task()
-        print("\nTest Stop All\n")
-        for daqmx_tsm in list_daqmx_tsm:
+            daqmx_tsm.read_waveform(samples_per_channel=1)
             daqmx_tsm.stop_task()
         print("\nTest Timing Configuration\n")
         samp_cha = 500
         samp_rate = 500
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.timing(samp_cha, samp_rate)
+            for session in daqmx_tsm.sessions:
+                assert(samp_rate == session.Task.timing.samp_clk_rate)
         print("\nTest Trigger Configuration\n")
-        # for daqmx_tsm in list_daqmx_tsm:
-        #    daqmx_tsm.reference_analog_edge("/Dev1/ai/StartTrigger")
-        # for daqmx_tsm in list_daqmx_tsm:
-        #     daqmx_tsm.reference_digital_edge("/Dev1/ai0", nidaqmx.constants.Slope.RISING, 2)
-        #     print("TestTest")
+        source = "APFI0"
+        for daqmx_tsm in list_daqmx_tsm:
+            daqmx_tsm.reference_analog_edge(source, constant.Slope.FALLING, 0.0, 400) #TODO Review case SPC=500
+            for session in daqmx_tsm.sessions:
+                #print(session.Task.triggers.reference_trigger.anlg_edge_src)
+                assert (source in session.Task.triggers.reference_trigger.anlg_edge_src)
+        source="PXI_Trig0"
+        for daqmx_tsm in list_daqmx_tsm:
+            daqmx_tsm.reference_digital_edge(source, constant.Slope.FALLING, 10)
+            for session in daqmx_tsm.sessions:
+                assert(source in session.Task.triggers.reference_trigger.dig_edge_src)
         print("\nTest Configure Read Channels\n")
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.configure_channels()
@@ -121,11 +131,15 @@ class TestDaqmx:
         for daqmx_tsm in list_daqmx_tsm:
             print("\nTest Read Single Channel\n")
             daqmx_tsm.start_task()
-            daqmx_tsm.read_waveform()
+            data = daqmx_tsm.read_waveform(samples_per_channel=8)
+            print(data)
+            assert(isinstance(data, list))
             daqmx_tsm.stop_task()
             print("\nTest Read Multiple Channels\n")
             daqmx_tsm.start_task()
-            daqmx_tsm.read_waveform_multichannel()
+            data = daqmx_tsm.read_waveform_multichannel(samples_per_channel=2)
+            print(data)
+            assert (isinstance(data, list))
             daqmx_tsm.stop_task()
         print("\nVerify Properties\n")
         for daqmx_tsm in list_daqmx_tsm:
@@ -134,6 +148,23 @@ class TestDaqmx:
             for task_property in data:
                 assert isinstance(task_property, ni_daqmx.TaskProperties)
                 assert task_property.SamplingRate == samp_rate
+
+    def test_baku_power_sequence(self, tsm_context):
+        daq_pins1 = ["DAQ_Pins1"]
+        daq_pins2 = ["DAQ_Pins2"]
+        daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
+        daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
+        sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
+        daq_sessions_all = ni_daqmx.MultipleSessions(pin_query_context=daq_sessions_1.pin_query_context,
+                                                     sessions=sessions_all)
+        print((daq_sessions_all.sessions))
+        daq_sessions_all.stop_task()
+        daq_sessions_all.timing()
+        daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+        daq_sessions_all.start_task()
+        data = daq_sessions_all.read_waveform_multichannel(2)
+        print("\n",(data))
+        daq_sessions_all.stop_task()
 
 
 @nitsm.codemoduleapi.code_module
@@ -164,8 +195,8 @@ def configure(
     # Timing Configuration
     tsm_multi_session.timing(500, 500)
     # Trigger Configuration
-    # tsm_multi_session.reference_analog_edge() TODO Solve trigger issue
-    # tsm_multi_session.reference_digital_edge()
+    tsm_multi_session.reference_analog_edge()
+    tsm_multi_session.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
     # Configure Read Channels
     tsm_multi_session.configure_channels()
     # Get Properties
@@ -198,19 +229,45 @@ def acquisition_multi_ch(
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: TSM_Context):
-    print("opening sessions")
-    ni_daqmx.set_task(tsm_context)
-    tsmdaqmx = ni_daqmx.pins_to_session_sessions_info(tsm_context, ["SGL1", "SGL2"])
-
-
-@nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: TSM_Context):
-    print(" Closing sessions")
-    tsmdaqmx = ni_daqmx.pins_to_session_sessions_info(tsm_context, ["SGL1", "SGL2"])
-    ni_daqmx.clear_task(tsm_context)
-
-
-@nitsm.codemoduleapi.code_module
-def Baku_Scenario(tsm_context: TSM_Context):
-    ni_daqmx.set_task(tsm_context)
+def scenario1(tsm_context: TSM_Context):
+    daq_pins1 = [
+        "ACTIVE_READY_DAQ",
+        "BUTTON1_DAQ",
+        "BUTTON2_DAQ",
+        "GPIO17_DAQ",
+        "GPIO18_DAQ",
+        "GPIO20_DAQ",
+        "GPIO21_DAQ",
+        "GPIO22_DAQ",
+        "GPIO23_DAQ",
+        "GPIO24_DAQ",
+        "GPIO25_DAQ",
+        "RESET_L_DAQ",
+        "SHDN_DAQ",
+        "SYS_ALIVE_DAQ"]
+    daq_pins2 = [
+        "GPIO6_DAQ",
+        "GPIO7_DAQ",
+        "GPIO8_DAQ",
+        "GPIO9_DAQ",
+        "GPIO10_DAQ",
+        "GPIO11_DAQ",
+        "GPIO12_DAQ",
+        "GPIO13_DAQ",
+        "GPIO14_DAQ",
+        "GPIO15_DAQ",
+        "GPIO16_DAQ",
+        "GPIO19_DAQ",
+        "OUT32K_DAQ",
+        "SLEEP_32K_DAQ"]
+    daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
+    daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
+    daq_sessions_all = ni_daqmx.MultipleSessions(
+        pin_query_context=daq_sessions_1.pin_query_context,
+        sessions=daq_sessions_1.sessions + daq_sessions_2.sessions)
+    daq_sessions_all.stop_task()
+    daq_sessions_all.timing()
+    daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+    daq_sessions_all.start_task()
+    daq_sessions_all.read_waveform_multichannel()
+    daq_sessions_all.stop_task()
