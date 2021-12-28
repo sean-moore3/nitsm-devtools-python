@@ -101,20 +101,8 @@ class TestNIScope:
             scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
             scope.tsm_ssc_clear_triggers(tsm_scope)
-            print(test_pins[0])
             scope.tsm_ssc_export_analog_edge_start_trigger(tsm_scope, test_pins[0], "/OSC1/PXI_Trig2")
             scope.tsm_ssc_start_acquisition(tsm_scope)
-            _, props = scope.get_session_properties(tsm_scope)
-            print("\n", props)
-            _, measurement1 = scope.fetch_measurement(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
-            print(measurement1)
-            _, measurement2 = scope.measure_statistics(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
-            print(measurement2)
-            scope.ssc_fetch_clear_stats(tsm_scope.ssc)
-            _, data3 = scope.tsm_ssc_fetch_meas_stats_per_channel(
-                tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
-            )
-            print(data3)
             _, data1, data2 = scope.fetch_waveform(tsm_scope, 1)
             print(data1, data2, "\n")
 

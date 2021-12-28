@@ -184,18 +184,17 @@ def pin_query_context_to_channel_list(
     sites: typing.List[int],
 ):
     """
-    .
+    provides the p.
     """
     tsm_context = pin_query_context._tsm_context
     tsm_context1 = nitsm.codemoduleapi.SemiconductorModuleContext(tsm_context)
     if not sites:
-        """
-        Get site numbers if not provided
-        """
+        """Get site numbers if not provided"""
         sites = list(tsm_context1.site_numbers)
-        print("sites from TSM:", sites)  # Need to test this case after bug fix
-
     if expanded_pin_info:
+        pins = [pin_info.pin for pin_info in expanded_pin_info]
+        pin_types = [pin_info.type for pin_info in expanded_pin_info]
+    else:
         """
         The list of pins from Pin Query Context Read Pins
         doesn't expand pin groups, it only contains the
@@ -204,14 +203,8 @@ def pin_query_context_to_channel_list(
         If a pin group is found when identifying pin types,
         expand pin groups
         """
-        pins = [pin_info.pin for pin_info in expanded_pin_info]
-        pin_types = [pin_info.type for pin_info in expanded_pin_info]
-    else:
         pins = pin_query_context._pins
-        pin_types, pin_group_found = identify_pin_types(tsm_context, pins)
-        if pin_group_found:
-            pins = tsm_context.get_pins_in_pin_groups(pins)
-            pin_types, pin_group_found = identify_pin_types(tsm_context, pins)
+        pin_types, pins = _check_for_pin_group(tsm_context, pins)
     (
         num_pins_per_channel_group,
         channel_group_indices,
@@ -225,9 +218,7 @@ def pin_query_context_to_channel_list(
         pins_array = pin_str * pin_count
         data.append(pins_array)
 
-    for site_number, channel_group_index_s, channel_index_s in zip(
-        sites, channel_group_indices, channel_indices
-    ):
+    for site_number, channel_group_index_s, channel_index_s in zip(sites, channel_group_indices, channel_indices):
         for channel_group_index, channel_index, pin, pin_type in zip(
             channel_group_index_s, channel_index_s, pins, pin_types
         ):
@@ -253,7 +244,9 @@ def pin_query_context_to_channel_list(
 
 
 @nitsm.codemoduleapi.code_module
-def identify_pin_types(tsm_context: SemiconductorModuleContext, pins_or_pins_group: typing.Union[str, typing.Sequence[str]]):
+def identify_pin_types(
+    tsm_context: SemiconductorModuleContext, pins_or_pins_group: typing.Union[str, typing.Sequence[str]]
+):
     all_pin_names, all_pin_types = get_all_pins(tsm_context)
     pin_group_found = False
     pin_types = []
@@ -266,3 +259,16 @@ def identify_pin_types(tsm_context: SemiconductorModuleContext, pins_or_pins_gro
             pin_group_found = True
         pin_types.append(pin_type)
     return pin_types, pin_group_found
+
+
+@nitsm.codemoduleapi.code_module
+def _check_for_pin_group(
+    tsm_context: SemiconductorModuleContext,
+    pins_or_pins_group: typing.Union[str, typing.Sequence[str]],
+):
+    pins = pins_or_pins_group
+    pins_types, pin_group_found = identify_pin_types(tsm_context, pins_or_pins_group)
+    if pin_group_found:
+        pins = tsm_context.get_pins_in_pin_groups(pins_or_pins_group)
+        pins_types, _ = identify_pin_types(tsm_context, pins)
+    return pins_types, pins

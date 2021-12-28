@@ -228,15 +228,26 @@ def _pin_query_context_to_channel_list(
     tsm_context = pin_query_context._tsm_context
     tsm_context1 = nitsm.codemoduleapi.SemiconductorModuleContext(pin_query_context._tsm_context)
     if len(sites) == 0:
-        print ("Get site numbers if not provided")
-        print(tsm_context)
         sites = list(tsm_context1.site_numbers)
-        print("sites from TSM:", sites)  # Need to test this case after bug fix
+    if expanded_pins_information:
+        pin_names = []
+        pin_types = []
+        for exp_pin_info in expanded_pins_information:
+            pin_names.append(exp_pin_info.Pin)
+            pin_types.append(exp_pin_info.Type)
+    else:
+        """
+        The list of pins from Pin Query Context Read Pins
+        doesn't expand pin groups, it only contains the
+        initial strings provided to pins to sessions
+
+        If a pin group is found when identifying pin types,
+        expand pin groups
+        """
+        pins = pin_query_context._pins
+        pin_types, pin_names = ni_dt_common._check_for_pin_group(tsm_context, pins)
     pins_array_for_session_input: typing.List[PinsCluster] = []
     channel_list_per_session = ()
-    pin_types_return: typing.List[PinType] = []
-    pin_names_return: typing.Union[str, typing.Sequence[str]] = []
-    pins: typing.Union[str, typing.Sequence[str]] = pin_query_context._pins
     (
         number_of_pins_per_channel,
         channel_group_indices,
@@ -248,20 +259,6 @@ def _pin_query_context_to_channel_list(
         """
         initialized_pins: typing.List[str] = [""] * number_of_pins
         pins_array_for_session_input.append(PinsCluster(Pins=initialized_pins))
-    if len(expanded_pins_information) == 0:
-        """
-        The list of pins from Pin Query Context Read Pins
-        doesn't expand pin groups, it only contains the
-        initial strings provided to pins to sessions
-
-        If a pin group is found when identifying pin types,
-        expand pin groups
-        """
-        pin_types_return, pin_names_return = _check_for_pin_group(tsm_context, pins)
-    else:
-        for expanded_pin_information in expanded_pins_information:
-            pin_names_return.append(expanded_pin_information.Pin)
-            pin_types_return.append(expanded_pin_information.Type)
     for (per_site_transposed_channel_group_indices, per_site_transposed_channel_indices, site_number,) in zip(
         numpy.transpose(channel_group_indices),
         numpy.transpose(channel_indices),
@@ -270,8 +267,8 @@ def _pin_query_context_to_channel_list(
         for (per_pin_transposed_channel_group_index, per_pin_transposed_channel_index, pin, pin_type,) in zip(
             per_site_transposed_channel_group_indices,
             per_site_transposed_channel_indices,
-            pin_names_return,
-            pin_types_return,
+            pin_names,
+            pin_types,
         ):
             if pin_type.value == 1:
                 pins_array_for_session_input[per_pin_transposed_channel_group_index].Pins[
@@ -285,19 +282,6 @@ def _pin_query_context_to_channel_list(
         channel_list = ",".join(pins_array_for_session.Pins)
         channel_list_per_session += (channel_list,)
     return sites, channel_list_per_session
-
-
-def _check_for_pin_group(
-    tsm_context: TSMContext,
-    pins_or_pins_group: typing.Union[str, typing.Sequence[str]],
-):
-    pins_types, pin_group_found = ni_dt_common.identify_pin_types(tsm_context, pins_or_pins_group)
-    if pin_group_found:
-        pins: typing.Union[str, typing.Sequence[str]] = tsm_context.get_pins_in_pin_groups(pins_or_pins_group)
-        pins_types, _ = ni_dt_common.identify_pin_types(tsm_context, pins)
-    else:
-        pins = pins_or_pins_group
-    return pins_types, pins
 
 
 # Digital Sub routines
@@ -349,8 +333,6 @@ def tsm_ssc_pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], si
     pin_query_context, sessions, channels = tsm_context.pins_to_niscope_sessions(pins)
     sites_out, channel_list_per_session = _pin_query_context_to_channel_list(pin_query_context, [], sites)
     # sites_out, channel_list_per_session = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
-    print("sites", sites_out)
-    print("channel_list_per_session", channel_list_per_session)
     for session, channel, channel_list in zip(sessions, channels, channel_list_per_session):
         ssc_s.append(SSCScope(session=session, channels=channel, channel_list=channel_list))
     return TSMScope(pin_query_context, sites_out, ssc_s)
@@ -599,33 +581,26 @@ def tsm_ssc_export_analog_edge_start_trigger(
 ):
     """Export Analog Edge Start Trigger.vi"""
     start_trigger: str = ""
-    temp_channel_name: str = ""
+    trigger_source: str = "0"
     i = 0
     flag = 0
     for ssc in tsm.ssc:
         j = 0
-        print("ssc.channel_list", ssc.channel_list, "ssc.channels", ssc.channels)
         for channel in ssc.channel_list.split(","):
-            print("channel", channel)
-            print("Pin Name", analog_trigger_pin_name)
             if analog_trigger_pin_name in channel:
-                temp_channel_name = analog_trigger_pin_name
                 flag = 1
-                print("Pin found at ", i, j)
+                trigger_source = ssc.channels.split(",")[j]
+                trigger_source = trigger_source.strip()
                 break
             j += 1
         if flag == 1:
             break
         i += 1
-        print(i, j)
     data = tsm.ssc.pop(i)
     tsm.ssc.insert(0, data)
     for ssc in tsm.ssc:
         if tsm.ssc.index(ssc) == 0:
-            channel = ssc.channel_list.split(",")[j]
-            channel = channel.strip()
-            print(channel, temp_channel_name)
-            ssc.session.configure_trigger_edge(channel, trigger_level, niscope.TriggerCoupling.DC, trigger_slope)
+            ssc.session.configure_trigger_edge(trigger_source, trigger_level, niscope.TriggerCoupling.DC, trigger_slope)
             ssc.session.exported_start_trigger_output_terminal = output_terminal
             ssc.session.commit()
             start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
