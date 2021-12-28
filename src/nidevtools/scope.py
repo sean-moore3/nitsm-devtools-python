@@ -226,6 +226,12 @@ def _pin_query_context_to_channel_list(
     sites: typing.List[int],
 ):
     tsm_context = pin_query_context._tsm_context
+    tsm_context1 = nitsm.codemoduleapi.SemiconductorModuleContext(pin_query_context._tsm_context)
+    if len(sites) == 0:
+        print ("Get site numbers if not provided")
+        print(tsm_context)
+        sites = list(tsm_context1.site_numbers)
+        print("sites from TSM:", sites)  # Need to test this case after bug fix
     pins_array_for_session_input: typing.List[PinsCluster] = []
     channel_list_per_session = ()
     pin_types_return: typing.List[PinType] = []
@@ -242,17 +248,6 @@ def _pin_query_context_to_channel_list(
         """
         initialized_pins: typing.List[str] = [""] * number_of_pins
         pins_array_for_session_input.append(PinsCluster(Pins=initialized_pins))
-    if len(sites) == 0:
-        """
-        Get site numbers if not provided
-        """
-        try:
-            sites_out: typing.List[int] = list(tsm_context.sites)
-            # print(sites)  # Need to test this case after bug fix
-        except Exception:
-            sites_out = []
-    else:
-        sites_out = sites
     if len(expanded_pins_information) == 0:
         """
         The list of pins from Pin Query Context Read Pins
@@ -270,7 +265,7 @@ def _pin_query_context_to_channel_list(
     for (per_site_transposed_channel_group_indices, per_site_transposed_channel_indices, site_number,) in zip(
         numpy.transpose(channel_group_indices),
         numpy.transpose(channel_indices),
-        sites_out,
+        sites,
     ):
         for (per_pin_transposed_channel_group_index, per_pin_transposed_channel_index, pin, pin_type,) in zip(
             per_site_transposed_channel_group_indices,
@@ -289,53 +284,20 @@ def _pin_query_context_to_channel_list(
     for pins_array_for_session in pins_array_for_session_input:
         channel_list = ",".join(pins_array_for_session.Pins)
         channel_list_per_session += (channel_list,)
-    return sites_out, channel_list_per_session
+    return sites, channel_list_per_session
 
 
 def _check_for_pin_group(
     tsm_context: TSMContext,
     pins_or_pins_group: typing.Union[str, typing.Sequence[str]],
 ):
-    pins_types, pin_group_found = _identify_pin_types(tsm_context, pins_or_pins_group)
+    pins_types, pin_group_found = ni_dt_common.identify_pin_types(tsm_context, pins_or_pins_group)
     if pin_group_found:
         pins: typing.Union[str, typing.Sequence[str]] = tsm_context.get_pins_in_pin_groups(pins_or_pins_group)
-        pins_types, _ = _identify_pin_types(tsm_context, pins)
+        pins_types, _ = ni_dt_common.identify_pin_types(tsm_context, pins)
     else:
         pins = pins_or_pins_group
     return pins_types, pins
-
-
-def _identify_pin_types(
-    tsm_context: TSMContext,
-    pins_or_pins_group: typing.Union[str, typing.Sequence[str]],
-):
-    filtered_pin_types: typing.List[PinType] = []
-    pin_group_found: bool = False
-    pin_names, pin_types = _get_all_pin_names(tsm_context, reload_cache=False)
-    for pin in pins_or_pins_group:
-        try:
-            index = pin_names.index(pin)
-            filtered_pin_types.append(pin_types[index])
-            pin_group_found = False
-        except ValueError:
-            filtered_pin_types.append(PinType.Pin_Group)
-            pin_group_found = True
-    return filtered_pin_types, pin_group_found
-
-
-def _get_all_pin_names(
-    tsm_context: TSMContext,
-    reload_cache: bool = False,
-):
-    pin_names: typing.Union[str, typing.Sequence[str]] = []
-    pin_types: typing.List[PinType] = []
-    if len(pin_names) == 0 or reload_cache:
-        dut_pins, system_pins = tsm_context.get_pin_names()
-        dut_pins_type = [PinType.DUT_Pin] * len(dut_pins)
-        system_pins_type = [PinType.System_Pin] * len(system_pins)
-        pin_names = dut_pins + system_pins
-        pin_types = dut_pins_type + system_pins_type
-    return pin_names, pin_types
 
 
 # Digital Sub routines
@@ -385,8 +347,10 @@ def _expand_to_requested_array_size(
 def tsm_ssc_pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int]):
     ssc_s: typing.List[SSCScope] = []
     pin_query_context, sessions, channels = tsm_context.pins_to_niscope_sessions(pins)
-    # sites_out, channel_list_per_session = _pin_query_context_to_channel_list(pin_query_context, [], sites)
-    sites_out, channel_list_per_session = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
+    sites_out, channel_list_per_session = _pin_query_context_to_channel_list(pin_query_context, [], sites)
+    # sites_out, channel_list_per_session = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
+    print("sites", sites_out)
+    print("channel_list_per_session", channel_list_per_session)
     for session, channel, channel_list in zip(sessions, channels, channel_list_per_session):
         ssc_s.append(SSCScope(session=session, channels=channel, channel_list=channel_list))
     return TSMScope(pin_query_context, sites_out, ssc_s)
@@ -640,15 +604,20 @@ def tsm_ssc_export_analog_edge_start_trigger(
     flag = 0
     for ssc in tsm.ssc:
         j = 0
+        print("ssc.channel_list", ssc.channel_list, "ssc.channels", ssc.channels)
         for channel in ssc.channel_list.split(","):
+            print("channel", channel)
+            print("Pin Name", analog_trigger_pin_name)
             if analog_trigger_pin_name in channel:
                 temp_channel_name = analog_trigger_pin_name
                 flag = 1
+                print("Pin found at ", i, j)
                 break
             j += 1
         if flag == 1:
             break
         i += 1
+        print(i, j)
     data = tsm.ssc.pop(i)
     tsm.ssc.insert(0, data)
     for ssc in tsm.ssc:
