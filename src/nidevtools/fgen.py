@@ -21,7 +21,9 @@ class _NIFGenSSC:
     """
 
     def __init__(self, session: nifgen.Session, channels: str, pin_list: str):
-        self._session = session  # mostly shared session  (very rarely unique session) depends on pinmap file.
+        self._session = (
+            session  # mostly shared session  (very rarely unique session) depends on pinmap file.
+        )
         self._channels = channels  # specific channel(s) of that session
         self._pin_list = pin_list  # pin names mapped to the channels
 
@@ -33,7 +35,9 @@ class _NIFGenSSC:
     def cs_channels(self):
         return self._channels
 
-    def cs_generate_sine_wave(self, waveform_data, sample_rate=1.0, gain=1.0, offset=0.0, enable_filter=True):
+    def cs_generate_sine_wave(
+        self, waveform_data, sample_rate=1.0, gain=1.0, offset=0.0, enable_filter=True
+    ):
         self.session.abort()
         self.session.clear_arb_memory()
         self.session.output_mode = nifgen.OutputMode.ARB
@@ -85,14 +89,18 @@ class _NIFGenTSM:
         else:
             samples = min_wav_samples
         sine_fr = 1 / pts
-        waveform_data = self.create_waveform_data(samples=samples, frequency=sine_fr, phase_degree=90)
+        waveform_data = self.create_waveform_data(
+            samples=samples, frequency=sine_fr, phase_degree=90
+        )
         waveform_data = [amplitude * data for data in waveform_data]
         waveform_data = [offset + data for data in waveform_data]
         sample_rate = pts * frequency  # waveform_dt = 1 / (sample_rate)
         gain = max([abs(data) for data in waveform_data])
         normalised_waveform = [data / gain for data in waveform_data]
         for ssc in self._sessions_sites_channels:
-            ssc.cs_generate_sine_wave(normalised_waveform, sample_rate, gain, 0, enable_filter=enable_filter)
+            ssc.cs_generate_sine_wave(
+                normalised_waveform, sample_rate, gain, 0, enable_filter=enable_filter
+            )
         return waveform_data
 
 
@@ -105,7 +113,9 @@ class TSMFGen(typing.NamedTuple):
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int]):
     pin_query_context, sessions, channels = tsm_context.pins_to_nifgen_sessions(pins)
-    sites_out, pin_list_per_session = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
+    sites_out, pin_list_per_session = ni_dt_common.pin_query_context_to_channel_list(
+        pin_query_context, [], sites
+    )
     sscs: typing.List[_NIFGenSSC] = []
     for session, channel, pin_list in zip(sessions, channels, pin_list_per_session):
         sscs.append(_NIFGenSSC(session=session, channels=channel, pin_list=pin_list))

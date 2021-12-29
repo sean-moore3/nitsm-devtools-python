@@ -137,7 +137,9 @@ def expand_pin_groups_and_identify_pin_types(tsm_context: TSMContext, pins_in):
             for a_pin in temp_exp_pins:
                 index_a = pins_temp.index(a_pin)
                 a_pin_type = pin_types_temp[index_a]
-                pin_expanded = ExpandedPinInformation(a_pin, a_pin_type, i)  # Found bug here due to class & fixed it.
+                pin_expanded = ExpandedPinInformation(
+                    a_pin, a_pin_type, i
+                )  # Found bug here due to class & fixed it.
                 pins_expanded.append(pin_expanded)
         pin_info = PinInformation(d_pin, d_pin_type, count)
         pins_info.append(pin_info)
@@ -218,7 +220,9 @@ def pin_query_context_to_channel_list(
         pins_array = pin_str * pin_count
         data.append(pins_array)
 
-    for site_number, channel_group_index_s, channel_index_s in zip(sites, channel_group_indices, channel_indices):
+    for site_number, channel_group_index_s, channel_index_s in zip(
+        sites, channel_group_indices, channel_indices
+    ):
         for channel_group_index, channel_index, pin, pin_type in zip(
             channel_group_index_s, channel_index_s, pins, pin_types
         ):
@@ -227,7 +231,9 @@ def pin_query_context_to_channel_list(
             else:
                 if data[channel_group_index][channel_index]:
                     temp = data[channel_group_index][channel_index].split("/")
-                    data[channel_group_index][channel_index] = temp[0] + "+" + str(site_number) + "/" + temp[1]
+                    data[channel_group_index][channel_index] = (
+                        temp[0] + "+" + str(site_number) + "/" + temp[1]
+                    )
                 else:
                     data[channel_group_index][channel_index] = "Site" + str(site_number) + "/" + pin
     per_session_pin_list = []
@@ -244,7 +250,9 @@ def pin_query_context_to_channel_list(
 
 
 @nitsm.codemoduleapi.code_module
-def identify_pin_types(tsm_context: TSMContext, pins_or_pins_group: typing.Union[str, typing.Sequence[str]]):
+def identify_pin_types(
+    tsm_context: TSMContext, pins_or_pins_group: typing.Union[str, typing.Sequence[str]]
+):
     all_pin_names, all_pin_types = get_all_pins(tsm_context)
     pin_group_found = False
     pin_types = []

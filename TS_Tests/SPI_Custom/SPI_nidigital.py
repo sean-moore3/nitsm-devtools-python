@@ -6,7 +6,9 @@ import digital as ni_dt_digital
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm_context: SemiconductorModuleContext):
     ni_dt_digital.tsm_initialize_sessions(tsm_context)
-    tsm_spi = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["CS", "SCK", "MOSI", "MISO", "SYNC"])
+    tsm_spi = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(
+        tsm_context, ["CS", "SCK", "MOSI", "MISO", "SYNC"]
+    )
     ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm_spi, "PinLevels", "Timing")
     ni_dt_digital.tsm_ssc_select_function(tsm_spi, ni_dt_digital.enums.SelectedFunction.DIGITAL)
 

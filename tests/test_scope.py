@@ -8,10 +8,7 @@ import nidevtools.scope as scope
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
-pin_file_names = [
-    "scope.pinmap",
-    "7DUT.pinmap",
-]
+pin_file_names = ["scope.pinmap", "7DUT.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 if SIMULATE:
@@ -76,8 +73,23 @@ class TestNIScope:
             scope.configure_impedance(tsm_scope, 0.5)
             scope.configure_reference_level(tsm_scope)
             scope.configure_vertical(tsm_scope, 5.0, niscope.VerticalCoupling.DC, 0.0, 1.0, True)
-            scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
-            scope.configure_vertical_per_channel(tsm_scope, 5.0, 0.0, 1.0, niscope.VerticalCoupling.DC, True)
+            scope.configure(
+                tsm_scope,
+                5.0,
+                1.0,
+                0.0,
+                niscope.VerticalCoupling.DC,
+                10e6,
+                1000,
+                0.0,
+                0.0,
+                1e6,
+                1,
+                True,
+            )
+            scope.configure_vertical_per_channel(
+                tsm_scope, 5.0, 0.0, 1.0, niscope.VerticalCoupling.DC, True
+            )
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
 
     @staticmethod
@@ -90,7 +102,20 @@ class TestNIScope:
         for tsm_scope in scope_tsm_s:
             scope.configure_impedance(tsm_scope, 0.5)
             scope.configure_reference_level(tsm_scope)
-            scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
+            scope.configure(
+                tsm_scope,
+                5.0,
+                1.0,
+                0.0,
+                niscope.VerticalCoupling.DC,
+                10e6,
+                1000,
+                0.0,
+                0.0,
+                1e6,
+                1,
+                True,
+            )
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
             scope.configure_immediate_trigger(tsm_scope)
             scope.tsm_ssc_start_acquisition(tsm_scope)
@@ -101,10 +126,25 @@ class TestNIScope:
         for tsm_scope, test_pins in zip(scope_tsm_s, test_pin_s):
             scope.configure_impedance(tsm_scope, 0.5)
             scope.configure_reference_level(tsm_scope)
-            scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
+            scope.configure(
+                tsm_scope,
+                5.0,
+                1.0,
+                0.0,
+                niscope.VerticalCoupling.DC,
+                10e6,
+                1000,
+                0.0,
+                0.0,
+                1e6,
+                1,
+                True,
+            )
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
             scope.tsm_ssc_clear_triggers(tsm_scope)
-            scope.tsm_ssc_export_analog_edge_start_trigger(tsm_scope, test_pins[0], "/OSC1/PXI_Trig2")
+            scope.tsm_ssc_export_analog_edge_start_trigger(
+                tsm_scope, test_pins[0], "/OSC1/PXI_Trig2"
+            )
             scope.tsm_ssc_start_acquisition(tsm_scope)
             _, data1, data2 = scope.fetch_waveform(tsm_scope, 1)
             print(data1, data2, "\n")
@@ -113,19 +153,40 @@ class TestNIScope:
         for tsm_scope in scope_tsm_s:
             scope.configure_impedance(tsm_scope, 0.5)
             scope.configure_reference_level(tsm_scope)
-            scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
+            scope.configure(
+                tsm_scope,
+                5.0,
+                1.0,
+                0.0,
+                niscope.VerticalCoupling.DC,
+                10e6,
+                1000,
+                0.0,
+                0.0,
+                1e6,
+                1,
+                True,
+            )
             scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
             self.subroutine_init_commit_abort(tsm_scope)
-            scope.configure_digital_edge_trigger(tsm_scope, "/OSC1/PXI_Trig0", niscope.TriggerSlope.POSITIVE)
-            scope.configure_trigger(tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
+            scope.configure_digital_edge_trigger(
+                tsm_scope, "/OSC1/PXI_Trig0", niscope.TriggerSlope.POSITIVE
+            )
+            scope.configure_trigger(
+                tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE
+            )
             scope.tsm_ssc_clear_triggers(tsm_scope)
             scope.tsm_ssc_export_start_triggers(tsm_scope, "/OSC1/PXI_Trig1")
             scope.tsm_ssc_start_acquisition(tsm_scope)
             _, props = scope.get_session_properties(tsm_scope)
             print("\n", props)
-            _, measurement1 = scope.fetch_measurement(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
+            _, measurement1 = scope.fetch_measurement(
+                tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
+            )
             print(measurement1)
-            _, measurement2 = scope.measure_statistics(tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
+            _, measurement2 = scope.measure_statistics(
+                tsm_scope, niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
+            )
             print(measurement2)
             scope.ssc_fetch_clear_stats(tsm_scope.ssc)
             _, data3 = scope.tsm_ssc_fetch_meas_stats_per_channel(
@@ -170,35 +231,27 @@ def open_sessions(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions(
-    tsm_context: SMClass,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def pins_to_sessions(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     return scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
 
 
 @nitsm.codemoduleapi.code_module
-def configure(
-    tsm_context: SMClass,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def configure(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.configure_impedance(tsm_scope, 0.5)
     scope.configure_reference_level(tsm_scope)
     scope.configure_vertical(tsm_scope, 5.0, niscope.VerticalCoupling.DC, 0.0, 1.0, True)
-    scope.configure(tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
-    scope.configure_vertical_per_channel(tsm_scope, 5.0, 0.0, 1.0, niscope.VerticalCoupling.DC, True)
+    scope.configure(
+        tsm_scope, 5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True
+    )
+    scope.configure_vertical_per_channel(
+        tsm_scope, 5.0, 0.0, 1.0, niscope.VerticalCoupling.DC, True
+    )
     scope.configure_timing(tsm_scope, 20e6, 1000, 50, 1, True)
 
 
 @nitsm.codemoduleapi.code_module
-def acquisition(
-    tsm_context: SMClass,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def acquisition(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.initiate(tsm_scope)
 
@@ -219,8 +272,12 @@ def session_properties(tsm_context: SMClass, pins: typing.List[str], sites: typi
 @nitsm.codemoduleapi.code_module
 def trigger(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
-    scope.configure_digital_edge_trigger(tsm_scope, scope.TRIGGER_SOURCE.RTSI0, niscope.TriggerSlope.POSITIVE)
-    scope.configure_trigger(tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
+    scope.configure_digital_edge_trigger(
+        tsm_scope, scope.TRIGGER_SOURCE.RTSI0, niscope.TriggerSlope.POSITIVE
+    )
+    scope.configure_trigger(
+        tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE
+    )
     scope.configure_immediate_trigger(tsm_scope)
     scope.tsm_ssc_clear_triggers(tsm_scope)
     scope.tsm_ssc_export_start_triggers(tsm_scope, scope.OUTPUT_TERMINAL.NONE)
@@ -246,7 +303,9 @@ def clear_stats(tsm_context: SMClass, pins: typing.List[str], sites: typing.List
 
 
 @nitsm.codemoduleapi.code_module
-def fetch_measurement_stats_per_channel(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def fetch_measurement_stats_per_channel(
+    tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]
+):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.tsm_ssc_fetch_meas_stats_per_channel(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
 

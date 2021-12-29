@@ -33,7 +33,10 @@ def initialize_sessions(tsm_context=SemiconductorModuleContext):
 @nitsm.codemoduleapi.code_module
 def configure_measurements(tsm_context=SemiconductorModuleContext):
     ctypes.windll.user32.MessageBoxW(
-        None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0
+        None,
+        "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()),
+        "Attach debugger",
+        0,
     )
     tsminfo = ni_dt_dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2"])
     tsminfo.ssc.abort()

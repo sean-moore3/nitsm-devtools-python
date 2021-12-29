@@ -29,7 +29,9 @@ def initialize_sessions(tsm_context=SemiconductorModuleContext):
 @nitsm.codemoduleapi.code_module
 def configure_measurements(tsm_context=SemiconductorModuleContext):
     tsmscope = ni_dt_scope.tsm_ssc_pins_to_sessions(tsm_context, ["DUTPin_IN_ANA1"], [])
-    ni_dt_scope.configure(tsmscope, 4e-3, 1, 0, niscope.VerticalCoupling.AC, 5e6, 20000, 50, -1, 1e6, 1, True)
+    ni_dt_scope.configure(
+        tsmscope, 4e-3, 1, 0, niscope.VerticalCoupling.AC, 5e6, 20000, 50, -1, 1e6, 1, True
+    )
     ni_dt_scope.configure_digital_edge_trigger(tsmscope, "", slope=niscope.TriggerSlope.POSITIVE)
     _, props = ni_dt_scope.get_session_properties(tsmscope)
     print("\n", props)
@@ -45,7 +47,9 @@ def fetch_waveform(tsm_context=SemiconductorModuleContext):
     _, v_peak = ni_dt_scope.fetch_measurement(
         tsmscope, scalar_meas_function=niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
     )
-    _, v_max = ni_dt_scope.fetch_measurement(tsmscope, scalar_meas_function=niscope.ScalarMeasurement.VOLTAGE_MAX)
+    _, v_max = ni_dt_scope.fetch_measurement(
+        tsmscope, scalar_meas_function=niscope.ScalarMeasurement.VOLTAGE_MAX
+    )
     print(wf_info)
     print(v_peak)
     print(v_max)

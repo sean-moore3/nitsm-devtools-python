@@ -61,7 +61,9 @@ class _Session(typing.NamedTuple):
     Site: int
 
     # Read
-    def st_read_wave_multi_chan(self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10):
+    def st_read_wave_multi_chan(
+        self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10
+    ):
         """
         Reads one or more waveforms from the task specified in the session that contains
         one or more analog input channels.
@@ -70,7 +72,9 @@ class _Session(typing.NamedTuple):
         """
         return self.Task.read(samples_per_channel, timeout)
 
-    def st_read_wave_single_chan(self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10):
+    def st_read_wave_single_chan(
+        self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10
+    ):
         """
         Reads one or more waveforms from the task specified in the session that contains
         one or more analog input channels.
@@ -235,7 +239,9 @@ class _Sessions:
     sessions: typing.List[_Session]
 
     # Read
-    def read_waveform_multichannel(self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10):
+    def read_waveform_multichannel(
+        self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10
+    ):
         """
         Reads one or more waveforms from each task specified in the list of session that contains
         one or more analog input channels.
@@ -342,7 +348,12 @@ class _Sessions:
         return daq_properties
 
     # Timing Configuration
-    def timing(self, samples_per_channel: int = 1000, sampling_rate_hz: float = 1000.0, clock_source: str = ""):
+    def timing(
+        self,
+        samples_per_channel: int = 1000,
+        sampling_rate_hz: float = 1000.0,
+        clock_source: str = "",
+    ):
         """
         Sets the source of the Sample Clock, its rate and number of samples to acquire or generate
         for each task referenced in this session list.
@@ -389,7 +400,9 @@ class _Sessions:
                 has value = 500.
         """
         for session in self.sessions:
-            session.st_ref_analog_edge(trigger_source, edge, level_v, pre_trigger_samples_per_channel)
+            session.st_ref_analog_edge(
+                trigger_source, edge, level_v, pre_trigger_samples_per_channel
+            )
 
     def reference_digital_edge(
         self,
@@ -487,12 +500,18 @@ def set_task(tsm_context: TSMContext):
     set all the sessions accordingly
     """
     input_voltage_range = 10.0
-    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AnalogInput")  # Replace String if PinMap change
+    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names(
+        "AnalogInput"
+    )  # Replace String if PinMap change
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
         try:
             task.ai_channels.add_ai_voltage_chan(
-                physical_channel, "", TerminalConfiguration.DIFFERENTIAL, -input_voltage_range, input_voltage_range
+                physical_channel,
+                "",
+                TerminalConfiguration.DIFFERENTIAL,
+                -input_voltage_range,
+                input_voltage_range,
             )
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         except Exception:
@@ -502,7 +521,9 @@ def set_task(tsm_context: TSMContext):
         finally:
             tsm_context.set_nidaqmx_task(task_name, task)
 
-    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AnalogInputDSA")  # Replace String if PM change
+    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names(
+        "AnalogInputDSA"
+    )  # Replace String if PM change
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
         try:
@@ -515,7 +536,9 @@ def set_task(tsm_context: TSMContext):
         finally:
             tsm_context.set_nidaqmx_task(task_name, task)
 
-    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("AnalogOutputDSA")  # Replace String if PM change
+    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names(
+        "AnalogOutputDSA"
+    )  # Replace String if PM change
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
         try:
@@ -528,15 +551,21 @@ def set_task(tsm_context: TSMContext):
         finally:
             tsm_context.set_nidaqmx_task(task_name, task)
 
-    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names("DigitalOutput")  # Replace String if PM change
+    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names(
+        "DigitalOutput"
+    )  # Replace String if PM change
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
         try:
-            task.do_channels.add_do_chan(physical_channel, "", nidaqmx.constants.LineGrouping.CHAN_PER_LINE)
+            task.do_channels.add_do_chan(
+                physical_channel, "", nidaqmx.constants.LineGrouping.CHAN_PER_LINE
+            )
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         except Exception:
             task = reset_devices(task)
-            task.do_channels.add_do_chan(physical_channel, "", nidaqmx.constants.LineGrouping.CHAN_PER_LINE)
+            task.do_channels.add_do_chan(
+                physical_channel, "", nidaqmx.constants.LineGrouping.CHAN_PER_LINE
+            )
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         finally:
             tsm_context.set_nidaqmx_task(task_name, task)
@@ -589,7 +618,9 @@ def pins_to_session_sessions_info(tsm_context: TSMContext, pins: PinsArg):
         Multiple_Sessions: An object that tracks the task associated with this pin query. Use this object
         to publish measurements and extract data from a set of measurements.
     """
-    pin_list = tsm_context.filter_pins_by_instrument_type(pins, InstrumentTypeIdConstants.NI_DAQMX, Capability.ALL)
+    pin_list = tsm_context.filter_pins_by_instrument_type(
+        pins, InstrumentTypeIdConstants.NI_DAQMX, Capability.ALL
+    )
     (pin_query_contex, task, channel_list) = tsm_context.pins_to_nidaqmx_task(pin_list)
     sites = tsm_context.site_numbers
     multiple_session_info = MultipleSessions(pin_query_contex, [])

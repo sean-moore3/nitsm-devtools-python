@@ -245,7 +245,8 @@ def scenario1(tsm_context: TSM_Context):
     daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
     daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
     daq_sessions_all = ni_daqmx.MultipleSessions(
-        pin_query_context=daq_sessions_1.pin_query_context, sessions=daq_sessions_1.sessions + daq_sessions_2.sessions
+        pin_query_context=daq_sessions_1.pin_query_context,
+        sessions=daq_sessions_1.sessions + daq_sessions_2.sessions,
     )
     daq_sessions_all.stop_task()
     daq_sessions_all.timing()
