@@ -15,7 +15,7 @@ if SIMULATE:
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm_context: TSMContext):
+def tsm_context(standalone_tsm):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
@@ -26,16 +26,16 @@ def tsm_context(standalone_tsm_context: TSMContext):
     else:
         options = {}  # empty options to run on real hardware.
 
-    ni_dt_dc_power.initialize_sessions(standalone_tsm_context, options=options)
-    yield standalone_tsm_context
-    ni_dt_dc_power.close_sessions(standalone_tsm_context)
+    ni_dt_dc_power.initialize_sessions(standalone_tsm, options=options)
+    yield standalone_tsm
+    ni_dt_dc_power.close_sessions(standalone_tsm)
 
 
 @pytest.fixture
-def dcpower_tsm_s(tsm_context, test_pin_s):
+def dcpower_tsm_s(tsm_context, tests_pins):
     """Returns LabVIEW Cluster equivalent data"""
     dcpower_tsms = []
-    for test_pin in test_pin_s:
+    for test_pin in tests_pins:
         dcpower_tsms.append(
             ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True)
         )
@@ -69,7 +69,7 @@ class TestDCPower:
             assert isinstance(session, nidcpower.Session)
         assert len(queried_sessions) == len(tsm_context.get_all_nidcpower_resource_strings())
 
-    def test_pin_to_sessions(self, dcpower_tsm_s, test_pin_s):
+    def test_pin_to_sessions(self, dcpower_tsm_s, tests_pins):
         """TSM SSC DCPower Pins to Sessions.vi"""
         # print("\nTest_pin_s\n", test_pin_s)
         for dcpower_tsm in dcpower_tsm_s:

@@ -146,14 +146,14 @@ digital_project_files = {
 
 
 @pytest.fixture
-def standalone_tsm_context(_published_data_reader_factory):
+def standalone_tsm(_published_data_reader_factory):
     # tsm_context = nitsm.codemoduleapi.SemiconductorModuleContext(_published_data_reader_factory[0])
     tsm_context = StandaloneSMC(_published_data_reader_factory[0], file_paths=digital_project_files)
     return tsm_context
 
 
 @pytest.fixture
-def test_pin_s(request):
+def tests_pins(request):
     """
     Need to improve this logic for supplying test pins
     using @pytest.mark.parametrize

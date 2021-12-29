@@ -28,24 +28,24 @@ OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "6224"}}
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm_context: TSM_Context):
+def tsm_context(standalone_tsm):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
-    ni_daqmx.set_task(standalone_tsm_context)
-    yield standalone_tsm_context
-    ni_daqmx.clear_task(standalone_tsm_context)
+    ni_daqmx.set_task(standalone_tsm)
+    yield standalone_tsm
+    ni_daqmx.clear_task(standalone_tsm)
 
 
 @pytest.fixture
-def daqmx_tsm_s(tsm_context, test_pin_s):
+def daqmx_tsm_s(tsm_context, tests_pins):
     """Returns LabVIEW Cluster equivalent data"""
-    print(test_pin_s)
+    print(tests_pins)
     daqmx_tsms = []
     pins = []
-    for test_pin in test_pin_s:
+    for test_pin in tests_pins:
         pins += test_pin
     print(pins)
     data = ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)

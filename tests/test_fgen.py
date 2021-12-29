@@ -15,7 +15,7 @@ if SIMULATE:
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm_context: TSMContext):
+def tsm_context(standalone_tsm):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
@@ -26,16 +26,16 @@ def tsm_context(standalone_tsm_context: TSMContext):
     else:
         options = {}  # empty options to run on real hardware.
 
-    ni_dt_fgen.initialize_sessions(standalone_tsm_context, options=options)
-    yield standalone_tsm_context
-    ni_dt_fgen.close_sessions(standalone_tsm_context)
+    ni_dt_fgen.initialize_sessions(standalone_tsm, options=options)
+    yield standalone_tsm
+    ni_dt_fgen.close_sessions(standalone_tsm)
 
 
 @pytest.fixture
-def fgen_tsm_s(tsm_context, test_pin_s):
+def fgen_tsm_s(tsm_context, tests_pins):
     """Returns LabVIEW Cluster equivalent data"""
     fgen_tsms = []
-    for test_pin in test_pin_s:
+    for test_pin in tests_pins:
         fgen_tsms.append(ni_dt_fgen.pins_to_sessions(tsm_context, test_pin, sites=[]))
     return fgen_tsms
 
@@ -57,7 +57,7 @@ class TestFGen:
             assert isinstance(session, nifgen.Session)
         assert len(queried_sessions) == len(tsm_context.get_all_nifgen_instrument_names())
 
-    def test_pin_to_sessions(self, fgen_tsm_s, test_pin_s):
+    def test_pin_to_sessions(self, fgen_tsm_s, tests_pins):
         """TSM SSC fgen Pins to Sessions"""
         # print("\nTest_pin_s\n", test_pin_s)
         for fgen_tsm in fgen_tsm_s:

@@ -23,7 +23,7 @@ if SIMULATE_HARDWARE:
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm_context: TSMContext):
+def tsm_context(standalone_tsm):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
@@ -36,18 +36,18 @@ def tsm_context(standalone_tsm_context: TSMContext):
     else:
         options = {}  # empty dict options to run on real hardware.
 
-    ni_dt_digital.tsm_initialize_sessions(standalone_tsm_context, options=options)
-    yield standalone_tsm_context
-    ni_dt_digital.tsm_close_sessions(standalone_tsm_context)
+    ni_dt_digital.tsm_initialize_sessions(standalone_tsm, options=options)
+    yield standalone_tsm
+    ni_dt_digital.tsm_close_sessions(standalone_tsm)
 
 
 @pytest.fixture
-def digital_tsm_s(tsm_context, test_pin_s):
+def digital_tsm_s(tsm_context, tests_pins):
     """Returns LabVIEW Cluster equivalent data
     This fixture accepts single pin in string format or
     multiple pins in list of string format"""
     digital_tsms = []
-    for test_pin in test_pin_s:
+    for test_pin in tests_pins:
         if isinstance(test_pin, str):
             digital_tsms.append(ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, test_pin))
         elif isinstance(test_pin, list):
@@ -81,7 +81,7 @@ class TestNIDigital:
             assert isinstance(session, nidigital.Session)
         assert len(queried_sessions) == len(tsm_context.get_all_nidigital_instrument_names())
 
-    def test_tsm_ssc_n_pins_to_m_sessions(self, digital_tsm_s, test_pin_s):
+    def test_tsm_ssc_n_pins_to_m_sessions(self, digital_tsm_s, tests_pins):
         """TSM SSC Digital N Pins To M Sessions.vi"""
         for digital_tsm in digital_tsm_s:
             assert isinstance(digital_tsm, ni_dt_digital.TSMDigital)

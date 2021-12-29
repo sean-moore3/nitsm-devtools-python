@@ -19,7 +19,7 @@ OPTIONS = {"Simulate": True, "driver_setup": {"Model": "5105"}}
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm_context: SMClass):
+def tsm_context(standalone_tsm):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
@@ -32,18 +32,18 @@ def tsm_context(standalone_tsm_context: SMClass):
     else:
         options = {}  # empty dict options to run on real hardware.
 
-    scope.initialize_sessions(standalone_tsm_context, options=options)
-    yield standalone_tsm_context
-    scope.close_sessions(standalone_tsm_context)
+    scope.initialize_sessions(standalone_tsm, options=options)
+    yield standalone_tsm
+    scope.close_sessions(standalone_tsm)
 
 
 @pytest.fixture
-def scope_tsm_s(tsm_context, test_pin_s):
+def scope_tsm_s(tsm_context, tests_pins):
     """Returns LabVIEW Cluster equivalent data
     This fixture accepts single pin in string format or
     multiple pins in list of string format"""
     scope_tsms = []
-    for test_pin in test_pin_s:
+    for test_pin in tests_pins:
         scope_tsms.append(scope.tsm_ssc_pins_to_sessions(tsm_context, test_pin, []))
     return scope_tsms
 
@@ -63,7 +63,7 @@ class TestNIScope:
             assert isinstance(session, niscope.Session)
         assert len(queried_sessions) == len(tsm_context.get_all_niscope_instrument_names())
 
-    def test_tsm_pins_to_sessions(self, scope_tsm_s, test_pin_s):
+    def test_tsm_pins_to_sessions(self, scope_tsm_s, tests_pins):
         """"""
         for scope_tsm in scope_tsm_s:
             assert isinstance(scope_tsm, scope.TSMScope)
@@ -122,8 +122,8 @@ class TestNIScope:
             _, data1, data2 = scope.fetch_waveform(tsm_scope, 1)
             print(data1, data2, "\n")
 
-    def test_analog_edge_start_trigger(self, scope_tsm_s, test_pin_s):
-        for tsm_scope, test_pins in zip(scope_tsm_s, test_pin_s):
+    def test_analog_edge_start_trigger(self, scope_tsm_s, tests_pins):
+        for tsm_scope, test_pins in zip(scope_tsm_s, tests_pins):
             scope.configure_impedance(tsm_scope, 0.5)
             scope.configure_reference_level(tsm_scope)
             scope.configure(
