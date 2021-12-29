@@ -6,13 +6,13 @@ import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import nidevtools.scope as scope
 
-# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
-SIMULATE_HARDWARE = not os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
-pin_file_names = ["7DUT.pinmap", "scope.pinmap"]
+# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
+SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
+pin_file_names = ["scope.pinmap", "7DUT.pinmap", ]
 # Change index below to change the pinmap to use
-pin_file_name = pin_file_names[1]
-if SIMULATE_HARDWARE:
-    pin_file_name = pin_file_names[0]
+pin_file_name = pin_file_names[0]
+if SIMULATE:
+    pin_file_name = pin_file_names[1]
     pass
 
 OPTIONS = {"Simulate": True, "driver_setup": {"Model": "5105"}}
@@ -26,8 +26,8 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     The fixture provides the digital project files necessary for initialisation of sessions
     in a dictionary format.
     """
-    print("\nTest is running on Simulated driver?", SIMULATE_HARDWARE)
-    if SIMULATE_HARDWARE:
+    print("\nTest is running on Simulated driver?", SIMULATE)
+    if SIMULATE:
         options = OPTIONS
     else:
         options = {}  # empty dict options to run on real hardware.

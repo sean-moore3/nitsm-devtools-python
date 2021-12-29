@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.5">
+	<Instruments>
+		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Digital1" />
+	</Instruments>
+	<Pins>
+		<SystemPin name="VDD" />
+		<SystemPin name="VDD_R" />
+		<SystemPin name="VDDIO" />
+		<SystemPin name="VDDIO_R" />
+		<DUTPin name="SCL" />
+		<DUTPin name="SCL_R" />
+		<DUTPin name="SDA" />
+		<DUTPin name="SDA_R" />
+	</Pins>
+	<PinGroups>
+		<PinGroup name="SGL">
+			<PinReference pin="SCL" />
+			<PinReference pin="SDA" />
+			<PinReference pin="SCL_R" />
+			<PinReference pin="SDA_R" />
+		</PinGroup>
+		<PinGroup name="AllPins">
+			<PinReference pin="SCL" />
+			<PinReference pin="SDA" />
+			<PinReference pin="SCL_R" />
+			<PinReference pin="SDA_R" />
+		</PinGroup>
+	</PinGroups>
+	<Sites>
+		<Site siteNumber="0" />
+	</Sites>
+	<Connections>
+		<SystemConnection pin="VDD" instrument="DPI1" channel="0" />
+		<SystemConnection pin="VDD_R" instrument="DPI1" channel="1" />
+		<SystemConnection pin="VDDIO" instrument="DPI1" channel="2" />
+		<SystemConnection pin="VDDIO_R" instrument="DPI1" channel="3" />
+		<Connection pin="SCL" siteNumber="0" instrument="DPI1" channel="4" />
+		<Connection pin="SCL_R" siteNumber="0" instrument="DPI1" channel="5" />
+		<Connection pin="SDA" siteNumber="0" instrument="DPI1" channel="6" />
+		<Connection pin="SDA_R" siteNumber="0" instrument="DPI1" channel="7" />
+	</Connections>
+</PinMap>

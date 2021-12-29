@@ -12,15 +12,15 @@ PinsArg = typing.Union[str, typing.Sequence[str]]
 Any = typing.Any
 StringTuple = typing.Tuple[str]
 
-# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
-SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
+# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
+SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["7DUT.pinmap", "daqmx.pinmap"]
+pin_file_names = ["daqmx.pinmap", "7DUT.pinmap"]
 # Change index below to change the pin map to use
-pin_file_name = pin_file_names[1]
+pin_file_name = pin_file_names[0]
 message = "With DAQmx Pinmap"
-if SIMULATE_HARDWARE:
-    pin_file_name = pin_file_names[0]
+if SIMULATE:
+    pin_file_name = pin_file_names[1]
     message = "With 7DUT Pinmap"
 print(message)
 
@@ -33,7 +33,7 @@ def tsm_context(standalone_tsm_context: TSM_Context):
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
-    print("\nSimulated driver?", SIMULATE_HARDWARE)
+    print("\nSimulated driver?", SIMULATE)
     ni_daqmx.set_task(standalone_tsm_context)
     yield standalone_tsm_context
     ni_daqmx.clear_task(standalone_tsm_context)

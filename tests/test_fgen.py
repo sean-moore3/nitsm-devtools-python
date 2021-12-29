@@ -4,14 +4,14 @@ import nifgen
 from nitsm.codemoduleapi import SemiconductorModuleContext
 import nidevtools.fgen as ni_dt_fgen
 
-# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
-SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
+# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
+SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["7DUT.pinmap", "fgen.pinmap"]
+pin_file_names = ["fgen.pinmap", "7DUT.pinmap"]
 # Change index below to change the pinmap to use
-pin_file_name = pin_file_names[1]
-if SIMULATE_HARDWARE:
-    pin_file_name = pin_file_names[0]
+pin_file_name = pin_file_names[0]
+if SIMULATE:
+    pin_file_name = pin_file_names[1]
 
 
 @pytest.fixture
@@ -20,8 +20,8 @@ def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
-    print("\nSimulated driver?", SIMULATE_HARDWARE)
-    if SIMULATE_HARDWARE:
+    print("\nSimulated driver?", SIMULATE)
+    if SIMULATE:
         options = {"Simulate": True, "DriverSetup": {"Model": "5451", "BoardType": "PXIe"}}
     else:
         options = {}  # empty options to run on real hardware.
