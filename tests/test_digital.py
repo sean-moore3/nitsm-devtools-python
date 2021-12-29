@@ -16,7 +16,7 @@ import nidevtools.digital as ni_dt_digital
 SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 pin_file_names = ["digital.pinmap", "7DUT.pinmap", "digital1.pinmap"]
 # Change index below to change the pinmap to use
-pin_file_name = pin_file_names[2]
+pin_file_name = pin_file_names[0]
 if SIMULATE_HARDWARE:
     pin_file_name = pin_file_names[1]
     pass
