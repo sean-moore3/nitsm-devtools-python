@@ -65,6 +65,8 @@ class _Session(typing.NamedTuple):
         """
         Reads one or more waveforms from the task specified in the session that contains
         one or more analog input channels.
+        Return:
+            Array of data
         """
         return self.Task.read(samples_per_channel, timeout)
 
@@ -72,6 +74,8 @@ class _Session(typing.NamedTuple):
         """
         Reads one or more waveforms from the task specified in the session that contains
         one or more analog input channels.
+        Return:
+            Array of data
         """
         return self.Task.read(samples_per_channel, timeout)
 
@@ -104,6 +108,8 @@ class _Session(typing.NamedTuple):
         Get the configuration properties of each pair channel-pin assigned to the task in
         this session in the pin map, and store them in a **TaskProperties object**.
         It then returns a list of **TaskProperties object** per pair channel-pin.
+        Return:
+            List of properties per pin/channel
         """
         task = self.Task
         channel_list = self.ChannelList.split(",")
@@ -167,7 +173,7 @@ class _Session(typing.NamedTuple):
         trigger_source: str,
         edge: Enum = nidaqmx.constants.Edge.RISING,
         level_v: float = 0.0,
-        pre_trigger_samples_per_channel: int = 400,
+        pre_trigger_samples_per_channel: int = 500,
     ):
         """
         Configures the task to stop the acquisition when the device acquires all pre-trigger samples;
@@ -187,7 +193,7 @@ class _Session(typing.NamedTuple):
             pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per channel before
             recognizing the Reference Trigger. The number of post-trigger samples per channel is equal to number
             of samples per channel in the DAQmx Timing VI minus pre-trigger samples per channel. If not specified it
-            has value = 400.
+            has value = 500.
         """
         self.Task.triggers.reference_trigger.cfg_anlg_edge_ref_trig(
             trigger_source, pre_trigger_samples_per_channel, edge, level_v
@@ -197,7 +203,7 @@ class _Session(typing.NamedTuple):
         self,
         trigger_source: str,
         edge: Enum = nidaqmx.constants.Slope.RISING,
-        pre_trigger_samples_per_channel: int = 400,
+        pre_trigger_samples_per_channel: int = 500,
     ):
         """
         Configures the task in this session to stop the acquisition when the device acquires all
@@ -253,6 +259,8 @@ class _Sessions:
                  timeout is 10 seconds. If you set timeout to nidaqmx.constants.WAIT_INFINITELY, the method waits
                  indefinitely. If you set timeout to 0, the method tries once to read the requested samples and
                  returns an error if it is unable to.
+         Return:
+             Array of data
          """
         waveform = []
         for session in self.sessions:
@@ -284,6 +292,8 @@ class _Sessions:
                 timeout is 10 seconds. If you set timeout to nidaqmx.constants.WAIT_INFINITELY, the method waits
                 indefinitely. If you set timeout to 0, the method tries once to read the requested samples and
                 returns an error if it is unable to.
+        Return:
+            Array of data
         """
         waveform = []
         for session in self.sessions:
@@ -322,6 +332,8 @@ class _Sessions:
         Get the configuration properties of each pair channel-pin assigned to the tasks in this session list,
         and store them in a **TaskProperties object**. It then returns a list of **TaskProperties object**
         per pair channel-pin for each task in the list.
+        Return:
+            List of properties per pin/channel
         """
         daq_properties = []
         for session in self.sessions:
@@ -354,7 +366,7 @@ class _Sessions:
         trigger_source: str,
         edge: Enum = nidaqmx.constants.Slope.RISING,
         level_v: float = 0.0,
-        pre_trigger_samples_per_channel: int = 400,
+        pre_trigger_samples_per_channel: int = 500,
     ):
         """
         Configures each task  in the session list to stop the acquisition when the device acquires all pre-trigger
@@ -374,7 +386,7 @@ class _Sessions:
             pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per channel before
                 recognizing the Reference Trigger. The number of post-trigger samples per channel is equal to number
                 of samples per channel in the DAQmx Timing VI minus pre-trigger samples per channel. If not specified it
-                has value = 400.
+                has value = 500.
         """
         for session in self.sessions:
             session.st_ref_analog_edge(trigger_source, edge, level_v, pre_trigger_samples_per_channel)
@@ -383,7 +395,7 @@ class _Sessions:
         self,
         trigger_source: str,
         edge: Enum = nidaqmx.constants.Slope.RISING,
-        pre_trigger_samples_per_channel: int = 400,
+        pre_trigger_samples_per_channel: int = 500,
     ):
         """
         Configures each task in this session list to stop the acquisition when the device acquires all
@@ -455,6 +467,10 @@ def clear_task(tsm_context: TSMContext):
 def reset_devices(task: nidaqmx.Task):
     """
     Reset all devices, clear the task and returns a new empty task with the same name.
+    Args:
+        task: object to reset
+    Return:
+        Object after reset
     """
     devices = task.devices
     task_name = task.name
@@ -539,8 +555,8 @@ def get_all_instrument_names(tsm_context: TSMContext, task_type: str = ""):
         tsm_context: Pin context defined by pin map
         task_type: Specifies the type of NI-DAQmx task to return. Use an empty string to obtain the names of all
         tasks regardless of task type.
-    Returns:
-        Returns a tuple of the NI-DAQmx task names.
+    Return:
+        A tuple of the NI-DAQmx task names.
     """
     instruments = tsm_context.get_all_nidaqmx_task_names(task_type)
     return instruments  # Instrument Names, Channel Lists per Instrument
@@ -554,6 +570,8 @@ def get_all_sessions(tsm_context: TSMContext, task_type: str = ""):
         tsm_context: Pin context defined by pin map
         task_type: Specifies the type of NI-DAQmx task to return. Use an empty string to obtain the names of all
         tasks regardless of task type
+    Return:
+        List of tasks of the specific type
     """
     tasks = tsm_context.get_all_nidaqmx_tasks(task_type)
     return tasks
@@ -590,7 +608,7 @@ def pins_to_sessions_sessions(tsm_context: TSMContext, pins: PinsArg):
     Args:
         tsm_context: Pin context defined by pin map
         pins: The name of the pin(s) or pin group(s) to translate to a set of tasks.
-    Returns:
+    Return:
         session: An object that tracks the tasks associated with this pin query. Use this object to publish
         measurements and extract data from a set of measurements.
     """
@@ -601,7 +619,7 @@ def pins_to_sessions_sessions(tsm_context: TSMContext, pins: PinsArg):
 # def set_session(tsm_context: TSMContext, instrument_name: str, daqmx_session: nidaqmx.Task):
 #     tsm_context.set_nidaqmx_task(instrument_name, daqmx_session)
 
-
+'''
 @nitsm.codemoduleapi.code_module
 def pins_to_task_and_connect(tsm_context: TSMContext, task_name: PinsArg, pins: PinsArg):
     pin_list = tsm_context.filter_pins_by_instrument_type(pins, InstrumentTypeIdConstants.NI_DAQMX, Capability.ALL)
@@ -614,3 +632,4 @@ def pins_to_task_and_connect(tsm_context: TSMContext, task_name: PinsArg, pins: 
         # abstract_switch.connect_session_info(sessions)     # TODO Abstract Switch?
         pass
     return multiple_session_info
+'''

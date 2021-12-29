@@ -34,10 +34,6 @@ def tsm_context(standalone_tsm_context: TSM_Context):
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE_HARDWARE)
-    if SIMULATE_HARDWARE:
-        options = OPTIONS
-    else:
-        options = {}  # empty options to run on real hardware.
     ni_daqmx.set_task(standalone_tsm_context)
     yield standalone_tsm_context
     ni_daqmx.clear_task(standalone_tsm_context)
@@ -106,7 +102,7 @@ class TestDaqmx:
             daqmx_tsm.read_waveform(samples_per_channel=1)
             daqmx_tsm.stop_task()
         print("\nTest Timing Configuration\n")
-        samp_cha = 500
+        samp_cha = 1000
         samp_rate = 500
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.timing(samp_cha, samp_rate)
@@ -115,11 +111,10 @@ class TestDaqmx:
         print("\nTest Trigger Configuration\n")
         source = "APFI0"
         for daqmx_tsm in list_daqmx_tsm:
-            daqmx_tsm.reference_analog_edge(source, constant.Slope.FALLING, 0.0, 400) #TODO Review case SPC=500
+            daqmx_tsm.reference_analog_edge(source, constant.Slope.FALLING, 0.0, 500)
             for session in daqmx_tsm.sessions:
-                #print(session.Task.triggers.reference_trigger.anlg_edge_src)
                 assert (source in session.Task.triggers.reference_trigger.anlg_edge_src)
-        source="PXI_Trig0"
+        source = "PXI_Trig0"
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.reference_digital_edge(source, constant.Slope.FALLING, 10)
             for session in daqmx_tsm.sessions:
@@ -157,13 +152,12 @@ class TestDaqmx:
         sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
         daq_sessions_all = ni_daqmx.MultipleSessions(pin_query_context=daq_sessions_1.pin_query_context,
                                                      sessions=sessions_all)
-        print((daq_sessions_all.sessions))
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
         daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
         daq_sessions_all.start_task()
         data = daq_sessions_all.read_waveform_multichannel(2)
-        print("\n",(data))
+        print("\n", data)
         daq_sessions_all.stop_task()
 
 
@@ -193,9 +187,9 @@ def configure(
     tsm_multi_session: ni_daqmx.MultipleSessions
     tsm_multi_session = ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
     # Timing Configuration
-    tsm_multi_session.timing(500, 500)
+    tsm_multi_session.timing(1000, 500)
     # Trigger Configuration
-    tsm_multi_session.reference_analog_edge()
+    tsm_multi_session.reference_analog_edge("APFI0")
     tsm_multi_session.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
     # Configure Read Channels
     tsm_multi_session.configure_channels()
@@ -245,21 +239,7 @@ def scenario1(tsm_context: TSM_Context):
         "RESET_L_DAQ",
         "SHDN_DAQ",
         "SYS_ALIVE_DAQ"]
-    daq_pins2 = [
-        "GPIO6_DAQ",
-        "GPIO7_DAQ",
-        "GPIO8_DAQ",
-        "GPIO9_DAQ",
-        "GPIO10_DAQ",
-        "GPIO11_DAQ",
-        "GPIO12_DAQ",
-        "GPIO13_DAQ",
-        "GPIO14_DAQ",
-        "GPIO15_DAQ",
-        "GPIO16_DAQ",
-        "GPIO19_DAQ",
-        "OUT32K_DAQ",
-        "SLEEP_32K_DAQ"]
+    daq_pins2 = ["DAQ_Pins2"]
     daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
     daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
     daq_sessions_all = ni_daqmx.MultipleSessions(
