@@ -1,7 +1,7 @@
 import pytest
 import os.path
 import nifgen
-from nitsm.codemoduleapi import SemiconductorModuleContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 import nidevtools.fgen as ni_dt_fgen
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
@@ -15,7 +15,7 @@ if SIMULATE:
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
+def tsm_context(standalone_tsm_context: TSMContext):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py

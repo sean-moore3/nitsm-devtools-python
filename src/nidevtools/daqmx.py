@@ -237,31 +237,31 @@ class _Sessions:
     # Read
     def read_waveform_multichannel(self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10):
         """
-         Reads one or more waveforms from each task specified in the list of session that contains
-         one or more analog input channels.
-         Args:
-             samples_per_channel: Specifies the number of samples to read. If this input is not set,
-                 assumes samples to read is 1. Conversely, if this input is set, assumes there are
-                 multiple samples to read.
-                 If you set this input to nidaqmx.constants. READ_ALL_AVAILABLE, NI-DAQmx determines
-                 how many samples to read based on if the task acquires samples continuously or
-                 acquires a finite number of samples.
-                 If the task acquires samples continuously, and you set this input to
-                 nidaqmx.constants.READ_ALL_AVAILABLE, this method reads all the samples currently
-                 available in the buffer.
-                 If the task acquires a finite number of samples, and you set this input
-                 to nidaqmx.constants.READ_ALL_AVAILABLE, the method waits for the task to acquire all requested
-                 samples, then reads those samples. If you set the “read_all_avail_samp” property to True, the
-                 method reads the samples currently available in the buffer and does not wait for the task to
-                 acquire all requested samples.
-             timeout:  Specifies the amount of time in seconds to wait for samples to become available. If the time
-                 elapses, the method returns an error and any samples read before the timeout elapsed. The default
-                 timeout is 10 seconds. If you set timeout to nidaqmx.constants.WAIT_INFINITELY, the method waits
-                 indefinitely. If you set timeout to 0, the method tries once to read the requested samples and
-                 returns an error if it is unable to.
-         Return:
-             Array of data
-         """
+        Reads one or more waveforms from each task specified in the list of session that contains
+        one or more analog input channels.
+        Args:
+            samples_per_channel: Specifies the number of samples to read. If this input is not set,
+                assumes samples to read is 1. Conversely, if this input is set, assumes there are
+                multiple samples to read.
+                If you set this input to nidaqmx.constants. READ_ALL_AVAILABLE, NI-DAQmx determines
+                how many samples to read based on if the task acquires samples continuously or
+                acquires a finite number of samples.
+                If the task acquires samples continuously, and you set this input to
+                nidaqmx.constants.READ_ALL_AVAILABLE, this method reads all the samples currently
+                available in the buffer.
+                If the task acquires a finite number of samples, and you set this input
+                to nidaqmx.constants.READ_ALL_AVAILABLE, the method waits for the task to acquire all requested
+                samples, then reads those samples. If you set the “read_all_avail_samp” property to True, the
+                method reads the samples currently available in the buffer and does not wait for the task to
+                acquire all requested samples.
+            timeout:  Specifies the amount of time in seconds to wait for samples to become available. If the time
+                elapses, the method returns an error and any samples read before the timeout elapsed. The default
+                timeout is 10 seconds. If you set timeout to nidaqmx.constants.WAIT_INFINITELY, the method waits
+                indefinitely. If you set timeout to 0, the method tries once to read the requested samples and
+                returns an error if it is unable to.
+        Return:
+            Array of data
+        """
         waveform = []
         for session in self.sessions:
             data = session.st_read_wave_multi_chan(samples_per_channel, timeout)
@@ -619,7 +619,7 @@ def pins_to_sessions_sessions(tsm_context: TSMContext, pins: PinsArg):
 # def set_session(tsm_context: TSMContext, instrument_name: str, daqmx_session: nidaqmx.Task):
 #     tsm_context.set_nidaqmx_task(instrument_name, daqmx_session)
 
-'''
+"""
 @nitsm.codemoduleapi.code_module
 def pins_to_task_and_connect(tsm_context: TSMContext, task_name: PinsArg, pins: PinsArg):
     pin_list = tsm_context.filter_pins_by_instrument_type(pins, InstrumentTypeIdConstants.NI_DAQMX, Capability.ALL)
@@ -632,4 +632,4 @@ def pins_to_task_and_connect(tsm_context: TSMContext, task_name: PinsArg, pins: 
         # abstract_switch.connect_session_info(sessions)     # TODO Abstract Switch?
         pass
     return multiple_session_info
-'''
+"""

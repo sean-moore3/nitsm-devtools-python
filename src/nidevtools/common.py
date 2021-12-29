@@ -244,9 +244,7 @@ def pin_query_context_to_channel_list(
 
 
 @nitsm.codemoduleapi.code_module
-def identify_pin_types(
-    tsm_context: TSMContext, pins_or_pins_group: typing.Union[str, typing.Sequence[str]]
-):
+def identify_pin_types(tsm_context: TSMContext, pins_or_pins_group: typing.Union[str, typing.Sequence[str]]):
     all_pin_names, all_pin_types = get_all_pins(tsm_context)
     pin_group_found = False
     pin_types = []

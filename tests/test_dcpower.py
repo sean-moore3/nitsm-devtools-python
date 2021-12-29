@@ -1,13 +1,13 @@
 import pytest
 import os.path
 import nidcpower
-from nitsm.codemoduleapi import SemiconductorModuleContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 import nidevtools.dcpower as ni_dt_dc_power
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = [ "dcpower.pinmap", "7DUT.pinmap"]
+pin_file_names = ["dcpower.pinmap", "7DUT.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 if SIMULATE:
@@ -15,7 +15,7 @@ if SIMULATE:
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm_context: SemiconductorModuleContext):
+def tsm_context(standalone_tsm_context: TSMContext):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py

@@ -107,18 +107,18 @@ class TestDaqmx:
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.timing(samp_cha, samp_rate)
             for session in daqmx_tsm.sessions:
-                assert(samp_rate == session.Task.timing.samp_clk_rate)
+                assert samp_rate == session.Task.timing.samp_clk_rate
         print("\nTest Trigger Configuration\n")
         source = "APFI0"
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.reference_analog_edge(source, constant.Slope.FALLING, 0.0, 500)
             for session in daqmx_tsm.sessions:
-                assert (source in session.Task.triggers.reference_trigger.anlg_edge_src)
+                assert source in session.Task.triggers.reference_trigger.anlg_edge_src
         source = "PXI_Trig0"
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.reference_digital_edge(source, constant.Slope.FALLING, 10)
             for session in daqmx_tsm.sessions:
-                assert(source in session.Task.triggers.reference_trigger.dig_edge_src)
+                assert source in session.Task.triggers.reference_trigger.dig_edge_src
         print("\nTest Configure Read Channels\n")
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.configure_channels()
@@ -128,13 +128,13 @@ class TestDaqmx:
             daqmx_tsm.start_task()
             data = daqmx_tsm.read_waveform(samples_per_channel=8)
             print(data)
-            assert(isinstance(data, list))
+            assert isinstance(data, list)
             daqmx_tsm.stop_task()
             print("\nTest Read Multiple Channels\n")
             daqmx_tsm.start_task()
             data = daqmx_tsm.read_waveform_multichannel(samples_per_channel=2)
             print(data)
-            assert (isinstance(data, list))
+            assert isinstance(data, list)
             daqmx_tsm.stop_task()
         print("\nVerify Properties\n")
         for daqmx_tsm in list_daqmx_tsm:
@@ -150,8 +150,9 @@ class TestDaqmx:
         daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
         daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
         sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
-        daq_sessions_all = ni_daqmx.MultipleSessions(pin_query_context=daq_sessions_1.pin_query_context,
-                                                     sessions=sessions_all)
+        daq_sessions_all = ni_daqmx.MultipleSessions(
+            pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all
+        )
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
         daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
@@ -238,13 +239,14 @@ def scenario1(tsm_context: TSM_Context):
         "GPIO25_DAQ",
         "RESET_L_DAQ",
         "SHDN_DAQ",
-        "SYS_ALIVE_DAQ"]
+        "SYS_ALIVE_DAQ",
+    ]
     daq_pins2 = ["DAQ_Pins2"]
     daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
     daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
     daq_sessions_all = ni_daqmx.MultipleSessions(
-        pin_query_context=daq_sessions_1.pin_query_context,
-        sessions=daq_sessions_1.sessions + daq_sessions_2.sessions)
+        pin_query_context=daq_sessions_1.pin_query_context, sessions=daq_sessions_1.sessions + daq_sessions_2.sessions
+    )
     daq_sessions_all.stop_task()
     daq_sessions_all.timing()
     daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
