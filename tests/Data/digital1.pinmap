@@ -64,5 +64,9 @@
 		<Connection pin="SCL_R" siteNumber="5" instrument="DPI1" channel="25" />
 		<Connection pin="SDA" siteNumber="5" instrument="DPI1" channel="26" />
 		<Connection pin="SDA_R" siteNumber="5" instrument="DPI1" channel="27" />
+		<Connection pin="SCL" siteNumber="6" instrument="DPI1" channel="28" />
+		<Connection pin="SCL_R" siteNumber="6" instrument="DPI1" channel="29" />
+		<Connection pin="SDA" siteNumber="6" instrument="DPI1" channel="30" />
+		<Connection pin="SDA_R" siteNumber="6" instrument="DPI1" channel="31" />
 	</Connections>
 </PinMap>
