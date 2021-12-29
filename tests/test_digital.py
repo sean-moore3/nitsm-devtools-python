@@ -18,7 +18,7 @@ pin_file_names = ["7DUT.pinmap", "digital.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[1]
 if SIMULATE_HARDWARE:
-    pin_file_name = pin_file_names[0]
+    pin_file_name = pin_file_names[1]
     pass
 
 

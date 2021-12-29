@@ -244,15 +244,15 @@ def _pin_query_context_to_channel_list(
         If a pin group is found when identifying pin types,
         expand pin groups
         """
-        pins = pin_query_context._pins
-        pin_types, pin_names = ni_dt_common._check_for_pin_group(tsm_context, pins)
+        pin_names = pin_query_context._pins
+        pin_types, pin_names = ni_dt_common._check_for_pin_group(tsm_context, pin_names)
     pins_array_for_session_input: typing.List[PinsCluster] = []
     channel_list_per_session = ()
     (
         number_of_pins_per_channel,
         channel_group_indices,
         channel_indices,
-    ) = tsm_context.GetChannelGroupAndChannelIndex(pins)
+    ) = tsm_context.GetChannelGroupAndChannelIndex(pin_names)
     for number_of_pins in number_of_pins_per_channel:
         """
         Create a pins list for each session of the correct size

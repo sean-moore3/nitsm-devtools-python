@@ -2,7 +2,7 @@ import nitsm.codemoduleapi
 import re
 import enum
 import typing
-from nitsm.codemoduleapi import SemiconductorModuleContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 from nitsm.pinquerycontexts import PinQueryContext
 
 _pin_names = []  # pin cache
@@ -84,7 +84,7 @@ def channel_list_to_pins(channel_list: str):
 
 
 @nitsm.codemoduleapi.code_module
-def get_all_pins(tsm_context: SemiconductorModuleContext, reload_cache=False):
+def get_all_pins(tsm_context: TSMContext, reload_cache=False):
     """Returns all pins and its types (DUT or system) available in the Semiconductor Module context.
     Maintains a cache of these pin details and reloads them when requested or required."""
     global _pin_names, _pin_types
@@ -118,7 +118,7 @@ def get_dut_pins_and_system_pins_from_expanded_pin_list(
 
 
 @nitsm.codemoduleapi.code_module
-def expand_pin_groups_and_identify_pin_types(tsm_context: SemiconductorModuleContext, pins_in):
+def expand_pin_groups_and_identify_pin_types(tsm_context: TSMContext, pins_in):
     pins_temp, pin_types_temp = get_all_pins(tsm_context)
     pins_info = []
     pins_expanded = []
@@ -187,7 +187,7 @@ def pin_query_context_to_channel_list(
     provides the p.
     """
     tsm_context = pin_query_context._tsm_context
-    tsm_context1 = nitsm.codemoduleapi.SemiconductorModuleContext(tsm_context)
+    tsm_context1 = TSMContext(tsm_context)
     if not sites:
         """Get site numbers if not provided"""
         sites = list(tsm_context1.site_numbers)
@@ -245,7 +245,7 @@ def pin_query_context_to_channel_list(
 
 @nitsm.codemoduleapi.code_module
 def identify_pin_types(
-    tsm_context: SemiconductorModuleContext, pins_or_pins_group: typing.Union[str, typing.Sequence[str]]
+    tsm_context: TSMContext, pins_or_pins_group: typing.Union[str, typing.Sequence[str]]
 ):
     all_pin_names, all_pin_types = get_all_pins(tsm_context)
     pin_group_found = False
@@ -262,10 +262,7 @@ def identify_pin_types(
 
 
 @nitsm.codemoduleapi.code_module
-def _check_for_pin_group(
-    tsm_context: SemiconductorModuleContext,
-    pins_or_pins_group: typing.Union[str, typing.Sequence[str]],
-):
+def _check_for_pin_group(tsm_context: TSMContext, pins_or_pins_group):
     pins = pins_or_pins_group
     pins_types, pin_group_found = identify_pin_types(tsm_context, pins_or_pins_group)
     if pin_group_found:
