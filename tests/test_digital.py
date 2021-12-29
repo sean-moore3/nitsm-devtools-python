@@ -14,11 +14,11 @@ import nidevtools.digital as ni_dt_digital
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
-pin_file_names = ["7DUT.pinmap", "digital.pinmap", "digital1.pinmap"]
+pin_file_names = ["digital.pinmap", "7DUT.pinmap", "digital1.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[2]
 if SIMULATE_HARDWARE:
-    pin_file_name = pin_file_names[2]
+    pin_file_name = pin_file_names[1]
     pass
 
 

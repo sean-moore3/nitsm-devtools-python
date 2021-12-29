@@ -31,13 +31,13 @@
 		<Site siteNumber="0" />
 	</Sites>
 	<Connections>
-		<SystemConnection pin="VDD" instrument="DPI1" channel="0" />
-		<SystemConnection pin="VDD_R" instrument="DPI1" channel="1" />
-		<SystemConnection pin="VDDIO" instrument="DPI1" channel="2" />
-		<SystemConnection pin="VDDIO_R" instrument="DPI1" channel="3" />
-		<Connection pin="SCL" siteNumber="0" instrument="DPI1" channel="4" />
-		<Connection pin="SCL_R" siteNumber="0" instrument="DPI1" channel="5" />
-		<Connection pin="SDA" siteNumber="0" instrument="DPI1" channel="6" />
-		<Connection pin="SDA_R" siteNumber="0" instrument="DPI1" channel="7" />
+		<SystemConnection pin="VDD" instrument="DPI1" channel="8" />
+		<SystemConnection pin="VDD_R" instrument="DPI1" channel="9" />
+		<SystemConnection pin="VDDIO" instrument="DPI1" channel="10" />
+		<SystemConnection pin="VDDIO_R" instrument="DPI1" channel="11" />
+		<Connection pin="SCL" siteNumber="0" instrument="DPI1" channel="12" />
+		<Connection pin="SCL_R" siteNumber="0" instrument="DPI1" channel="13" />
+		<Connection pin="SDA" siteNumber="0" instrument="DPI1" channel="14" />
+		<Connection pin="SDA_R" siteNumber="0" instrument="DPI1" channel="15" />
 	</Connections>
 </PinMap>
