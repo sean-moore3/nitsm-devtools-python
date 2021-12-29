@@ -16,3 +16,4 @@ __pycache__
 *.std
 *.csv
 *.digiprojcache
+*Simulate.driver
