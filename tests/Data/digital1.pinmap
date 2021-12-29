@@ -34,10 +34,11 @@
 		<Site siteNumber="3" />
 		<Site siteNumber="4" />
 		<Site siteNumber="5" />
+		<Site siteNumber="6" />
 	</Sites>
 	<Connections>
-		<SystemConnection pin="VDD" instrument="DPI1" channel="0" />
-		<SystemConnection pin="VDD_R" instrument="DPI1" channel="1" />
+		<SystemConnection pin="VDD" instrument="DPI1" channel="28" />
+		<SystemConnection pin="VDD_R" instrument="DPI1" channel="29" />
 		<SystemConnection pin="VDDIO" instrument="DPI1" channel="2" />
 		<SystemConnection pin="VDDIO_R" instrument="DPI1" channel="3" />
 		<Connection pin="SCL" siteNumber="0" instrument="DPI1" channel="4" />
@@ -64,8 +65,8 @@
 		<Connection pin="SCL_R" siteNumber="5" instrument="DPI1" channel="25" />
 		<Connection pin="SDA" siteNumber="5" instrument="DPI1" channel="26" />
 		<Connection pin="SDA_R" siteNumber="5" instrument="DPI1" channel="27" />
-		<Connection pin="SCL" siteNumber="6" instrument="DPI1" channel="28" />
-		<Connection pin="SCL_R" siteNumber="6" instrument="DPI1" channel="29" />
+		<Connection pin="SCL" siteNumber="6" instrument="DPI1" channel="0" />
+		<Connection pin="SCL_R" siteNumber="6" instrument="DPI1" channel="1" />
 		<Connection pin="SDA" siteNumber="6" instrument="DPI1" channel="30" />
 		<Connection pin="SDA_R" siteNumber="6" instrument="DPI1" channel="31" />
 	</Connections>
