@@ -3,7 +3,7 @@ import typing
 import os
 import niscope
 import nitsm.codemoduleapi
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
 import nidevtools.scope as scope
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
@@ -22,7 +22,7 @@ OPTIONS = {"Simulate": True, "driver_setup": {"Model": "5105"}}
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm_context: TSMContext):
+def tsm_context(standalone_tsm_context: SMClass):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
@@ -165,13 +165,13 @@ class TSMScope(typing.NamedTuple):
 
 
 @nitsm.codemoduleapi.code_module
-def open_sessions(tsm_context: TSMContext):
+def open_sessions(tsm_context: SMClass):
     scope.initialize_sessions(tsm_context, OPTIONS)
 
 
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
-    tsm_context: TSMContext,
+    tsm_context: SMClass,
     pins: typing.List[str],
     sites: typing.List[int],
 ):
@@ -180,7 +180,7 @@ def pins_to_sessions(
 
 @nitsm.codemoduleapi.code_module
 def configure(
-    tsm_context: TSMContext,
+    tsm_context: SMClass,
     pins: typing.List[str],
     sites: typing.List[int],
 ):
@@ -195,7 +195,7 @@ def configure(
 
 @nitsm.codemoduleapi.code_module
 def acquisition(
-    tsm_context: TSMContext,
+    tsm_context: SMClass,
     pins: typing.List[str],
     sites: typing.List[int],
 ):
@@ -204,32 +204,20 @@ def acquisition(
 
 
 @nitsm.codemoduleapi.code_module
-def control(
-    tsm_context: TSMContext,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def control(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.commit(tsm_scope)
     scope.abort(tsm_scope)
 
 
 @nitsm.codemoduleapi.code_module
-def session_properties(
-    tsm_context: TSMContext,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def session_properties(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.get_session_properties(tsm_scope)
 
 
 @nitsm.codemoduleapi.code_module
-def trigger(
-    tsm_context: TSMContext,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def trigger(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.configure_digital_edge_trigger(tsm_scope, scope.TRIGGER_SOURCE.RTSI0, niscope.TriggerSlope.POSITIVE)
     scope.configure_trigger(tsm_scope, 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
@@ -240,51 +228,31 @@ def trigger(
 
 
 @nitsm.codemoduleapi.code_module
-def measure_results(
-    tsm_context: TSMContext,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def measure_results(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.fetch_measurement(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
 @nitsm.codemoduleapi.code_module
-def measure_stats(
-    tsm_context: TSMContext,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def measure_stats(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.measure_statistics(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
 @nitsm.codemoduleapi.code_module
-def clear_stats(
-    tsm_context: TSMContext,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def clear_stats(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.ssc_fetch_clear_stats(tsm_scope.ssc)
 
 
 @nitsm.codemoduleapi.code_module
-def fetch_measurement_stats_per_channel(
-    tsm_context: TSMContext,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def fetch_measurement_stats_per_channel(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     scope.tsm_ssc_fetch_meas_stats_per_channel(tsm_scope, niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
 @nitsm.codemoduleapi.code_module
-def fetch_waveform(
-    tsm_context: TSMContext,
-    pins: typing.List[str],
-    sites: typing.List[int],
-):
+def fetch_waveform(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     tsm_scope = scope.tsm_ssc_pins_to_sessions(tsm_context, pins, sites)
     print(scope.fetch_waveform(tsm_scope, 1))
     print(scope.fetch_multirecord_waveform(tsm_scope, 1))
@@ -292,5 +260,5 @@ def fetch_waveform(
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: TSMContext):
+def close_sessions(tsm_context: SMClass):
     scope.close_sessions(tsm_context)
