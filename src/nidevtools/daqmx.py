@@ -70,7 +70,8 @@ class _Session(typing.NamedTuple):
         Return:
             Array of data
         """
-        return self.Task.read(samples_per_channel, timeout)
+        data = self.Task.read(samples_per_channel, timeout)
+        return data
 
     def st_read_wave_single_chan(
         self, samples_per_channel=nidaqmx.task.NUM_SAMPLES_UNSET, timeout=10
@@ -81,7 +82,8 @@ class _Session(typing.NamedTuple):
         Return:
             Array of data
         """
-        return self.Task.read(samples_per_channel, timeout)
+        data = self.Task.read(samples_per_channel, timeout)
+        return data
 
     # Read Configuration
     def st_cnfg_chan_to_read(self):

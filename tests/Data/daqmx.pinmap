@@ -6,6 +6,7 @@
 		<NIDAQmxTask name="DSA_4463_C1_S14" taskType="AnalogOutputDSA" channelList="DSA_4463_C1_S14/ao0,DSA_4463_C1_S14/ao1" />
 		<NIDAQmxTask channelList="DAQ_6368_C1_S16/ai0,DAQ_6368_C1_S16/ai1,DAQ_6368_C1_S16/ai2,DAQ_6368_C1_S16/ai3,DAQ_6368_C1_S16/ai4,DAQ_6368_C1_S16/ai5,DAQ_6368_C1_S16/ai6,DAQ_6368_C1_S16/ai7,DAQ_6368_C1_S16/ai8,DAQ_6368_C1_S16/ai9,DAQ_6368_C1_S16/ai10,DAQ_6368_C1_S16/ai11,DAQ_6368_C1_S16/ai12,DAQ_6368_C1_S16/ai13,DAQ_6368_C1_S16/ai14,DAQ_6368_C1_S16/ai15" name="DAQ_6368_C1_S16_AI" taskType="AnalogInput" />
 		<NIDAQmxTask channelList="DAQ_6368_C1_S17/ai0,DAQ_6368_C1_S17/ai1,DAQ_6368_C1_S17/ai2,DAQ_6368_C1_S17/ai3,DAQ_6368_C1_S17/ai4,DAQ_6368_C1_S17/ai5,DAQ_6368_C1_S17/ai6,DAQ_6368_C1_S17/ai7,DAQ_6368_C1_S17/ai8,DAQ_6368_C1_S17/ai9,DAQ_6368_C1_S17/ai10,DAQ_6368_C1_S17/ai11,DAQ_6368_C1_S17/ai12,DAQ_6368_C1_S17/ai13,DAQ_6368_C1_S17/ai14,DAQ_6368_C1_S17/ai15" name="DAQ_6368_C1_S17_AI" taskType="AnalogInput" />
+		<NIDAQmxTask channelList="DAQ_6368_C1_S17/ao0,DAQ_6368_C1_S17/ao1" name="DAQ_6368_C1_S17_AO" taskType="AnalogOutput" />
 		<NIDAQmxTask channelList="DAQ_6368_C1_S16/port0/line14" name="DAQ_6368_C1_S16_P0_14" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ_6368_C1_S16/port0/line15" name="DAQ_6368_C1_S16_P0_15" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ_6368_C1_S16/port0/line16" name="DAQ_6368_C1_S16_P0_16" taskType="DigitalOutput" />
@@ -99,6 +100,8 @@
 		<DUTPin name="SGL1" />
 		<DUTPin name="SGL2" />
 		<SystemPin name="RefSGL" />
+		<DUTPin name="AO0" />
+		<DUTPin name="AO1" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="DAQ_Pins1">
@@ -137,6 +140,10 @@
 			<PinReference pin="SGL1" />
 			<PinReference pin="SGL2" />
 		</PinGroup>
+		<PinGroup name="TestAnalogO">
+			<PinReference pin="AO0" />
+			<PinReference pin="AO1" />
+		</PinGroup>
 	</PinGroups>
 	<Sites>
 		<Site siteNumber="0" />
@@ -151,6 +158,8 @@
 		<Connection channel="DAQ_6368_C1_S16/ai2" instrument="DAQ_6368_C1_S16_AI" pin="BUTTON3_DAQ" siteNumber="0" />
 		<Connection channel="DAQ_6368_C1_S16/ai3" instrument="DAQ_6368_C1_S16_AI" pin="BUTTON4_DAQ" siteNumber="0" />
 		<Connection channel="DAQ_6368_C1_S16/ai4" instrument="DAQ_6368_C1_S16_AI" pin="ACTIVE_READY_DAQ" siteNumber="0" />
+		<Connection pin="AO0" siteNumber="0" instrument="DAQ_6368_C1_S17_AO" channel="DAQ_6368_C1_S17/ao0" />
+		<Connection pin="AO1" siteNumber="0" instrument="DAQ_6368_C1_S17_AO" channel="DAQ_6368_C1_S17/ao1" />
 		<Connection channel="DAQ_6368_C1_S16/ai5" instrument="DAQ_6368_C1_S16_AI" pin="SYS_ALIVE_DAQ" siteNumber="0" />
 		<Connection channel="DAQ_6368_C1_S16/ai6" instrument="DAQ_6368_C1_S16_AI" pin="SHDN_DAQ" siteNumber="0" />
 		<Connection channel="DAQ_6368_C1_S16/ai7" instrument="DAQ_6368_C1_S16_AI" pin="RESET_L_DAQ" siteNumber="0" />

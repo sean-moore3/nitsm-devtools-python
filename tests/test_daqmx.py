@@ -155,10 +155,16 @@ class TestDaqmx:
         )
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
-        daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+        # daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
         daq_sessions_all.start_task()
-        data = daq_sessions_all.read_waveform_multichannel(2)
-        print("\n", data)
+        daq_sessions_out: ni_daqmx.MultipleSessions
+        data = daq_sessions_all.read_waveform_multichannel(50)
+        output = 1.0  # configure output in NI-MAX
+        error = 0.002
+        for measure in data[16:18]:
+            for value in measure:
+                assert(output + error > value > output - error)
+        print("\nAll measured values within the expected value of: ",output,"+-",error)
         daq_sessions_all.stop_task()
 
 
