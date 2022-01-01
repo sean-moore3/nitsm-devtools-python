@@ -164,7 +164,7 @@ class TestDaqmx:
         for measure in data[16:18]:
             for value in measure:
                 assert(output + error > value > output - error)
-        print("\nAll measured values within the expected value of: ",output,"+-",error)
+        print("\nAll measured values within the expected value of: ", output, "+-", error)
         daq_sessions_all.stop_task()
 
 
