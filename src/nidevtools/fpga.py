@@ -2,12 +2,12 @@ import os
 import nifpga
 from enum import Enum
 from time import time
-import nitsm.codemoduleapi
-from nitsm.enums import Capability
-from nidaqmx.constants import TerminalConfiguration
+# import nitsm.codemoduleapi
+# from nitsm.enums import Capability
+# from nidaqmx.constants import TerminalConfiguration
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
-from nitsm.enums import InstrumentTypeIdConstants
-from nitsm.pinquerycontexts import PinQueryContext
+# from nitsm.enums import InstrumentTypeIdConstants
+# from nitsm.pinquerycontexts import PinQueryContext
 import typing
 
 # Types Definition
@@ -76,6 +76,7 @@ class Connector(Enum):
     Connector3 = 3
     Con_None = 4
 
+
 class States(Enum):
     Zero: 0
     One: 1
@@ -83,12 +84,15 @@ class States(Enum):
     I2C: 3
 
 
-class Channel():
-    channel: DIOLines
-    connector: Connector
+class Channel:
+    def __init__(self, channel: DIOLines, connector: Connector):
+        self.channel = channel
+        self.connector = connector
+
 
 class CurrentCommandedStates(Channel):
-    State:
+    state: States
+
 
 class I2CMasterLineConfiguration(typing.NamedTuple):
     SDA: Channel
@@ -96,11 +100,28 @@ class I2CMasterLineConfiguration(typing.NamedTuple):
 
 
 class WorldControllerSetting:
-    Device_Address: int
-    Read: bool
-    Number_of_Bytes: int
-    ten_bit_addressing: bool
-    Divide: int
+    def __init__(self,
+                 device_address: int = 0,
+                 read: bool = False,
+                 number_of_bytes: int = 0,
+                 ten_bit_addressing: bool = False,
+                 divide: int = 0
+                 ):
+        self.Device_Address = device_address
+        self.Read = read
+        self.Number_of_Bytes = number_of_bytes
+        self.Ten_Bit_Addressing = ten_bit_addressing
+        self.Divide = divide
+
+
+def search_line(line: Channel, ch_list: typing.List[Channel]):
+    index = 0
+    for element in ch_list:
+        if element.channel == line.channel and element.connector == line.connector:
+            return index
+        else:
+            index += 1
+    return -1
 
 
 class _SSCFPGA(typing.NamedTuple):
@@ -125,17 +146,8 @@ class _SSCFPGA(typing.NamedTuple):
                                            ):
         """"""
         cluster = I2CMasterLineConfiguration(sda_channel, scl_channel)
-        if i2c_master == 0:
-            master = self.Session.registers['I2C Master0 Line Configuration']
-            master.write(cluster)
-        elif i2c_master == 1:
-            master = self.Session.registers['I2C Master1 Line Configuration']
-            master.write(cluster)
-        elif i2c_master == 2:
-            master = self.Session.registers['I2C Master2 Line Configuration']
-            master.write(cluster)
-        elif i2c_master == 3:
-            master = self.Session.registers['I2C Master3 Line Configuration']
+        if 0 <= i2c_master.value <= 3:
+            master = self.Session.registers['I2C Master%d Line Configuration' % i2c_master.value]
             master.write(cluster)
         else:
             print("Requested I2C_master is not defined")
@@ -148,27 +160,12 @@ class _SSCFPGA(typing.NamedTuple):
                                       clock_stretching: bool = True
                                       ):
         """"""
-        cluster = WorldControllerSetting(Divide=divide, ten_bit_addressing=ten_bit_addressing)
-        if i2c_master == 0:
-            master = self.Session.registers['I2C Master0 Configuration']
-            clock = self.Session.registers['I2C Master0 Enable Clock Stretching?']
+        cluster = WorldControllerSetting(divide=divide, ten_bit_addressing=ten_bit_addressing)
+        if 0 <= i2c_master.value <= 3:
+            master = self.Session.registers['I2C Master%d Configuration' % i2c_master.value]
+            clock = self.Session.registers['I2C Master%d Enable Clock Stretching?' % i2c_master.value]
             clock.write(clock_stretching)
-            master.write(cluster)
-        elif i2c_master == 1:
-            master = self.Session.registers['I2C Master1 Configuration']
-            clock = self.Session.registers['I2C Master1 Enable Clock Stretching?']
-            clock.write(clock_stretching)
-            master.write(cluster)
-        elif i2c_master == 2:
-            master = self.Session.registers['I2C Master2 Configuration']
-            clock = self.Session.registers['I2C Master2 Enable Clock Stretching?']
-            clock.write(clock_stretching)
-            master.write(cluster)
-        elif i2c_master == 3:
-            master = self.Session.registers['I2C Master3 Configuration']
-            clock = self.Session.registers['I2C Master3 Enable Clock Stretching?']
-            clock.write(clock_stretching)
-            master.write(cluster)
+            master.write(cluster)  # without all info?
         else:
             print("Requested I2C_master is not defined")
             raise Exception
@@ -181,18 +178,13 @@ class _SSCFPGA(typing.NamedTuple):
         """"""
         if timeout == 0:
             timeout = start_time
-        if i2c_master == 0:
-            master_ready = self.Session.registers['I2C Master0 ready for input']
-        elif i2c_master == 1:
-            master_ready = self.Session.registers['I2C Master1 ready for input']
-        elif i2c_master == 2:
-            master_ready = self.Session.registers['I2C Master2 ready for input']
-        elif i2c_master == 3:
-            master_ready = self.Session.registers['I2C Master3 ready for input']
+        if 0 <= i2c_master.value <= 3:
+            master_ready = self.Session.registers['I2C Master%d ready for input' % i2c_master.value]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
         stop = False
+        data = False
         while not stop:
             data = master_ready.read()
             time_count = time() - start_time
@@ -201,39 +193,28 @@ class _SSCFPGA(typing.NamedTuple):
             pass
         else:
             raise nifpga.ErrorStatus(5000,
-                                     ("I2C %s not ready for input", I2CMaster),
+                                     ("I2C %s not ready for input" % i2c_master.name),
                                      "i2c_master_poll_until_ready()",
                                      ["i2c_master", "timeout"],
                                      (i2c_master, timeout))
+
     def i2c_master_read(self,
                         i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
                         device_address: int = 0,
-                        timeout:float = 1,
-                        number_of_bytes:int = 1
+                        timeout: float = 1,
+                        number_of_bytes: int = 1
                         ):
-        start_time=time()
-        if timeout>30:
-            timeout=30
-        elif timeout<0:
-            timeout=0
+        start_time = time()
+        if timeout > 30:
+            timeout = 30
+        elif timeout < 0:
+            timeout = 0
         else:
             pass
-        if i2c_master == 0:
-            master_config = self.Session.registers['I2C Master0 Configuration']
-            master_go = self.Session.registers['I2C Master0 Go']
-            master_data = self.Session.registers['I2C Master0 Read Data']
-        elif i2c_master == 1:
-            master_config = self.Session.registers['I2C Master1 Configuration']
-            master_go = self.Session.registers['I2C Master1 Go']
-            master_data = self.Session.registers['I2C Master1 Read Data']
-        elif i2c_master == 2:
-            master_config = self.Session.registers['I2C Master2 Configuration']
-            master_go = self.Session.registers['I2C Master2 Go']
-            master_data = self.Session.registers['I2C Master2 Read Data']
-        elif i2c_master == 3:
-            master_config = self.Session.registers['I2C Master3 Configuration']
-            master_go = self.Session.registers['I2C Master3 Go']
-            master_data = self.Session.registers['I2C Master3 Read Data']
+        if 0 <= i2c_master.value <= 3:
+            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master.value]
+            master_go = self.Session.registers['I2C Master%d Go' % i2c_master.value]
+            master_data = self.Session.registers['I2C Master%d Read Data' % i2c_master.value]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
@@ -242,7 +223,7 @@ class _SSCFPGA(typing.NamedTuple):
         config.Device_Address = device_address
         config.Number_of_Bytes = number_of_bytes
         config.Read = True
-        self.i2c_master_poll_until_ready(i2c_master,start_time,timeout)
+        self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
         master_config.write(config)
         master_go.write(True)
         self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
@@ -250,29 +231,16 @@ class _SSCFPGA(typing.NamedTuple):
         data = data[0:number_of_bytes+1]
         return data
 
-
     def i2c_master_write(self,
                          i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
-                         timeout:float = 1,
-                         device_address:int = 0,
+                         timeout: float = 1,
+                         device_address: int = 0,
                          data_to_write: typing.List[int] = []):
-        start_time=time()
-        if i2c_master == 0:
-            master_config = self.Session.registers['I2C Master0 Configuration']
-            master_go = self.Session.registers['I2C Master0 Go']
-            master_data = self.Session.registers['I2C Master0 Write Data']
-        elif i2c_master == 1:
-            master_config = self.Session.registers['I2C Master1 Configuration']
-            master_go = self.Session.registers['I2C Master1 Go']
-            master_data = self.Session.registers['I2C Master1 Write Data']
-        elif i2c_master == 2:
-            master_config = self.Session.registers['I2C Master2 Configuration']
-            master_go = self.Session.registers['I2C Master2 Go']
-            master_data = self.Session.registers['I2C Master2 Write Data']
-        elif i2c_master == 3:
-            master_config = self.Session.registers['I2C Master3 Configuration']
-            master_go = self.Session.registers['I2C Master3 Go']
-            master_data = self.Session.registers['I2C Master3 Write Data']
+        start_time = time()
+        if 0 <= i2c_master.value <= 3:
+            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master.value]
+            master_go = self.Session.registers['I2C Master%d Go' % i2c_master.value]
+            master_data = self.Session.registers['I2C Master%d Write Data' % i2c_master.value]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
@@ -286,96 +254,141 @@ class _SSCFPGA(typing.NamedTuple):
         master_data.write(data_to_write)
         master_go.write(True)
 
-
     def read_all_lines(self):
-        con0 = self.Session.registers['Connector0 Read Data']
-        con1 = self.Session.registers['Connector1 Read Data']
-        con2 = self.Session.registers['Connector2 Read Data']
-        con3 = self.Session.registers['Connector3 Read Data']
-        con0_data = con0.read()
-        con1_data = con1.read()
-        con2_data = con2.read()
-        con3_data = con3.read()
-        data = ReadData(con0_data, con1_data,con2_data,con3_data)
+        data_rd = []
+        for i in range(4):
+            con = self.Session.registers['Connector%d Read Data' % i]
+            data_rd.append(con.read())
+        data = ReadData(data_rd[0], data_rd[1], data_rd[2], data_rd[3])
         return data
 
-    def serch_line(self, line: Channel, list:typing.List[Channel]):
-        index=0
-        for element in list:
-            if element.channel==line.channel and element.connector==line.connector:
-                return index
-            else:
-                index+=1
-        return -1
-
     def read_multiple_dio_commanded_states(self, lines_to_read: typing.List[Channel]):
-        connector_enable0 = self.Session.registers["Connector0 Output Enable"]
-        connector_enable1 = self.Session.registers["Connector1 Output Enable"]
-        connector_enable2 = self.Session.registers["Connector2 Output Enable"]
-        connector_enable3 = self.Session.registers["Connector3 Output Enable"]
-        connector_data0 = self.Session.registers["Connector0 Output Data"]
-        connector_data1 = self.Session.registers["Connector1 Output Data"]
-        connector_data2 = self.Session.registers["Connector2 Output Data"]
-        connector_data3 = self.Session.registers["Connector3 Output Data"]
-        master0:I2CMasterLineConfiguration = self.Session.registers["I2C_Master0_Line_Configuration"]
-        master1:I2CMasterLineConfiguration = self.Session.registers["I2C_Master1_Line_Configuration"]
-        master2:I2CMasterLineConfiguration = self.Session.registers["I2C_Master2_Line_Configuration"]
-        master3:I2CMasterLineConfiguration = self.Session.registers["I2C_Master3_Line_Configuration"]
-        out_list = [(connector_enable0, connector_data0),
-                    (connector_enable1, connector_data1),
-                    (connector_enable2, connector_data2),
-                    (connector_enable3, connector_data3)]
-        config_list=[master0.SDA, master0.SCL,
-                     master1.SDA, master1.SCL,
-                     master2.SDA, master2.SCL,
-                     master3.SDA, master3.SCL]
-        states_list=[]
+        out_list = []
+        config_list = []
+        for i in range(4):
+            connector_enable = self.Session.registers["Connector%d Output Enable" % i]
+            connector_data = self.Session.registers["Connector%d Output Data" % i]
+            merge = (connector_enable.read(), connector_data.read())
+            out_list.append(merge)
+            master = self.Session.registers["I2C_Master%d_Line_Configuration" % i]
+            master_data: I2CMasterLineConfiguration = master.read()
+            config_list.append(master_data.SDA)
+            config_list.append(master_data.SCL)
+        states_list = []
         for element in lines_to_read:
-            index = self.serch_line(element, config_list)
+            index = search_line(element, config_list)
             connector = element.connector
             line = element.channel
-            out = out_list[connector]
-            enable = list("{:032b}".format(out[0],"b"))[::-1]
-            data = list("{:032b}".format(out[1],"b"))[::-1]
-            if data[line]:
+            out = out_list[connector.value]
+            enable = list("{:032b}".format(out[0], "b"))[::-1]
+            data = list("{:032b}".format(out[1], "b"))[::-1]
+            if data[line.value]:
                 line_state = States.One
             else:
                 line_state = States.Zero
-            if enable[line]:
+            if enable[line.value]:
                 pass
             else:
                 line_state = States.X
-            if index>0:
+            if index > 0:
                 pass
             else:
                 line_state = States.I2C
-            state = CurrentCommandedStates()
+            state = CurrentCommandedStates(line, connector)
             state.State = line_state
-            state.connector = connector
-            state.channel = line
             states_list.append(state)
         return states_list
 
+    def read_multiple_lines(self, lines_to_read: typing.List[Channel]):
+        ch_data_list = []
+        for ch in range(4):
+            con_rd = self.Session.registers['Connector%d Read Data' % ch]
+            ch_data_list.append(con_rd.read())
+        readings = []
+        for lines in lines_to_read:
+            connector = lines.connector
+            line = lines.channel
+            data = ch_data_list[connector.value]
+            state_list = list("{:032b}".format(data, "b"))[::-1]
+            line_state = state_list[line.value]
+            state = CurrentCommandedStates(line, connector)
+            state.State = line_state
+            readings.append(state)
+        return readings
+
+    def read_single_connector(self, connector: Connector):
+        data: nifpga.DataType.U32 = 0
+        if 0 <= connector.value <= 3:
+            read_control = self.Session.registers["Connector%d Read Data" % connector.value]
+            data = read_control.read()
+        return data
+
+    def read_single_dio_line(self, connector: Connector = Connector.Connector0, line: DIOLines = DIOLines.DIO0):
+        data = self.read_single_connector(connector)
+        state_list = list("{:032b}".format(data, "b"))[::-1]
+        line_state = state_list[line.value]
+        return line_state
+
+    def write_multiple_dio_lines(self, lines_to_write: typing.List[CurrentCommandedStates]):
+        con_list = []
+        data_list = []
+        for i in range(4):
+            con_enable = self.Session.registers['Connector%d Output Enable' % i]
+            con_data = self.Session.registers['Connector%d Output Enable' % i]
+            merge_con = (con_enable, con_data)
+            merge_data = [con_enable.read(), con_data.read()]
+            con_list.append(merge_con)
+            data_list.append(merge_data)
+        for lines in lines_to_write:
+            if 0 <= lines.connector.value <= 3:
+                enable, data = update_line_on_connector(data_list[lines.connector.value][0],
+                                                        data_list[lines.connector.value][1],
+                                                        lines.channel,
+                                                        lines.state)
+                data_list[lines.connector.value] = [enable, data]
+            else:
+                pass
+        for data, con in zip(data_list, con_list):
+            con[0].write(data[0])
+            con[1].write(data[1])
+
+    def write_single_dio_line(self,
+                              connector: Connector = Connector.Connector0,
+                              line: DIOLines = DIOLines.DIO0,
+                              state: States = States.Zero):
+        if 0 <= connector.value <= 3:
+            con_enable = self.Session.registers['Connector%d Output Enable' % connector.value]
+            con_data = self.Session.registers['Connector%d Output Data' % connector.value]
+            enable, data = update_line_on_connector(con_enable.read(), con_data.read(), line, state)
+            con_enable.write(enable)
+            con_data.write(data)
 
 
-    def read_multiple_lines(self):
-        pass  # TODO finish
+def update_line_on_connector(output_enable: nifpga.DataType.U32 = 0,
+                             output_data: nifpga.DataType.U32 = 0,
+                             dio_line: DIOLines = DIOLines.DIO0,
+                             line_state: States = States.Zero):
+    dio_line.value
+    line_state.value
+    enable: nifpga.DataType.U32 = output_enable
+    data: nifpga.DataType.U32 = output_data
+    return enable, data  # TODO Check
 
 
-    def read_single_connector(self):
-        pass  # TODO finish
+def line_state_to_out(line: States, out_data: bool):
+    data = False
+    enable = False
+    if line.value == 0:
+        data = False
+        enable = True
+    elif line.value == 1:
+        data = True
+        enable = True
+    elif line.value == 2:
+        data = out_data
+        enable = False
+    return data, enable
 
-
-    def read_single_dio_line(self):
-        pass  # TODO finish
-
-
-    def write_multiple_dio_lines(self):
-        pass  # TODO finish
-
-
-    def write_single_dio_line(self):
-        pass  # TODO finish
 
 class TSMFPGA(typing.NamedTuple):
     pin_query_context: Any
@@ -410,8 +423,8 @@ def open_reference(rio_resource: str, target: str, ldb_type: str):
 def initialize_session(tsm_context: TSMContext, ldb_type: str):
     instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(InstrumentTypeId)
     for instrument, group in zip(instrument_names, channel_group_ids):
-        traget_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
-        for target in traget_list:
+        target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
+        for target in target_list:
             ref_out = open_reference(instrument, target, ldb_type)
         tsm_context.set_custom_session(InstrumentTypeId, instrument, group, ref_out)
         dut_pins, system_pins = tsm_context.get_pin_names(InstrumentTypeId)

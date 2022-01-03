@@ -511,7 +511,7 @@ def set_task(tsm_context: TSMContext):
             task.ai_channels.add_ai_voltage_chan(
                 physical_channel,
                 "",
-                TerminalConfiguration.DIFFERENTIAL,
+                TerminalConfiguration.RSE,
                 -input_voltage_range,
                 input_voltage_range,
             )
