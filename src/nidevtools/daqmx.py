@@ -85,6 +85,10 @@ class _Session(typing.NamedTuple):
         data = self.Task.read(samples_per_channel, timeout)
         return data
 
+    # Write Analog
+    def st_write_anlg(self, data):
+        self.Task.write(data)
+
     # Read Configuration
     def st_cnfg_chan_to_read(self):
         """
@@ -309,6 +313,10 @@ class _Sessions:
             waveform += data
         return waveform
 
+    def write_data(self, data: typing.List[float]):
+        for session in self.sessions:
+            session.st_write_anlg(data)
+
     # Read Configuration
     def configure_channels(self):
         """
@@ -460,11 +468,15 @@ def clear_task(tsm_context: TSMContext):
     and will release any resources the tasks reserved. You cannot use a task after you clear it unless you
     set it again.
     """
+    task_ao = tsm_context.get_all_nidaqmx_tasks("AnalogOutput")
     tasks_ai = tsm_context.get_all_nidaqmx_tasks("AnalogInput")
     tasks_ai_dsa = tsm_context.get_all_nidaqmx_tasks("AnalogInputDSA")
     tasks_ao_dsa = tsm_context.get_all_nidaqmx_tasks("AnalogOutputDSA")
     tasks_do = tsm_context.get_all_nidaqmx_tasks("DigitalOutput")
 
+    for task in task_ao:
+        task.stop()
+        task.close()
     for task in tasks_ai:
         task.stop()
         task.close()
@@ -503,6 +515,27 @@ def set_task(tsm_context: TSMContext):
     """
     input_voltage_range = 10.0
     task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names(
+        "AnalogOutput"
+    )  # Replace String if PinMap change
+    for task_name, physical_channel in zip(task_names, channel_lists):
+        task = nidaqmx.Task(task_name)
+        try:
+            task.ao_channels.add_ao_voltage_chan(
+                physical_channel,
+                "",
+                TerminalConfiguration.DIFFERENTIAL,
+                -input_voltage_range,
+                input_voltage_range,
+            )
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
+        except Exception:
+            task = reset_devices(task)
+            task.ao_channels.add_ao_voltage_chan(physical_channel)
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
+        finally:
+            tsm_context.set_nidaqmx_task(task_name, task)
+    # input_voltage_range = 10.0
+    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names(
         "AnalogInput"
     )  # Replace String if PinMap change
     for task_name, physical_channel in zip(task_names, channel_lists):
@@ -511,7 +544,7 @@ def set_task(tsm_context: TSMContext):
             task.ai_channels.add_ai_voltage_chan(
                 physical_channel,
                 "",
-                TerminalConfiguration.RSE,
+                TerminalConfiguration.DIFFERENTIAL,
                 -input_voltage_range,
                 input_voltage_range,
             )

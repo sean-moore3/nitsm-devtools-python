@@ -32,8 +32,6 @@
 		<NIDAQmxTask channelList="DAQ_6368_C1_S17/port1/line5" name="DAQ_6368_C1_S17_P1_5" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ_6368_C1_S17/port1/line6" name="DAQ_6368_C1_S17_P1_6" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ_6368_C1_S17/port1/line7" name="DAQ_6368_C1_S17_P1_7" taskType="DigitalOutput" />
-		<NIDAQmxTask name="Dev1" taskType="AnalogInput" channelList="Dev1/ai0,Dev1/ai1" />
-		<NIDAQmxTask name="Dev3" taskType="AnalogOutputDSA" channelList="Dev3/ao0" />
 	</Instruments>
 	<Pins>
 		<DUTPin name="En_DIO_5V0_6368_VDD_LDO2_RLY_EN" />
@@ -95,9 +93,6 @@
 		<DUTPin name="GPIO19_DAQ" />
 		<DUTPin name="VPROBE1_4464" />
 		<DUTPin name="VPROBE2_4464" />
-		<DUTPin name="SGL1" />
-		<DUTPin name="SGL2" />
-		<SystemPin name="RefSGL" />
 		<DUTPin name="AO0" />
 		<DUTPin name="AO1" />
 	</Pins>
@@ -133,10 +128,6 @@
 			<PinReference pin="GPIO19_DAQ" />
 			<PinReference pin="OUT32K_DAQ" />
 			<PinReference pin="SLEEP_32K_DAQ" />
-		</PinGroup>
-		<PinGroup name="Signal">
-			<PinReference pin="SGL1" />
-			<PinReference pin="SGL2" />
 		</PinGroup>
 		<PinGroup name="TestAnalogO">
 			<PinReference pin="AO0" />
@@ -208,8 +199,5 @@
 		<Connection channel="DAQ_6368_C1_S17/port1/line5" instrument="DAQ_6368_C1_S17_P1_5" pin="En_DIO_5V0_6368_4464_MUX2_A1" siteNumber="0" />
 		<Connection channel="DAQ_6368_C1_S17/port1/line6" instrument="DAQ_6368_C1_S17_P1_6" pin="En_DIO_5V0_6368_4464_MUX2_A2" siteNumber="0" />
 		<Connection channel="DAQ_6368_C1_S17/port1/line7" instrument="DAQ_6368_C1_S17_P1_7" pin="En_DIO_5V0_6368_4464_MUX_EN" siteNumber="0" />
-		<Connection pin="SGL1" siteNumber="0" instrument="Dev1" channel="Dev1/ai1" />
-		<Connection pin="SGL2" siteNumber="0" instrument="Dev1" channel="Dev1/ai0" />
-		<SystemConnection pin="RefSGL" instrument="Dev3" channel="Dev3/ao0" />
 	</Connections>
 </PinMap>

@@ -395,12 +395,88 @@ class TSMFPGA(typing.NamedTuple):
     SSC: typing.List[_SSCFPGA]
 
     def get_i2c_master(self):
-        for element in self.SSC:
-            session = element.Session
-            ch_list = element.ChannelList
+        session = self.SSC[0].Session
+        ch_list = self.SSC[0].ChannelList
+        sites_and_pins, sites, pins = channel_list_to_pins(ch_list)
+        sites_and_pins.clear()
+        sites.clear()
+        #todo scan
+
+
+    def configure_i2c_bus(self):
+        pass  # TODO Check
+
+    def read_i2c_data(self):
+        pass  # TODO Check
 
     def write_i2c_data(self, data_to_write: typing.List[int], timeout: float = 1, slave_address: int = 0):
-        pass
+        pass  # TODO Check
+
+    def extract_i2c_master_from_sessions(self):
+        pass  # TODO Check
+
+    def read_commanded_line_states(self):
+        pass  # TODO Check
+
+    def read_static(self):
+        pass  # TODO Check
+
+    def write_static_array(self):
+        pass  # TODO Check
+
+    def write_static(self):
+        pass  # TODO Check
+
+
+def channel_list_to_pins(channel_list: str = ""):
+    ch_list = channel_list.split(",")
+    sites_and_pins = []
+    sites = []
+    pins = []
+    for ch in ch_list:
+        ch = ch.lstrip()
+        sites_and_pins.append(ch)
+        ch_l = ch.split('\\')
+        if '\\' in ch:
+            site = "site-1"
+            pin = ch_l[0]
+        else:
+            site = ch_l[0]
+            pin = ch_l[1]
+        site = site[4:]
+        if site[0] == "+" or site[0] == "-":
+            if site[1:].isnumeric():
+                data = int(site)
+            else:
+                data = 0
+        else:
+            if site.isnumeric():
+                data = int(site)
+            else:
+                data = 0
+        sites.append(data)
+        pins.append(pin)
+    return sites_and_pins, sites, pins
+
+
+def close_session(tsm_context: TSMContext):
+    pass  # TODO Check
+
+
+def initialize_session(tsm_context: TSMContext, ldb_type: str):
+    instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(InstrumentTypeId)
+    for instrument, group in zip(instrument_names, channel_group_ids):
+        target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
+        for target in target_list:
+            ref_out = open_reference(instrument, target, ldb_type)
+        tsm_context.set_custom_session(InstrumentTypeId, instrument, group, ref_out)
+        dut_pins, system_pins = tsm_context.get_pin_names(InstrumentTypeId)
+        debug = tsm_context.pins_to_custom_sessions(InstrumentTypeId, dut_pins+system_pins)
+        return debug
+
+
+def pins_to_sessions():
+    pass  # Todo Check
 
 
 def open_reference(rio_resource: str, target: str, ldb_type: str):
@@ -418,15 +494,3 @@ def open_reference(rio_resource: str, target: str, ldb_type: str):
     path = os.path.join(CurrentPath, '..\\..\\FPGA Bitfiles\\', name_of_relative_path)
     reference = os.path.join(rio_resource, path)
     return reference
-
-
-def initialize_session(tsm_context: TSMContext, ldb_type: str):
-    instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(InstrumentTypeId)
-    for instrument, group in zip(instrument_names, channel_group_ids):
-        target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
-        for target in target_list:
-            ref_out = open_reference(instrument, target, ldb_type)
-        tsm_context.set_custom_session(InstrumentTypeId, instrument, group, ref_out)
-        dut_pins, system_pins = tsm_context.get_pin_names(InstrumentTypeId)
-        debug = tsm_context.pins_to_custom_sessions(InstrumentTypeId, dut_pins+system_pins)
-        return debug

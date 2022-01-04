@@ -181,9 +181,7 @@ def tests_pins(request):
         pins_selected = [input_dut_pins, output_dut_pins, all_dut_pins]
     elif file_name == "test_daqmx.py":
         # for daqmx driver i.e. nidaqmx testing
-        input_dut_pins = ["SGL1", "SGL2"]
-        output_dut_pins = ["RefSGL"]
-        pins_selected = [input_dut_pins]
+        pins_selected = [["DAQ_Pins1"], ["DAQ_Pins2"]]
     elif file_name == "test_fgen.py":
         # for daqmx driver i.e. nidaqmx testing
         reference_sys_pin = ["RefSGL"]

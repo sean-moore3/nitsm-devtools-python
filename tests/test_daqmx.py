@@ -44,12 +44,13 @@ def daqmx_tsm_s(tsm_context, tests_pins):
     """Returns LabVIEW Cluster equivalent data"""
     print(tests_pins)
     daqmx_tsms = []
-    pins = []
-    for test_pin in tests_pins:
-        pins += test_pin
-    print(pins)
-    data = ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
-    daqmx_tsms.append(data)
+    sessions = []
+    for test_pin_group in tests_pins:
+        print(test_pin_group)
+        data = ni_daqmx.pins_to_session_sessions_info(tsm_context, test_pin_group)
+        daqmx_tsms.append(data)
+        sessions += data.sessions
+    print(sessions)
     yield tsm_context, daqmx_tsms
 
 
@@ -58,13 +59,13 @@ def daqmx_tsm_s(tsm_context, tests_pins):
 class TestDaqmx:
     def test_set_task(self, tsm_context):
         print(tsm_context.pin_map_file_path)
-        queried_tasks = tsm_context.get_all_nidaqmx_tasks("AI")
+        queried_tasks = tsm_context.get_all_nidaqmx_tasks("AnalogInput")
         assert isinstance(queried_tasks, tuple)  # Type verification
         for task in queried_tasks:
             print("\nTest_set/clear_task\n", task)
             assert isinstance(task, nidaqmx.Task)  # Type verification
             assert len(queried_tasks) != 0  # not void
-            assert len(queried_tasks) >= 1  # Matching quantity
+            assert len(queried_tasks) == 2  # Matching quantity
 
     def test_pin_to_sessions_info(self, daqmx_tsm_s):
         tsm_context = daqmx_tsm_s[0]
@@ -108,17 +109,17 @@ class TestDaqmx:
             daqmx_tsm.timing(samp_cha, samp_rate)
             for session in daqmx_tsm.sessions:
                 assert samp_rate == session.Task.timing.samp_clk_rate
-        print("\nTest Trigger Configuration\n")
-        source = "APFI0"
-        for daqmx_tsm in list_daqmx_tsm:
-            daqmx_tsm.reference_analog_edge(source, constant.Slope.FALLING, 0.0, 500)
-            for session in daqmx_tsm.sessions:
-                assert source in session.Task.triggers.reference_trigger.anlg_edge_src
-        source = "PXI_Trig0"
-        for daqmx_tsm in list_daqmx_tsm:
-            daqmx_tsm.reference_digital_edge(source, constant.Slope.FALLING, 10)
-            for session in daqmx_tsm.sessions:
-                assert source in session.Task.triggers.reference_trigger.dig_edge_src
+        # print("\nTest Trigger Configuration\n")
+        # source = "APFI0"
+        # for daqmx_tsm in list_daqmx_tsm:
+        #     daqmx_tsm.reference_analog_edge(source, constant.Slope.FALLING, 0.0, 500)
+        #     for session in daqmx_tsm.sessions:
+        #         assert source in session.Task.triggers.reference_trigger.anlg_edge_src
+        # source = "PXI_Trig0"
+        # for daqmx_tsm in list_daqmx_tsm:
+        #     daqmx_tsm.reference_digital_edge(source, constant.Slope.FALLING, 10)
+        #     for session in daqmx_tsm.sessions:
+        #         assert source in session.Task.triggers.reference_trigger.dig_edge_src
         print("\nTest Configure Read Channels\n")
         for daqmx_tsm in list_daqmx_tsm:
             daqmx_tsm.configure_channels()
@@ -147,20 +148,25 @@ class TestDaqmx:
     def test_baku_power_sequence(self, tsm_context):
         daq_pins1 = ["DAQ_Pins1"]
         daq_pins2 = ["DAQ_Pins2"]
+        daq_pins_out = ["TestAnalogO"]
         daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
         daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
+        daq_sessions_out = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out)
         sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
         daq_sessions_all = ni_daqmx.MultipleSessions(
             pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all
         )
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
+        daq_sessions_out.timing()
         # daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+        daq_sessions_out.write_data([1.0, 1.0])
         daq_sessions_all.start_task()
         daq_sessions_out: ni_daqmx.MultipleSessions
         data = daq_sessions_all.read_waveform_multichannel(50)
+        daq_sessions_out.stop_task()
         output = 1.0  # configure output in NI-MAX
-        error = 0.002
+        error = 0.00123  # 16 bits with range 20 for both input and output
         for measure in data[16:18]:
             for value in measure:
                 assert(output + error > value > output - error)
@@ -231,32 +237,23 @@ def acquisition_multi_ch(
 
 @nitsm.codemoduleapi.code_module
 def scenario1(tsm_context: TSM_Context):
-    daq_pins1 = [
-        "ACTIVE_READY_DAQ",
-        "BUTTON1_DAQ",
-        "BUTTON2_DAQ",
-        "GPIO17_DAQ",
-        "GPIO18_DAQ",
-        "GPIO20_DAQ",
-        "GPIO21_DAQ",
-        "GPIO22_DAQ",
-        "GPIO23_DAQ",
-        "GPIO24_DAQ",
-        "GPIO25_DAQ",
-        "RESET_L_DAQ",
-        "SHDN_DAQ",
-        "SYS_ALIVE_DAQ",
-    ]
+    daq_pins1 = ["DAQ_Pins1"]
     daq_pins2 = ["DAQ_Pins2"]
+    daq_pins_out = ["TestAnalogO"]
     daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
     daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
+    daq_sessions_out = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out)
+    sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
     daq_sessions_all = ni_daqmx.MultipleSessions(
-        pin_query_context=daq_sessions_1.pin_query_context,
-        sessions=daq_sessions_1.sessions + daq_sessions_2.sessions,
+        pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all
     )
     daq_sessions_all.stop_task()
     daq_sessions_all.timing()
-    daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+    daq_sessions_out.timing()
+    # daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+    daq_sessions_out.write_data([1, 1])
     daq_sessions_all.start_task()
-    daq_sessions_all.read_waveform_multichannel()
+    data = daq_sessions_all.read_waveform_multichannel(50)
+    yield data
+    daq_sessions_out.stop_task
     daq_sessions_all.stop_task()
