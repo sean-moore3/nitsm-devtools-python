@@ -33,6 +33,12 @@ class I2CMaster(Enum):
     I2C_3V3_7822_TLOAD = 3
 
 
+class IOandI2CInterface(Enum):
+    PXIe_7822R = 0
+    PXIe_7821R = 1
+    PXIe_7820R = 2  # TODO Does order matters?
+
+
 class DIOLines(Enum):
     DIO0 = 0
     DIO1 = 1
@@ -77,10 +83,13 @@ class Connector(Enum):
     Con_None = 4
 
 
-class States(Enum):
+class StaticStates(Enum):
     Zero: 0
     One: 1
     X: 2
+
+
+class States(StaticStates):
     I2C: 3
 
 
@@ -91,7 +100,11 @@ class Channel:
 
 
 class CurrentCommandedStates(Channel):
-    state: States
+    state: StaticStates
+
+
+class Readings(Channel):
+    state: bool
 
 
 class I2CMasterLineConfiguration(typing.NamedTuple):
@@ -129,6 +142,61 @@ class _SSCFPGA(typing.NamedTuple):
     ChannelGroupID: str
     Channels: str
     ChannelList: str
+
+    def ss_wr_static_array(self, static_states: typing.List[StaticStates]):
+        ch_list = self.ChannelList.split(",")
+        iq_list = []
+        r_list = []
+        for ch in ch_list[0]:
+            iq_list.append(int(ch) // 32)
+            r_list.append(int(ch) % 32)
+        lines_to_write = []
+        for s_s, iq, r in zip(static_states, iq_list, r_list):
+            element = CurrentCommandedStates(DIOLines(r), Connector(iq))
+            element.state = s_s
+            lines_to_write.append(element)
+        self.write_multiple_dio_lines(lines_to_write)
+
+    def ss_wr_static(self, static_states: typing.List[StaticStates]):
+        ch_list = self.ChannelList.split(",")
+        iq_list = []
+        r_list = []
+        for ch in ch_list[0]:
+            iq_list.append(int(ch) // 32)
+            r_list.append(int(ch) % 32)
+        lines_to_write = []
+        for s_s, iq, r in zip(static_states, iq_list, r_list):
+            element = CurrentCommandedStates(DIOLines(r), Connector(iq))
+            element.state = s_s
+            lines_to_write.append(element)
+        self.write_multiple_dio_lines(lines_to_write)
+        # TODO Check difference with ss_wr_static_array
+
+    def ss_read_static(self):
+        line_states = []
+        ch_list = self.ChannelList.split(",")
+        channels = []
+        for ch in ch_list[0]:
+            iq = int(ch) // 32
+            r = int(ch) % 32
+            channels.append(Channel(DIOLines(iq), Connector(r)))
+        data = self.read_multiple_lines(channels)
+        for bit in data:
+            line_states.append(bit.state)
+        return data, line_states
+            
+    def ss_read_c_states(self):
+        commanded_states = []
+        ch_list = self.ChannelList.split(",")
+        channels = []
+        for ch in ch_list[0]:
+            iq = int(ch) // 32
+            r = int(ch) % 32
+            channels.append(Channel(DIOLines(iq), Connector(r)))
+        states = self.read_multiple_dio_commanded_states(channels)
+        for state in states:
+            commanded_states.append(state.state)
+        return states, commanded_states
 
     def close_session(self, reset_if_last_session: bool = True):
         """
@@ -311,7 +379,7 @@ class _SSCFPGA(typing.NamedTuple):
             data = ch_data_list[connector.value]
             state_list = list("{:032b}".format(data, "b"))[::-1]
             line_state = state_list[line.value]
-            state = CurrentCommandedStates(line, connector)
+            state = Readings(line, connector)
             state.State = line_state
             readings.append(state)
         return readings
@@ -367,7 +435,7 @@ class _SSCFPGA(typing.NamedTuple):
 def update_line_on_connector(output_enable: int = 0,
                              output_data: int = 0,
                              dio_line: DIOLines = DIOLines.DIO0,
-                             line_state: States = States.Zero):
+                             line_state: StaticStates = StaticStates.Zero):
     enable: int = output_enable
     data: int = output_data
     return enable, data  # TODO Check
@@ -392,7 +460,32 @@ class TSMFPGA(typing.NamedTuple):
     pin_query_context: Any
     SSC: typing.List[_SSCFPGA]
 
-    def get_i2c_master(self):
+    def configure_i2c_bus(self,
+                          tenb_addresing: bool = False,
+                          divide: int = 8,
+                          clock_stretching: bool = True):
+        session: _SSCFPGA
+        session, i2c = self.extract_i2c_master_from_sessions()
+        session.configure_i2c_master_settings(i2c, divide, tenb_addresing, clock_stretching)
+
+    def read_i2c_data(self,
+                      timeout: float = 1,
+                      slave_address: int = 0,
+                      number_of_bytes: int = 1):
+        session: _SSCFPGA
+        session, i2c = self.extract_i2c_master_from_sessions()
+        i2c_read_data = session.i2c_master_read(i2c, slave_address, timeout, number_of_bytes)
+        return i2c_read_data
+
+    def write_i2c_data(self,
+                       data_to_write: typing.List[int],
+                       timeout: float = 1,
+                       slave_address: int = 0):
+        session: _SSCFPGA
+        session, i2c = self.extract_i2c_master_from_sessions()
+        session.i2c_master_write(i2c, timeout, slave_address, data_to_write)
+
+    def extract_i2c_master_from_sessions(self):
         session = self.SSC[0].Session
         ch_list = self.SSC[0].ChannelList
         sites_and_pins, sites, pins = channel_list_to_pins(ch_list)
@@ -410,45 +503,31 @@ class TSMFPGA(typing.NamedTuple):
                                      self)
         return session, scan
 
-    def configure_i2c_bus(self,
-                          tenb_addresing: bool = False,
-                          divide: int = 8,
-                          clock_stretching: bool = True):
-        session: _SSCFPGA
-        session, i2c = self.get_i2c_master()
-        session.configure_i2c_master_settings(i2c, divide, tenb_addresing, clock_stretching)
-
-    def read_i2c_data(self,
-                      timeout: float = 1,
-                      slave_address: int = 0,
-                      number_of_bytes: int = 1):
-        session: _SSCFPGA
-        session, i2c = self.get_i2c_master()
-        i2c_read_data = session.i2c_master_read(i2c, slave_address, timeout, number_of_bytes)
-        return i2c_read_data
-
-    def write_i2c_data(self,
-                       data_to_write: typing.List[int],
-                       timeout: float = 1,
-                       slave_address: int = 0):
-        session: _SSCFPGA
-        session, i2c = self.get_i2c_master()
-        session.i2c_master_write(i2c, timeout, slave_address, data_to_write)
-
-    def extract_i2c_master_from_sessions(self):
-        pass  # TODO Check
-
     def read_commanded_line_states(self):
-        pass  # TODO Check
+        commanded_states = []
+        current_commanded_states = []
+        for ss in self.SSC:
+            data = ss.ss_read_c_states()
+        current_commanded_states.append(data[0])
+        commanded_states += data[1]
+        return current_commanded_states, commanded_states
 
     def read_static(self):
-        pass  # TODO Check
+        readings = []
+        line_states = []
+        for ss in self.SSC:
+            data = ss.ss_read_static()
+            readings.append(data[0])
+            line_states.append(data[0])
+        return readings, line_states
 
-    def write_static_array(self):
-        pass  # TODO Check
+    def write_static_array(self, static_state: typing.List[StaticStates]):
+        for ss in self.SSC:
+            ss.ss_wr_static_array(static_state)
 
-    def write_static(self):
-        pass  # TODO Check
+    def write_static(self, static_state: typing.List[StaticStates]):
+        for ss in self.SSC:
+            ss.ss_wr_static(static_state)
 
 
 def channel_list_to_pins(channel_list: str = ""):
@@ -489,13 +568,14 @@ def close_session(tsm_context: TSMContext):
 def initialize_session(tsm_context: TSMContext, ldb_type: str):
     instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(InstrumentTypeId)
     for instrument, group in zip(instrument_names, channel_group_ids):
-        target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
-        for target in target_list:
+        # target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
+        for target in IOandI2CInterface:
             ref_out = open_reference(instrument, target, ldb_type)
+            # TODO clear error
         tsm_context.set_custom_session(InstrumentTypeId, instrument, group, ref_out)
-        dut_pins, system_pins = tsm_context.get_pin_names(InstrumentTypeId)
-        debug = tsm_context.pins_to_custom_sessions(InstrumentTypeId, dut_pins+system_pins)
-        return debug
+    dut_pins, system_pins = tsm_context.get_pin_names(InstrumentTypeId)
+    debug = tsm_context.pins_to_custom_sessions(InstrumentTypeId, dut_pins+system_pins)
+    return debug
 
 
 def pins_to_sessions():
