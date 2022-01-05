@@ -20,10 +20,10 @@ CurrentPath = os.getcwd()
 
 
 class ReadData(typing.NamedTuple):
-    Connector0: nifpga.DataType.U32
-    Connector1: nifpga.DataType.U32
-    Connector2: nifpga.DataType.U32
-    Connector3: nifpga.DataType.U32
+    Connector0: int
+    Connector1: int
+    Connector2: int
+    Connector3: int
 
 
 class I2CMaster(Enum):
@@ -317,7 +317,7 @@ class _SSCFPGA(typing.NamedTuple):
         return readings
 
     def read_single_connector(self, connector: Connector):
-        data: nifpga.DataType.U32 = 0
+        data: int = 0
         if 0 <= connector.value <= 3:
             read_control = self.Session.registers["Connector%d Read Data" % connector.value]
             data = read_control.read()
@@ -364,14 +364,12 @@ class _SSCFPGA(typing.NamedTuple):
             con_data.write(data)
 
 
-def update_line_on_connector(output_enable: nifpga.DataType.U32 = 0,
-                             output_data: nifpga.DataType.U32 = 0,
+def update_line_on_connector(output_enable: int = 0,
+                             output_data: int = 0,
                              dio_line: DIOLines = DIOLines.DIO0,
                              line_state: States = States.Zero):
-    dio_line.value
-    line_state.value
-    enable: nifpga.DataType.U32 = output_enable
-    data: nifpga.DataType.U32 = output_data
+    enable: int = output_enable
+    data: int = output_data
     return enable, data  # TODO Check
 
 
@@ -400,17 +398,42 @@ class TSMFPGA(typing.NamedTuple):
         sites_and_pins, sites, pins = channel_list_to_pins(ch_list)
         sites_and_pins.clear()
         sites.clear()
-        #todo scan
+        scan = ''
+        for i2c in I2CMaster:
+            if pins[0] in i2c.name:
+                scan = i2c
+        if scan == '':
+            raise nifpga.ErrorStatus(5000,
+                                     "Invalid I2C Master Session Provided",
+                                     "get_i2c_master",
+                                     ["self"],
+                                     self)
+        return session, scan
 
+    def configure_i2c_bus(self,
+                          tenb_addresing: bool = False,
+                          divide: int = 8,
+                          clock_stretching: bool = True):
+        session: _SSCFPGA
+        session, i2c = self.get_i2c_master()
+        session.configure_i2c_master_settings(i2c, divide, tenb_addresing, clock_stretching)
 
-    def configure_i2c_bus(self):
-        pass  # TODO Check
+    def read_i2c_data(self,
+                      timeout: float = 1,
+                      slave_address: int = 0,
+                      number_of_bytes: int = 1):
+        session: _SSCFPGA
+        session, i2c = self.get_i2c_master()
+        i2c_read_data = session.i2c_master_read(i2c, slave_address, timeout, number_of_bytes)
+        return i2c_read_data
 
-    def read_i2c_data(self):
-        pass  # TODO Check
-
-    def write_i2c_data(self, data_to_write: typing.List[int], timeout: float = 1, slave_address: int = 0):
-        pass  # TODO Check
+    def write_i2c_data(self,
+                       data_to_write: typing.List[int],
+                       timeout: float = 1,
+                       slave_address: int = 0):
+        session: _SSCFPGA
+        session, i2c = self.get_i2c_master()
+        session.i2c_master_write(i2c, timeout, slave_address, data_to_write)
 
     def extract_i2c_master_from_sessions(self):
         pass  # TODO Check

@@ -154,23 +154,26 @@ class TestDaqmx:
         daq_sessions_out = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out)
         sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
         daq_sessions_all = ni_daqmx.MultipleSessions(
-            pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all
-        )
+            pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all)
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
         daq_sessions_out.timing()
-        # daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
-        daq_sessions_out.write_data([1.0, 1.0])
-        daq_sessions_all.start_task()
-        daq_sessions_out: ni_daqmx.MultipleSessions
-        data = daq_sessions_all.read_waveform_multichannel(50)
-        daq_sessions_out.stop_task()
-        output = 1.0  # configure output in NI-MAX
+        daq_sessions_2: ni_daqmx.MultipleSessions
+        #for s in daq_sessions_2.sessions:
+        #    print(s.Task.triggers.reference_trigger.anlg_edge_src)
+        #daq_sessions_2.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+        output = 2.0  # configure output in NI-MAX
         error = 0.00123  # 16 bits with range 20 for both input and output
+        daq_sessions_out.write_data([output, output])
+        daq_sessions_all.start_task()
+        data = daq_sessions_all.read_waveform_multichannel(50)
         for measure in data[16:18]:
             for value in measure:
                 assert(output + error > value > output - error)
+        daq_sessions_out.write_data([0, 0])
         print("\nAll measured values within the expected value of: ", output, "+-", error)
+        print("\nDevice has been released: ", output, "+-", error)
+        daq_sessions_out.stop_task()
         daq_sessions_all.stop_task()
 
 
@@ -250,10 +253,11 @@ def scenario1(tsm_context: TSM_Context):
     daq_sessions_all.stop_task()
     daq_sessions_all.timing()
     daq_sessions_out.timing()
-    # daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+    #daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
     daq_sessions_out.write_data([1, 1])
     daq_sessions_all.start_task()
     data = daq_sessions_all.read_waveform_multichannel(50)
     yield data
-    daq_sessions_out.stop_task
+    daq_sessions_out.write_data([0, 0])
+    daq_sessions_out.stop_task()
     daq_sessions_all.stop_task()
