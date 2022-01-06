@@ -20,11 +20,11 @@ pin_file_names = ["daqmx.pinmap", "7DUT.pinmap"]
 pin_file_name = pin_file_names[0]
 message = "With DAQmx Pinmap"
 if SIMULATE:
-    pin_file_name = pin_file_names[1]
+    pin_file_name = pin_file_names[0]
     message = "With 7DUT Pinmap"
 print(message)
 
-OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "6224"}}
+OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "6368"}}
 
 
 @pytest.fixture
