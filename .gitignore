@@ -17,3 +17,4 @@ __pycache__
 *.csv
 *.digiprojcache
 *Simulate.driver
+/venv/*
