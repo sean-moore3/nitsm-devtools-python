@@ -13,7 +13,6 @@ pin_file_names = ["scope.pinmap", "7DUT.pinmap"]
 pin_file_name = pin_file_names[0]
 if SIMULATE:
     pin_file_name = pin_file_names[1]
-    pass
 
 OPTIONS = {"Simulate": True, "driver_setup": {"Model": "5105"}}
 

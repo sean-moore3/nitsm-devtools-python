@@ -1,8 +1,9 @@
+import nitsm.codemoduleapi
 import pytest
 import os.path
 import nidcpower
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
-import nidevtools.dcpower as ni_dt_dc_power
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
+import nidevtools.dcpower as dcpower
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
@@ -13,6 +14,8 @@ pin_file_name = pin_file_names[0]
 if SIMULATE:
     pin_file_name = pin_file_names[1]
 
+OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
+
 
 @pytest.fixture
 def tsm_context(standalone_tsm):
@@ -22,13 +25,13 @@ def tsm_context(standalone_tsm):
     """
     print("\nSimulated driver?", SIMULATE)
     if SIMULATE:
-        options = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
+        options = OPTIONS
     else:
         options = {}  # empty options to run on real hardware.
 
-    ni_dt_dc_power.initialize_sessions(standalone_tsm, options=options)
+    dcpower.initialize_sessions(standalone_tsm, options=options)
     yield standalone_tsm
-    ni_dt_dc_power.close_sessions(standalone_tsm)
+    dcpower.close_sessions(standalone_tsm)
 
 
 @pytest.fixture
@@ -37,7 +40,7 @@ def dcpower_tsm_s(tsm_context, tests_pins):
     dcpower_tsms = []
     for test_pin in tests_pins:
         dcpower_tsms.append(
-            ni_dt_dc_power.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True)
+            dcpower.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True)
         )
     return dcpower_tsms
 
@@ -70,11 +73,11 @@ class TestDCPower:
         assert len(queried_sessions) == len(tsm_context.get_all_nidcpower_resource_strings())
 
     def test_pin_to_sessions(self, dcpower_tsm_s, tests_pins):
-        """TSM SSC DCPower Pins to Sessions.vi"""
+        """TSM SSC DCPower Pins to Sessions vi"""
         # print("\nTest_pin_s\n", test_pin_s)
         for dcpower_tsm in dcpower_tsm_s:
             # print("\nTest_dcpower_tsm\n", dcpower_tsm)
-            assert isinstance(dcpower_tsm, ni_dt_dc_power.TSMDCPower)
+            assert isinstance(dcpower_tsm, dcpower.TSMDCPower)
 
     def test_get_max_current(self, dcpower_tsm_s):
         """TSM DC Power Get Max Current.vi"""
@@ -141,7 +144,7 @@ class TestDCPower:
 
     def test_configure_settings(self, dcpower_tsm_s):
         """
-        TSM SSC DCPower Configure Settings.vim
+        TSM SSC DCPower Configure Settings vim
         dcpower_tsm.query_in_compliance()
         """
         # custom_settings = {"aperture_time": 20e-03, "source_delay": 1.0, "sense": Sense.LOCAL}
@@ -158,7 +161,7 @@ class TestDCPower:
 
     def test_tsm_source_voltage(self, dcpower_tsm_s):
         """
-        # TSM SSC DCPower Source Voltage.vim
+        # TSM SSC DCPower Source Voltage vim
         Force_voltage_symmetric_limits is the python function name
         """
         voltage_set_point = 1.0  # we measured current consumed for this voltage.
@@ -177,8 +180,8 @@ class TestDCPower:
 
     def test_tsm_source_current(self, dcpower_tsm_s):
         """
-        # TSM SSC DCPower Source Current.vim
-        # SSC DCPower Source Current.vim
+        # TSM SSC DCPower Source Current vim
+        # SSC DCPower Source Current vim
         """
         current_set_point = 0.1e-03  # This value is measured for a know voltage
         for dcpower_tsm in dcpower_tsm_s:
@@ -224,3 +227,8 @@ class TestDCPower:
             dcpower_tsm.ssc.configure_output_connected(output_connected=True)
             # dcpower_tsm.ssc.configure_output_enabled_and_connected(output_enabled_and_connected=False)
             i += 1
+
+
+@nitsm.codemoduleapi.code_module
+def open_sessions(tsm_context: SMClass):
+    dcpower.initialize_sessions(tsm_context)
