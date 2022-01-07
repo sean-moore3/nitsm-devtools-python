@@ -410,9 +410,7 @@ class _SSCFPGA(typing.NamedTuple):
         for lines in lines_to_write:
             if 0 <= lines.connector.value <= 3:
                 enable, data = update_line_on_connector(data_list[lines.connector.value][0],
-                                                        data_list[lines.connector.value][1],
-                                                        lines.channel,
-                                                        lines.state)
+                                                        data_list[lines.connector.value][1], lines.channel, lines.state)
                 data_list[lines.connector.value] = [enable, data]
             else:
                 pass
@@ -432,16 +430,22 @@ class _SSCFPGA(typing.NamedTuple):
             con_data.write(data)
 
 
-def update_line_on_connector(output_enable: int = 0,
-                             output_data: int = 0,
+def update_line_on_connector(enable_in: int = 0,
+                             data_in: int = 0,
                              dio_line: DIOLines = DIOLines.DIO0,
                              line_state: StaticStates = StaticStates.Zero):
-    enable: int = output_enable
-    data: int = output_data
-    return enable, data  # TODO Check
+    dio_index = dio_line.value
+    output_data = ((-dio_index << data_in) & 1) > 0
+    data, enable = line_state_to_out(line_state, output_data)
+    ch1 = ~(dio_index << 1)
+    ch2 = dio_index << enable
+    ch3 = dio_index << data
+    enable_out = ch2 | (enable_in & ch1)
+    data_out = (ch1 & data_in) | ch3
+    return enable_out, data_out
 
 
-def line_state_to_out(line: States, out_data: bool):
+def line_state_to_out(line: StaticStates, out_data: bool):
     data = False
     enable = False
     if line.value == 0:
@@ -459,6 +463,7 @@ def line_state_to_out(line: States, out_data: bool):
 class TSMFPGA(typing.NamedTuple):
     pin_query_context: Any
     SSC: typing.List[_SSCFPGA]
+    site_numbers: typing.List[int]
 
     def configure_i2c_bus(self,
                           tenb_addresing: bool = False,
@@ -506,6 +511,7 @@ class TSMFPGA(typing.NamedTuple):
     def read_commanded_line_states(self):
         commanded_states = []
         current_commanded_states = []
+        data = ()
         for ss in self.SSC:
             data = ss.ss_read_c_states()
         current_commanded_states.append(data[0])
@@ -562,13 +568,17 @@ def channel_list_to_pins(channel_list: str = ""):
 
 
 def close_session(tsm_context: TSMContext):
-    pass  # TODO Check
+    session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(InstrumentTypeId)
+    for session in session_data:
+        session: nifpga.Session
+        session.close()
 
 
 def initialize_session(tsm_context: TSMContext, ldb_type: str):
     instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(InstrumentTypeId)
     for instrument, group in zip(instrument_names, channel_group_ids):
         # target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
+        ref_out = ""
         for target in IOandI2CInterface:
             ref_out = open_reference(instrument, target, ldb_type)
             # TODO clear error
@@ -578,16 +588,20 @@ def initialize_session(tsm_context: TSMContext, ldb_type: str):
     return debug
 
 
-def pins_to_sessions():
-    pass  # Todo Check
+def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbers: typing.List[int]):
+    pin_query_context, session_data, channel_group_ids, channel_lists =\
+        tsm_context.pins_to_custom_sessions(InstrumentTypeId, pins)
+    channels = pin_query_context.get_session_and_channel_index(site_numbers)
+    new_session = _SSCFPGA(session_data, channel_group_ids, channels, channel_lists)
+    return TSMFPGA(pin_query_context, [new_session], site_numbers)
 
 
-def open_reference(rio_resource: str, target: str, ldb_type: str):
-    if target == 'PXIe-7820R':
+def open_reference(rio_resource: str, target: IOandI2CInterface, ldb_type: str):
+    if target == IOandI2CInterface.PXIe_7820R:
         name_of_relative_path = '7820R Static IO and I2C FPGA Main 3.3V.lvbitx'
-    elif target == 'PXIe-7821R':
+    elif target == IOandI2CInterface.PXIe_7821R:
         name_of_relative_path = '7821R Static IO and I2C FPGA Main 3.3V.lvbitx'
-    elif target == 'PXIe-7822R':
+    elif target == IOandI2CInterface.PXIe_7822R:
         if 'Seq' in ldb_type:
             name_of_relative_path = '7822R Static IO and I2C FPGA Main 3.3V.lvbitx'
         else:
@@ -595,5 +609,23 @@ def open_reference(rio_resource: str, target: str, ldb_type: str):
     else:
         name_of_relative_path = ''
     path = os.path.join(CurrentPath, '..\\..\\FPGA Bitfiles\\', name_of_relative_path)
-    reference = os.path.join(rio_resource, path)
+    reference = os.path.join(rio_resource, path)  # TODO check if the result of this operation is valid
     return reference
+
+
+def get_i2c_master_session(tsm_context: TSMContext,
+                           i2c_master: I2CMaster.I2C_3V3_7822_SINK,
+                           apply_i2c_settings: bool = True):
+    sda = "%s_SDA" % i2c_master.name
+    scl = "%s_SDA" % i2c_master.name
+    session_data = pins_to_sessions(tsm_context, [sda, scl], [])
+    session = session_data.SSC[0]
+    ch_list = session_data.SSC[0].Channels.split(",")
+    iq_list = []
+    r_list = []
+    for ch in ch_list[0]:
+        iq_list.append(int(ch) // 32)
+        r_list.append(int(ch) % 32)
+    session.configure_i2c_master_sda_scl_lines(i2c_master, r_list, iq_list)
+    if apply_i2c_settings:
+        session_data.configure_i2c_bus(False, 64, True)
