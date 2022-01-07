@@ -8,6 +8,9 @@
 		<NIDCPowerInstrument name="SMU2" numberOfChannels="4">
 			<ChannelGroup name="CommonDCPowerChannelGroup2" />
 		</NIDCPowerInstrument>
+		<NIScopeInstrument name="SCOPE1" numberOfChannels="4" group="Scope" />
+		<NIScopeInstrument name="OSC1" numberOfChannels="8" group="Scope" />
+		<NIScopeInstrument name="OSC2" numberOfChannels="8" group="Scope" />
 	</Instruments>
 	<Pins>
 		<DUTPin name="DUTPin_IN_1" />

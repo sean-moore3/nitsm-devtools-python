@@ -13,6 +13,12 @@
 		<NIScopeInstrument name="OSC2" numberOfChannels="8" group="Scope" />
 	</Instruments>
 	<Pins>
+		<DUTPin name="DUTPin_IN_1" />
+		<DUTPin name="DUTPin_IN_2" />
+		<DUTPin name="DUTPin_IN_3" />
+		<DUTPin name="DUTPin_OUT_1" />
+		<DUTPin name="DUTPin_OUT_2" />
+		<DUTPin name="DUTPin_OUT_3" />
 		<DUTPin name="DUTPin_IN_ANA1" />
 		<DUTPin name="DUTPin_IN_ANA2" />
 		<DUTPin name="DUTPin_IN_ANA3" />
@@ -20,6 +26,16 @@
 		<DUTPin name="DUTPin_IN_ANA5" />
 	</Pins>
 	<PinGroups>
+		<PinGroup name="Inputs">
+			<PinReference pin="DUTPin_IN_1" />
+			<PinReference pin="DUTPin_IN_2" />
+			<PinReference pin="DUTPin_IN_3" />
+		</PinGroup>
+		<PinGroup name="Outputs">
+			<PinReference pin="DUTPin_OUT_1" />
+			<PinReference pin="DUTPin_OUT_2" />
+			<PinReference pin="DUTPin_OUT_3" />
+		</PinGroup>
 		<PinGroup name="Inputs_ANA">
 			<PinReference pin="DUTPin_IN_ANA1" />
 		</PinGroup>
@@ -28,6 +44,12 @@
 		<Site siteNumber="0" />
 	</Sites>
 	<Connections>
+		<Connection pin="DUTPin_OUT_1" siteNumber="0" instrument="DPI1" channel="0" />
+		<Connection pin="DUTPin_IN_1" siteNumber="0" instrument="DPI1" channel="1" />
+		<Connection pin="DUTPin_IN_2" siteNumber="0" instrument="DPI1" channel="3" />
+		<Connection pin="DUTPin_IN_3" siteNumber="0" instrument="DPI1" channel="5" />
+		<Connection pin="DUTPin_OUT_2" siteNumber="0" instrument="DPI1" channel="2" />
+		<Connection pin="DUTPin_OUT_3" siteNumber="0" instrument="DPI1" channel="4" />
 		<Connection pin="DUTPin_IN_ANA1" siteNumber="0" instrument="OSC1" channel="0" />
 		<Connection pin="DUTPin_IN_ANA2" siteNumber="0" instrument="OSC1" channel="1" />
 		<Connection pin="DUTPin_IN_ANA3" siteNumber="0" instrument="OSC2" channel="0" />
