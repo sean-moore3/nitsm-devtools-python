@@ -9,7 +9,7 @@ import nidevtools.scope as scope
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
-pin_file_names = ["scope.pinmap", "7DUT.pinmap"]
+pin_file_names = ["scope.pinmap", "7xDUT.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 if SIMULATE:
