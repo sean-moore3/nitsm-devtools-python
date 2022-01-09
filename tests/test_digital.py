@@ -297,6 +297,11 @@ class TestNIDigital:
 
 
 @nitsm.codemoduleapi.code_module
+def open_sessions(tsm_context: SMClass):
+    ni_dt_digital.tsm_initialize_sessions(tsm_context, options=OPTIONS)
+
+
+@nitsm.codemoduleapi.code_module
 def close_sessions(tsm_context: SMClass):
     ni_dt_digital.tsm_close_sessions(tsm_context)
 
