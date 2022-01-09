@@ -343,7 +343,8 @@ def frequency_measurement_func(tsm_context: SMClass, pins: typing.List[str]):
         per_site_per_pin_frequency_measurements,
     ) = ni_dt_digital.tsm_ssc_frequency_counter_measure_frequency(tsm)
     assert isinstance(per_site_per_pin_frequency_measurements, list)
-    assert numpy.shape(per_site_per_pin_frequency_measurements) == (3, 2)
+    print(numpy.shape(per_site_per_pin_frequency_measurements))
+    assert numpy.shape(per_site_per_pin_frequency_measurements) == (1, 2)
     for frequency_measurements in per_site_per_pin_frequency_measurements:
         for frequency_measurement in frequency_measurements:
             assert isinstance(frequency_measurement, float)
@@ -409,18 +410,20 @@ def pattern_actions(tsm_context: SMClass, pins: typing.List[str]):
     ni_dt_digital.tsm_ssc_wait_until_done(tsm)
     _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(tsm, "start_burst")
     assert isinstance(per_site_pass, list)
-    assert numpy.shape(per_site_pass) == (3,)
+    print(numpy.shape(per_site_pass))
+    assert numpy.shape(per_site_pass) == (1,)
     for status in per_site_pass:
         assert isinstance(status, bool)
     _, per_site_per_pin_fail_counts = ni_dt_digital.tsm_ssc_get_fail_count(tsm)
     assert isinstance(per_site_per_pin_fail_counts, list)
-    assert numpy.shape(per_site_per_pin_fail_counts) == (3, 2)
+    print(numpy.shape(per_site_per_pin_fail_counts))
+    assert numpy.shape(per_site_per_pin_fail_counts) == (1, 2)
     for fail_counts in per_site_per_pin_fail_counts:
         for fail_count in fail_counts:
             assert isinstance(fail_count, int)
     _, per_site_pass = ni_dt_digital.tsm_ssc_get_site_pass_fail(tsm)
     assert isinstance(per_site_pass, list)
-    assert numpy.shape(per_site_pass) == (3,)
+    assert numpy.shape(per_site_pass) == (1,)
     for status in per_site_pass:
         assert isinstance(status, bool)
 
@@ -431,7 +434,7 @@ def pin_levels_and_timing(tsm_context: SMClass, pins: typing.List[str]):
 
     ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm, "PinLevels", "Timing")
     ni_dt_digital.tsm_ssc_apply_tdr_offsets_per_site_per_pin(tsm, [[1e-9, ]] * 3)
-    ni_dt_digital.tsm_ssc_apply_tdr_offsets(tsm, [[1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9]] * 1)
+    ni_dt_digital.tsm_ssc_apply_tdr_offsets(tsm, [[1e-9, 1e-9, ]] * 1)
     ni_dt_digital.tsm_ssc_configure_active_load(tsm, 0.0015, 0.0015, -0.0015)
     ni_dt_digital.tsm_ssc_configure_single_level_per_site(
         tsm, ni_dt_digital.LevelTypeToSet.VIL, [0.0015, 0.0015, 0.0015]
@@ -483,14 +486,14 @@ def ppmu(tsm_context: SMClass, pins: typing.List[str]):
     ni_dt_digital.tsm_ssc_ppmu_source(tsm)
     _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_current(tsm)
     assert isinstance(per_site_per_pin_measurements, list)
-    assert numpy.shape(per_site_per_pin_measurements) == (3, 2)
+    assert numpy.shape(per_site_per_pin_measurements) == (1, 2)
     for measurements in per_site_per_pin_measurements:
         for measurement in measurements:
             assert isinstance(measurement, float)
     ni_dt_digital.tsm_ssc_ppmu_source_voltage(tsm, 0.01, 0.01)
     _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(tsm)
     assert isinstance(per_site_per_pin_measurements, list)
-    assert numpy.shape(per_site_per_pin_measurements) == (3, 2)
+    assert numpy.shape(per_site_per_pin_measurements) == (1, 2)
     for measurements in per_site_per_pin_measurements:
         for measurement in measurements:
             assert isinstance(measurement, float)
@@ -543,7 +546,7 @@ def source_and_capture_waveforms(tsm_context: SMClass, pins: typing.List[str]):
         True,
     )
     ni_dt_digital.tsm_ssc_write_source_waveform_broadcast(
-        tsm, "SourceWaveform_Broadcast", [1, 2, 3, 4, 5], True
+        tsm, "SourceWaveform", [1, 2, 3, 4, 5], True
     )
     ni_dt_digital.tsm_ssc_burst_pattern(tsm, "start_capture")
     _, per_site_waveforms = ni_dt_digital.tsm_ssc_fetch_capture_waveform(tsm, "CaptureWaveform", 2)
@@ -565,7 +568,8 @@ def static(tsm_context: SMClass, pins: typing.List[str]):
     )
     _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(tsm)
     assert isinstance(per_site_per_pin_data, list)
-    assert numpy.shape(per_site_per_pin_data) == (3, 2)
+    print(numpy.shape(per_site_per_pin_data))
+    assert numpy.shape(per_site_per_pin_data) == (1, 2)
     for data in per_site_per_pin_data:
         for _data in data:
             assert isinstance(_data, enums.PinState)
