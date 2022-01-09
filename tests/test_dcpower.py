@@ -15,10 +15,10 @@ SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driv
 pin_file_names = ["dcpower.pinmap", "7DUT.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
+OPTIONS = {}  # empty options to run on real hardware.
 if SIMULATE:
     pin_file_name = pin_file_names[1]
-
-OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
+    OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "4162"}}
 
 
 @pytest.fixture
@@ -28,12 +28,7 @@ def tsm_context(standalone_tsm):
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
-    if SIMULATE:
-        options = OPTIONS
-    else:
-        options = {}  # empty options to run on real hardware.
-
-    dcpower.initialize_sessions(standalone_tsm, options=options)
+    dcpower.initialize_sessions(standalone_tsm, options=OPTIONS)
     yield standalone_tsm
     dcpower.close_sessions(standalone_tsm)
 
@@ -236,8 +231,8 @@ class TestDCPower:
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm_context: SMClass):
     # ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
-    dcpower.initialize_sessions(tsm_context)
-    dcpower_tsm = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2", "DUTPin_IN_ANA1"])
+    dcpower.initialize_sessions(tsm_context, options=OPTIONS)
+    dcpower_tsm = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_SMU_ANA2", "DUTPin_IN_SMU_ANA1"])
     dcpower_tsm[1].reset()
     time.sleep(0.5)
 
@@ -250,7 +245,7 @@ def configure_measurements(tsm_context: SMClass):
         "Attach debugger",
         0,
     )
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2"])
+    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_SMU_ANA2"])
     tsminfo.ssc.abort()
     tsminfo.ssc.configure_aperture_time_with_abort_and_initiate()
     # tsminfo.ssc.configure_settings(20e-3, 0.0, ni_dt_dcpower.enums.Sense.LOCAL)
@@ -264,7 +259,7 @@ def configure_measurements(tsm_context: SMClass):
 
 @nitsm.codemoduleapi.code_module
 def configure_measurements_waveform(tsm_context: SMClass):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2", "DUTPin_IN_ANA1"])
+    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_SMU_ANA2", "DUTPin_IN_SMU_ANA1"])
     tsminfo.ssc.abort()
     tsminfo.ssc.configure_settings(20e-3, 0.0, dcpower.enums.Sense.LOCAL)
     tsminfo.ssc.configure_and_start_waveform_acquisition(sample_rate=10e3, buffer_length=1.0)
@@ -275,7 +270,7 @@ def configure_measurements_waveform(tsm_context: SMClass):
 
 @nitsm.codemoduleapi.code_module
 def fetch_waveform(tsm_context: SMClass):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2", "DUTPin_IN_ANA1"])
+    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_SMU_ANA2", "DUTPin_IN_SMU_ANA1"])
     volt_wf, curr_wf = tsminfo.ssc.fetch_waveform(0, waveform_length_s=1e-3)
     print(volt_wf, curr_wf)
     return volt_wf
@@ -283,7 +278,7 @@ def fetch_waveform(tsm_context: SMClass):
 
 @nitsm.codemoduleapi.code_module
 def source_current(tsm_context: SMClass):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2"])
+    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_SMU_ANA2"])
     tsminfo.ssc.force_current_symmetric_limits(
         current_level=10e-3, current_level_range=10e-3, voltage_limit=6, voltage_limit_range=6
     )
@@ -292,7 +287,7 @@ def source_current(tsm_context: SMClass):
 
 @nitsm.codemoduleapi.code_module
 def source_voltage(tsm_context: SMClass):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2"])
+    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_SMU_ANA2"])
     tsminfo.ssc.force_voltage_symmetric_limits(
         voltage_level=3.8, voltage_level_range=6.0, current_limit=10e-3, current_limit_range=100e-3
     )
@@ -301,7 +296,7 @@ def source_voltage(tsm_context: SMClass):
 
 @nitsm.codemoduleapi.code_module
 def measure(tsm_context: SMClass):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2"])
+    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_SMU_ANA2"])
     volt_meas, curr_meas = tsminfo.ssc.measure()
     compliance = tsminfo.ssc.query_in_compliance()
     print(compliance)
@@ -311,7 +306,7 @@ def measure(tsm_context: SMClass):
 
 @nitsm.codemoduleapi.code_module
 def close_sessions(tsm_context: SMClass, settings):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_ANA2", "DUTPin_IN_ANA1"])
+    tsminfo = dcpower.pins_to_sessions(tsm_context, ["DUTPin_IN_SMU_ANA2", "DUTPin_IN_SMU_ANA1"])
     tsminfo.ssc.abort()
     tsminfo.ssc.configure_output_connected(output_connected=True)
     # tsminfo.ssc.set_measurement_settings(settings)
