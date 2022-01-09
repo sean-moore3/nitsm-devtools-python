@@ -17,8 +17,10 @@ SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simu
 pin_file_names = ["digital.pinmap", "7xDUT.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
+OPTIONS = {}  # empty dict options to run on real hardware.
 if SIMULATE_HARDWARE:
     pin_file_name = pin_file_names[1]
+    OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
 
 
 @pytest.fixture
@@ -30,12 +32,7 @@ def tsm_context(standalone_tsm):
     in a dictionary format.
     """
     print("\nTest is running on Simulated driver?", SIMULATE_HARDWARE)
-    if SIMULATE_HARDWARE:
-        options = {"Simulate": True, "driver_setup": {"Model": "6571"}}
-    else:
-        options = {}  # empty dict options to run on real hardware.
-
-    ni_dt_digital.tsm_initialize_sessions(standalone_tsm, options=options)
+    ni_dt_digital.tsm_initialize_sessions(standalone_tsm, options=OPTIONS)
     yield standalone_tsm
     ni_dt_digital.tsm_close_sessions(standalone_tsm)
 
@@ -646,22 +643,22 @@ def initialize_sessions(tsm_context: SMClass):
     # print(tsm_context.pin_map_file_path)
     # pins = ni_dt_digital.SemiconductorModuleContext.get_pin_names(tsm_context, instrument_type_id=tsm_enums.InstrumentTypeIdConstants.NI_DIGITAL_PATTERN)
     # print(pins)
-    ni_dt_digital.tsm_initialize_sessions(tsm_context)
-    tsm_i_o = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["Inputs", "Outputs"])
-    ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm_i_o, "PinLevels_ts", "Timing")
+    ni_dt_digital.tsm_initialize_sessions(tsm_context, options=OPTIONS)
+    tsm_i_o = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["DPI_PG_Inputs", "DPI_PG_Outputs"])
+    ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm_i_o, "I2C_Levels", "I2C_Timing")
     ni_dt_digital.tsm_ssc_select_function(tsm_i_o, ni_dt_digital.enums.SelectedFunction.DIGITAL)
 
 
 @nitsm.codemoduleapi.code_module
 def configure_pins(tsm_context: SMClass):
-    tsm_o = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["Outputs"])
+    tsm_o = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["DPI_PG_Outputs"])
     # ni_dt_digital.tsm_ssc_select_function(tsm_o, ni_dt_digital.enums.SelectedFunction.DIGITAL)
     ni_dt_digital.tsm_ssc_write_static(tsm_o, ni_dt_digital.enums.WriteStaticPinState.ZERO)
 
 
 @nitsm.codemoduleapi.code_module
 def read_pins(tsm_context: SMClass):
-    tsm_i = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["Inputs"])
+    tsm_i = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["DPI_PG_Inputs"])
     # ni_dt_digital.tsm_ssc_select_function(tsm_i, ni_dt_digital.enums.SelectedFunction.DIGITAL)
     _, data = ni_dt_digital.tsm_ssc_read_static(tsm_i)
     print(data)
@@ -671,8 +668,8 @@ def read_pins(tsm_context: SMClass):
 @nitsm.codemoduleapi.code_module
 def burst_pattern(tsm_context: SMClass):
     tsm = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["DPI_SR_VDD", "DPI_PM_VDD"])
-    ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm, "PinLevels_ts", "Timing")
-    _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(tsm, "start_burst")
+    ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm, "I2C_Levels", "I2C_Timing")
+    _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(tsm, "I2C_Write")
     print(per_site_pass)
 
 

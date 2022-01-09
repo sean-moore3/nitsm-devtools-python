@@ -53,7 +53,9 @@
 		<DUTPin name="DPI_DI_SDA" />
 		<DUTPin name="DPI_DO_SDA" />
 		<SystemPin name="DPI_SR_VDD" />
+		<SystemPin name="DPI_PM_VDD" />
 		<SystemPin name="DPI_SR_VDDIO" />
+		<SystemPin name="DPI_PM_VDDIO" />
 		<SystemPin name="SMU_VI_VCC" />
 		<DUTPin name="SMU_VI_V_In" />
 		<DUTPin name="SMU_VI_V_Out" />
@@ -63,15 +65,19 @@
 		<DUTPin name="DAQ_AI_SGL2" />
 		<SystemPin name="FGN_SI_RefSGL" />
 		<DUTPin name="FGN_SI_SGL_In" />
-		<SystemPin name="DPI_PM_VDD" />
-		<SystemPin name="DPI_PM_VDDIO" />
 	</Pins>
 	<PinGroups>
-		<PinGroup name="DPI_PG_SGL">
-			<PinReference pin="DPI_DO_SCL" />
+		<PinGroup name="DPI_PG_Inputs">
 			<PinReference pin="DPI_DI_SDA" />
 			<PinReference pin="DPI_DI_SCL" />
+		</PinGroup>
+		<PinGroup name="DPI_PG_Outputs">
+			<PinReference pin="DPI_DO_SCL" />
 			<PinReference pin="DPI_DO_SDA" />
+		</PinGroup>
+		<PinGroup name="DPI_PG_AllPins">
+			<PinReference pin="DPI_PG_Outputs" />
+			<PinReference pin="DPI_PG_Inputs" />
 		</PinGroup>
 		<PinGroup name="SMU_PG_SYS">
 			<PinReference pin="SMU_VI_VCC" />
@@ -79,16 +85,6 @@
 		<PinGroup name="SMU_PG_Logic">
 			<PinReference pin="SMU_VI_V_In" />
 			<PinReference pin="SMU_VI_V_Out" />
-		</PinGroup>
-		<PinGroup name="DPI_PG_AllPins">
-			<PinReference pin="DPI_DO_SCL" />
-			<PinReference pin="DPI_DI_SDA" />
-			<PinReference pin="DPI_DI_SCL" />
-			<PinReference pin="DPI_DO_SDA" />
-			<PinReference pin="DPI_SR_VDDIO" />
-			<PinReference pin="DPI_SR_VDD" />
-			<PinReference pin="DPI_PM_VDD" />
-			<PinReference pin="DPI_PM_VDDIO" />
 		</PinGroup>
 		<PinGroup name="DAQ_PG_Audio">
 			<PinReference pin="DAQ_AI_SGL1" />

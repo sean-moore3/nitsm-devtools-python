@@ -13,10 +13,10 @@ This example shows the usage of the Power Sequence procedure to apply voltage to
   </ContinuityTest>
   <PowerSequence>
     <PowerSequenceItems>
-      <PowerSequenceItem pin="DPI_DO_VDD">
+      <PowerSequenceItem pin="DPI_SR_VDD">
         <Comment>Apply voltage to the DUT's power supply pin</Comment>
       </PowerSequenceItem>
-      <PowerSequenceItem pin="DPI_DO_VDDIO">
+      <PowerSequenceItem pin="DPI_SR_VDDIO">
         <Comment>Apply voltage to the DUT's digital interface power supply pin</Comment>
       </PowerSequenceItem>
     </PowerSequenceItems>
