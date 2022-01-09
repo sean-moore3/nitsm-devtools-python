@@ -106,7 +106,7 @@ class StandaloneSMC(nitsm.codemoduleapi.SemiconductorModuleContext):
 def _published_data_reader_factory(request):
     # get absolute path of the pin map file which is assumed to be relative to the test module
     pin_map_path = request.node.get_closest_marker("pin_map").args[0]
-    module_directory = os.path.join(os.path.dirname(request.module.__file__), "Data")
+    module_directory = os.path.join(os.path.dirname(request.module.__file__), "LoopBack")
     pin_map_path = os.path.join(module_directory, pin_map_path)
 
     published_data_reader_factory = win32com.client.Dispatch(
@@ -134,10 +134,10 @@ pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write_Loop.digi
 pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read_Loop.digipat")
 pattern3 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
 pattern4 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read.digipat")
-cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "I2C_capture_buffer.digicapture")
+cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "I2C_Capture_Buffer.digicapture")
 src_wfm1 = os.path.join(os.path.join(data_dir, "Waveforms"), "I2C_Broadcast.tdms")
 src_wfm2 = os.path.join(os.path.join(data_dir, "Waveforms"), "I2C_SiteUnique.tdms")
-src_wfm3 = os.path.join(os.path.join(data_dir, "Waveforms"), "I2C_source_buffer.tdms")
+src_wfm3 = os.path.join(os.path.join(data_dir, "Waveforms"), "I2C_Source_Buffer.tdms")
 digital_project_files = {
     "specifications": [specification1, specification2],
     "levels": [level],
