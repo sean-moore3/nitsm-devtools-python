@@ -430,8 +430,8 @@ def pin_levels_and_timing(tsm_context: SMClass, pins: typing.List[str]):
     tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm, "PinLevels", "Timing")
-    ni_dt_digital.tsm_ssc_apply_tdr_offsets_per_site_per_pin(tsm, [[1e-9, 1e-9]] * 3)
-    ni_dt_digital.tsm_ssc_apply_tdr_offsets(tsm, [[1e-9, 1e-9, 1e-9]] * 2)
+    ni_dt_digital.tsm_ssc_apply_tdr_offsets_per_site_per_pin(tsm, [[1e-9, ]] * 3)
+    ni_dt_digital.tsm_ssc_apply_tdr_offsets(tsm, [[1e-9, 1e-9, 1e-9, 1e-9, 1e-9, 1e-9]] * 1)
     ni_dt_digital.tsm_ssc_configure_active_load(tsm, 0.0015, 0.0015, -0.0015)
     ni_dt_digital.tsm_ssc_configure_single_level_per_site(
         tsm, ni_dt_digital.LevelTypeToSet.VIL, [0.0015, 0.0015, 0.0015]
@@ -439,7 +439,7 @@ def pin_levels_and_timing(tsm_context: SMClass, pins: typing.List[str]):
     ni_dt_digital.tsm_ssc_configure_single_level(tsm, ni_dt_digital.LevelTypeToSet.VIL, 0.0015)
     ni_dt_digital.tsm_ssc_configure_termination_mode(tsm, enums.TerminationMode.HIGH_Z)
     ni_dt_digital.tsm_ssc_configure_time_set_compare_edge_per_site_per_pin(
-        tsm, "time_set", [[40e-6, 40e-6]] * 3
+        tsm, "time_set", [[40e-6, ]] * 3
     )
     ni_dt_digital.tsm_ssc_configure_time_set_compare_edge_per_site(
         tsm, "time_set", [40e-6, 40e-6, 40e-6]
@@ -506,14 +506,14 @@ def sequencer_flags_and_registers(tsm_context: SMClass, pins: typing.List[str]):
         tsm, enums.SequencerFlag.FLAG1
     )
     assert isinstance(per_instrument_state, list)
-    assert numpy.shape(per_instrument_state) == (2,)
+    assert numpy.shape(per_instrument_state) == (1,)
     for state in per_instrument_state:
         assert isinstance(state, bool)
     _, per_instrument_register_values = ni_dt_digital.tsm_ssc_read_sequencer_register(
         tsm, enums.SequencerRegister.REGISTER1
     )
     assert isinstance(per_instrument_register_values, list)
-    assert numpy.shape(per_instrument_register_values) == (2,)
+    assert numpy.shape(per_instrument_register_values) == (1,)
     for register_value in per_instrument_register_values:
         assert isinstance(register_value, int)
 
@@ -524,7 +524,7 @@ def session_properties_func(tsm_context: SMClass, pins: typing.List[str]):
 
     _, session_properties = ni_dt_digital.tsm_ssc_get_properties(tsm)
     for session_property in session_properties:
-        assert session_property[0].startswith("DigitalPattern")
+        assert session_property[0].startswith("DPI")
         assert math.isclose(session_property[1], 0.0015, abs_tol=5e-6)
         assert math.isclose(session_property[2], 0.0015, abs_tol=5e-6)
         assert math.isclose(session_property[3], 0.0015, abs_tol=5e-6)

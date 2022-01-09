@@ -2,7 +2,6 @@
 <PinMap schemaVersion="1.5" xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<Instruments>
 		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Group1" />
-		<NIDigitalPatternInstrument name="DPI2" numberOfChannels="32" group="Group2" />
 	</Instruments>
 	<Pins>
 		<DUTPin name="DUTPin1" />
@@ -21,10 +20,10 @@
 	</Sites>
 	<Connections>
 		<Connection pin="DUTPin1" siteNumber="0" instrument="DPI1" channel="0" />
-		<Connection pin="DUTPin1" siteNumber="1" instrument="DPI1" channel="1" />
-		<Connection pin="DUTPin1" siteNumber="2" instrument="DPI1" channel="2" />
-		<Connection pin="DUTPin2" siteNumber="0" instrument="DPI2" channel="0" />
-		<Connection pin="DUTPin2" siteNumber="1" instrument="DPI2" channel="1" />
-		<Connection pin="DUTPin2" siteNumber="2" instrument="DPI2" channel="2" />
+		<Connection pin="DUTPin1" siteNumber="1" instrument="DPI1" channel="2" />
+		<Connection pin="DUTPin1" siteNumber="2" instrument="DPI1" channel="4" />
+		<Connection pin="DUTPin2" siteNumber="0" instrument="DPI1" channel="1" />
+		<Connection pin="DUTPin2" siteNumber="1" instrument="DPI1" channel="3" />
+		<Connection pin="DUTPin2" siteNumber="2" instrument="DPI1" channel="5" />
 	</Connections>
 </PinMap>
