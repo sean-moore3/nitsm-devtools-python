@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TimingFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.0" xmlns="http://www.ni.com/Semiconductor/Timing">
+  <TimingSheet>
+    <TimeSets>
+      <TimeSet name="time_set">
+        <Period>ac.period</Period>
+        <PinEdges>
+          <PinEdge pin="Outputs">
+            <ReturnToLow>
+              <On>0.1 * ac.period</On>
+              <Data>0.1 * ac.period</Data>
+              <Return>0.9 * ac.period</Return>
+              <Off>0.9 * ac.period</Off>
+            </ReturnToLow>
+            <CompareStrobe>
+              <Strobe>(3 * ac.period) / 4</Strobe>
+            </CompareStrobe>
+            <DataSource>Pattern</DataSource>
+          </PinEdge>
+        </PinEdges>
+      </TimeSet>
+    </TimeSets>
+  </TimingSheet>
+</TimingFile>
