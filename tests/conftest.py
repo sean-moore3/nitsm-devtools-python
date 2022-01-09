@@ -112,6 +112,9 @@ def _published_data_reader_factory(request):
     published_data_reader_factory = win32com.client.Dispatch(
         "NationalInstruments.TestStand.SemiconductorModule.Restricted.PublishedDataReaderFactory"
     )
+    print()
+    print(pin_map_path)
+    print()
     return published_data_reader_factory.NewSemiconductorModuleContext(pin_map_path)
 
 
@@ -120,21 +123,21 @@ def published_data_reader(_published_data_reader_factory):
     return PublishedDataReader(_published_data_reader_factory[1])
 
 
-data_dir = os.path.join(os.path.dirname(__file__), "Data")
+data_dir = os.path.join(os.path.dirname(__file__), "LoopBack")
 specification1 = os.path.join(
-    os.path.join(data_dir, "Specifications"), "Electrical Characteristics.specs"
+    os.path.join(data_dir, "Specifications"), "I2C_Electrical.specs"
 )
-specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C Characteristic.specs")
-level = os.path.join(os.path.join(data_dir, "Levels"), "PinLevels.digilevels")
+specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C_Time.specs")
+level = os.path.join(os.path.join(data_dir, "Levels"), "I2C_Levels.digilevels")
 timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C_Timing.digitiming")
 pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write_Loop.digipat")
 pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read_Loop.digipat")
 pattern3 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
 pattern4 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read.digipat")
-cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "capture_buffer.digicapture")
-src_wfm1 = os.path.join(os.path.join(data_dir, "Waveforms"), "Broadcast.tdms")
-src_wfm2 = os.path.join(os.path.join(data_dir, "Waveforms"), "SiteUnique.tdms")
-src_wfm3 = os.path.join(os.path.join(data_dir, "Waveforms"), "source_buffer.tdms")
+cap_wfm = os.path.join(os.path.join(data_dir, "Waveforms"), "I2C_capture_buffer.digicapture")
+src_wfm1 = os.path.join(os.path.join(data_dir, "Waveforms"), "I2C_Broadcast.tdms")
+src_wfm2 = os.path.join(os.path.join(data_dir, "Waveforms"), "I2C_SiteUnique.tdms")
+src_wfm3 = os.path.join(os.path.join(data_dir, "Waveforms"), "I2C_source_buffer.tdms")
 digital_project_files = {
     "specifications": [specification1, specification2],
     "levels": [level],
@@ -161,22 +164,22 @@ def tests_pins(request):
     _, file_name = os.path.split(request.module.__file__)
     if file_name == "test_dcpower.py":  # overriding the pin_select as it is inside dcpower module
         # for SMU driver i.e. nidcpower Testing
-        smu_system_pins = ["VCC"]
-        input_dut_pins = ["V_In"]
-        output_dut_pins = ["V_Out"]
-        all_smu_pins = ["Logic"]  # pin group name
+        smu_system_pins = ["SMU_VI_VCC"]
+        input_dut_pins = ["SMU_VI_V_In"]
+        output_dut_pins = ["SMU_VI_V_Out"]
+        all_smu_pins = ["SMU_PG_Logic"]  # pin group name
         pins_selected = [smu_system_pins, input_dut_pins, output_dut_pins, all_smu_pins]
     elif file_name == "test_digital.py":
         # for Digital pattern instrument driver i.e. nidigital Testing
-        input_dut_pins = ["SCL", "SDA"]
-        output_dut_pins = ["SCL_R", "SDA_R"]
+        input_dut_pins = ["DPI_DO_SCL", "DPI_DO_SDA"]
+        output_dut_pins = ["DPI_DI_SCL", "DPI_DI_SDA"]
         all_dut_pins = input_dut_pins + output_dut_pins
-        dpi_system_pins = ["VDD", "VDDIO"]
+        dpi_system_pins = ["DPI_PM_VDD", "DPI_PM_VDDIO"]
         pins_selected = [input_dut_pins, output_dut_pins, all_dut_pins]
     elif file_name == "test_scope.py":
         # for scope driver i.e. niscope testing
-        input_dut_pins = ["P_In"]
-        output_dut_pins = ["P_Out"]
+        input_dut_pins = ["OSC_xA_P_In"]
+        output_dut_pins = ["OSC_xA_P_Out"]
         all_dut_pins = input_dut_pins + output_dut_pins
         pins_selected = [input_dut_pins, output_dut_pins, all_dut_pins]
     elif file_name == "test_daqmx.py":
@@ -184,8 +187,8 @@ def tests_pins(request):
         pins_selected = [["DAQ_Pins1"], ["DAQ_Pins2"]]
     elif file_name == "test_fgen.py":
         # for daqmx driver i.e. nidaqmx testing
-        reference_sys_pin = ["RefSGL"]
-        input_dut_pins = ["SGL_In"]
+        reference_sys_pin = ["FGN_SI_RefSGL"]
+        input_dut_pins = ["FGN_SI_SGL_In"]
         pins_selected = [reference_sys_pin, input_dut_pins]
     else:
         pins_selected = ["dummy", "pins", "to_fail"]

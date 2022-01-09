@@ -2,7 +2,7 @@
 <PinLevelsFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.0" xmlns="http://www.ni.com/Semiconductor/PinLevels">
   <PinLevelsSheet>
     <DigitalPinLevelSets>
-      <DigitalPinLevelSet pin="SCL">
+      <DigitalPinLevelSet pin="DPI_DO_SCL">
         <Vil>DC.Vil</Vil>
         <Vih>DC.Vih</Vih>
         <Vol>DC.Vol</Vol>
@@ -13,7 +13,7 @@
         <TerminationMode>ActiveLoad</TerminationMode>
         <Comment>DUT clock pin electrical parameters</Comment>
       </DigitalPinLevelSet>
-      <DigitalPinLevelSet pin="SDA">
+      <DigitalPinLevelSet pin="DPI_DO_SDA">
         <Vil>DC.Vil</Vil>
         <Vih>DC.Vih</Vih>
         <Vol>DC.Vol</Vol>
@@ -24,7 +24,7 @@
         <TerminationMode>ActiveLoad</TerminationMode>
         <Comment>DUT data pin electrical parameters</Comment>
       </DigitalPinLevelSet>
-      <DigitalPinLevelSet pin="SCL_R">
+      <DigitalPinLevelSet pin="DPI_DI_SCL">
         <Vil>DC.Vil</Vil>
         <Vih>DC.Vih</Vih>
         <Vol>DC.Vol</Vol>
@@ -35,7 +35,7 @@
         <Vterm>0</Vterm>
         <TerminationMode>HighZ</TerminationMode>
       </DigitalPinLevelSet>
-      <DigitalPinLevelSet pin="SDA_R">
+      <DigitalPinLevelSet pin="DPI_DI_SDA">
         <Vil>DC.Vil</Vil>
         <Vih>DC.Vih</Vih>
         <Vol>DC.Vol</Vol>
@@ -48,12 +48,22 @@
       </DigitalPinLevelSet>
     </DigitalPinLevelSets>
     <PpmuPinLevelSets>
-      <PpmuPinLevelSet pin="VDD">
+      <PpmuPinLevelSet pin="DPI_SR_VDD">
         <Vf>DC.VDD</Vf>
         <IRange>32 mA</IRange>
         <Comment>DUT's power supply pin electrical parameters</Comment>
       </PpmuPinLevelSet>
-      <PpmuPinLevelSet pin="VDDIO">
+      <PpmuPinLevelSet pin="DPI_SR_VDDIO">
+        <Vf>DC.VDDIO</Vf>
+        <IRange>32 mA</IRange>
+        <Comment>DUT's digital interface power supply pin electrical parameters</Comment>
+      </PpmuPinLevelSet>
+      <PpmuPinLevelSet pin="DPI_PM_VDD">
+        <Vf>DC.VDD</Vf>
+        <IRange>32 mA</IRange>
+        <Comment>DUT's power supply pin electrical parameters</Comment>
+      </PpmuPinLevelSet>
+      <PpmuPinLevelSet pin="DPI_PM_VDDIO">
         <Vf>DC.VDDIO</Vf>
         <IRange>32 mA</IRange>
         <Comment>DUT's digital interface power supply pin electrical parameters</Comment>

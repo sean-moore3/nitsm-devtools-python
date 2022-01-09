@@ -1,6 +1,7 @@
 import pytest
 import typing
 import os
+import time
 import niscope
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
@@ -219,7 +220,7 @@ class TSMScope(typing.NamedTuple):
     ssc: typing.List[SSCScope]
 
 
-# @pytest.mark.sequence_file("niscope.seq")
+# @pytest.mark.sequence_file("scope.seq")
 # def test_niscope(system_test_runner):
 #     assert system_test_runner.run()
 
@@ -319,4 +320,45 @@ def fetch_waveform(tsm_context: SMClass, pins: typing.List[str], sites: typing.L
 
 @nitsm.codemoduleapi.code_module
 def close_sessions(tsm_context: SMClass):
+    print(" Closing sessions")
     scope.close_sessions(tsm_context)
+
+
+@nitsm.codemoduleapi.code_module
+def initialize_sessions(tsm_context: SMClass):
+    # ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
+    print("opening sessions")
+    scope.initialize_sessions(tsm_context)
+    tsmscope = scope.tsm_ssc_pins_to_sessions(tsm_context, ["DUTPin_IN_ANA1"], [])
+    scope.abort(tsmscope)
+    time.sleep(0.5)
+
+
+@nitsm.codemoduleapi.code_module
+def configure_measurements(tsm_context: SMClass):
+    tsmscope = scope.tsm_ssc_pins_to_sessions(tsm_context, ["DUTPin_IN_ANA1"], [])
+    scope.configure(
+        tsmscope, 4e-3, 1, 0, niscope.VerticalCoupling.AC, 5e6, 20000, 50, -1, 1e6, 1, True
+    )
+    scope.configure_digital_edge_trigger(tsmscope, "", slope=niscope.TriggerSlope.POSITIVE)
+    _, props = scope.get_session_properties(tsmscope)
+    print("\n", props)
+    print("Configuring fetch wf")
+    return props
+
+
+@nitsm.codemoduleapi.code_module
+def fetch_waveform1(tsm_context: SMClass):
+    tsmscope = scope.tsm_ssc_pins_to_sessions(tsm_context, ["DUTPin_IN_ANA1"], [])
+    scope.tsm_ssc_start_acquisition(tsmscope)
+    _, data_capture, wf_info = scope.fetch_waveform(tsmscope, 20000)
+    _, v_peak = scope.fetch_measurement(
+        tsmscope, scalar_meas_function=niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK
+    )
+    _, v_max = scope.fetch_measurement(
+        tsmscope, scalar_meas_function=niscope.ScalarMeasurement.VOLTAGE_MAX
+    )
+    print(wf_info)
+    print(v_peak)
+    print(v_max)
+    return data_capture, wf_info, v_peak, v_max

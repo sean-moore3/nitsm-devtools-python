@@ -5,7 +5,7 @@
       <TimeSet name="time_set">
         <Period>ac.period</Period>
         <PinEdges>
-          <PinEdge pin="AllPins">
+          <PinEdge pin="DPI_PG_AllPins">
             <ReturnToLow>
               <On>0.1 * ac.period</On>
               <Data>0.1 * ac.period</Data>
@@ -22,7 +22,7 @@
       <TimeSet name="Start">
         <Period>t.SCL</Period>
         <PinEdges>
-          <PinEdge pin="SCL">
+          <PinEdge pin="DPI_DO_SCL">
             <ReturnToLow>
               <On>0</On>
               <Data>0</Data>
@@ -35,7 +35,7 @@
             <DataSource>Pattern</DataSource>
             <Comment>Clock line START condition timing</Comment>
           </PinEdge>
-          <PinEdge pin="SDA">
+          <PinEdge pin="DPI_DO_SDA">
             <ReturnToLow>
               <On>0</On>
               <Data>0</Data>
@@ -53,7 +53,7 @@
       <TimeSet name="Busy">
         <Period>t.SCL</Period>
         <PinEdges>
-          <PinEdge pin="SCL">
+          <PinEdge pin="DPI_DO_SCL">
             <ReturnToLow>
               <On>0</On>
               <Data>t.SU_DAT</Data>
@@ -66,7 +66,7 @@
             <DataSource>Pattern</DataSource>
             <Comment>Clock line timing while transferring data</Comment>
           </PinEdge>
-          <PinEdge pin="SDA">
+          <PinEdge pin="DPI_DO_SDA">
             <DriveNonReturn>
               <On>0</On>
               <Data>t.HD_DAT</Data>
@@ -83,7 +83,7 @@
       <TimeSet name="Stop">
         <Period>t.SCL + t.BUF</Period>
         <PinEdges>
-          <PinEdge pin="SCL">
+          <PinEdge pin="DPI_DO_SCL">
             <DriveNonReturn>
               <On>0</On>
               <Data>t.LOW</Data>
@@ -95,7 +95,7 @@
             <DataSource>Pattern</DataSource>
             <Comment>Clock line STOP condition timing</Comment>
           </PinEdge>
-          <PinEdge pin="SDA">
+          <PinEdge pin="DPI_DO_SDA">
             <ReturnToHigh>
               <On>0</On>
               <Data>0</Data>
@@ -113,7 +113,7 @@
       <TimeSet name="Idle">
         <Period>t.SCL</Period>
         <PinEdges>
-          <PinEdge pin="AllPins">
+          <PinEdge pin="DPI_PG_AllPins">
             <DriveNonReturn>
               <On>0</On>
               <Data>0</Data>
@@ -130,7 +130,7 @@
       <TimeSet name="SourceStartSetup">
         <Period>3 µs</Period>
         <PinEdges>
-          <PinEdge pin="AllPins">
+          <PinEdge pin="DPI_PG_AllPins">
             <DriveNonReturn>
               <On>0</On>
               <Data>0</Data>
