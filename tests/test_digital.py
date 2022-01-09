@@ -259,7 +259,7 @@ class TestNIDigital:
         """TSM SSC Digital Write Source Waveform [Broadcast].vi"""
         ni_dt_digital.tsm_ssc_write_source_waveform_site_unique(
             digital_tsm_s[0],
-            "SiteUnique",
+            "I2C_SiteUnique",
             [
                 [1, 2, 3, 4, 5],
                 [1, 2, 3, 4, 5],
@@ -272,7 +272,7 @@ class TestNIDigital:
             True,
         )
         ni_dt_digital.tsm_ssc_write_source_waveform_broadcast(
-            digital_tsm_s[0], "Broadcast", [1, 2, 3, 4, 5], True
+            digital_tsm_s[0], "I2C_Broadcast", [1, 2, 3, 4, 5], True
         )
 
     def test_tsm_ssc_write_sequencer_register(self, digital_tsm_s):
