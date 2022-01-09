@@ -90,6 +90,19 @@
 			<PinReference pin="DAQ_AI_SGL1" />
 			<PinReference pin="DAQ_AI_SGL2" />
 		</PinGroup>
+		<PinGroup name="OSC_PG_AllPins">
+			<PinReference pin="OSC_xA_P_In" />
+			<PinReference pin="OSC_xA_P_Out" />
+		</PinGroup>
+		<PinGroup name="OSC_PG_Input">
+			<PinReference pin="OSC_xA_P_In" />
+		</PinGroup>
+		<PinGroup name="OSC_PG_Output">
+			<PinReference pin="OSC_xA_P_Out" />
+		</PinGroup>
+		<PinGroup name="FGN_PG_Signal">
+			<PinReference pin="FGN_SI_RefSGL" />
+		</PinGroup>
 	</PinGroups>
 	<Sites>
 		<Site siteNumber="0" />

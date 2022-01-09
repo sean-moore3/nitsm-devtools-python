@@ -6,26 +6,26 @@
 		<NIScopeInstrument name="OSC3" numberOfChannels="2" group="Scope2" />
 	</Instruments>
 	<Pins>
-		<DUTPin name="P_In" />
-		<DUTPin name="P_Out" />
+		<DUTPin name="OSC_xA_P_In" />
+		<DUTPin name="OSC_xA_P_Out" />
 	</Pins>
 	<PinGroups>
-		<PinGroup name="AllPins">
-			<PinReference pin="P_In" />
-			<PinReference pin="P_Out" />
+		<PinGroup name="OSC_PG_AllPins">
+			<PinReference pin="OSC_xA_P_In" />
+			<PinReference pin="OSC_xA_P_Out" />
 		</PinGroup>
-		<PinGroup name="Input">
-			<PinReference pin="P_In" />
+		<PinGroup name="OSC_PG_Input">
+			<PinReference pin="OSC_xA_P_In" />
 		</PinGroup>
-		<PinGroup name="Output">
-			<PinReference pin="P_Out" />
+		<PinGroup name="OSC_PG_Output">
+			<PinReference pin="OSC_xA_P_Out" />
 		</PinGroup>
 	</PinGroups>
 	<Sites>
 		<Site siteNumber="0" />
 	</Sites>
 	<Connections>
-		<Connection pin="P_In" siteNumber="0" instrument="OSC1" channel="0" />
-		<Connection pin="P_Out" siteNumber="0" instrument="OSC1" channel="1" />
+		<Connection pin="OSC_xA_P_In" siteNumber="0" instrument="OSC1" channel="0" />
+		<Connection pin="OSC_xA_P_Out" siteNumber="0" instrument="OSC1" channel="1" />
 	</Connections>
 </PinMap>
