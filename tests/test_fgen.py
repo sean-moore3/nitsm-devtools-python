@@ -7,9 +7,9 @@ import nidevtools.fgen as ni_dt_fgen
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["Rainbow.pinmap", "fgen.pinmap"]
+pin_file_names = ["Rainbow.pinmap", "MonoLithic.pinmap"]
 # Change index below to change the pinmap to use
-pin_file_name = pin_file_names[0]
+pin_file_name = pin_file_names[1]
 OPTIONS = {}
 if SIMULATE:
     OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "5451", "BoardType": "PXIe"}}
