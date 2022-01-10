@@ -7,12 +7,12 @@ import nidevtools.fgen as ni_dt_fgen
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["fgen.pinmap", "7xDUT.pinmap"]
+pin_file_names = ["Rainbow.pinmap", "fgen.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
+OPTIONS = {}
 if SIMULATE:
-    pin_file_name = pin_file_names[1]
-
+    OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "5451", "BoardType": "PXIe"}}
 
 @pytest.fixture
 def tsm_context(standalone_tsm):
@@ -21,12 +21,7 @@ def tsm_context(standalone_tsm):
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
-    if SIMULATE:
-        options = {"Simulate": True, "DriverSetup": {"Model": "5451", "BoardType": "PXIe"}}
-    else:
-        options = {}  # empty options to run on real hardware.
-
-    ni_dt_fgen.initialize_sessions(standalone_tsm, options=options)
+    ni_dt_fgen.initialize_sessions(standalone_tsm, options=OPTIONS)
     yield standalone_tsm
     ni_dt_fgen.close_sessions(standalone_tsm)
 
@@ -65,7 +60,9 @@ class TestFGen:
             assert isinstance(fgen_tsm, ni_dt_fgen.TSMFGen)
 
     def test_generate_sine_wave(self, fgen_tsm_s):
-        """"""
+        """Generate the sin wave on the hardware"""
         for fgen_tsm in fgen_tsm_s:
             fgen_tsm.ssc.generate_sine_wave(enable_filter=False)
             fgen_tsm.ssc.generate_sine_wave(10e3, 1, 0, 5, 1, 100e6, enable_filter=True)
+
+

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="5F4FC326EADBA46CF602BD92751D3800" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="6EF84995610ACAE1985A6ABEAEE8942A" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
 		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
@@ -36,12 +36,9 @@
 			<FileReference Id="294" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}DutBringupDefinition" Name="I2C_Bringup\.dutbringup" StoragePath="Misc\I2C_Bringup.dutbringup" />
 			<FileReference Id="295" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}RegisterMapDefinition" Name="I2C_Reg\.digireg" StoragePath="Misc\I2C_Reg.digireg" />
 			<SourceFileReference Id="296" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}SystemViewDefinition" Name="I2C_SystemView\.digisysview" StoragePath="Misc\I2C_SystemView.digisysview" />
-			<FileReference Id="299" ModelDefinitionType="PinMap" Name="dcpower\.pinmap" StoragePath="dcpower.pinmap" />
-			<FileReference Id="300" ModelDefinitionType="PinMap" Name="digital\.pinmap" StoragePath="digital.pinmap" />
-			<FileReference Id="301" ModelDefinitionType="PinMap" Name="scope\.pinmap" StoragePath="scope.pinmap" />
-			<FileReference Id="307" ModelDefinitionType="PinMap" Name="fgen\.pinmap" StoragePath="fgen.pinmap" />
-			<FileReference Id="310" ModelDefinitionType="PinMap" Name="daqmx\.pinmap" StoragePath="daqmx.pinmap" />
-			<FileReference Id="313" ModelDefinitionType="PinMap" Name="\7xDUT\.pinmap" StoragePath="7xDUT.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
+			<FileReference Id="316" ModelDefinitionType="PinMap" Name="Rainbow\.pinmap" StoragePath="Rainbow.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
+			<FileReference Id="319" ModelDefinitionType="PinMap" Name="MonoLithic\.pinmap" StoragePath="MonoLithic.pinmap" />
+			<FileReference Id="320" ModelDefinitionType="PinMap" Name="YinYang\.pinmap" StoragePath="YinYang.pinmap" />
 		</NameScopingEnvoy>
 		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">
 			<ProjectPropertiesDefinition xmlns="http://www.ni.com/PatternBasedDigital" />

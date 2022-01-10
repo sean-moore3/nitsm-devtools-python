@@ -9,7 +9,7 @@ import nidevtools.scope as scope
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
-pin_file_names = ["scope.pinmap", "7xDUT.pinmap"]
+pin_file_names = ["scope.pinmap", "Rainbow.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 if SIMULATE:
@@ -329,14 +329,14 @@ def initialize_sessions(tsm_context: SMClass):
     # ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
     print("opening sessions")
     scope.initialize_sessions(tsm_context)
-    tsmscope = scope.tsm_ssc_pins_to_sessions(tsm_context, ["DUTPin_IN_ANA1"], [])
+    tsmscope = scope.tsm_ssc_pins_to_sessions(tsm_context, ["OSC_xA_ANA1"], [])
     scope.abort(tsmscope)
     time.sleep(0.5)
 
 
 @nitsm.codemoduleapi.code_module
 def configure_measurements(tsm_context: SMClass):
-    tsmscope = scope.tsm_ssc_pins_to_sessions(tsm_context, ["DUTPin_IN_ANA1"], [])
+    tsmscope = scope.tsm_ssc_pins_to_sessions(tsm_context, ["OSC_xA_ANA1"], [])
     scope.configure(
         tsmscope, 4e-3, 1, 0, niscope.VerticalCoupling.AC, 5e6, 20000, 50, -1, 1e6, 1, True
     )
@@ -349,7 +349,7 @@ def configure_measurements(tsm_context: SMClass):
 
 @nitsm.codemoduleapi.code_module
 def fetch_waveform1(tsm_context: SMClass):
-    tsmscope = scope.tsm_ssc_pins_to_sessions(tsm_context, ["DUTPin_IN_ANA1"], [])
+    tsmscope = scope.tsm_ssc_pins_to_sessions(tsm_context, ["OSC_xA_ANA1"], [])
     scope.tsm_ssc_start_acquisition(tsmscope)
     _, data_capture, wf_info = scope.fetch_waveform(tsmscope, 20000)
     _, v_peak = scope.fetch_measurement(

@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<PinMap schemaVersion="1.6" xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.6">
 	<Instruments>
+		<NIFGenInstrument name="FGN1" numberOfChannels="1" />
 		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Group1" />
 		<NIDCPowerInstrument name="SMU1" numberOfChannels="1">
 			<ChannelGroup name="CommonDCPowerChannelGroup1" />
@@ -13,19 +14,28 @@
 		<NIScopeInstrument name="OSC2" numberOfChannels="8" group="Scope" />
 	</Instruments>
 	<Pins>
+		<DUTPin name="FGN_SI_SGL_In" />
 		<DUTPin name="DUTPin_IN_1" />
 		<DUTPin name="DUTPin_IN_2" />
 		<DUTPin name="DUTPin_IN_3" />
 		<DUTPin name="DUTPin_OUT_1" />
 		<DUTPin name="DUTPin_OUT_2" />
 		<DUTPin name="DUTPin_OUT_3" />
-		<DUTPin name="DUTPin_IN_OSC_ANA1" />
-		<DUTPin name="DUTPin_IN_OSC_ANA2" />
-		<DUTPin name="DUTPin_IN_OSC_ANA3" />
-		<DUTPin name="DUTPin_IN_OSC_ANA4" />
-		<DUTPin name="DUTPin_IN_OSC_ANA5" />
+		<DUTPin name="OSC_xA_ANA1" />
+		<DUTPin name="OSC_xA_ANA2" />
+		<DUTPin name="OSC_xA_ANA3" />
+		<DUTPin name="OSC_xA_ANA4" />
+		<DUTPin name="OSC_xA_ANA5" />
+		<DUTPin name="SMU_VI_ANA1" />
+		<DUTPin name="SMU_VI_ANA2" />
+		<DUTPin name="SMU_VI_ANA3" />
+		<DUTPin name="SMU_VI_ANA4" />
+		<DUTPin name="SMU_VI_ANA5" />
 	</Pins>
 	<PinGroups>
+		<PinGroup name="FGN_PG_Signal">
+			<PinReference pin="FGN_SI_SGL_In" />
+		</PinGroup>
 		<PinGroup name="Inputs">
 			<PinReference pin="DUTPin_IN_1" />
 			<PinReference pin="DUTPin_IN_2" />
@@ -37,23 +47,33 @@
 			<PinReference pin="DUTPin_OUT_3" />
 		</PinGroup>
 		<PinGroup name="Inputs_OSC_ANA">
-			<PinReference pin="DUTPin_IN_OSC_ANA1" />
+			<PinReference pin="OSC_xA_ANA1" />
+			<PinReference pin="OSC_xA_ANA2" />
+			</PinGroup>
+		<PinGroup name="Inputs_SMU_ANA">
+			<PinReference pin="SMU_VI_ANA1" />
 		</PinGroup>
 	</PinGroups>
 	<Sites>
 		<Site siteNumber="0" />
 	</Sites>
 	<Connections>
+		<Connection pin="FGN_SI_SGL_In" siteNumber="0" instrument="FGN1" channel="0" />
 		<Connection pin="DUTPin_IN_1" siteNumber="0" instrument="DPI1" channel="1" />
 		<Connection pin="DUTPin_IN_2" siteNumber="0" instrument="DPI1" channel="3" />
 		<Connection pin="DUTPin_IN_3" siteNumber="0" instrument="DPI1" channel="5" />
 		<Connection pin="DUTPin_OUT_1" siteNumber="0" instrument="DPI1" channel="0" />
 		<Connection pin="DUTPin_OUT_2" siteNumber="0" instrument="DPI1" channel="2" />
 		<Connection pin="DUTPin_OUT_3" siteNumber="0" instrument="DPI1" channel="4" />
-		<Connection pin="DUTPin_IN_OSC_ANA1" siteNumber="0" instrument="OSC1" channel="0" />
-		<Connection pin="DUTPin_IN_OSC_ANA2" siteNumber="0" instrument="OSC1" channel="1" />
-		<Connection pin="DUTPin_IN_OSC_ANA3" siteNumber="0" instrument="OSC2" channel="0" />
-		<Connection pin="DUTPin_IN_OSC_ANA4" siteNumber="0" instrument="OSC2" channel="1" />
-		<Connection pin="DUTPin_IN_OSC_ANA5" siteNumber="0" instrument="OSC2" channel="2" />
+		<Connection pin="OSC_xA_ANA1" siteNumber="0" instrument="OSC1" channel="0" />
+		<Connection pin="OSC_xA_ANA2" siteNumber="0" instrument="OSC1" channel="1" />
+		<Connection pin="OSC_xA_ANA3" siteNumber="0" instrument="OSC2" channel="0" />
+		<Connection pin="OSC_xA_ANA4" siteNumber="0" instrument="OSC2" channel="1" />
+		<Connection pin="OSC_xA_ANA5" siteNumber="0" instrument="OSC2" channel="2" />
+		<Connection pin="SMU_VI_ANA1" siteNumber="0" instrument="SMU1" channel="0" />
+		<Connection pin="SMU_VI_ANA2" siteNumber="0" instrument="SMU2" channel="0" />
+		<Connection pin="SMU_VI_ANA3" siteNumber="0" instrument="SMU2" channel="1" />
+		<Connection pin="SMU_VI_ANA4" siteNumber="0" instrument="SMU2" channel="2" />
+		<Connection pin="SMU_VI_ANA5" siteNumber="0" instrument="SMU2" channel="3" />
 	</Connections>
 </PinMap>
