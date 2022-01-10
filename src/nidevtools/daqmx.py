@@ -7,6 +7,7 @@ from nitsm.enums import InstrumentTypeIdConstants
 from nitsm.pinquerycontexts import PinQueryContext
 from enum import Enum
 import typing
+import nidevtools.abstract_switch as abstract_switch
 
 # Types Definition
 PinsArg = typing.Union[str, typing.Sequence[str]]
@@ -685,17 +686,14 @@ def pins_to_sessions_sessions(tsm_context: TSMContext, pins: PinsArg):
 # def set_session(tsm_context: TSMContext, instrument_name: str, daqmx_session: nidaqmx.Task):
 #     tsm_context.set_nidaqmx_task(instrument_name, daqmx_session)
 
-"""
 @nitsm.codemoduleapi.code_module
 def pins_to_task_and_connect(tsm_context: TSMContext, task_name: PinsArg, pins: PinsArg):
-    pin_list = tsm_context.filter_pins_by_instrument_type(pins, InstrumentTypeIdConstants.NI_DAQMX, Capability.ALL)
+    pin_list = tsm_context.filter_pins_by_instrument_type(pins, 'abstinst', Capability.ALL)
     multiple_session_info = pins_to_session_sessions_info(tsm_context, task_name)
     sessions = []
     for pin in pin_list:
-        # sessions += abstract_switch.pin_to_session(pin)    # TODO Abstract Switch function?
-        pass
+        sessions += abstract_switch.pins_to_sessions_sessions_info(tsm_context, [pin]).enable_pins
+    multi_session = abstract_switch.AbstractSession(sessions)
     if len(sessions) != 0:
-        # abstract_switch.connect_session_info(sessions)     # TODO Abstract Switch?
-        pass
+        multi_session.connect_sessions_info(tsm_context)
     return multiple_session_info
-"""

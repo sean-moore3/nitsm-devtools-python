@@ -10,10 +10,16 @@ import nidaqmx.constants as constants
 import nidevtools.daqmx as ni_daqmx
 import nidevtools.digital as ni_digital
 import nidevtools.fpga as ni_fpga
-import nidevtools._switch as ni_switch
+# import nidevtools._switch as ni_switch
 import time
 
 instrument_type_id = "Matrix"
+
+
+class Control(Enum):
+    get_connections = 0
+    disconnect_all = 1
+    init = 2
 
 
 class InstrumentTypes(Enum):
@@ -25,7 +31,7 @@ class InstrumentTypes(Enum):
 
 class Session(typing.NamedTuple):
     enable_pin: str
-    instrument_type: InstrumentTypes
+    instrument_type: typing.Union[InstrumentTypes, str]
     route_value: str
     site: int
     status: str
@@ -164,52 +170,131 @@ def close_sessions(tsm_context: TSMContext):
     pass
 
 
+# Not used
+'''
 def debug_ui(tsm_context: TSMContext):
     pass  # TODO CHECK
+'''
 
 
 def disconnect_all(tsm_context: TSMContext):
-    session = get_all_sessions(tsm_context)
-    for pin in session.enable_pins:
-        if 'BUCKLX_DAMP' in pin.enable_pin:
-            # TODO Check for output
+    sessions = get_all_sessions(tsm_context)
+    array1 = []
+    array2 = []
+    for session in sessions:
+        if 'BUCKLX_DAMP' in session.enable_pin:
+            array2.append(session)
+        else:
+            array1.append(session)
+    multi_session = AbstractSession(array1 + array2)
+    multi_session.disconnect_sessions_info(tsm_context)
 
 
-
-
-def disconnect_pin(tsm_context: TSMContext):
-    pass  # TODO CHECK
+def disconnect_pin(tsm_context: TSMContext, pins: typing.List[str]):
+    sessions = pins_to_sessions_sessions_info(tsm_context, pins)
+    sessions.disconnect_sessions_info(tsm_context)
 
 
 def initialize_tsm_context(tsm_context: TSMContext):
+    names = tsm_context.get_all_relay_driver_niswitch_sessions()  # TODO Names??
+    if len(names) == 1:
+        dut_pins, sys_pins = tsm_context.get_pin_names()
+        array = []
+        for pin in dut_pins+sys_pins:
+            if '^[Ee][Nn]_' in pin:
+                array.append(pin)
+        data = []
+        for instrument in ['niDAQmx', 'niDigitalIP', '782xFPGA', '_niSwitch']:
+            for pin in tsm_context.filter_pins_by_instrument_type(array, instrument, ''):
+                session = Session(pin, instrument, '', 0, '')  # Not all info
+                data.append(session)
+        multi_session = AbstractSession(data)
+        multi_session.set_sessions(tsm_context, names[0])
+    else:
+        raise nifpga.ErrorStatus(5000,
+                                 ("Unsupported Pin Map for the Abstract Switch."
+                                  "Ensure you only have one abstract switch in the pinmap"),
+                                 "initialize_tsm_context()",
+                                 ["tsm_context"],
+                                 (tsm_context,))
+
+
+def pin_fgv(tsm_context: TSMContext, pin: str = '', action: Control = Control.get_connections):
+    connections = []
+    while True:
+        if action == Control.get_connections:
+            for connection in connections:
+                if connection[1] == 'AbstractInstrument':
+                    sessions = pins_to_sessions_sessions_info(tsm_context, connection[0])
+                    data = sessions.read_state(tsm_context)
+                    conditions = []
+                    condition = False
+                    for info in data:
+                        if info.instrument_type == InstrumentTypes.daqmx:
+                            if info.route_value:
+                                condition = info.status
+                            else:
+                                condition = not info.status
+                        elif info.instrument_type == InstrumentTypes.digitalpattern:
+                            if info.route_value == '1':
+                                condition = info.status == '1'
+                            else:
+                                condition = info.status != '1'
+                        elif info.instrument_type == InstrumentTypes.fpga:
+                            if info.route_value == '1':
+                                condition = info.status == 'Connected'
+                            else:
+                                condition = info.status == 'Disconnected'
+                        elif info.instrument_type == InstrumentTypes.switch:
+                            condition = info.status in info.route_value
+                        conditions.append(condition)
+                    if len(conditions) == 0:
+                        condition = True
+                    else:
+                        if False in conditions:
+                            condition = False
+                        else:
+                            condition = True
+                    if condition:
+                        connections[5] = 'Connected'
+                    else:
+                        connections[5] = 'Disconnected'  # TODO Why Element 5?
+        elif action == Control.disconnect_all:
+            disconnect_all(tsm_context)
+        elif action == Control.init:
+            pinmap_path = tsm_context.pin_map_file_path
+            connections += pin_name_to_instrument(pinmap_path)
+
+
+def pin_name_to_instrument(pinmap_path: str = ''):
     pass  # TODO CHECK
 
 
-def pin_fgv(tsm_context: TSMContext):
-    pass  # TODO CHECK
-
-
-def pin_name_to_instrument():
-    pass  # TODO CHECK
-
-
-def enable_pins_to_sessions(tsm_context: TSMContext):
-    pass  # TODO CHECK
+def enable_pins_to_sessions(tsm_context: TSMContext, enable_pins: typing.List[str]):
+    sessions = get_all_sessions(tsm_context)
+    array = []
+    for pin in enable_pins:
+        for session in sessions:
+            if pin == session.enable_pin:
+                array.append(session)
+    return AbstractSession(array)
 
 
 def get_all_instruments_names(tsm_context: TSMContext):
-    pass  # TODO CHECK
+    switch_names = tsm_context.get_custom_instrument_names(instrument_type_id)
+    return switch_names
 
 
 def get_all_sessions(tsm_context: TSMContext):
     data = tsm_context.get_all_relay_driver_niswitch_sessions()
     if len(data) == 0:
         # Raise Error?
-        session=AbstractSession([])
+        session = AbstractSession([])
     else:
         session = data[0]
     return session
 
 
-def pins_to_sessions_sessions_info(tsm_context: TSMContext):
-    pass  # TODO CHECK
+def pins_to_sessions_sessions_info(tsm_context: TSMContext, pins: typing.List[str]):
+    return AbstractSession([])
+# TODO CHECK
