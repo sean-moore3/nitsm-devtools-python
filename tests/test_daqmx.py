@@ -149,15 +149,22 @@ class TestDaqmx:
         daq_pins1 = ["DAQ_Pins1"]
         daq_pins2 = ["DAQ_Pins2"]
         daq_pins_out = ["TestAnalogO"]
+        daq_pins_in = ["TestIn"]
+        daq_pins_out2 = ["TestOut2"]
         daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
         daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
         daq_sessions_out = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out)
+        daq_sessions_out2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out2)
+        daq_sessions_in = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_in)
         sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
         daq_sessions_all = ni_daqmx.MultipleSessions(
-            pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all)
+            pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all
+        )
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
         daq_sessions_out.timing()
+        daq_sessions_out2.timing()
+        daq_sessions_in.timing()
         daq_sessions_2: ni_daqmx.MultipleSessions
         #for s in daq_sessions_2.sessions:
         #    print(s.Task.triggers.reference_trigger.anlg_edge_src)
@@ -165,8 +172,12 @@ class TestDaqmx:
         output = 2.0  # configure output in NI-MAX
         error = 0.00123  # 16 bits with range 20 for both input and output
         daq_sessions_out.write_data([output, output])
+        daq_sessions_out2.write_data([output, output])
         daq_sessions_all.start_task()
         data = daq_sessions_all.read_waveform_multichannel(50)
+        daq_sessions_in.start_task()
+        data2 = daq_sessions_all.read_waveform_multichannel(5)
+        print("Data2:", data2)
         for measure in data[16:18]:
             for value in measure:
                 assert(output + error > value > output - error)
@@ -243,9 +254,13 @@ def scenario1(tsm_context: TSM_Context):
     daq_pins1 = ["DAQ_Pins1"]
     daq_pins2 = ["DAQ_Pins2"]
     daq_pins_out = ["TestAnalogO"]
+    daq_pins_in = ["TestIn"]
+    daq_pins_out2 = ["TestOut2"]
     daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
     daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
     daq_sessions_out = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out)
+    daq_sessions_out2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out2)
+    daq_sessions_in = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_in)
     sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
     daq_sessions_all = ni_daqmx.MultipleSessions(
         pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all

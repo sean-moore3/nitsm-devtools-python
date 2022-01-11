@@ -2,8 +2,8 @@
 <PinMap schemaVersion="1.1" xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<Instruments>
 		<!--- - - - Chassis 1 - - - - -->
-		<NIDAQmxTask channelList="DSA_4464_C1_S12/ai0,DSA_4464_C1_S12/ai1" name="DSA_4464_C1_S12" taskType="AnalogInputDSA" />
-		<NIDAQmxTask name="DSA_4463_C1_S14" taskType="AnalogOutputDSA" channelList="DSA_4463_C1_S14/ao0,DSA_4463_C1_S14/ao1" />
+		<NIDAQmxTask channelList="DSA_4464_C1_S12/ai0,DSA_4464_C1_S12/ai1" name="DSA_4464_C1_S12_AI" taskType="AnalogInputDSA" />
+		<NIDAQmxTask name="DSA_4464_C1_S12_AO" taskType="AnalogOutputDSA" channelList="DSA_4464_C1_S12/ao0,DSA_4464_C1_S12/ao1" />
 		<NIDAQmxTask channelList="DAQ_6368_C1_S16/ai0,DAQ_6368_C1_S16/ai1,DAQ_6368_C1_S16/ai2,DAQ_6368_C1_S16/ai3,DAQ_6368_C1_S16/ai4,DAQ_6368_C1_S16/ai5,DAQ_6368_C1_S16/ai6,DAQ_6368_C1_S16/ai7,DAQ_6368_C1_S16/ai8,DAQ_6368_C1_S16/ai9,DAQ_6368_C1_S16/ai10,DAQ_6368_C1_S16/ai11,DAQ_6368_C1_S16/ai12,DAQ_6368_C1_S16/ai13,DAQ_6368_C1_S16/ai14,DAQ_6368_C1_S16/ai15" name="DAQ_6368_C1_S16_AI" taskType="AnalogInput" />
 		<NIDAQmxTask channelList="DAQ_6368_C1_S17/ai0,DAQ_6368_C1_S17/ai1,DAQ_6368_C1_S17/ai2,DAQ_6368_C1_S17/ai3,DAQ_6368_C1_S17/ai4,DAQ_6368_C1_S17/ai5,DAQ_6368_C1_S17/ai6,DAQ_6368_C1_S17/ai7,DAQ_6368_C1_S17/ai8,DAQ_6368_C1_S17/ai9,DAQ_6368_C1_S17/ai10,DAQ_6368_C1_S17/ai11,DAQ_6368_C1_S17/ai12,DAQ_6368_C1_S17/ai13,DAQ_6368_C1_S17/ai14,DAQ_6368_C1_S17/ai15" name="DAQ_6368_C1_S17_AI" taskType="AnalogInput" />
 		<NIDAQmxTask channelList="DAQ_6368_C1_S17/ao0,DAQ_6368_C1_S17/ao1" name="DAQ_6368_C1_S17_AO" taskType="AnalogOutput" />
@@ -95,6 +95,8 @@
 		<DUTPin name="VPROBE2_4464" />
 		<DUTPin name="AO0" />
 		<DUTPin name="AO1" />
+		<DUTPin name="AO3" />
+		<DUTPin name="AO4" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="DAQ_Pins1">
@@ -133,13 +135,21 @@
 			<PinReference pin="AO0" />
 			<PinReference pin="AO1" />
 		</PinGroup>
+		<PinGroup name="TestOut2">
+			<PinReference pin="AO3" />
+			<PinReference pin="AO4" />
+		</PinGroup>
+		<PinGroup name="TestIn">
+			<PinReference pin="VPROBE1_4464" />
+			<PinReference pin="VPROBE2_4464" />
+		</PinGroup>
 	</PinGroups>
 	<Sites>
 		<Site siteNumber="0" />
 	</Sites>
 	<Connections>
-		<Connection channel="DSA_4464_C1_S12/ai0" instrument="DSA_4464_C1_S12" pin="VPROBE1_4464" siteNumber="0" />
-		<Connection channel="DSA_4464_C1_S12/ai1" instrument="DSA_4464_C1_S12" pin="VPROBE2_4464" siteNumber="0" />
+		<Connection channel="DSA_4464_C1_S12/ai0" instrument="DSA_4464_C1_S12_AI" pin="VPROBE1_4464" siteNumber="0" />
+		<Connection channel="DSA_4464_C1_S12/ai1" instrument="DSA_4464_C1_S12_AI" pin="VPROBE2_4464" siteNumber="0" />
 		<Connection channel="DAQ_6368_C1_S16/ai0" instrument="DAQ_6368_C1_S16_AI" pin="BUTTON1_DAQ" siteNumber="0" />
 		<Connection channel="DAQ_6368_C1_S16/ai1" instrument="DAQ_6368_C1_S16_AI" pin="BUTTON2_DAQ" siteNumber="0" />
 		<Connection channel="DAQ_6368_C1_S16/ai2" instrument="DAQ_6368_C1_S16_AI" pin="BUTTON3_DAQ" siteNumber="0" />
@@ -147,6 +157,8 @@
 		<Connection channel="DAQ_6368_C1_S16/ai4" instrument="DAQ_6368_C1_S16_AI" pin="ACTIVE_READY_DAQ" siteNumber="0" />
 		<Connection pin="AO0" siteNumber="0" instrument="DAQ_6368_C1_S17_AO" channel="DAQ_6368_C1_S17/ao0" />
 		<Connection pin="AO1" siteNumber="0" instrument="DAQ_6368_C1_S17_AO" channel="DAQ_6368_C1_S17/ao1" />
+		<Connection pin="AO3" siteNumber="0" instrument="DSA_4464_C1_S12_AO" channel="DSA_4464_C1_S12/ao0" />
+		<Connection pin="AO4" siteNumber="0" instrument="DSA_4464_C1_S12_AO" channel="DSA_4464_C1_S12/ao1" />
 		<Connection channel="DAQ_6368_C1_S16/ai5" instrument="DAQ_6368_C1_S16_AI" pin="SYS_ALIVE_DAQ" siteNumber="0" />
 		<Connection channel="DAQ_6368_C1_S16/ai6" instrument="DAQ_6368_C1_S16_AI" pin="SHDN_DAQ" siteNumber="0" />
 		<Connection channel="DAQ_6368_C1_S16/ai7" instrument="DAQ_6368_C1_S16_AI" pin="RESET_L_DAQ" siteNumber="0" />

@@ -7,7 +7,7 @@ from nitsm.enums import InstrumentTypeIdConstants
 from nitsm.pinquerycontexts import PinQueryContext
 from enum import Enum
 import typing
-import nidevtools.abstract_switch as abstract_switch
+#import nidevtools.abstract_switch as abstract_switch
 
 # Types Definition
 PinsArg = typing.Union[str, typing.Sequence[str]]
