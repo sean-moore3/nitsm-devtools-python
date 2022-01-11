@@ -64,8 +64,8 @@ class TestFGen:
     def test_generate_sine_wave(self, fgen_tsm_s):
         """Generate the sin wave on the hardware"""
         for fgen_tsm in fgen_tsm_s:
-            fgen_tsm.ssc.generate_sine_wave()
-            # fgen_tsm.ssc.generate_sine_wave(10e6, enable_filter=False)
+            # fgen_tsm.ssc.generate_sine_wave()
+            fgen_tsm.ssc.generate_sine_wave(10e6, enable_filter=False)
             # fgen_tsm.ssc.generate_sine_wave(10e6, 1, 0, 5, 1, 100e6, enable_filter=True)
         time.sleep(10.0)
 

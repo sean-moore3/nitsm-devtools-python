@@ -88,11 +88,11 @@ class _NIFGenTSM:
             samples = calc_samples
         else:
             samples = min_wav_samples
-        sine_fr = 1 / pts
+        sine_fr = 1 / (2*pts)
         waveform_data = self.create_waveform_data(samples, sine_fr, phase_degree=90)
         waveform_data = [amplitude * data for data in waveform_data]
         waveform_data = [offset + data for data in waveform_data]
-        sample_rate = 2* pts * frequency  # waveform_dt = 1 / (sample_rate)
+        sample_rate = pts * frequency  # waveform_dt = 1 / (sample_rate)
         gain = max([abs(data) for data in waveform_data])
         normalised_waveform = [data / gain for data in waveform_data]
         for ssc in self._sessions_sites_channels:
