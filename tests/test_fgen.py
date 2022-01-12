@@ -3,7 +3,7 @@ import time
 import pytest
 import os.path
 import nifgen
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
 import nidevtools.fgen as ni_dt_fgen
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
@@ -15,6 +15,7 @@ pin_file_name = pin_file_names[1]
 OPTIONS = {}
 if SIMULATE:
     OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "5451", "BoardType": "PXIe"}}
+
 
 @pytest.fixture
 def tsm_context(standalone_tsm):
@@ -70,3 +71,9 @@ class TestFGen:
         time.sleep(10.0)
 
 
+def init_fgen(tsm: SMClass):
+    ni_dt_fgen.initialize_sessions(tsm, options=OPTIONS)
+
+
+def close_fgen(tsm: SMClass):
+    ni_dt_fgen.close_sessions(tsm)
