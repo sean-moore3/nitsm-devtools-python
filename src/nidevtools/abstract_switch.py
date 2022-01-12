@@ -149,7 +149,7 @@ def check_debug_ui_tool(
         path_teststand: str = 'C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)'
 ):
     path_icons = path.join(path_teststand, 'Components\\Icons')
-    path_in = path.join(path_in, '..\\Code Modules\Common\\Instrument Control\\Abstract Switch\\Debug UI')
+    path_in = path.join(path_in, '..\\Code Modules\\Common\\Instrument Control\\Abstract Switch\\Debug UI')
     path_debug = path.join(path_icons, 'Abstract Switch Debug UI.ico')
     if not path.exists(path_debug):
         source = path.join(path_in, 'Abstract Switch Debug UI.ico')
