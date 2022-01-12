@@ -7,7 +7,7 @@ from nitsm.enums import InstrumentTypeIdConstants
 from nitsm.pinquerycontexts import PinQueryContext
 from enum import Enum
 import typing
-#import nidevtools.abstract_switch as abstract_switch
+# import nidevtools.abstract_switch as abstract_switch
 
 # Types Definition
 PinsArg = typing.Union[str, typing.Sequence[str]]
@@ -563,7 +563,7 @@ def set_task(tsm_context: TSMContext):
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
         try:
-            task.ai_channels.add_ai_voltage_chan(physical_channel)
+            task.ai_channels.add_ai_voltage_chan(physical_channel) #TODO Differentia?
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         except Exception:
             task = reset_devices(task)

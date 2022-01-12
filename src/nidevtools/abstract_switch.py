@@ -7,7 +7,7 @@ from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 from enum import Enum as Enum
 from nidigital import enums
 import nidaqmx.constants as constants
-#import nidevtools.daqmx as ni_daqmx
+import nidevtools.daqmx as ni_daqmx
 import nidevtools.digital as ni_digital
 import nidevtools.fpga as ni_fpga
 import nidevtools._switch as ni_switch
@@ -267,7 +267,7 @@ def pin_fgv(tsm_context: TSMContext, pin: str = '', action: Control = Control.ge
 
 
 def pin_name_to_instrument(pinmap_path: str = ''):
-    pass  # TODO CHECK
+    pass  # TODO CHECK XML
 
 
 def enable_pins_to_sessions(tsm_context: TSMContext, enable_pins: typing.List[str]):
@@ -296,8 +296,19 @@ def get_all_sessions(tsm_context: TSMContext):
 
 
 def pins_to_sessions_sessions_info(tsm_context: TSMContext, pins: typing.List[str]):
-    pin_query_context, session_data, channel_group_ids, channel_lists = tsm_context.pins_to_custom_sessions(
-        instrument_type_id, pins)
-    tsm_context.pin
+    contexts, session_data, switch_routes = tsm_context.pins_to_custom_sessions(instrument_type_id, pins) #TODO change
+    contexts, session_data, switch_routes: typing.Sequence
+    for context, session, route in zip(contexts, session_data, switch_routes):
+        data - route.split(',')
+        for row in data:
+            for col in row:
+                for element in col:
+                    element.split('=')
+                    #todo check
+
+
+
+        # TODO Session to Session_class
+
     return AbstractSession([])
 # TODO CHECK
