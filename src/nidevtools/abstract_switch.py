@@ -127,6 +127,7 @@ class AbstractSession(typing.NamedTuple):
 
     def set_sessions(self, tsm_context: TSMContext, switch_name: str = ''):
         tsm_context.set_relay_driver_niswitch_session(switch_name, self.enable_pins)  # TODO CHECK
+        # tsm_context.set_custom_session() #Anish: Use this function.
 
     def connect_sessions_info(self, tsm_context: TSMContext):
         for session in self.enable_pins:
@@ -268,6 +269,7 @@ def pin_fgv(tsm_context: TSMContext, pin: str = '', action: Control = Control.ge
 
 def pin_name_to_instrument(pinmap_path: str = ''):
     pass  # TODO CHECK XML
+    # use any xml parser to get the desired output LabVIEW array (python List)
 
 
 def enable_pins_to_sessions(tsm_context: TSMContext, enable_pins: typing.List[str]):
