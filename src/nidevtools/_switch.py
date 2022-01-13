@@ -70,21 +70,20 @@ def pin_to_sessions_session_info(tsm_context: TSMContext, pin: str = ''):
     try:
         session, relay_names = tsm_context.relays_to_relay_driver_niswitch_sessions(pin)
         # TODO CHECK for better equivalent
-        return Session(session, pin, relay_names)
+        return Session(session[0], pin, relay_names[0])
     except Exception:
-        # TODO what should it return
         return None
     # pin_query_context,session_data,channel_group_ids,channel_lists =
     # tsm_context.pins_to_custom_sessions(instrument_type_id, pin)
 
 
 def set_sessions(tsm_context: TSMContext, switch_name: str, session: niswitch.Session, channel_group_id: str):
-    tsm_context.set_relay_driver_niswitch_session(switch_name, session)  # TODO CH_GROUP_ID not requiered?
+    tsm_context.set_relay_driver_niswitch_session(switch_name, session)  # TODO CH_GROUP_ID not required?
 
 
 def close_sessions(tsm_context: TSMContext):
     sessions = get_all_sessions(tsm_context)
-    # TODO first part is requiered?
+    # TODO is first part in baku required?
     for session in sessions:
         session.close()
 
