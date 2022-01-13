@@ -298,19 +298,15 @@ def get_all_sessions(tsm_context: TSMContext):
 
 
 def pins_to_sessions_sessions_info(tsm_context: TSMContext, pins: typing.List[str]):
-    contexts, session_data, switch_routes = tsm_context.pins_to_custom_sessions(instrument_type_id, pins) #TODO change
-    contexts, session_data, switch_routes: typing.Sequence
+    contexts, session_data, switch_routes = tsm_context.pins_to_custom_sessions(instrument_type_id, pins)
+    # TODO change
     for context, session, route in zip(contexts, session_data, switch_routes):
         data = route.split(',')
         for row in data:
             for col in row:
                 for element in col:
                     element.split('=')
-                    #todo check
-
-
-
+                    # todo check
         # TODO Session to Session_class
-
     return AbstractSession([])
 # TODO CHECK
