@@ -301,7 +301,7 @@ def pins_to_sessions_sessions_info(tsm_context: TSMContext, pins: typing.List[st
     contexts, session_data, switch_routes = tsm_context.pins_to_custom_sessions(instrument_type_id, pins) #TODO change
     contexts, session_data, switch_routes: typing.Sequence
     for context, session, route in zip(contexts, session_data, switch_routes):
-        data - route.split(',')
+        data = route.split(',')
         for row in data:
             for col in row:
                 for element in col:
