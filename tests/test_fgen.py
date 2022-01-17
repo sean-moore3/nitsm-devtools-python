@@ -81,5 +81,5 @@ def close_fgen(tsm: SMClass):
 
 def generate_signal_for_test_pins(tsm: SMClass, test_pin):
     fgen_tsm = ni_dt_fgen.pins_to_sessions(tsm, test_pin, sites=[])
-    fgen_tsm.ssc.generate_sine_wave(10e6, 1, 0, 5, 1, 100e6, enable_filter=False)
+    fgen_tsm.ssc.generate_sine_wave(10e6, enable_filter=False)
     time.sleep(10.0)
