@@ -7,7 +7,8 @@ from nitsm.enums import InstrumentTypeIdConstants
 from nitsm.pinquerycontexts import PinQueryContext
 from enum import Enum
 import typing
-# import nidevtools.abstract_switch as abstract_switch
+import nidevtools.abstract_switch as ni_abstract
+
 
 # Types Definition
 PinsArg = typing.Union[str, typing.Sequence[str]]
@@ -563,7 +564,7 @@ def set_task(tsm_context: TSMContext):
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
         try:
-            task.ai_channels.add_ai_voltage_chan(physical_channel) #TODO Differentia?
+            task.ai_channels.add_ai_voltage_chan(physical_channel)  # TODO Differential?
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         except Exception:
             task = reset_devices(task)
@@ -692,8 +693,8 @@ def pins_to_task_and_connect(tsm_context: TSMContext, task_name: PinsArg, pins: 
     multiple_session_info = pins_to_session_sessions_info(tsm_context, task_name)
     sessions = []
     for pin in pin_list:
-        sessions += abstract_switch.pins_to_sessions_sessions_info(tsm_context, [pin]).enable_pins
-    multi_session = abstract_switch.AbstractSession(sessions)
+        sessions += ni_abstract.pins_to_sessions_sessions_info(tsm_context, [pin]).enable_pins
+    multi_session = ni_abstract.AbstractSession(sessions)
     if len(sessions) != 0:
         multi_session.connect_sessions_info(tsm_context)
     return multiple_session_info

@@ -1,16 +1,15 @@
+import nidevtools.daqmx as ni_daqmx
 import typing
 import os.path as path
 import shutil
-
 import nifpga
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 from enum import Enum as Enum
 from nidigital import enums
 import nidaqmx.constants as constants
-import nidevtools.daqmx as ni_daqmx
 import nidevtools.digital as ni_digital
 import nidevtools.fpga as ni_fpga
-import nidevtools._switch as ni_switch
+import nidevtools.switch as ni_switch
 import time
 
 instrument_type_id = "Matrix"
@@ -66,7 +65,9 @@ class Session(typing.NamedTuple):
             multiple_session.write_static(data)
 
         elif self.instrument_type == InstrumentTypes.switch:
-            pass  # TODO where is switch module?
+            ni_switch.pin_to_sessions_session_info(tsm_context, self.enable_pin)
+            handler = ni_switch.MultipleSessions(self)
+            handler.action_session_info(self.route_value, ni_switch.Action.Connect)
         else:
             pass
         if 'BUCKLX_DAMP' in self.enable_pin:
@@ -130,6 +131,11 @@ class AbstractSession(typing.NamedTuple):
         # tsm_context.set_custom_session() #Anish: Use this function.
 
     def connect_sessions_info(self, tsm_context: TSMContext):
+        for session in self.enable_pins:
+            if session.instrument_type == InstrumentTypes.switch or session.instrument_type == '_niSwitch':
+                ni_switch.pin_to_sessions_session_info(tsm_context, session.enable_pin)
+                session_handler = ni_switch.MultipleSessions([session])
+                session_handler.action_session_info(action=ni_switch.Action.Disconnect_All)
         for session in self.enable_pins:
             session.ss_connect(tsm_context)
 
