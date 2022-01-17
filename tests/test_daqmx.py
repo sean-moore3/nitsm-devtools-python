@@ -163,8 +163,8 @@ class TestDaqmx:
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
         daq_sessions_out.timing()
-        daq_sessions_out2.timing()
-        daq_sessions_in.timing()
+        daq_sessions_out2.timing() #DSA Channel
+        daq_sessions_in.timing() #DSA Channel
         daq_sessions_2: ni_daqmx.MultipleSessions
         #for s in daq_sessions_2.sessions:
         #    print(s.Task.triggers.reference_trigger.anlg_edge_src)

@@ -2,6 +2,8 @@ import os
 import nifpga
 from enum import Enum
 from time import time
+from time import sleep
+import shutil
 # import nitsm.codemoduleapi
 # from nitsm.enums import Capability
 # from nidaqmx.constants import TerminalConfiguration
@@ -629,3 +631,26 @@ def get_i2c_master_session(tsm_context: TSMContext,
     session.configure_i2c_master_sda_scl_lines(i2c_master, r_list, iq_list)
     if apply_i2c_settings:
         session_data.configure_i2c_bus(False, 64, True)
+
+
+def check_ui_tool(
+        path_in: str,
+        path_teststand: str = 'C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)'
+):
+    path_icons = os.path.join(path_teststand, 'Components\\Icons')
+    path_in = os.path.join(path_in, '..\\Code Modules\\Common\\Instrument Control\\782x FPGA\\CustomInstrument')
+    path_debug = os.path.join(path_icons, '782x FPGA Debug UI.ico')
+    if not os.path.exists(path_debug):
+        source = os.path.join(path_in, '782x FPGA Debug UI.ico')
+        target = path_icons
+        shutil.copy2(source, target)
+    path_panels = os.path.join(path_teststand, 'Components\\Modules\\NI_SemiconductorModule\\CustomInstrumentPanels')
+    path_debug = os.path.join(path_panels, '782x FPGA Debug UI.seq')
+    path_debug2 = os.path.join(path_panels, '782x FPGA Debug UI')
+    condition = os.path.exists(path_debug) and os.path.exists(path_debug2)
+    if not False:  # TODO connected to condition?
+        source = os.path.join(path_in, '.\\782x FPGA Debug UI\\')
+        target = path_panels
+        shutil.copy2(source, target)
+        source = os.path.join(path_in, '.\\782x FPGA Debug UI.seq')
+        shutil.copy2(source, target)
