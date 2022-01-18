@@ -2,7 +2,9 @@ import typing
 import os.path
 import shutil
 import nifpga
+import niswitch
 import nitsm.codemoduleapi
+import nitsm.enums
 import enum
 import nidigital
 import nidaqmx.constants
@@ -14,6 +16,9 @@ import time
 
 
 instrument_type_id = "Matrix"
+PinsArg = typing.Union[str, typing.Sequence[str]]
+Any = typing.Any
+StringTuple = typing.Tuple[str]
 
 
 class Control(enum.Enum):
@@ -92,7 +97,12 @@ class Session(typing.NamedTuple):
             multiple_session.write_static(data)
 
         elif self.instrument_type == InstrumentTypes.switch:
-            pass  # TODO where is switch module?
+            data = nidevtools.switch.pin_to_sessions_session_info(tsm_context, self.enable_pin)
+            data = nidevtools.switch.MultipleSessions([data])
+            if self.route_value == '':
+                data.action_session_info(self.route_value, nidevtools.switch.Action.Disconnect_All)
+            else:
+                data.action_session_info(self.route_value, nidevtools.switch.Action.Disconnect)
         else:
             pass
 
@@ -119,7 +129,13 @@ class Session(typing.NamedTuple):
             self.status = text
 
         elif self.instrument_type == InstrumentTypes.switch:
-            pass  # TODO where is switch module?
+            data = nidevtools.switch.pin_to_sessions_session_info(tsm_context, self.enable_pin)
+            data = nidevtools.switch.MultipleSessions([data])
+            capability = data.action_session_info(self.route_value, nidevtools.switch.Action.Read)
+            if capability[0] == niswitch.PathCapability.PATH_EXISTS:
+                self.status = 'Connected To: %s'%self.route_value
+            else:
+                self.status = 'Not Connected'
         else:
             pass
         return self
@@ -205,7 +221,7 @@ def disconnect_pin(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, 
 
 
 def initialize_tsm_context(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
-    names = tsm_context.get_all_relay_driver_niswitch_sessions()  # TODO Names??
+    names = tsm_context.get_all_relay_driver_niswitch_sessions()  # TODO get all switch names equivalent
     if len(names) == 1:
         dut_pins, sys_pins = tsm_context.get_pin_names()
         array = []
@@ -341,3 +357,18 @@ def pins_to_sessions_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconducto
                 session_list.append(session)
         # TODO context close
     return AbstractSession(session_list)
+
+
+@nitsm.codemoduleapi.code_module
+def pins_to_task_and_connect(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
+                             task_name: PinsArg,
+                             pins: PinsArg):
+    pin_list = tsm_context.filter_pins_by_instrument_type(pins, 'abstinst', nitsm.enums.Capability.ALL)
+    multiple_session_info = nidevtools.daqmx.pins_to_session_sessions_info(tsm_context, task_name)
+    sessions = []
+    for pin in pin_list:
+        sessions += pins_to_sessions_sessions_info(tsm_context, [pin]).enable_pins
+    multi_session = AbstractSession(sessions)
+    if len(sessions) != 0:
+        multi_session.connect_sessions_info(tsm_context)
+    return multiple_session_info

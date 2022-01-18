@@ -11,7 +11,7 @@ class Action(Enum):
     Read = 3
 
 
-class Topology(typing.NamedTuple):
+class Topology(typing.NamedTuple):  # TODO Check if valid and enough
     matrix_2738 = '2738/2-Wire 8x32 Matrix'
     mux_2525 = '2525/2-Wire Octal 8x1 Mux'
     matrix_2503 = '2503/2-Wire 4x6 Matrix'
@@ -47,10 +47,10 @@ class MultipleSessions:
 
     def action_session_info(self, route_value: str = '', action: Action = Action.Disconnect, timeout: int = 40):
         read_path_capability = []
-        data = []
         for session in self.Sessions:
             data = session.info(route_value, action, timeout)
-        read_path_capability += data
+            read_path_capability += data
+        return read_path_capability
 
 
 instrument_type_id = '_niSwitch'
