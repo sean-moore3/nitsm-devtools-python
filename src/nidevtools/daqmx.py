@@ -684,21 +684,3 @@ def pins_to_sessions_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModu
     """
     session = tsm_context.pins_to_nidaqmx_tasks(pins)  # pin_query_context, task, channel_lists
     return session
-
-
-# def set_session(tsm_context: TSMContext, instrument_name: str, daqmx_session: nidaqmx.Task):
-#     tsm_context.set_nidaqmx_task(instrument_name, daqmx_session)
-
-@nitsm.codemoduleapi.code_module
-def pins_to_task_and_connect(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
-                             task_name: PinsArg,
-                             pins: PinsArg):
-    pin_list = tsm_context.filter_pins_by_instrument_type(pins, 'abstinst', nitsm.enums.Capability.ALL)
-    multiple_session_info = pins_to_session_sessions_info(tsm_context, task_name)
-    sessions = []
-    for pin in pin_list:
-        sessions += ni_abstract.pins_to_sessions_sessions_info(tsm_context, [pin]).enable_pins
-    multi_session = ni_abstract.AbstractSession(sessions)
-    if len(sessions) != 0:
-        multi_session.connect_sessions_info(tsm_context)
-    return multiple_session_info
