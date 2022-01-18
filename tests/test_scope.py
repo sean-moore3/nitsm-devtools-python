@@ -9,13 +9,13 @@ import nidevtools.scope as scope
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
-pin_file_names = ["scope.pinmap", "Rainbow.pinmap"]
+pin_file_names = ["Rainbow.pinmap", "MonoLithic.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
-if SIMULATE:
-    pin_file_name = pin_file_names[1]
 
-OPTIONS = {"Simulate": True, "driver_setup": {"Model": "5105"}}
+OPTIONS = {}  # empty options to run on real hardware.
+if SIMULATE:
+    OPTIONS = {"Simulate": True, "driver_setup": {"Model": "5105"}}
 
 
 @pytest.fixture
@@ -27,12 +27,7 @@ def tsm_context(standalone_tsm):
     in a dictionary format.
     """
     print("\nTest is running on Simulated driver?", SIMULATE)
-    if SIMULATE:
-        options = OPTIONS
-    else:
-        options = {}  # empty dict options to run on real hardware.
-
-    scope.initialize_sessions(standalone_tsm, options=options)
+    scope.initialize_sessions(standalone_tsm, options=OPTIONS)
     yield standalone_tsm
     scope.close_sessions(standalone_tsm)
 
@@ -328,7 +323,7 @@ def close_sessions(tsm_context: SMClass):
 def initialize_sessions(tsm_context: SMClass):
     # ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
     print("opening sessions")
-    scope.initialize_sessions(tsm_context)
+    scope.initialize_sessions(tsm_context, options=OPTIONS)
     tsmscope = scope.tsm_ssc_pins_to_sessions(tsm_context, ["OSC_xA_ANA1"], [])
     scope.abort(tsmscope)
     time.sleep(0.5)

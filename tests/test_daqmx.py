@@ -7,24 +7,22 @@ import os
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
 import nidevtools.daqmx as ni_daqmx
 
+# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
+SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
+
+pin_file_names = ["MonoLithic.pinmap", "Rainbow.pinmap"]
+# Change index below to change the pin map to use
+pin_file_name = pin_file_names[0]
+message = "With" + pin_file_name + "Pinmap"
+print(message)
+OPTIONS = {}  # empty options to run on real hardware.
+if SIMULATE:
+    OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "6368"}}
+
 # Types Definition
 PinsArg = typing.Union[str, typing.Sequence[str]]
 Any = typing.Any
 StringTuple = typing.Tuple[str]
-
-# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
-SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
-
-pin_file_names = ["daqmx.pinmap", "7DUT.pinmap"]
-# Change index below to change the pin map to use
-pin_file_name = pin_file_names[0]
-message = "With DAQmx Pinmap"
-if SIMULATE:
-    pin_file_name = pin_file_names[0]
-    message = "With 7DUT Pinmap"
-print(message)
-
-OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "6368"}}
 
 
 @pytest.fixture
