@@ -1,13 +1,12 @@
+import nidevtools.abstract_switch as ni_abstract
 import nidaqmx
 import nitsm.codemoduleapi
-from nitsm.enums import Capability
-from nidaqmx.constants import TerminalConfiguration
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
-from nitsm.enums import InstrumentTypeIdConstants
-from nitsm.pinquerycontexts import PinQueryContext
-from enum import Enum
+import nitsm.enums
+import nitsm.codemoduleapi
+import nitsm.pinquerycontexts
+import nidaqmx.constants
+import enum
 import typing
-import nidevtools.abstract_switch as ni_abstract
 
 
 # Types Definition
@@ -183,7 +182,7 @@ class _Session(typing.NamedTuple):
     def st_ref_analog_edge(
         self,
         trigger_source: str,
-        edge: Enum = nidaqmx.constants.Edge.RISING,
+        edge: enum.Enum = nidaqmx.constants.Edge.RISING,
         level_v: float = 0.0,
         pre_trigger_samples_per_channel: int = 500,
     ):
@@ -214,7 +213,7 @@ class _Session(typing.NamedTuple):
     def st_ref_digital_edge(
         self,
         trigger_source: str,
-        edge: Enum = nidaqmx.constants.Slope.RISING,
+        edge: enum.Enum = nidaqmx.constants.Slope.RISING,
         pre_trigger_samples_per_channel: int = 500,
     ):
         """
@@ -387,7 +386,7 @@ class _Sessions:
     def reference_analog_edge(
         self,
         trigger_source: str,
-        edge: Enum = nidaqmx.constants.Slope.RISING,
+        edge: enum.Enum = nidaqmx.constants.Slope.RISING,
         level_v: float = 0.0,
         pre_trigger_samples_per_channel: int = 500,
     ):
@@ -419,7 +418,7 @@ class _Sessions:
     def reference_digital_edge(
         self,
         trigger_source: str,
-        edge: Enum = nidaqmx.constants.Slope.RISING,
+        edge: enum.Enum = nidaqmx.constants.Slope.RISING,
         pre_trigger_samples_per_channel: int = 500,
     ):
         """
@@ -443,13 +442,16 @@ class _Sessions:
             session.st_ref_digital_edge(trigger_source, edge, pre_trigger_samples_per_channel)
 
 
+PinQuery = nitsm.pinquerycontexts.PinQueryContext
+
+
 class MultipleSessions(_Sessions):
     """
     Class that contains a list of DAQmx sessions with methods to control all sessions inside the object.
     It also contains the pin query contex that can be related to each of the sessions inside the sessions list.
     """
 
-    pin_query_context: PinQueryContext
+    pin_query_context: PinQuery
 
     def __init__(self, pin_query_context, sessions):
         """
@@ -464,7 +466,7 @@ class MultipleSessions(_Sessions):
 
 
 @nitsm.codemoduleapi.code_module
-def clear_task(tsm_context: TSMContext):
+def clear_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
     """
     Clears all the tasks in the TSMContext. Before clearing, this method will abort all tasks, if necessary,
     and will release any resources the tasks reserved. You cannot use a task after you clear it unless you
@@ -510,7 +512,7 @@ def reset_devices(task: nidaqmx.Task):
 
 
 @nitsm.codemoduleapi.code_module
-def set_task(tsm_context: TSMContext):
+def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
     """
     Associates each NI-DAQmx tasks with the NI-DAQmx task name defined in the pin map and
     set all the sessions accordingly
@@ -525,7 +527,7 @@ def set_task(tsm_context: TSMContext):
             task.ao_channels.add_ao_voltage_chan(
                 physical_channel,
                 "",
-                TerminalConfiguration.DIFFERENTIAL,
+                nidaqmx.constants.TerminalConfiguration.DIFFERENTIAL,
                 -input_voltage_range,
                 input_voltage_range,
             )
@@ -546,7 +548,7 @@ def set_task(tsm_context: TSMContext):
             task.ai_channels.add_ai_voltage_chan(
                 physical_channel,
                 "",
-                TerminalConfiguration.DIFFERENTIAL,
+                nidaqmx.constants.TerminalConfiguration.DIFFERENTIAL,
                 -input_voltage_range,
                 input_voltage_range,
             )
@@ -610,7 +612,7 @@ def set_task(tsm_context: TSMContext):
 
 # Pin Map
 @nitsm.codemoduleapi.code_module
-def get_all_instrument_names(tsm_context: TSMContext, task_type: str = ""):
+def get_all_instrument_names(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, task_type: str = ""):
     """
     Returns the channel group ID and associated instrument names and channel lists of all instruments
     of type Instrument Type ID defined in the Semiconductor Module context. You can use instrument names,
@@ -629,7 +631,7 @@ def get_all_instrument_names(tsm_context: TSMContext, task_type: str = ""):
 
 
 @nitsm.codemoduleapi.code_module
-def get_all_sessions(tsm_context: TSMContext, task_type: str = ""):
+def get_all_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, task_type: str = ""):
     """
     Returns all sessions in the Semiconductor Module Context that belong to multiple instruments of the type DAQmx.
     Args:
@@ -644,7 +646,7 @@ def get_all_sessions(tsm_context: TSMContext, task_type: str = ""):
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_session_sessions_info(tsm_context: TSMContext, pins: PinsArg):
+def pins_to_session_sessions_info(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pins: PinsArg):
     """
     Returns a properly filled object of the type MultipleSessions with a session per each
     site defined in the pin map
@@ -656,7 +658,7 @@ def pins_to_session_sessions_info(tsm_context: TSMContext, pins: PinsArg):
         to publish measurements and extract data from a set of measurements.
     """
     pin_list = tsm_context.filter_pins_by_instrument_type(
-        pins, InstrumentTypeIdConstants.NI_DAQMX, Capability.ALL
+        pins, nitsm.enums.InstrumentTypeIdConstants.NI_DAQMX, nitsm.enums.Capability.ALL
     )
     (pin_query_contex, task, channel_list) = tsm_context.pins_to_nidaqmx_task(pin_list)
     sites = tsm_context.site_numbers
@@ -669,7 +671,7 @@ def pins_to_session_sessions_info(tsm_context: TSMContext, pins: PinsArg):
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions_sessions(tsm_context: TSMContext, pins: PinsArg):
+def pins_to_sessions_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pins: PinsArg):
     """
     Returns a pin query contex and a list of properties defined in the pin map.
     The list of properties returned can be used to fill a new object type MultipleSessions
@@ -688,8 +690,10 @@ def pins_to_sessions_sessions(tsm_context: TSMContext, pins: PinsArg):
 #     tsm_context.set_nidaqmx_task(instrument_name, daqmx_session)
 
 @nitsm.codemoduleapi.code_module
-def pins_to_task_and_connect(tsm_context: TSMContext, task_name: PinsArg, pins: PinsArg):
-    pin_list = tsm_context.filter_pins_by_instrument_type(pins, 'abstinst', Capability.ALL)
+def pins_to_task_and_connect(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
+                             task_name: PinsArg,
+                             pins: PinsArg):
+    pin_list = tsm_context.filter_pins_by_instrument_type(pins, 'abstinst', nitsm.enums.Capability.ALL)
     multiple_session_info = pins_to_session_sessions_info(tsm_context, task_name)
     sessions = []
     for pin in pin_list:

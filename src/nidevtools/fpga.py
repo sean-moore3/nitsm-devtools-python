@@ -86,13 +86,16 @@ class Connector(Enum):
 
 
 class StaticStates(Enum):
-    Zero: 0
-    One: 1
-    X: 2
+    Zero= 0
+    One= 1
+    X= 2
 
 
-class States(StaticStates):
-    I2C: 3
+class States(Enum):
+    Zero= 0
+    One= 1
+    X= 2
+    I2C= 3
 
 
 class Channel:

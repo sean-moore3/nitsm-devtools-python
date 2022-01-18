@@ -53,6 +53,16 @@ def daqmx_tsm_s(tsm_context, tests_pins):
     print(sessions)
     yield tsm_context, daqmx_tsms
 
+@pytest.fixture
+def daqmx_tsm_sc(tsm_context, tests_pins):
+    """Returns LabVIEW Cluster equivalent data"""
+    print(tests_pins)
+    daqmx_tsms = []
+    for test_pin_group in tests_pins:
+        print(test_pin_group)
+        data = ni_daqmx.pins_to_task_and_connect(tsm_context, test_pin_group, test_pin_group)
+        daqmx_tsms.append(data)
+    yield daqmx_tsms
 
 @pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
@@ -75,9 +85,16 @@ class TestDaqmx:
             print("\nTest_pin_to_sessions\n", daqmx_tsm)
             print(daqmx_tsm.sessions)
             assert isinstance(daqmx_tsm, ni_daqmx.MultipleSessions)
-            assert isinstance(daqmx_tsm.pin_query_context, ni_daqmx.PinQueryContext)
+            assert isinstance(daqmx_tsm.pin_query_context, ni_daqmx.PinQuery)
             assert isinstance(daqmx_tsm.sessions, typing.List)
             assert len(daqmx_tsm.sessions) == len(tsm_context.site_numbers)
+
+    def test_pin_to_sessions_and_connect(self, daqmx_tsm_sc):
+        list_daqmx_tsm = daqmx_tsm_sc
+        print(list_daqmx_tsm)
+        for daqmx_tsm in list_daqmx_tsm:
+            print("\nTest_pin_to_sessions\n", daqmx_tsm)
+            print(daqmx_tsm.sessions)
 
     def test_get_all_instrument_names(self, tsm_context):
         data = ni_daqmx.get_all_instrument_names(tsm_context)
@@ -163,12 +180,12 @@ class TestDaqmx:
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
         daq_sessions_out.timing()
-        daq_sessions_out2.timing() #DSA Channel
-        daq_sessions_in.timing() #DSA Channel
+        daq_sessions_out2.timing()  # DSA Channel
+        daq_sessions_in.timing()  # DSA Channel
         daq_sessions_2: ni_daqmx.MultipleSessions
-        #for s in daq_sessions_2.sessions:
+        # for s in daq_sessions_2.sessions:
         #    print(s.Task.triggers.reference_trigger.anlg_edge_src)
-        #daq_sessions_2.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+        # daq_sessions_2.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
         output = 2.0  # configure output in NI-MAX
         error = 0.00123  # 16 bits with range 20 for both input and output
         daq_sessions_out.write_data([output, output])
@@ -268,7 +285,9 @@ def scenario1(tsm_context: TSM_Context):
     daq_sessions_all.stop_task()
     daq_sessions_all.timing()
     daq_sessions_out.timing()
-    #daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
+    daq_sessions_in.timing()
+    daq_sessions_out2.timing()
+    # daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
     daq_sessions_out.write_data([1, 1])
     daq_sessions_all.start_task()
     data = daq_sessions_all.read_waveform_multichannel(50)
