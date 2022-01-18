@@ -12,7 +12,7 @@ import ctypes
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["Rainbow.pinmap"]
+pin_file_names = ["YinYang.pinmap"]
 # Change index below to change the pinmap to use
 pin_file_name = pin_file_names[0]
 OPTIONS = {}  # empty options to run on real hardware.
