@@ -581,7 +581,7 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
         try:
-            ch = task.ao_channels.add_ao_voltage_chan(physical_channel)  # TODO doesn't write for DSA channel
+            ch = task.ao_channels.add_ao_voltage_chan(physical_channel)  # TODO Config doesn't write properly for DSA channel
             ch.ao_term_cfg = nidaqmx.constants.TerminalConfiguration.PSEUDODIFFERENTIAL
             print(ch.ao_term_cfg, ch.ao_min, ch.channel_names)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
