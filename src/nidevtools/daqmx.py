@@ -1,4 +1,3 @@
-import nidevtools.abstract_switch as ni_abstract
 import nidaqmx
 import nitsm.codemoduleapi
 import nitsm.enums
@@ -566,7 +565,8 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
         try:
-            task.ai_channels.add_ai_voltage_chan(physical_channel)  # TODO Differential?
+            ch = task.ai_channels.add_ai_voltage_chan(physical_channel)
+            print(ch.ai_coupling, ch.ai_term_cfg, ch.channel_names)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         except Exception:
             task = reset_devices(task)
@@ -581,7 +581,9 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
     for task_name, physical_channel in zip(task_names, channel_lists):
         task = nidaqmx.Task(task_name)
         try:
-            task.ao_channels.add_ao_voltage_chan(physical_channel)
+            ch = task.ao_channels.add_ao_voltage_chan(physical_channel)  # TODO doesn't write for DSA channel
+            ch.ao_term_cfg = nidaqmx.constants.TerminalConfiguration.PSEUDODIFFERENTIAL
+            print(ch.ao_term_cfg, ch.ao_min, ch.channel_names)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         except Exception:
             task = reset_devices(task)

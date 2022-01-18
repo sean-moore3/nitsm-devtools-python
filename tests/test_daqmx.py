@@ -162,19 +162,21 @@ class TestDaqmx:
         daq_sessions_out.timing()
         daq_sessions_out2.timing()  # DSA Channel
         daq_sessions_in.timing()  # DSA Channel
-        daq_sessions_2: ni_daqmx.MultipleSessions
         # for s in daq_sessions_2.sessions:
         #    print(s.Task.triggers.reference_trigger.anlg_edge_src)
         # daq_sessions_2.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
         output = 2.0  # configure output in NI-MAX
         error = 0.00123  # 16 bits with range 20 for both input and output
+        error2 = 0.02
         daq_sessions_out.write_data([output, output])
-        daq_sessions_out2.write_data([output, output])
+        daq_sessions_out2.write_data([output, output])  # TODO missing write
         daq_sessions_all.start_task()
         data = daq_sessions_all.read_waveform_multichannel(50)
         daq_sessions_in.start_task()
-        data2 = daq_sessions_all.read_waveform_multichannel(5)
-        print("Data2:", data2)
+        data2 = daq_sessions_in.read_waveform_multichannel(5)
+        for value in data2[0]:
+            # assert(output + error2 > value > output - error2)
+            print(value)
         for measure in data[16:18]:
             for value in measure:
                 assert(output + error > value > output - error)
