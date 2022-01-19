@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.1">
+	<Instruments>
+		<Instrument name="AbstractInstrument" instrumentTypeId="abstinst">
+			<Channel id="0" />
+		</Instrument>
+		<Multiplexer multiplexerTypeId="abstract" name="Masterconnect" />
+	</Instruments>
+	<Pins>
+		<DUTPin name="SGL0" />
+		<DUTPin name="SGL1" />
+		<DUTPin name="SGL2" />
+	</Pins>
+	<PinGroups>
+		<PinGroup name="BUCK_TLOAD_CTRL">
+			<PinReference pin="SGL0" />
+			<PinReference pin="SGL1" />
+			<PinReference pin="SGL2" />
+		</PinGroup>
+	</PinGroups>
+	<Sites>
+		<Site siteNumber="0" />
+	</Sites>
+	<Connections>
+		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
+			<MultiplexedDUTPinRoute pin="SGL0" siteNumber="0" multiplexer="Masterconnect" routeName="a" />
+			<MultiplexedDUTPinRoute pin="SGL1" siteNumber="0" multiplexer="Masterconnect" routeName="b" />
+			<MultiplexedDUTPinRoute pin="SGL2" siteNumber="0" multiplexer="Masterconnect" routeName="c" />
+		</MultiplexedConnection>
+	</Connections>
+</PinMap>
