@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
-<PinMap schemaVersion="1.1" xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<PinMap schemaVersion="1.6" xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<Instruments>
 		<!--- - - - Chassis 1 - - - - -->
 		<NIFGenInstrument name="FGN1" numberOfChannels="1" />
@@ -43,6 +43,9 @@
 		<NIDAQmxTask channelList="DAQ2/port1/line5" name="DAQ2_P1_5" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ2/port1/line6" name="DAQ2_P1_6" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ2/port1/line7" name="DAQ2_P1_7" taskType="DigitalOutput" />
+		<Instrument name="AbstractInstrument" instrumentTypeId="abstinst">
+			<Channel id="0" />
+		</Instrument>
 	</Instruments>
 	<Pins>
 		<DUTPin name="FGN_SI_SGL_In" />
@@ -143,10 +146,10 @@
 		<PinGroup name="Inputs_OSC_ANA">
 			<PinReference pin="OSC_xA_ANA1" />
 			<PinReference pin="OSC_xA_ANA2" />
-			</PinGroup>
+		</PinGroup>
 		<PinGroup name="Inputs_SMU_ANA">
 			<PinReference pin="SMU_VI_ANA1" />
-		</PinGroup>	
+		</PinGroup>
 		<PinGroup name="DAQ_Pins1">
 			<PinReference pin="ACTIVE_READY_DAQ" />
 			<PinReference pin="BUTTON1_DAQ" />
