@@ -51,6 +51,7 @@ def daqmx_tsm_s(tsm_context, tests_pins):
     print(sessions)
     yield tsm_context, daqmx_tsms
 
+
 @pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestDaqmx:
@@ -146,13 +147,9 @@ class TestDaqmx:
         daq_pins1 = ["DAQ_Pins1"]
         daq_pins2 = ["DAQ_Pins2"]
         daq_pins_out = ["TestAnalogO"]
-        daq_pins_in = ["TestIn"]
-        daq_pins_out2 = ["TestOut2"]
         daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
         daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
         daq_sessions_out = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out)
-        daq_sessions_out2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out2)
-        daq_sessions_in = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_in)
         sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
         daq_sessions_all = ni_daqmx.MultipleSessions(
             pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all
@@ -160,23 +157,14 @@ class TestDaqmx:
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
         daq_sessions_out.timing()
-        daq_sessions_out2.timing()  # DSA Channel
-        daq_sessions_in.timing()  # DSA Channel
         # for s in daq_sessions_2.sessions:
         #    print(s.Task.triggers.reference_trigger.anlg_edge_src)
         # daq_sessions_2.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
         output = 2.0  # configure output in NI-MAX
         error = 0.00123  # 16 bits with range 20 for both input and output
-        error2 = 0.02
         daq_sessions_out.write_data([output, output])
-        daq_sessions_out2.write_data([output, output])  # TODO missing write
         daq_sessions_all.start_task()
         data = daq_sessions_all.read_waveform_multichannel(50)
-        daq_sessions_in.start_task()
-        data2 = daq_sessions_in.read_waveform_multichannel(5)
-        for value in data2[0]:
-            # assert(output + error2 > value > output - error2)
-            print(value)
         for measure in data[16:18]:
             for value in measure:
                 assert(output + error > value > output - error)
@@ -185,6 +173,26 @@ class TestDaqmx:
         print("\nDevice has been released: ", output, "+-", error)
         daq_sessions_out.stop_task()
         daq_sessions_all.stop_task()
+
+    def test_baku_dsa_write_read(self, tsm_context):
+        daq_pins_in_dsa = ["TestIn"]
+        daq_pins_out_dsa = ["TestOut2"]
+        daq_sessions_out_dsa = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out_dsa)
+        daq_sessions_in_dsa = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_in_dsa)
+        daq_sessions_out_dsa.timing()  # DSA Channel
+        daq_sessions_in_dsa.timing()  # DSA Channel
+        output = 2.0  # configure output in NI-MAX
+        error = 0.05  # 16 bits with range 20 for both input and output
+        daq_sessions_out_dsa.write_data([output, output])  # TODO missing write
+        daq_sessions_in_dsa.start_task()
+        data2 = daq_sessions_in_dsa.read_waveform_multichannel(5)
+        for value in data2[0]:
+            #assert(output + error > value > output - error)
+            print(value)
+        print("\nAll measured values within the expected value of: ", output, "+-", error)
+        print("\nDevice has been released: ", output, "+-", error)
+        daq_sessions_out_dsa.stop_task()
+        daq_sessions_in_dsa.stop_task()
 
 
 @nitsm.codemoduleapi.code_module
@@ -253,13 +261,9 @@ def scenario1(tsm_context: TSM_Context):
     daq_pins1 = ["DAQ_Pins1"]
     daq_pins2 = ["DAQ_Pins2"]
     daq_pins_out = ["TestAnalogO"]
-    daq_pins_in = ["TestIn"]
-    daq_pins_out2 = ["TestOut2"]
     daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
     daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
     daq_sessions_out = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out)
-    daq_sessions_out2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out2)
-    daq_sessions_in = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_in)
     sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
     daq_sessions_all = ni_daqmx.MultipleSessions(
         pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all
@@ -267,10 +271,8 @@ def scenario1(tsm_context: TSM_Context):
     daq_sessions_all.stop_task()
     daq_sessions_all.timing()
     daq_sessions_out.timing()
-    daq_sessions_in.timing()
-    daq_sessions_out2.timing()
-    # daq_sessions_all.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
-    daq_sessions_out.write_data([1, 1])
+    output = 2.0
+    daq_sessions_out.write_data([output, output])
     daq_sessions_all.start_task()
     data = daq_sessions_all.read_waveform_multichannel(50)
     yield data

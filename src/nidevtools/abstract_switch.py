@@ -144,9 +144,7 @@ class Session(typing.NamedTuple):
 class AbstractSession(typing.NamedTuple):
     enable_pins: typing.List[Session]
 
-    def set_sessions(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, switch_name: str = ''):
-        print(tsm_context,switch_name)
-        instrument_type_id='abstinst'
+    def set_sessions(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, switch_name: str = ''):  #CHECK
         tsm_context.set_custom_session(instrument_type_id, switch_name, '0', self)  # TODO no channel Group ID data
         # tsm_context.set_custom_session() #Anish: Use this function.
         # tsm_context.set_relay_driver_niswitch_session()
@@ -160,8 +158,9 @@ class AbstractSession(typing.NamedTuple):
         for session in self.enable_pins:
             session.ss_connect(tsm_context)
 
-    def disconnect_sessions_info(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
+    def disconnect_sessions_info(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext): #CHECK
         for session in self.enable_pins:
+            print(session)
             session.ss_disconnect(tsm_context)
 
     def read_state(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
@@ -205,12 +204,11 @@ def debug_ui(tsm_context: TSMContext):
 '''
 
 
-def disconnect_all(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
-    sessions = get_all_sessions(tsm_context)
-    print(sessions[0].enable_pins)
+def disconnect_all(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext): #CHECK
+    sessions = get_all_sessions(tsm_context).enable_pins
     array1 = []
     array2 = []
-    for session in sessions: #TODO Pending Correction
+    for session in sessions:
         if 'BUCKLX_DAMP' in session.enable_pin:
             array2.append(session)
         else:
@@ -224,8 +222,8 @@ def disconnect_pin(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, 
     sessions.disconnect_sessions_info(tsm_context)
 
 
-def initialize_tsm_context(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
-    instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names('abstinst')
+def initialize_tsm_context(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):  #CHECK
+    instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(instrument_type_id)
     # TODO in Baku it use get_custom_instrument_names('Matrix') but there is no reference of Matrix instruments
     if len(instrument_names) == 1:
         dut_pins, sys_pins = tsm_context.get_pin_names()
@@ -319,14 +317,13 @@ def get_all_instruments_names(tsm_context: nitsm.codemoduleapi.SemiconductorModu
     return switch_names
 
 
-def get_all_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
-    data = tsm_context.get_all_custom_sessions('abstinst')
-    if len(data) == 0:
+def get_all_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):  #CHECK
+    session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(instrument_type_id)
+    if len(session_data) == 0:
         # Raise Error?
-        session = (AbstractSession([]),)
+        session = AbstractSession([])
     else:
-        session = data[0]
-    print('hhh', session)
+        session = session_data[0]
     return session
 
 
