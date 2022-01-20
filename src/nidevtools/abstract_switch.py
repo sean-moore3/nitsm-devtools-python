@@ -145,7 +145,9 @@ class AbstractSession(typing.NamedTuple):
     enable_pins: typing.List[Session]
 
     def set_sessions(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, switch_name: str = ''):
-        tsm_context.set_custom_session(instrument_type_id, switch_name, '', self)  # TODO no channel Group ID data
+        print(tsm_context,switch_name)
+        instrument_type_id='abstinst'
+        tsm_context.set_custom_session(instrument_type_id, switch_name, '0', self)  # TODO no channel Group ID data
         # tsm_context.set_custom_session() #Anish: Use this function.
         # tsm_context.set_relay_driver_niswitch_session()
 
@@ -205,9 +207,10 @@ def debug_ui(tsm_context: TSMContext):
 
 def disconnect_all(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
     sessions = get_all_sessions(tsm_context)
+    print(sessions[0].enable_pins)
     array1 = []
     array2 = []
-    for session in sessions:
+    for session in sessions: #TODO Pending Correction
         if 'BUCKLX_DAMP' in session.enable_pin:
             array2.append(session)
         else:
@@ -222,20 +225,22 @@ def disconnect_pin(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, 
 
 
 def initialize_tsm_context(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
-    names = tsm_context.get_all_relay_driver_niswitch_sessions()  # TODO get all switch names equivalent
-    if len(names) == 1:
+    instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names('abstinst')
+    # TODO in Baku it use get_custom_instrument_names('Matrix') but there is no reference of Matrix instruments
+    if len(instrument_names) == 1:
         dut_pins, sys_pins = tsm_context.get_pin_names()
         array = []
         for pin in dut_pins+sys_pins:
-            if '^[Ee][Nn]_' in pin:
+            if pin.lower().find('en_') == 0:
                 array.append(pin)
         data = []
-        for instrument in ['niDAQmx', 'niDigitalIP', '782xFPGA', '_niSwitch']:
-            for pin in tsm_context.filter_pins_by_instrument_type(array, instrument, ''):
+        for instrument in ['niDAQmx', 'niDigitalPattern', '782xFPGA', '_niSwitch']:
+            filtered_pins = tsm_context.filter_pins_by_instrument_type(array, instrument, nitsm.enums.Capability.ALL)
+            for pin in filtered_pins:
                 session = Session(pin, instrument, '', 0, '')  # Not all info
                 data.append(session)
         multi_session = AbstractSession(data)
-        multi_session.set_sessions(tsm_context, names[0])
+        multi_session.set_sessions(tsm_context, instrument_names[0])
     else:
         raise nifpga.ErrorStatus(5000,
                                  ("Unsupported Pin Map for the Abstract Switch."
@@ -315,12 +320,13 @@ def get_all_instruments_names(tsm_context: nitsm.codemoduleapi.SemiconductorModu
 
 
 def get_all_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
-    data = tsm_context.get_all_relay_driver_niswitch_sessions()
+    data = tsm_context.get_all_custom_sessions('abstinst')
     if len(data) == 0:
         # Raise Error?
-        session = AbstractSession([])
+        session = (AbstractSession([]),)
     else:
         session = data[0]
+    print('hhh', session)
     return session
 
 

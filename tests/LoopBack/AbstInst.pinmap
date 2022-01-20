@@ -1,15 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.1">
+<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.5">
 	<Instruments>
 		<Instrument name="AbstractInstrument" instrumentTypeId="abstinst">
 			<Channel id="0" />
 		</Instrument>
 		<Multiplexer multiplexerTypeId="abstract" name="Masterconnect" />
+		<NIDAQmxTask name="DAQ2" taskType="" channelList="DAQ_6368_C1_S16/port0/line2" />
+		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Digital" />
+		<Instrument name="RIO1" instrumentTypeId="782xFPGA">
+			<ChannelGroup id="DIO">
+				<Channel id="0" />
+			</ChannelGroup>
+		</Instrument>
+		<Instrument name="Switch" instrumentTypeId="_niSwitch">
+			<Channel id="0" />
+		</Instrument>
 	</Instruments>
 	<Pins>
 		<DUTPin name="SGL0" />
 		<DUTPin name="SGL1" />
 		<DUTPin name="SGL2" />
+		<DUTPin name="En_Daq" />
+		<DUTPin name="eN_Digital" />
+		<DUTPin name="EN_FPGA" />
+		<DUTPin name="en_Switch" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="BUCK_TLOAD_CTRL">
@@ -17,11 +31,21 @@
 			<PinReference pin="SGL1" />
 			<PinReference pin="SGL2" />
 		</PinGroup>
+		<PinGroup name="Enablers">
+			<PinReference pin="En_Daq" />
+			<PinReference pin="eN_Digital" />
+			<PinReference pin="EN_FPGA" />
+			<PinReference pin="en_Switch" />
+		</PinGroup>
 	</PinGroups>
 	<Sites>
 		<Site siteNumber="0" />
 	</Sites>
 	<Connections>
+		<Connection pin="EN_FPGA" siteNumber="0" instrument="RIO1" channel="0" />
+		<Connection pin="En_Daq" siteNumber="0" instrument="DAQ2" channel="DAQ_6368_C1_S16/port0/line2" />
+		<Connection pin="eN_Digital" siteNumber="0" instrument="DPI1" channel="0" />
+		<Connection pin="en_Switch" siteNumber="0" instrument="Switch" channel="0" />
 		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
 			<MultiplexedDUTPinRoute pin="SGL0" siteNumber="0" multiplexer="Masterconnect" routeName="a" />
 			<MultiplexedDUTPinRoute pin="SGL1" siteNumber="0" multiplexer="Masterconnect" routeName="b" />

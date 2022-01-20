@@ -185,6 +185,9 @@ def tests_pins(request):
     elif file_name == "test_daqmx.py":
         # for daqmx driver i.e. nidaqmx testing
         pins_selected = [["DAQ_Pins1"], ["DAQ_Pins2"]]
+    elif file_name == "test_abstract.py":
+        # for daqmx driver i.e. nidaqmx testing
+        pins_selected = [["BUCK_TLOAD_CTRL"]]
     elif file_name == "test_fgen.py":
         # for function generator driver i.e. nifgen testing
         input_dut_pins = ["FGN_SI_SGL_In"]
