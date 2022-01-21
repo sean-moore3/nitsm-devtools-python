@@ -192,9 +192,7 @@ class _NIDCPowerSSC:
     """
 
     def __init__(self, session: nidcpower.Session, channels: str, pins: str):
-        self._session = (
-            session  # mostly shared session  (very rarely unique session) depends on pinmap file.
-        )
+        self._session = session  # mostly shared session depends on pinmap file.
         self._channels = channels  # specific channel(s) of that session
         self._pins = pins  # pin names mapped to the channels
         self._channels_session = session.channels[channels]
@@ -1311,11 +1309,8 @@ def pins_to_sessions(
     _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(
         pin_query_context, pins_expanded, sites
     )
-
-    sscs = [
-        _NIDCPowerSSC(session, channel, pin_list)
-        for session, channel, pin_list in zip(sessions, channels, pin_lists)
-    ]
+    sscs = [_NIDCPowerSSC(session, channel, pin_list)
+            for session, channel, pin_list in zip(sessions, channels, pin_lists)]
     dc_power_tsm = _NIDCPowerTSM(sscs)
     return TSMDCPower(pin_query_context, dc_power_tsm, sites, pins_info, pins_expanded)
 
