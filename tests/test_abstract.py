@@ -27,7 +27,7 @@ def tsm_context(standalone_tsm):
     print("\nSimulated driver?", SIMULATE)
     ni_abstract.initialize_tsm_context(standalone_tsm)
     yield standalone_tsm
-    ni_abstract.disconnect_all(standalone_tsm)
+    ni_abstract.close_sessions(standalone_tsm)
 
 
 @pytest.fixture
@@ -38,7 +38,8 @@ def abstract_tsm_s(tsm_context, tests_pins):
     sessions = []
     for test_pin_group in tests_pins:
         print(test_pin_group)
-        data = ni_abstract.pins_to_session_sessions_info(tsm_context, test_pin_group)
+        data = ni_abstract.pins_to_sessions_sessions_info(tsm_context, test_pin_group)
+        print('pass')
         abstract_tsm.append(data)
         sessions += data
     print(sessions)
@@ -48,5 +49,7 @@ def abstract_tsm_s(tsm_context, tests_pins):
 @pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestAbstract:
-    def test_x(self, tsm_context):
+    def test_initialize_and_close(self, tsm_context):
+        pass
+    def test_pins_to_session_sessions_info(self, abstract_tsm_s):
         pass

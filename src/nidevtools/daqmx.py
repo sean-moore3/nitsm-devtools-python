@@ -660,9 +660,11 @@ def pins_to_session_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconductor
         Multiple_Sessions: An object that tracks the task associated with this pin query. Use this object
         to publish measurements and extract data from a set of measurements.
     """
-    pin_list = tsm_context.filter_pins_by_instrument_type(
-        pins, nitsm.enums.InstrumentTypeIdConstants.NI_DAQMX, nitsm.enums.Capability.ALL
-    )
+    if type(pins)==str:
+        pins=[pins]
+    pin_list = tsm_context.filter_pins_by_instrument_type(pins,
+                                                          nitsm.enums.InstrumentTypeIdConstants.NI_DAQMX,
+                                                          nitsm.enums.Capability.ALL)
     (pin_query_contex, task, channel_list) = tsm_context.pins_to_nidaqmx_task(pin_list)
     sites = tsm_context.site_numbers
     multiple_session_info = MultipleSessions(pin_query_contex, [])

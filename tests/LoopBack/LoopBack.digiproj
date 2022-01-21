@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="6EF84995610ACAE1985A6ABEAEE8942A" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="01FAC93E0D1E390F84D5D1B7A65B4BA8" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
-		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
-		<ParsableNamespace AssemblyFileVersion="5.3.2.54637" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
-		<ApplicationVersionInfo Build="5.3.2.54637" Name="Digital Pattern Editor" Version="21.0.0" />
+		<ParsableNamespace AssemblyFileVersion="5.3.2.50247" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
+		<ParsableNamespace AssemblyFileVersion="5.3.2.50247" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
+		<ApplicationVersionInfo Build="5.3.2.50247" Name="Digital Pattern Editor" Version="20.6.0" />
 	</SourceModelFeatureSet>
 	<Project xmlns="http://www.ni.com/PlatformFramework">
 		<ProjectSettings Id="1" ModelDefinitionType="ProjectSettings" Name="ZProjectSettings" />
@@ -39,6 +39,7 @@
 			<FileReference Id="316" ModelDefinitionType="PinMap" Name="Rainbow\.pinmap" StoragePath="Rainbow.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
 			<FileReference Id="319" ModelDefinitionType="PinMap" Name="MonoLithic\.pinmap" StoragePath="MonoLithic.pinmap" />
 			<FileReference Id="320" ModelDefinitionType="PinMap" Name="YinYang\.pinmap" StoragePath="YinYang.pinmap" />
+			<FileReference Id="323" ModelDefinitionType="PinMap" Name="AbstInst\.pinmap" StoragePath="AbstInst.pinmap" />
 		</NameScopingEnvoy>
 		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">
 			<ProjectPropertiesDefinition xmlns="http://www.ni.com/PatternBasedDigital" />

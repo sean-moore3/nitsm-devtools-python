@@ -63,7 +63,7 @@ class TestDaqmx:
             print("\nTest_set/clear_task\n", task)
             assert isinstance(task, nidaqmx.Task)  # Type verification
             assert len(queried_tasks) != 0  # not void
-            assert len(queried_tasks) == 2  # Matching quantity
+            assert len(queried_tasks) == 3  # Matching quantity
 
     def test_pin_to_sessions_info(self, daqmx_tsm_s):
         tsm_context = daqmx_tsm_s[0]
@@ -188,7 +188,7 @@ class TestDaqmx:
         data2 = daq_sessions_in_dsa.read_waveform_multichannel(5)
         for value in data2[0]:
             #assert(output + error > value > output - error)
-            print(value)
+            print(value, output, error )
         print("\nAll measured values within the expected value of: ", output, "+-", error)
         print("\nDevice has been released: ", output, "+-", error)
         daq_sessions_out_dsa.stop_task()
