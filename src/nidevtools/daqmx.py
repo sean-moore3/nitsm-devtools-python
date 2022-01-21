@@ -524,12 +524,8 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
         task = nidaqmx.Task(task_name)
         try:
             task.ao_channels.add_ao_voltage_chan(
-                physical_channel,
-                "",
-                nidaqmx.constants.TerminalConfiguration.DIFFERENTIAL,
-                -input_voltage_range,
-                input_voltage_range,
-            )
+                physical_channel=physical_channel,
+                )
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         except Exception:
             task = reset_devices(task)
