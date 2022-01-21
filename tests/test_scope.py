@@ -218,7 +218,7 @@ def pins_to_sessions(tsm_context: SMClass, pins: typing.List[str], sites: typing
 def configure(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
     scope_tsm.ssc.configure_impedance(0.5)
-    scope_tsm.configure_reference_level()
+    scope_tsm.ssc.configure_reference_level()
     scope_tsm.ssc.configure_vertical(5.0, niscope.VerticalCoupling.DC, 0.0, 1.0, True)
     scope_tsm.ssc.configure(
         5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True

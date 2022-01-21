@@ -9,6 +9,122 @@ from enum import Enum
 import nidevtools.common as ni_dt_common
 
 
+class OutputTerminal(typing.NamedTuple):
+    NONE: str
+    PXI_trigger_line0_RTSI0: str
+    PXI_trigger_line1_RTSI1: str
+    PXI_trigger_line2_RTSI2: str
+    PXI_trigger_line3_RTSI3: str
+    PXI_trigger_line4_RTSI4: str
+    PXI_trigger_line5_RTSI5: str
+    PXI_trigger_line6_RTSI6: str
+    PXI_trigger_line7_RTSI7_RTSI_clock: str
+    PXI_star_trigger: str
+    PFI0: str
+    PFI1: str
+    PFI2: str
+    PFI3: str
+    PFI4: str
+    PFI5: str
+    PFI6: str
+    PFI7: str
+    Clock_out: str
+    AUX0_PFI0: str
+    AUX0_PFI1: str
+    AUX0_PFI2: str
+    AUX0_PFI3: str
+    AUX0_PFI4: str
+    AUX0_PFI5: str
+    AUX0_PFI6: str
+    AUX0_PFI7: str
+
+
+OUTPUT_TERMINAL = OutputTerminal(
+    "VAL_NO_SOURCE",
+    "VAL_RTSI_0",
+    "VAL_RTSI_1",
+    "VAL_RTSI_2",
+    "VAL_RTSI_3",
+    "VAL_RTSI_4",
+    "VAL_RTSI_5",
+    "VAL_RTSI_6",
+    "VAL_RTSI_7",
+    "VAL_PXI_STAR",
+    "VAL_PFI_0",
+    "VAL_PFI_1",
+    "VAL_PFI_2",
+    "VAL_PFI_3",
+    "VAL_PFI_4",
+    "VAL_PFI_5",
+    "VAL_PFI_6",
+    "VAL_PFI_7",
+    "VAL_CLK_OUT",
+    "VAL_AUX_0_PFI_0",
+    "VAL_AUX_0_PFI_1",
+    "VAL_AUX_0_PFI_2",
+    "VAL_AUX_0_PFI_3",
+    "VAL_AUX_0_PFI_4",
+    "VAL_AUX_0_PFI_5",
+    "VAL_AUX_0_PFI_6",
+    "VAL_AUX_0_PFI_7",
+)
+
+
+class TriggerSource(typing.NamedTuple):
+    RTSI0: str
+    RTSI1: str
+    RTSI2: str
+    RTSI3: str
+    RTSI4: str
+    RTSI5: str
+    RTSI6: str
+    PFI0: str
+    PFI1: str
+    PFI2: str
+    PFI3: str
+    PFI4: str
+    PFI5: str
+    PFI6: str
+    PFI7: str
+    PXI_star_trigger: str
+    AUX0_PFI0: str
+    AUX0_PFI1: str
+    AUX0_PFI2: str
+    AUX0_PFI3: str
+    AUX0_PFI4: str
+    AUX0_PFI5: str
+    AUX0_PFI6: str
+    AUX0_PFI7: str
+
+
+TRIGGER_SOURCE = TriggerSource(
+    "VAL_RTSI_0",
+    "VAL_RTSI_1",
+    "VAL_RTSI_2",
+    "VAL_RTSI_3",
+    "VAL_RTSI_4",
+    "VAL_RTSI_5",
+    "VAL_RTSI_6",
+    "VAL_PFI_0",
+    "VAL_PFI_1",
+    "VAL_PFI_2",
+    "VAL_PFI_3",
+    "VAL_PFI_4",
+    "VAL_PFI_5",
+    "VAL_PFI_6",
+    "VAL_PFI_7",
+    "VAL_PXI_STAR",
+    "VAL_AUX_0_PFI_0",
+    "VAL_AUX_0_PFI_1",
+    "VAL_AUX_0_PFI_2",
+    "VAL_AUX_0_PFI_3",
+    "VAL_AUX_0_PFI_4",
+    "VAL_AUX_0_PFI_5",
+    "VAL_AUX_0_PFI_6",
+    "VAL_AUX_0_PFI_7",
+)
+
+
 class _NIScopeSSC:
     """
     _Site specific _Session and _Channel.
@@ -483,8 +599,8 @@ class _NIScopeTSM:
 
 class TSMScope(typing.NamedTuple):
     pin_query_context: typing.Any
-    site_numbers: typing.List[int]
     ssc: _NIScopeTSM
+    sites: typing.List[int]
 
 
 class PinType(Enum):
@@ -515,122 +631,6 @@ class ScopeSessionProperties(typing.NamedTuple):
     input_impedance: float
     trigger_channel: str
     edge: str
-
-
-class OutputTerminal(typing.NamedTuple):
-    NONE: str
-    PXI_trigger_line0_RTSI0: str
-    PXI_trigger_line1_RTSI1: str
-    PXI_trigger_line2_RTSI2: str
-    PXI_trigger_line3_RTSI3: str
-    PXI_trigger_line4_RTSI4: str
-    PXI_trigger_line5_RTSI5: str
-    PXI_trigger_line6_RTSI6: str
-    PXI_trigger_line7_RTSI7_RTSI_clock: str
-    PXI_star_trigger: str
-    PFI0: str
-    PFI1: str
-    PFI2: str
-    PFI3: str
-    PFI4: str
-    PFI5: str
-    PFI6: str
-    PFI7: str
-    Clock_out: str
-    AUX0_PFI0: str
-    AUX0_PFI1: str
-    AUX0_PFI2: str
-    AUX0_PFI3: str
-    AUX0_PFI4: str
-    AUX0_PFI5: str
-    AUX0_PFI6: str
-    AUX0_PFI7: str
-
-
-OUTPUT_TERMINAL = OutputTerminal(
-    "VAL_NO_SOURCE",
-    "VAL_RTSI_0",
-    "VAL_RTSI_1",
-    "VAL_RTSI_2",
-    "VAL_RTSI_3",
-    "VAL_RTSI_4",
-    "VAL_RTSI_5",
-    "VAL_RTSI_6",
-    "VAL_RTSI_7",
-    "VAL_PXI_STAR",
-    "VAL_PFI_0",
-    "VAL_PFI_1",
-    "VAL_PFI_2",
-    "VAL_PFI_3",
-    "VAL_PFI_4",
-    "VAL_PFI_5",
-    "VAL_PFI_6",
-    "VAL_PFI_7",
-    "VAL_CLK_OUT",
-    "VAL_AUX_0_PFI_0",
-    "VAL_AUX_0_PFI_1",
-    "VAL_AUX_0_PFI_2",
-    "VAL_AUX_0_PFI_3",
-    "VAL_AUX_0_PFI_4",
-    "VAL_AUX_0_PFI_5",
-    "VAL_AUX_0_PFI_6",
-    "VAL_AUX_0_PFI_7",
-)
-
-
-class TriggerSource(typing.NamedTuple):
-    RTSI0: str
-    RTSI1: str
-    RTSI2: str
-    RTSI3: str
-    RTSI4: str
-    RTSI5: str
-    RTSI6: str
-    PFI0: str
-    PFI1: str
-    PFI2: str
-    PFI3: str
-    PFI4: str
-    PFI5: str
-    PFI6: str
-    PFI7: str
-    PXI_star_trigger: str
-    AUX0_PFI0: str
-    AUX0_PFI1: str
-    AUX0_PFI2: str
-    AUX0_PFI3: str
-    AUX0_PFI4: str
-    AUX0_PFI5: str
-    AUX0_PFI6: str
-    AUX0_PFI7: str
-
-
-TRIGGER_SOURCE = TriggerSource(
-    "VAL_RTSI_0",
-    "VAL_RTSI_1",
-    "VAL_RTSI_2",
-    "VAL_RTSI_3",
-    "VAL_RTSI_4",
-    "VAL_RTSI_5",
-    "VAL_RTSI_6",
-    "VAL_PFI_0",
-    "VAL_PFI_1",
-    "VAL_PFI_2",
-    "VAL_PFI_3",
-    "VAL_PFI_4",
-    "VAL_PFI_5",
-    "VAL_PFI_6",
-    "VAL_PFI_7",
-    "VAL_PXI_STAR",
-    "VAL_AUX_0_PFI_0",
-    "VAL_AUX_0_PFI_1",
-    "VAL_AUX_0_PFI_2",
-    "VAL_AUX_0_PFI_3",
-    "VAL_AUX_0_PFI_4",
-    "VAL_AUX_0_PFI_5",
-    "VAL_AUX_0_PFI_6",
-    "VAL_AUX_0_PFI_7",
-)
 
 
 # TSMContext Pin Abstraction Sub routines
@@ -721,7 +721,7 @@ def pins_to_sessions(
     for session, channel, channel_list in zip(sessions, channels, channel_list_per_session):
         sscs.append(_NIScopeSSC(session=session, channels=channel, channel_list=channel_list))
     scope_tsm = _NIScopeTSM(sscs)
-    return TSMScope(pin_query_context, sites_out, scope_tsm)
+    return TSMScope(pin_query_context, scope_tsm, sites_out)
 
 
 @nitsm.codemoduleapi.code_module
