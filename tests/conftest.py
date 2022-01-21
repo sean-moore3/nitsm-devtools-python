@@ -192,6 +192,10 @@ def tests_pins(request):
         # for function generator driver i.e. nifgen testing
         input_dut_pins = ["FGN_SI_SGL_In"]
         pins_selected = [input_dut_pins]
+    elif file_name == "test_Switch.py":
+        # for function generator driver i.e. nifgen testing
+        input_dut_pins = ["Pin1","Pin2"]
+        pins_selected = input_dut_pins
     else:
         pins_selected = ["dummy", "pins", "to_fail"]
     return pins_selected

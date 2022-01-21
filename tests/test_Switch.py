@@ -1,14 +1,12 @@
-import nitsm
-import typing
+import niswitch
 import pytest
 import os
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
-import nidevtools.abstract_switch as ni_abstract
+import nidevtools.switch as ni_switch
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["AbstInst.pinmap", "Rainbow.pinmap"]
+pin_file_names = ["Switch.pinmap", "Rainbow.pinmap"]
 # Change index below to change the pin map to use
 pin_file_name = pin_file_names[0]
 message = "With" + pin_file_name + "Pinmap"
@@ -25,33 +23,53 @@ def tsm_context(standalone_tsm):
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
+    ni_switch.initialize_sessions(standalone_tsm)
     yield standalone_tsm
+    ni_switch.close_sessions(standalone_tsm)
 
 
 @pytest.fixture
-def abstract_tsm_s(tsm_context, tests_pins):
+def switch_tsm_s(tsm_context, tests_pins):
     """Returns LabVIEW Cluster equivalent data"""
     print(tests_pins)
-    abstract_tsm = []
+    switch_tsm = []
     sessions = []
-    for test_pin_group in tests_pins:
-        print(test_pin_group)
-        data = ni_abstract.pins_to_sessions_sessions_info(tsm_context, test_pin_group)
-        print('pass')
-        abstract_tsm.append(data)
-        sessions += data
+    for test_pin in tests_pins:
+        print(test_pin)
+        data = ni_switch.pin_to_sessions_session_info(tsm_context, test_pin)
+        print('data22', type(data))
+        switch_tsm.append(data)
+        sessions.append(data)
     print(sessions)
-    yield tsm_context, abstract_tsm
+    yield tsm_context, switch_tsm #TODO This is not setting PIN2
 
 
 @pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
-class TestAbstract:
+class TestSwitch:
     def test_initialize_and_close(self, tsm_context):
-        ni_abstract.initialize_tsm_context(tsm_context)
-        ni_abstract.close_sessions(tsm_context)
+        session_data, channel_group_ids, channel_lists =\
+            tsm_context.get_all_custom_sessions(ni_switch.instrument_type_id)
+        assert(len(session_data) == len(channel_group_ids) == len(channel_lists))
+        instrument_names = ni_switch.get_all_instruments_names(tsm_context)[0]
+        assert (len(session_data) == len(instrument_names))
+        for name in instrument_names:
+            assert(isinstance(name, str))
+        sessions = ni_switch.get_all_sessions(tsm_context)
+        assert(len(session_data) == len(sessions))
+        for session in sessions:
+            assert(isinstance(session, niswitch.session.Session))
 
-    def test_pins_to_session_sessions_info(self, tsm_context):
-        ni_abstract.initialize_tsm_context(tsm_context)
-        ni_abstract.pins_to_sessions_sessions_info(tsm_context, 'BUCK_TLOAD_CTRL')
+    def test_name_to_topology(self):
+        assert(ni_switch.name_to_topology('Matrix_2738_3') == '2738/2-Wire 8x32 Matrix')
+        assert(ni_switch.name_to_topology('Mux_2525_test') == '2525/2-Wire Octal 8x1 Mux')
+        assert(ni_switch.name_to_topology('Matrix_2503_TEST') == '2503/2-Wire 4x6 Matrix')
+        assert(ni_switch.name_to_topology('Other') == 'Configured Topology')
+        assert(ni_switch.name_to_topology('TEST_Matrix_2738') == 'Configured Topology')
 
+    def test_pin_to_session(self, switch_tsm_s):
+        #Add Forloop once solver pin2 issue
+        switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Disconnect_All)
+        switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Disconnect)
+        switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Connect, route_value='1')
+        switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Read, route_value='1')
