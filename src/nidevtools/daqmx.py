@@ -579,7 +579,7 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
         try:
             ch = task.ao_channels.add_ao_voltage_chan(physical_channel)
             # TODO Config doesn't write properly for DSA channel
-            ch.ao_term_cfg = nidaqmx.constants.TerminalConfiguration.PSEUDODIFFERENTIAL
+            ch.ao_term_cfg = nidaqmx.constants.TerminalConfiguration.DIFFERENTIAL
             print(ch.ao_term_cfg, ch.ao_min, ch.channel_names)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         except Exception:

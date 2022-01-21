@@ -333,10 +333,11 @@ def pins_to_sessions_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconducto
     print(instrument_type_id, pin)
     # TODO change for better equivalent pin to switch sessions
     #pin_query_context, session_data, channel_group_ids, channel_lists
-    contexts, session_data, switch_routes = tsm_context.pins_to_custom_sessions(instrument_type_id, pin)
+    pin_query_context, session_data, channel_group_ids, channel_lists = tsm_context.pins_to_custom_sessions(instrument_type_id, pin)
     # tsm_context.relays_to_relay_driver_niswitch_sessions()
     i = 0
-    for context, session, route in zip(contexts, session_data, switch_routes):
+    switch_routes=('a','b','c')
+    for context, session, route in zip(pin_query_context, session_data, switch_routes):
         data = route.split(',')
         list1 = []
         list2 = []
