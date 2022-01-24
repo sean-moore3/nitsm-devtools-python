@@ -49,9 +49,11 @@ def abstract_tsm_s(tsm_context, tests_pins):
 class TestAbstract:
     def test_initialize_and_close(self, tsm_context):
         ni_abstract.initialize_tsm_context(tsm_context)
+        print(ni_abstract.get_all_sessions(tsm_context))
+        print(ni_abstract.get_all_instruments_names(tsm_context))
         ni_abstract.close_sessions(tsm_context)
 
     def test_pins_to_session_sessions_info(self, tsm_context):
         ni_abstract.initialize_tsm_context(tsm_context)
-        ni_abstract.pins_to_sessions_sessions_info(tsm_context, 'BUCK_TLOAD_CTRL')
+        ni_abstract.pins_to_sessions_sessions_info(tsm_context, 'Buck')
 

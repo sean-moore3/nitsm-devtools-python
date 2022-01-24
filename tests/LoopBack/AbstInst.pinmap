@@ -1,10 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.5">
 	<Instruments>
-		<Instrument name="AbstractInstrument" instrumentTypeId="Matrix">
-			<Channel id="0" />
-		</Instrument>
-		<Multiplexer multiplexerTypeId="abstract" name="Masterconnect" />
+		<Multiplexer multiplexerTypeId="Matrix" name="Masterconnect" />
 		<NIDAQmxTask name="DAQ2" taskType="" channelList="DAQ_6368_C1_S16/port0/line2" />
 		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Digital" />
 		<Instrument name="RIO1" instrumentTypeId="782xFPGA">
@@ -15,27 +12,40 @@
 		<Instrument name="Switch" instrumentTypeId="_niSwitch">
 			<Channel id="0" />
 		</Instrument>
+		<Instrument instrumentTypeId="Matrix" name="AbstractInstrument">
+			<Channel id="0" />
+		</Instrument>
 	</Instruments>
 	<Pins>
-		<DUTPin name="SGL0" />
-		<DUTPin name="SGL1" />
-		<DUTPin name="SGL2" />
 		<DUTPin name="En_Daq" />
 		<DUTPin name="eN_Digital" />
 		<DUTPin name="EN_FPGA" />
 		<DUTPin name="en_Switch" />
+		<DUTPin name="BuckSGL_1" />
+		<DUTPin name="BuckSGL_2" />
+		<DUTPin name="BuckSGL_3" />
+		<DUTPin name="BuckSGL_4" />
+		<DUTPin name="BuckSGL_5" />
+		<DUTPin name="BuckSGL_6" />
+		<DUTPin name="BuckSGL_7" />
+		<DUTPin name="BuckSGL_8" />
 	</Pins>
 	<PinGroups>
-		<PinGroup name="BUCK_TLOAD_CTRL">
-			<PinReference pin="SGL0" />
-			<PinReference pin="SGL1" />
-			<PinReference pin="SGL2" />
-		</PinGroup>
 		<PinGroup name="Enablers">
 			<PinReference pin="En_Daq" />
 			<PinReference pin="eN_Digital" />
 			<PinReference pin="EN_FPGA" />
 			<PinReference pin="en_Switch" />
+		</PinGroup>
+		<PinGroup name="Buck">
+			<PinReference pin="BuckSGL_1" />
+			<PinReference pin="BuckSGL_2" />
+			<PinReference pin="BuckSGL_3" />
+			<PinReference pin="BuckSGL_4" />
+			<PinReference pin="BuckSGL_5" />
+			<PinReference pin="BuckSGL_6" />
+			<PinReference pin="BuckSGL_7" />
+			<PinReference pin="BuckSGL_8" />
 		</PinGroup>
 	</PinGroups>
 	<Sites>
@@ -47,9 +57,14 @@
 		<Connection pin="eN_Digital" siteNumber="0" instrument="DPI1" channel="0" />
 		<Connection pin="en_Switch" siteNumber="0" instrument="Switch" channel="0" />
 		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
-			<MultiplexedDUTPinRoute pin="SGL0" siteNumber="0" multiplexer="Masterconnect" routeName="a" />
-			<MultiplexedDUTPinRoute pin="SGL1" siteNumber="0" multiplexer="Masterconnect" routeName="b" />
-			<MultiplexedDUTPinRoute pin="SGL2" siteNumber="0" multiplexer="Masterconnect" routeName="c" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_1" siteNumber="0" multiplexer="Masterconnect" routeName="EN_FPGA=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_2" siteNumber="0" multiplexer="Masterconnect" routeName="EN_FPGA=1" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_3" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_4" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq=1" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_5" siteNumber="0" multiplexer="Masterconnect" routeName="eN_Digital=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_6" siteNumber="0" multiplexer="Masterconnect" routeName="eN_Digital=1" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_7" siteNumber="0" multiplexer="Masterconnect" routeName="en_Switch=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_8" siteNumber="0" multiplexer="Masterconnect" routeName="en_Switch=1" />
 		</MultiplexedConnection>
 	</Connections>
 </PinMap>

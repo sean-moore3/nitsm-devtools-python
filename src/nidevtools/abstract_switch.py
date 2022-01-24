@@ -5,6 +5,7 @@ import nifpga
 import niswitch
 import nitsm.codemoduleapi
 import nitsm.enums
+import nitsm.pinquerycontexts
 import enum
 import nidigital
 import nidaqmx.constants
@@ -146,7 +147,6 @@ class AbstractSession(typing.NamedTuple):
     enable_pins: typing.List[Session]
 
     def set_sessions(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, switch_name: str = ''):  # CHECK
-        print(switch_name, self)
         tsm_context.set_custom_session(instrument_type_id, switch_name, '0', self)  # TODO no channel Group ID data
         # tsm_context.set_custom_session() #Anish: Use this function.
         # tsm_context.set_relay_driver_niswitch_session()
@@ -225,9 +225,11 @@ def disconnect_pin(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, 
 
 def initialize_tsm_context(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):  # CHECK
     instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(instrument_type_id)
+    print('instrumentnames', instrument_names, len(instrument_names))
     # TODO in Baku it use get_custom_instrument_names('Matrix') but there is no reference of Matrix instruments
     if len(instrument_names) == 1:
         dut_pins, sys_pins = tsm_context.get_pin_names()
+        print(dut_pins)
         array = []
         for pin in dut_pins+sys_pins:
             if pin.lower().find('en_') == 0:
@@ -236,7 +238,7 @@ def initialize_tsm_context(tsm_context: nitsm.codemoduleapi.SemiconductorModuleC
         for instrument in ['niDAQmx', 'niDigitalPattern', '782xFPGA', '_niSwitch']:
             filtered_pins = tsm_context.filter_pins_by_instrument_type(array, instrument, nitsm.enums.Capability.ALL)
             for pin in filtered_pins:
-                session = Session(pin, instrument, '', 0, '')  # Not all info
+                session = Session(pin, instrument, '', 0, '')  # TODO Not all info
                 data.append(session)
         multi_session = AbstractSession(data)
         multi_session.set_sessions(tsm_context, instrument_names[0])
@@ -330,13 +332,14 @@ def get_all_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext
 
 def pins_to_sessions_sessions_info(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pin: str):
     session_list = []
-    print(instrument_type_id, pin)
+    print('input:', instrument_type_id, pin)
     # TODO change for better equivalent pin to switch sessions
-    #pin_query_context, session_data, channel_group_ids, channel_lists
+    print(tsm_context.get_all_custom_sessions('Matrix'))
     pin_query_context, session_data, channel_group_ids, channel_lists = tsm_context.pins_to_custom_sessions(instrument_type_id, pin)
-    # tsm_context.relays_to_relay_driver_niswitch_sessions()
+    print(pin_query_context, session_data, channel_group_ids, channel_lists)
     i = 0
-    switch_routes=('a','b','c')
+    print(tsm_context.pins_to_custom_session(instrument_type_id, pin))
+    switch_routes = ('a','b','c')
     for context, session, route in zip(pin_query_context, session_data, switch_routes):
         data = route.split(',')
         list1 = []
