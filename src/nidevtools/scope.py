@@ -137,10 +137,10 @@ class _NIScopeSSC:
     These are for internal use only and can be changed any time. 
     External module should not use these methods with prefix 'cs_' directly.  
     """
-    def __init__(self, session: niscope.Session, channels: str, channel_list: str):
-        self._session = session
-        self._channels = channels
-        self._pins = channel_list
+    def __init__(self, session: niscope.Session, channels: str, pins: str):
+        self._session = session  # mostly shared session depends on pinmap file.
+        self._channels = channels  # specific channel(s) of that session
+        self._pins = pins  # pin names mapped to the channels
 
     @property
     def session(self):
@@ -170,7 +170,7 @@ def _expand_ssc_to_ssc_per_channel(ssc_s: typing.List[_NIScopeSSC]):
     ]
 
 
-def _ssc_configure_vertical_per_channel_arrays(
+def _configure_vertical_per_channel_arrays(
     ssc_s: typing.List[_NIScopeSSC],
     ranges: typing.List[float],
     couplings: typing.List[niscope.VerticalCoupling],
@@ -184,18 +184,6 @@ def _ssc_configure_vertical_per_channel_arrays(
         ssc.session.channels[ssc.channels].configure_vertical(
             v_range, coupling, offset, probe_drop, enabled
         )
-
-
-def _ssc_fetch_measurement_stats_arrays(
-    ssc_s: typing.List[_NIScopeSSC],
-    scalar_measurements: typing.List[niscope.ScalarMeasurement],
-):
-    stats: typing.List[niscope.MeasurementStats] = []
-    for ssc, scalar_meas_function in zip(ssc_s, scalar_measurements):
-        stats.append(
-            ssc.session.channels[ssc.channels].fetch_measurement_stats(scalar_meas_function)
-        )  # function with unknown type
-    return stats
 
 
 # Digital Sub routines
@@ -241,9 +229,21 @@ def _expand_to_requested_array_size(
     return data_out
 
 
+def _fetch_measurement_stats_arrays(
+    ssc_s: typing.List[_NIScopeSSC],
+    scalar_measurements: typing.List[niscope.ScalarMeasurement],
+):
+    stats: typing.List[niscope.MeasurementStats] = []
+    for ssc, scalar_meas_function in zip(ssc_s, scalar_measurements):
+        stats.append(
+            ssc.session.channels[ssc.channels].fetch_measurement_stats(scalar_meas_function)
+        )  # function with unknown type
+    return stats
+
+
 class _NIScopeTSM:
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIScopeSSC]):
-        self._sscs = list(sessions_sites_channels)
+        self._sscs = sessions_sites_channels
 
     def _obtain_trigger_path(self, trigger_source: str, setup_type: str):
         trigger_paths: typing.List[str] = []
@@ -324,7 +324,7 @@ class _NIScopeTSM:
         ranges = _expand_to_requested_array_size(vertical_range, size)
         offsets = _expand_to_requested_array_size(offset, size)
         enabled_out = _expand_to_requested_array_size(channel_enabled, size)
-        _ssc_configure_vertical_per_channel_arrays(
+        _configure_vertical_per_channel_arrays(
             ssc_per_channel, ranges, couplings, offsets, probe_drops, enabled_out
         )
         return
@@ -593,7 +593,7 @@ class _NIScopeTSM:
     def fetch_meas_stats_per_channel(self, scalar_measurement: niscope.ScalarMeasurement):
         ssc_per_channel = _expand_ssc_to_ssc_per_channel(self._sscs)
         scalar_measurements = _expand_to_requested_array_size(scalar_measurement, len(ssc_per_channel))
-        measurement_stats = _ssc_fetch_measurement_stats_arrays(ssc_per_channel, scalar_measurements)
+        measurement_stats = _fetch_measurement_stats_arrays(ssc_per_channel, scalar_measurements)
         return measurement_stats
 
 
@@ -710,18 +710,17 @@ def _pin_query_context_to_channel_list(
 # Pinmap
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
-    tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int]
+    tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int] = []
 ):
-    sscs: typing.List[_NIScopeSSC] = []
+    if len(sites) == 0:
+        sites = list(tsm_context.site_numbers)  # This is tested and works
     pin_query_context, sessions, channels = tsm_context.pins_to_niscope_sessions(pins)
-    sites_out, channel_list_per_session = _pin_query_context_to_channel_list(
-        pin_query_context, [], sites
-    )
-    # sites_out, channel_list_per_session = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
-    for session, channel, channel_list in zip(sessions, channels, channel_list_per_session):
-        sscs.append(_NIScopeSSC(session=session, channels=channel, channel_list=channel_list))
+    sites, pin_lists = _pin_query_context_to_channel_list(pin_query_context, [], sites)
+    # sites, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
+    sscs = [_NIScopeSSC(session, channel, pin_list)
+            for session, channel, pin_list in zip(sessions, channels, pin_lists)]
     scope_tsm = _NIScopeTSM(sscs)
-    return TSMScope(pin_query_context, scope_tsm, sites_out)
+    return TSMScope(pin_query_context, scope_tsm, sites)
 
 
 @nitsm.codemoduleapi.code_module

@@ -210,8 +210,9 @@ def open_sessions(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def pins_to_sessions_info(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     return scope.pins_to_sessions(tsm_context, pins, sites)
+
 
 
 @nitsm.codemoduleapi.code_module
