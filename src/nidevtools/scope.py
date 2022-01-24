@@ -243,7 +243,7 @@ def _fetch_measurement_stats_arrays(
 
 class _NIScopeTSM:
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIScopeSSC]):
-        self._sscs = list(sessions_sites_channels)
+        self._sscs = sessions_sites_channels
 
     def _obtain_trigger_path(self, trigger_source: str, setup_type: str):
         trigger_paths: typing.List[str] = []
@@ -715,12 +715,12 @@ def pins_to_sessions(
     if len(sites) == 0:
         sites = list(tsm_context.site_numbers)  # This is tested and works
     pin_query_context, sessions, channels = tsm_context.pins_to_niscope_sessions(pins)
-    sites_out, pin_lists = _pin_query_context_to_channel_list(pin_query_context, [], sites)
-    # sites_out, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
+    sites, pin_lists = _pin_query_context_to_channel_list(pin_query_context, [], sites)
+    # sites, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
     sscs = [_NIScopeSSC(session, channel, pin_list)
             for session, channel, pin_list in zip(sessions, channels, pin_lists)]
     scope_tsm = _NIScopeTSM(sscs)
-    return TSMScope(pin_query_context, scope_tsm, sites_out)
+    return TSMScope(pin_query_context, scope_tsm, sites)
 
 
 @nitsm.codemoduleapi.code_module
