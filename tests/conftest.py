@@ -194,7 +194,7 @@ def tests_pins(request):
         pins_selected = [input_dut_pins]
     elif file_name == "test_Switch.py":
         # for function generator driver i.e. nifgen testing
-        input_dut_pins = ["Pin1","Pin2"]
+        input_dut_pins = ["Pin1","Pin2", 'TestIn', 'TestOut2']
         pins_selected = input_dut_pins
     else:
         pins_selected = ["dummy", "pins", "to_fail"]

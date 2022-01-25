@@ -333,7 +333,7 @@ def get_all_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext
 def pins_to_sessions_sessions_info(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pin: str):
     session_list = []
     print('input:', instrument_type_id, pin)
-    # TODO change for better equivalent pin to switch sessions
+    # TODO change for better equivalent pin to switch sessions (Routes Requiered)
     print(tsm_context.get_all_custom_sessions('Matrix'))
     pin_query_context, session_data, channel_group_ids, channel_lists = tsm_context.pins_to_custom_sessions(instrument_type_id, pin)
     print(pin_query_context, session_data, channel_group_ids, channel_lists)
