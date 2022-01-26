@@ -62,7 +62,7 @@ class TestDaqmx:
             print("\nTest_set/clear_task\n", task)
             assert isinstance(task, nidaqmx.Task)  # Type verification
             assert len(queried_tasks) != 0  # not void
-            assert len(queried_tasks) == 3  # Matching quantity
+            assert len(queried_tasks) == 2  # Matching quantity
 
     def test_pin_to_sessions_info(self, daqmx_tsm_s):
         tsm_context = daqmx_tsm_s[0]
@@ -178,37 +178,37 @@ class TestDaqmx:
         daq_pins_out_dsa = ["TestOut2"]
         daq_sessions_out_dsa = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out_dsa)
         daq_sessions_in_dsa = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_in_dsa)
-        daq_sessions_out_dsa.timing()  # DSA Channel
-        daq_sessions_in_dsa.timing()  # DSA Channel
+        daq_sessions_out_dsa.timing(sampling_rate_hz=1250)  # DSA Channel
+        daq_sessions_in_dsa.timing(sampling_rate_hz=10000)  # DSA Channel
         output = 2.0  # configure output in NI-MAX
         error = 0.05  # 16 bits with range 20 for both input and output
-        daq_sessions_out_dsa.write_data([output, output])  # TODO missing write
         daq_sessions_in_dsa.start_task()
-        data2 = daq_sessions_in_dsa.read_waveform_multichannel(5)
-        for value in data2[0]:
-            # assert(output + error > value > output - error)
-            print(value, output, error)
+        daq_sessions_out_dsa.write_data([output, output])  # TODO missing write
+        data2 = daq_sessions_in_dsa.read_waveform_multichannel(1000)
+        value = max(data2[0])
+        assert(output + error > value > output - error)
+        print(value)
         print("\nAll measured values within the expected value of: ", output, "+-", error)
         print("\nDevice has been released: ", output, "+-", error)
         daq_sessions_out_dsa.stop_task()
         daq_sessions_in_dsa.stop_task()
 
     def test_baku_dsa_write_read_wo_pinmap(self):
-        #taski = nidaqmx.Task('DAQ3_AI')
+        taski = nidaqmx.Task('DAQ3_AI')
         tasko = nidaqmx.Task('DAQ3_AO')
-        #ch_in = taski.ai_channels.add_ai_voltage_chan('DAQ3/ai0')
+        ch_in = taski.ai_channels.add_ai_voltage_chan('DAQ3/ai0')
         ch_out = tasko.ao_channels.add_ao_voltage_chan('DAQ3/ao0')
         tasko.out_stream.regen_mode = nidaqmx.constants.RegenerationMode.ALLOW_REGENERATION
-        tasko.timing.cfg_samp_clk_timing(rate=1000)
-        #print('AI_CHA_CONFIG: ', ch_in.ai_term_cfg, ch_in.ai_coupling)
+        tasko.timing.cfg_samp_clk_timing(rate=1250)
+        taski.timing.cfg_samp_clk_timing(rate=10000)
+        print('AI_CHA_CONFIG: ', ch_in.ai_term_cfg, ch_in.ai_coupling)
         print('AO_CHA_CONFIG: ', ch_out.ao_term_cfg, ch_out.physical_channel)
-        #taski.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
+        taski.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         tasko.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
-        #taski.start()
+        taski.start()
         print(tasko.out_stream.regen_mode)
-        tasko.write(2)
-        #print(taski.read(5))
-
+        tasko.write(5)
+        print(max(taski.read(1000)))
 
 
 @nitsm.codemoduleapi.code_module
@@ -295,3 +295,21 @@ def scenario1(tsm_context: TSM_Context):
     daq_sessions_out.write_data([0, 0])
     daq_sessions_out.stop_task()
     daq_sessions_all.stop_task()
+
+
+@nitsm.codemoduleapi.code_module
+def scenario2(tsm_context: TSM_Context):
+    daq_pins_in_dsa = ["TestIn"]
+    daq_pins_out_dsa = ["TestOut2"]
+    daq_sessions_out_dsa = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out_dsa)
+    daq_sessions_in_dsa = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_in_dsa)
+    daq_sessions_out_dsa.timing(sampling_rate_hz=1250)  # DSA Channel
+    daq_sessions_in_dsa.timing(sampling_rate_hz=10000)  # DSA Channel
+    expected = 2.0  # configure expected in NI-MAX
+    daq_sessions_in_dsa.start_task()
+    daq_sessions_out_dsa.write_data([expected, expected])
+    data2 = daq_sessions_in_dsa.read_waveform_multichannel(1000)
+    value = max(data2[0])
+    yield value
+    daq_sessions_out_dsa.stop_task()
+    daq_sessions_in_dsa.stop_task()
