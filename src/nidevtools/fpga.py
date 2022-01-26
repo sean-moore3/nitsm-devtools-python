@@ -579,7 +579,7 @@ def close_session(tsm_context: TSMContext):
         session.close()
 
 
-def initialize_session(tsm_context: TSMContext, ldb_type: str):
+def initialize_sessions(tsm_context: TSMContext, ldb_type: str):
     instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(InstrumentTypeId)
     for instrument, group in zip(instrument_names, channel_group_ids):
         # target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
