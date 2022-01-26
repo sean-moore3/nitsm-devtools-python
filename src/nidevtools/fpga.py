@@ -579,15 +579,20 @@ def close_session(tsm_context: TSMContext):
         session.close()
 
 
-def initialize_sessions(tsm_context: TSMContext, ldb_type: str):
+def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
     instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(InstrumentTypeId)
+    print(instrument_names, channel_group_ids, channel_lists)
     for instrument, group in zip(instrument_names, channel_group_ids):
         # target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
         ref_out = ""
         for target in IOandI2CInterface:
             ref_out = open_reference(instrument, target, ldb_type)
+            print(instrument, ref_out)
+            session = nifpga.Session(ref_out, instrument)
+            print(session)
             # TODO clear error
-        tsm_context.set_custom_session(InstrumentTypeId, instrument, group, ref_out)
+
+        tsm_context.set_custom_session(InstrumentTypeId, instrument, group, session)
     dut_pins, system_pins = tsm_context.get_pin_names(InstrumentTypeId)
     debug = tsm_context.pins_to_custom_sessions(InstrumentTypeId, dut_pins+system_pins)
     return debug
