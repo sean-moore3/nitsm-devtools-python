@@ -36,8 +36,25 @@ def tsm_context(standalone_tsm):
     ni_fpga.close_session(standalone_tsm)
 
 
+@pytest.fixture
+def fpga_tsm_s(tsm_context, tests_pins):
+    """Returns LabVIEW Cluster equivalent data"""
+    print(tests_pins)
+    fpga_tsms = []
+    sessions = []
+    for test_pin_group in tests_pins:
+        print(test_pin_group)
+        data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
+        fpga_tsms.append(data)
+        sessions += data.sessions
+    print(sessions)
+    yield tsm_context, daqmx_tsms
+
 @pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestFPGA:
     def test_initialize_sessions(self, tsm_context):
+        pass
+
+    def test_pin_to_sessions(self,fpga_tsm_s):
         pass

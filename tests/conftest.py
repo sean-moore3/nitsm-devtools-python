@@ -186,16 +186,20 @@ def tests_pins(request):
         # for daqmx driver i.e. nidaqmx testing
         pins_selected = [["DAQ_Pins1"], ["DAQ_Pins2"]]
     elif file_name == "test_abstract.py":
-        # for daqmx driver i.e. nidaqmx testing
+        # for daqmx driver i.e. niabstract testing
         pins_selected = [["BUCK_TLOAD_CTRL"]]
     elif file_name == "test_fgen.py":
         # for function generator driver i.e. nifgen testing
         input_dut_pins = ["FGN_SI_SGL_In"]
         pins_selected = [input_dut_pins]
     elif file_name == "test_Switch.py":
-        # for function generator driver i.e. nifgen testing
+        # for function generator driver i.e. niswitch testing
         input_dut_pins = ["Pin1","Pin2", 'TestIn', 'TestOut2']
         pins_selected = input_dut_pins
+    elif file_name == "test_fpga.py":
+        # for function generator driver i.e. nifpga testing
+        input_dut_pins = ["RIO_Pins"]
+        pins_selected = [input_dut_pins]
     else:
         pins_selected = ["dummy", "pins", "to_fail"]
     return pins_selected

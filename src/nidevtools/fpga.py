@@ -1,4 +1,6 @@
 import os
+import site
+
 import nifpga
 from enum import Enum
 from time import time
@@ -86,16 +88,16 @@ class Connector(Enum):
 
 
 class StaticStates(Enum):
-    Zero= 0
-    One= 1
-    X= 2
+    Zero = 0
+    One = 1
+    X = 2
 
 
 class States(Enum):
-    Zero= 0
-    One= 1
-    X= 2
-    I2C= 3
+    Zero = 0
+    One = 1
+    X = 2
+    I2C = 3
 
 
 class Channel:
@@ -426,7 +428,7 @@ class _SSCFPGA(typing.NamedTuple):
     def write_single_dio_line(self,
                               connector: Connector = Connector.Connector0,
                               line: DIOLines = DIOLines.DIO0,
-                              state: States = States.Zero):
+                              state: StaticStates = StaticStates.Zero):
         if 0 <= connector.value <= 3:
             con_enable = self.Session.registers['Connector%d Output Enable' % connector.value]
             con_data = self.Session.registers['Connector%d Output Data' % connector.value]
@@ -575,33 +577,37 @@ def channel_list_to_pins(channel_list: str = ""):
 def close_session(tsm_context: TSMContext):
     session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(InstrumentTypeId)
     for session in session_data:
-        session: nifpga.Session
         session.close()
 
 
 def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
     instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(InstrumentTypeId)
-    print(instrument_names, channel_group_ids, channel_lists)
-    for instrument, group in zip(instrument_names, channel_group_ids):
+    for instrument, group_id in zip(instrument_names, channel_group_ids):
         # target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
         ref_out = ""
         for target in IOandI2CInterface:
-            ref_out = open_reference(instrument, target, ldb_type)
-            print(instrument, ref_out)
-            session = nifpga.Session(ref_out, instrument)
-            print(session)
-            # TODO clear error
-
-        tsm_context.set_custom_session(InstrumentTypeId, instrument, group, session)
+            try:
+                ref_out = open_reference(instrument, target, ldb_type)
+                print(target)
+            except Exception: # TODO Check on baku since the condition seems to be up side down
+                continue
+            else:
+                break
+        tsm_context.set_custom_session(InstrumentTypeId, instrument, group_id, ref_out)
     dut_pins, system_pins = tsm_context.get_pin_names(InstrumentTypeId)
     debug = tsm_context.pins_to_custom_sessions(InstrumentTypeId, dut_pins+system_pins)
     return debug
 
 
-def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbers: typing.List[int]):
+def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbers: typing.List[int] = []):
     pin_query_context, session_data, channel_group_ids, channel_lists =\
         tsm_context.pins_to_custom_sessions(InstrumentTypeId, pins)
-    channels = pin_query_context.get_session_and_channel_index(site_numbers)
+    channels = []
+    for site_number in site_numbers:
+        for pin in pins:
+            session_index, channel_index = pin_query_context.get_session_and_channel_index(site_number, pin)
+            print(session_index, channel_index)
+            channels.append(channel_index)
     new_session = _SSCFPGA(session_data, channel_group_ids, channels, channel_lists)
     return TSMFPGA(pin_query_context, [new_session], site_numbers)
 
@@ -612,14 +618,14 @@ def open_reference(rio_resource: str, target: IOandI2CInterface, ldb_type: str):
     elif target == IOandI2CInterface.PXIe_7821R:
         name_of_relative_path = '7821R Static IO and I2C FPGA Main 3.3V.lvbitx'
     elif target == IOandI2CInterface.PXIe_7822R:
-        if 'Seq' in ldb_type:
+        if 'seq' in ldb_type.lower():
             name_of_relative_path = '7822R Static IO and I2C FPGA Main 3.3V.lvbitx'
         else:
             name_of_relative_path = '7822R Static IO and I2C FPGA Main Conn01 3.3V Conn 23 1.2V.lvbitx'
     else:
         name_of_relative_path = ''
     path = os.path.join(CurrentPath, '..\\..\\FPGA Bitfiles\\', name_of_relative_path)
-    reference = os.path.join(rio_resource, path)  # TODO check if the result of this operation is valid
+    reference = nifpga.Session(path, rio_resource)
     return reference
 
 
