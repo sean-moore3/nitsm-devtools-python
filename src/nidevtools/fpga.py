@@ -11,7 +11,7 @@ import shutil
 # from nidaqmx.constants import TerminalConfiguration
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 # from nitsm.enums import InstrumentTypeIdConstants
-# from nitsm.pinquerycontexts import PinQueryContext
+import nitsm.pinquerycontexts
 import typing
 
 # Types Definition
@@ -21,7 +21,101 @@ Any = typing.Any
 StringTuple = typing.Tuple[str]
 InstrumentTypeId = '782xFPGA'
 CurrentPath = os.getcwd()
+PinQuery = nitsm.pinquerycontexts.PinQueryContext
 
+
+class I2CDataType(typing.NamedTuple):
+    Data: int
+    ACK: bool
+    Valid: bool
+
+
+class I2CSlaveStates(Enum):
+    WaitOnStartCondition = 0
+    Addressing = 1
+    AddressAck = 2
+    MasterReadingData = 3
+    RetrieveAck = 4
+    MasterWritingData = 5
+    SendAck = 6
+
+
+class I2CTransferSettings(typing.NamedTuple):
+    SendStopCondition: bool
+    Divide: int
+    Read: bool
+
+
+class MasterState(Enum):
+    Idle = 0
+    SendStartCondition = 1
+    SendData = 2
+    SendRisingClock = 3
+    SendFallingClock = 4
+    Waiting = 5
+    ReleaseClock = 6
+    ReleaseData = 7
+    StopConditionSetUp = 8
+
+
+class SlaveCaptureDataInterface(typing.NamedTuple):
+    reset_data: bool
+    capture_data: bool
+    store_data: bool
+    capture_header: bool
+
+
+class WorldControllerState(Enum):
+    Idle = 0
+    WaitForReady = 1
+    Address = 2
+    Data = 3
+    Waiting = 4
+
+
+class DataArray(typing.NamedTuple):
+    val0: int
+    val1: int
+    val2: int
+    val3: int
+    val4: int
+    val5: int
+    val6: int
+    val7: int
+
+
+class I2CHeaderWord(typing.NamedTuple):
+    Address: int
+    Read: bool
+    Valid: bool
+
+
+class I2CInterface(typing.NamedTuple):
+    Clock: bool
+    Data: bool
+
+
+class WorlControllerSetting(typing.NamedTuple):
+    Device_Address: int
+    Read: bool
+    Number_of_Bytes: int
+    ten_bit_Addresing: bool
+    Divide: int
+
+
+def parse_header(header_word: I2CHeaderWord, data_in: int, ten_bit_addr_ack: bool):
+    data_in = data_in%256  # limited to U8
+    ten_bit_addr_detected = (data_in & 248) == 240
+    valid_out = not (ten_bit_addr_ack and ten_bit_addr_detected)
+    if ten_bit_addr_ack:
+        address_out = (header_word.Address << 8) | data_in
+        read_out = header_word.Read
+    else:
+        address_out = data_in >> 1
+        read_out = bool(data_in % 2)
+        if not valid_out:
+            address_out = address_out & 3
+    return I2CHeaderWord(address_out, read_out, valid_out), ten_bit_addr_detected
 
 class ReadData(typing.NamedTuple):
     Connector0: int
@@ -553,20 +647,20 @@ def channel_list_to_pins(channel_list: str = ""):
         sites_and_pins.append(ch)
         ch_l = ch.split('\\')
         if '\\' in ch:
-            site = "site-1"
+            site_out = "site_out-1"
             pin = ch_l[0]
         else:
-            site = ch_l[0]
+            site_out = ch_l[0]
             pin = ch_l[1]
-        site = site[4:]
-        if site[0] == "+" or site[0] == "-":
-            if site[1:].isnumeric():
-                data = int(site)
+        site_out = site_out[4:]
+        if site_out[0] == "+" or site_out[0] == "-":
+            if site_out[1:].isnumeric():
+                data = int(site_out)
             else:
                 data = 0
         else:
-            if site.isnumeric():
-                data = int(site)
+            if site_out.isnumeric():
+                data = int(site_out)
             else:
                 data = 0
         sites.append(data)
@@ -589,7 +683,7 @@ def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
             try:
                 ref_out = open_reference(instrument, target, ldb_type)
                 print(target)
-            except Exception: # TODO Check on baku since the condition seems to be up side down
+            except Exception:  # TODO Check on baku since the condition seems to be up side down
                 continue
             else:
                 break
@@ -602,15 +696,13 @@ def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
 def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbers: typing.List[int] = []):
     pin_query_context, session_data, channel_group_ids, channel_lists =\
         tsm_context.pins_to_custom_sessions(InstrumentTypeId, pins)
-    channels = []
-    for site_number in tsm_context.site_numbers:
-        for pin in pins:
-            print(site_number, pin)
-            session_index, channel_index = pin_query_context.get_session_and_channel_index(site_number, pin)
-            print(session_index, channel_index)
-            channels.append(channel_index)
-    new_session = _SSCFPGA(session_data, channel_group_ids, channels, channel_lists)
-    return TSMFPGA(pin_query_context, [new_session], site_numbers)
+    session_data: typing.Tuple[nifpga.Session]
+    # channel = pin_query_context.get_session_and_channel_index() TODO pending TSM PIN Abstraction
+    # new_session = _SSCFPGA(session_data, channel_group_ids, channels, channel_lists)
+    new_sessions = []
+    for session, channel_id, channel_list in zip(session_data, channel_group_ids, channel_lists):
+        new_sessions.append(_SSCFPGA(session, channel_id, '', channel_list))
+    return TSMFPGA(pin_query_context, new_sessions, site_numbers)
 
 
 def open_reference(rio_resource: str, target: IOandI2CInterface, ldb_type: str):

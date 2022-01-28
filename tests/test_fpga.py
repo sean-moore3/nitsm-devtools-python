@@ -1,3 +1,4 @@
+import nifpga
 import nitsm
 import typing
 import nidaqmx
@@ -46,15 +47,47 @@ def fpga_tsm_s(tsm_context, tests_pins):
         print(test_pin_group)
         data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
         fpga_tsms.append(data)
-        sessions += data.sessions
+        sessions += data.SSC
     print(sessions)
-    yield tsm_context, daqmx_tsms
+    yield tsm_context, fpga_tsms
+
 
 @pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestFPGA:
     def test_initialize_sessions(self, tsm_context):
-        pass
+        print(tsm_context.pin_map_file_path)
+        queried_sessions = tsm_context.get_all_custom_sessions("782xFPGA")
+        assert isinstance(queried_sessions[0], tuple)  # Type verification
+        for session in queried_sessions[0]:
+            print("\nTest_Init/Clear_Sessions\n", session)
+            assert isinstance(session, nifpga.session.Session)  # Type verification
+            assert len(queried_sessions[0]) != 0  # not void
+            assert len(queried_sessions[0]) == 1  # Matching quantity
 
-    def test_pin_to_sessions(self,fpga_tsm_s):
-        pass
+    def test_pin_to_sessions(self, fpga_tsm_s):
+        tsm_context = fpga_tsm_s[0]
+        list_fpga_tsm = fpga_tsm_s[1]
+        print(list_fpga_tsm)
+        for fpga_tsm in list_fpga_tsm:
+            print("\nTest_pin_to_sessions\n", fpga_tsm)
+            print(fpga_tsm.SSC)
+            assert isinstance(fpga_tsm, ni_fpga.TSMFPGA)
+            assert isinstance(fpga_tsm.pin_query_context, ni_fpga.PinQuery)
+            print(type(fpga_tsm.SSC))
+            assert isinstance(fpga_tsm.SSC, typing.List)
+            assert len(fpga_tsm.SSC) == len(tsm_context.site_numbers)
+
+    def test_parse_header(self):
+        for data in range(254):
+            print('Test Address/Read/Valid')
+            for addr in range(256):
+                result = ni_fpga.parse_header(ni_fpga.I2CHeaderWord(addr, True, False), addr, True)
+                assert(result[0].Address == ((addr << 8) | addr))
+                assert (result[0].Read == True)
+                assert (result[0].Valid != ((addr & 248) == 240))
+                result = ni_fpga.parse_header(ni_fpga.I2CHeaderWord(addr, False, False), addr, False)
+                assert (result[0].Address == (addr >> 1))
+                assert (result[0].Read == bool(addr % 2))
+                assert (result[0].Valid == True)
+            print('Value test completed: Pass')

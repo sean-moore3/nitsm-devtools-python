@@ -12,6 +12,7 @@ import typing
 PinsArg = typing.Union[str, typing.Sequence[str]]
 Any = typing.Any
 StringTuple = typing.Tuple[str]
+PinQuery = nitsm.pinquerycontexts.PinQueryContext
 
 
 class ChannelsToRead:
@@ -441,9 +442,6 @@ class _Sessions:
             session.st_ref_digital_edge(trigger_source, edge, pre_trigger_samples_per_channel)
 
 
-PinQuery = nitsm.pinquerycontexts.PinQueryContext
-
-
 class MultipleSessions(_Sessions):
     """
     Class that contains a list of DAQmx sessions with methods to control all sessions inside the object.
@@ -656,8 +654,8 @@ def pins_to_session_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconductor
         Multiple_Sessions: An object that tracks the task associated with this pin query. Use this object
         to publish measurements and extract data from a set of measurements.
     """
-    if type(pins)==str:
-        pins=[pins]
+    if type(pins) == str:
+        pins = [pins]
     pin_list = tsm_context.filter_pins_by_instrument_type(pins,
                                                           nitsm.enums.InstrumentTypeIdConstants.NI_DAQMX,
                                                           nitsm.enums.Capability.ALL)
