@@ -603,8 +603,9 @@ def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbe
     pin_query_context, session_data, channel_group_ids, channel_lists =\
         tsm_context.pins_to_custom_sessions(InstrumentTypeId, pins)
     channels = []
-    for site_number in site_numbers:
+    for site_number in tsm_context.site_numbers:
         for pin in pins:
+            print(site_number, pin)
             session_index, channel_index = pin_query_context.get_session_and_channel_index(site_number, pin)
             print(session_index, channel_index)
             channels.append(channel_index)
