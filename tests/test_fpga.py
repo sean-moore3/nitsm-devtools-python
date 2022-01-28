@@ -40,15 +40,12 @@ def tsm_context(standalone_tsm):
 @pytest.fixture
 def fpga_tsm_s(tsm_context, tests_pins):
     """Returns LabVIEW Cluster equivalent data"""
-    print(tests_pins)
     fpga_tsms = []
     sessions = []
     for test_pin_group in tests_pins:
-        print(test_pin_group)
         data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
         fpga_tsms.append(data)
         sessions += data.SSC
-    print(sessions)
     yield tsm_context, fpga_tsms
 
 
@@ -68,13 +65,10 @@ class TestFPGA:
     def test_pin_to_sessions(self, fpga_tsm_s):
         tsm_context = fpga_tsm_s[0]
         list_fpga_tsm = fpga_tsm_s[1]
-        print(list_fpga_tsm)
         for fpga_tsm in list_fpga_tsm:
             print("\nTest_pin_to_sessions\n", fpga_tsm)
-            print(fpga_tsm.SSC)
             assert isinstance(fpga_tsm, ni_fpga.TSMFPGA)
             assert isinstance(fpga_tsm.pin_query_context, ni_fpga.PinQuery)
-            print(type(fpga_tsm.SSC))
             assert isinstance(fpga_tsm.SSC, typing.List)
             assert len(fpga_tsm.SSC) == len(tsm_context.site_numbers)
 
@@ -83,7 +77,7 @@ class TestFPGA:
             print('Test Address/Read/Valid')
             for addr in range(256):
                 result = ni_fpga.parse_header(ni_fpga.I2CHeaderWord(addr, True, False), addr, True)
-                assert(result[0].Address == ((addr << 8) | addr))
+                assert (result[0].Address == ((addr << 8) | addr))
                 assert (result[0].Read == True)
                 assert (result[0].Valid != ((addr & 248) == 240))
                 result = ni_fpga.parse_header(ni_fpga.I2CHeaderWord(addr, False, False), addr, False)
@@ -91,3 +85,17 @@ class TestFPGA:
                 assert (result[0].Read == bool(addr % 2))
                 assert (result[0].Valid == True)
             print('Value test completed: Pass')
+
+    def test_create_header(self):
+        print('Test Create Header')
+        result = ni_fpga.create_header(False, 15, False)
+        assert (result == (30, 15))
+        result = ni_fpga.create_header(False, 25, True)
+        assert (result == (51, 25))
+        result = ni_fpga.create_header(True, 35, False)
+        assert (result == (240, 35))
+        result = ni_fpga.create_header(True, 45, True)
+        assert (result == (241, 45))
+
+    def test_get_i2c_master_session(self, tsm_context):
+        print(ni_fpga.get_i2c_master_session(tsm_context, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True))

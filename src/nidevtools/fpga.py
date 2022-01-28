@@ -95,6 +95,20 @@ class I2CInterface(typing.NamedTuple):
     Data: bool
 
 
+def create_header(ten_bit_address: bool, address: int, read: bool):
+    bin_address = "{:016b}".format(address, "b")
+    print(bin_address)
+    addr1 = int(bin_address[8:16], 2)  # LO
+    addr0 = int(bin_address[0:8], 2)  # HI
+    print(addr0, addr1)
+    if ten_bit_address:
+        addr0 = (addr0 & 3) | 120
+    else:
+        addr0 = addr1
+    addr0 = (addr0 << 1) | int(read)
+    return addr0, addr1
+
+
 class WorlControllerSetting(typing.NamedTuple):
     Device_Address: int
     Read: bool
@@ -739,6 +753,7 @@ def get_i2c_master_session(tsm_context: TSMContext,
                            apply_i2c_settings: bool = True):
     sda = "%s_SDA" % i2c_master.name
     scl = "%s_SDA" % i2c_master.name
+    print([sda, scl], [])
     session_data = pins_to_sessions(tsm_context, [sda, scl], [])
     session = session_data.SSC[0]
     ch_list = session_data.SSC[0].Channels.split(",")
