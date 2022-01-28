@@ -104,7 +104,7 @@ class WorlControllerSetting(typing.NamedTuple):
 
 
 def parse_header(header_word: I2CHeaderWord, data_in: int, ten_bit_addr_ack: bool):
-    data_in = data_in%256  # limited to U8
+    data_in = data_in % 256  # limited to U8
     ten_bit_addr_detected = (data_in & 248) == 240
     valid_out = not (ten_bit_addr_ack and ten_bit_addr_detected)
     if ten_bit_addr_ack:
@@ -117,11 +117,19 @@ def parse_header(header_word: I2CHeaderWord, data_in: int, ten_bit_addr_ack: boo
             address_out = address_out & 3
     return I2CHeaderWord(address_out, read_out, valid_out), ten_bit_addr_detected
 
-class ReadData(typing.NamedTuple):
+
+class ReadData(typing.NamedTuple):  # AllConnector Data
     Connector0: int
     Connector1: int
     Connector2: int
     Connector3: int
+
+
+class I2CBusOutputEnableAndData(typing.NamedTuple):
+    SDA_Output_Data: bool
+    SDA_Output_Enable: bool
+    SCL_Output_Data: bool
+    SCL_Output_Enable: bool
 
 
 class I2CMaster(Enum):
@@ -131,7 +139,7 @@ class I2CMaster(Enum):
     I2C_3V3_7822_TLOAD = 3
 
 
-class IOandI2CInterface(Enum):
+class BoardType(Enum):
     PXIe_7822R = 0
     PXIe_7821R = 1
     PXIe_7820R = 2  # TODO Does order matters?
@@ -173,7 +181,7 @@ class DIOLines(Enum):
     DIO_None = 32
 
 
-class Connector(Enum):
+class Connectors(Enum):
     Connector0 = 0
     Connector1 = 1
     Connector2 = 2
@@ -187,30 +195,34 @@ class StaticStates(Enum):
     X = 2
 
 
-class States(Enum):
+class States(Enum):  # DIO Line State with I2C
     Zero = 0
     One = 1
     X = 2
     I2C = 3
 
 
-class Channel:
-    def __init__(self, channel: DIOLines, connector: Connector):
+class LineLocation:  # Channel
+    def __init__(self, channel: DIOLines, connector: Connectors):
         self.channel = channel
         self.connector = connector
 
 
-class CurrentCommandedStates(Channel):
+class DIOLineLocationandStaticState(LineLocation):
     state: StaticStates
 
 
-class Readings(Channel):
+class LineLocationandStates(LineLocation):
+    state: States
+
+
+class DIOLineLocationandReadState(LineLocation):
     state: bool
 
 
-class I2CMasterLineConfiguration(typing.NamedTuple):
-    SDA: Channel
-    SCL: Channel
+class I2CMasterLineConfiguration(typing.NamedTuple):  # I2C Channel Mapping
+    SDA: LineLocation
+    SCL: LineLocation
 
 
 class WorldControllerSetting:
@@ -228,7 +240,7 @@ class WorldControllerSetting:
         self.Divide = divide
 
 
-def search_line(line: Channel, ch_list: typing.List[Channel]):
+def search_line(line: LineLocation, ch_list: typing.List[LineLocation]):
     index = 0
     for element in ch_list:
         if element.channel == line.channel and element.connector == line.connector:
@@ -253,7 +265,7 @@ class _SSCFPGA(typing.NamedTuple):
             r_list.append(int(ch) % 32)
         lines_to_write = []
         for s_s, iq, r in zip(static_states, iq_list, r_list):
-            element = CurrentCommandedStates(DIOLines(r), Connector(iq))
+            element = DIOLineLocationandStaticState(DIOLines(r), Connectors(iq))
             element.state = s_s
             lines_to_write.append(element)
         self.write_multiple_dio_lines(lines_to_write)
@@ -267,7 +279,7 @@ class _SSCFPGA(typing.NamedTuple):
             r_list.append(int(ch) % 32)
         lines_to_write = []
         for s_s, iq, r in zip(static_states, iq_list, r_list):
-            element = CurrentCommandedStates(DIOLines(r), Connector(iq))
+            element = DIOLineLocationandStaticState(DIOLines(r), Connectors(iq))
             element.state = s_s
             lines_to_write.append(element)
         self.write_multiple_dio_lines(lines_to_write)
@@ -280,7 +292,7 @@ class _SSCFPGA(typing.NamedTuple):
         for ch in ch_list[0]:
             iq = int(ch) // 32
             r = int(ch) % 32
-            channels.append(Channel(DIOLines(iq), Connector(r)))
+            channels.append(LineLocation(DIOLines(iq), Connectors(r)))
         data = self.read_multiple_lines(channels)
         for bit in data:
             line_states.append(bit.state)
@@ -293,7 +305,7 @@ class _SSCFPGA(typing.NamedTuple):
         for ch in ch_list[0]:
             iq = int(ch) // 32
             r = int(ch) % 32
-            channels.append(Channel(DIOLines(iq), Connector(r)))
+            channels.append(LineLocation(DIOLines(iq), Connectors(r)))
         states = self.read_multiple_dio_commanded_states(channels)
         for state in states:
             commanded_states.append(state.state)
@@ -310,8 +322,8 @@ class _SSCFPGA(typing.NamedTuple):
 
     def configure_i2c_master_sda_scl_lines(self,
                                            i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
-                                           sda_channel: Channel = Channel(DIOLines.DIO0, Connector.Connector0),
-                                           scl_channel: Channel = Channel(DIOLines.DIO0, Connector.Connector0)
+                                           sda_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0),
+                                           scl_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0)
                                            ):
         """"""
         cluster = I2CMasterLineConfiguration(sda_channel, scl_channel)
@@ -431,7 +443,7 @@ class _SSCFPGA(typing.NamedTuple):
         data = ReadData(data_rd[0], data_rd[1], data_rd[2], data_rd[3])
         return data
 
-    def read_multiple_dio_commanded_states(self, lines_to_read: typing.List[Channel]):
+    def read_multiple_dio_commanded_states(self, lines_to_read: typing.List[LineLocation]):
         out_list = []
         config_list = []
         for i in range(4):
@@ -463,12 +475,12 @@ class _SSCFPGA(typing.NamedTuple):
                 pass
             else:
                 line_state = States.I2C
-            state = CurrentCommandedStates(line, connector)
+            state = DIOLineLocationandStaticState(line, connector)
             state.State = line_state
             states_list.append(state)
         return states_list
 
-    def read_multiple_lines(self, lines_to_read: typing.List[Channel]):
+    def read_multiple_lines(self, lines_to_read: typing.List[LineLocation]):
         ch_data_list = []
         for ch in range(4):
             con_rd = self.Session.registers['Connector%d Read Data' % ch]
@@ -480,25 +492,25 @@ class _SSCFPGA(typing.NamedTuple):
             data = ch_data_list[connector.value]
             state_list = list("{:032b}".format(data, "b"))[::-1]
             line_state = state_list[line.value]
-            state = Readings(line, connector)
+            state = DIOLineLocationandReadState(line, connector)
             state.State = line_state
             readings.append(state)
         return readings
 
-    def read_single_connector(self, connector: Connector):
+    def read_single_connector(self, connector: Connectors):
         data: int = 0
         if 0 <= connector.value <= 3:
             read_control = self.Session.registers["Connector%d Read Data" % connector.value]
             data = read_control.read()
         return data
 
-    def read_single_dio_line(self, connector: Connector = Connector.Connector0, line: DIOLines = DIOLines.DIO0):
+    def read_single_dio_line(self, connector: Connectors = Connectors.Connector0, line: DIOLines = DIOLines.DIO0):
         data = self.read_single_connector(connector)
         state_list = list("{:032b}".format(data, "b"))[::-1]
         line_state = state_list[line.value]
         return line_state
 
-    def write_multiple_dio_lines(self, lines_to_write: typing.List[CurrentCommandedStates]):
+    def write_multiple_dio_lines(self, lines_to_write: typing.List[DIOLineLocationandStaticState]):
         con_list = []
         data_list = []
         for i in range(4):
@@ -520,7 +532,7 @@ class _SSCFPGA(typing.NamedTuple):
             con[1].write(data[1])
 
     def write_single_dio_line(self,
-                              connector: Connector = Connector.Connector0,
+                              connector: Connectors = Connectors.Connector0,
                               line: DIOLines = DIOLines.DIO0,
                               state: StaticStates = StaticStates.Zero):
         if 0 <= connector.value <= 3:
@@ -679,7 +691,7 @@ def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
     for instrument, group_id in zip(instrument_names, channel_group_ids):
         # target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
         ref_out = ""
-        for target in IOandI2CInterface:
+        for target in BoardType:
             try:
                 ref_out = open_reference(instrument, target, ldb_type)
                 print(target)
@@ -705,12 +717,12 @@ def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbe
     return TSMFPGA(pin_query_context, new_sessions, site_numbers)
 
 
-def open_reference(rio_resource: str, target: IOandI2CInterface, ldb_type: str):
-    if target == IOandI2CInterface.PXIe_7820R:
+def open_reference(rio_resource: str, target: BoardType, ldb_type: str):
+    if target == BoardType.PXIe_7820R:
         name_of_relative_path = '7820R Static IO and I2C FPGA Main 3.3V.lvbitx'
-    elif target == IOandI2CInterface.PXIe_7821R:
+    elif target == BoardType.PXIe_7821R:
         name_of_relative_path = '7821R Static IO and I2C FPGA Main 3.3V.lvbitx'
-    elif target == IOandI2CInterface.PXIe_7822R:
+    elif target == BoardType.PXIe_7822R:
         if 'seq' in ldb_type.lower():
             name_of_relative_path = '7822R Static IO and I2C FPGA Main 3.3V.lvbitx'
         else:
