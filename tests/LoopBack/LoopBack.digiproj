@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="01FAC93E0D1E390F84D5D1B7A65B4BA8" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="E5700F43F32BCE8A72EE72CE3B38BD2A" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
 		<ParsableNamespace AssemblyFileVersion="5.3.2.50247" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
 		<ParsableNamespace AssemblyFileVersion="5.3.2.50247" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
@@ -40,6 +40,8 @@
 			<FileReference Id="319" ModelDefinitionType="PinMap" Name="MonoLithic\.pinmap" StoragePath="MonoLithic.pinmap" />
 			<FileReference Id="320" ModelDefinitionType="PinMap" Name="YinYang\.pinmap" StoragePath="YinYang.pinmap" />
 			<FileReference Id="323" ModelDefinitionType="PinMap" Name="AbstInst\.pinmap" StoragePath="AbstInst.pinmap" />
+			<FileReference Id="326" ModelDefinitionType="PinMap" Name="Switch\.pinmap" StoragePath="Switch.pinmap" />
+			<FileReference Id="327" ModelDefinitionType="PinMap" Name="FPGA\.pinmap" StoragePath="FPGA.pinmap" />
 		</NameScopingEnvoy>
 		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">
 			<ProjectPropertiesDefinition xmlns="http://www.ni.com/PatternBasedDigital" />

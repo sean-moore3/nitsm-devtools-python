@@ -376,13 +376,13 @@ class _SSCFPGA(typing.NamedTuple):
                                       clock_stretching: bool = True
                                       ):
         """"""
-        #cluster = WorldControllerSetting(divide=divide, ten_bit_addressing=ten_bit_addressing)
+        # cluster = WorldControllerSetting(divide=divide, ten_bit_addressing=ten_bit_addressing)
         if 0 <= i2c_master.value <= 3:
             master = self.Session.registers['I2C Master%d Configuration' % i2c_master.value]
             clock = self.Session.registers['I2C Master%d Enable Clock Stretching?' % i2c_master.value]
             cluster = master.read()
-            cluster['10-bit Addressing']=ten_bit_addressing
-            cluster['Divide']=divide
+            cluster['10-bit Addressing'] = ten_bit_addressing
+            cluster['Divide'] = divide
             clock.write(clock_stretching)
             master.write(cluster)  # without all info?
         else:
@@ -407,7 +407,7 @@ class _SSCFPGA(typing.NamedTuple):
         while not stop:
             data = master_ready.read()
             time_count = time() - start_time
-            stop = data and time_count > timeout
+            stop = data and (time_count > timeout)
         if data:
             pass
         else:
@@ -437,15 +437,23 @@ class _SSCFPGA(typing.NamedTuple):
         else:
             print("Requested I2C_master is not defined")
             raise Exception
-        config: WorldControllerSetting
+        # config: WorldControllerSetting
         config = master_config.read()
+        '''
         config.Device_Address = device_address
         config.Number_of_Bytes = number_of_bytes
         config.Read = True
+        '''
+        config['Device Address'] = device_address
+        config['Number of Bytes'] = number_of_bytes
+        config['Read'] = True
+
+        print('Test', config)
         self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
         master_config.write(config)
         master_go.write(True)
         self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
+        raise Exception
         data = master_data.read()
         data = data[0:number_of_bytes+1]
         return data
@@ -652,7 +660,7 @@ class TSMFPGA(typing.NamedTuple):
         if type(scan) != I2CMaster:
             raise nifpga.ErrorStatus(5000,
                                      "Invalid I2C Master Session Provided",
-                                     "get_i2c_master",
+                                     "extract_i2c_master_from_sessions",
                                      ["self"],
                                      self)
         return session, scan
@@ -716,7 +724,7 @@ def channel_list_to_pins(channel_list: str = ""):
     return sites_and_pins, sites, pins
 
 
-def close_session(tsm_context: TSMContext):
+def close_sessions(tsm_context: TSMContext):
     session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(InstrumentTypeId)
     for session in session_data:
         session.close()
@@ -741,14 +749,14 @@ def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
 
 
 def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbers: typing.List[int] = []):
-    pin_query_context, session_data, channel_group_ids, channels_list =\
+    pin_query_context, session_data, channel_group_ids, channels_lists =\
         tsm_context.pins_to_custom_sessions(InstrumentTypeId, pins)
     session_data: typing.Tuple[nifpga.Session]
-    channel_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], site_numbers)
+    channel_list = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], site_numbers)
     new_sessions = []
-    for session, channel_id, channel, list_d in zip(session_data, channel_group_ids, channels_list, channel_lists[1]):
+    for session, channel_id, channel, list_d in zip(session_data, channel_group_ids, channels_lists, channel_list[1]):
         new_sessions.append(_SSCFPGA(session, channel_id, channel, list_d))
-    return TSMFPGA(pin_query_context, new_sessions, channel_lists[0])
+    return TSMFPGA(pin_query_context, new_sessions, channel_list[0])
 
 
 def open_reference(rio_resource: str, target: BoardType, ldb_type: str):
