@@ -79,12 +79,15 @@ class TestFPGA:
                 result = ni_fpga.parse_header(ni_fpga.I2CHeaderWord(addr, True, False), addr, True)
                 assert (result[0].Address == ((addr << 8) | addr))
                 assert (result[0].Read == True)
-                assert (result[0].Valid != ((addr & 248) == 240))
-                result = ni_fpga.parse_header(ni_fpga.I2CHeaderWord(addr, False, False), addr, False)
-                assert (result[0].Address == (addr >> 1))
-                assert (result[0].Read == bool(addr % 2))
                 assert (result[0].Valid == True)
-            print('Value test completed: Pass')
+                result = ni_fpga.parse_header(ni_fpga.I2CHeaderWord(addr, False, False), addr, False)
+                if (addr & 248) == 240:
+                    assert (result[0].Address == ((addr >> 1)&3))
+                else:
+                    assert (result[0].Address == (addr >> 1))
+                assert (result[0].Read == bool(addr % 2))
+                assert (result[0].Valid != result[1])
+        print('Value test completed: Pass')
 
     def test_create_header(self):
         print('Test Create Header')

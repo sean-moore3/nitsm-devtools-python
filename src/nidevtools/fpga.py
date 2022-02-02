@@ -1,10 +1,11 @@
 import os
-import site
-
+# import site
+import collections
+import nidevtools.common as ni_dt_common
 import nifpga
 from enum import Enum
 from time import time
-from time import sleep
+# from time import sleep
 import shutil
 # import nitsm.codemoduleapi
 # from nitsm.enums import Capability
@@ -97,10 +98,8 @@ class I2CInterface(typing.NamedTuple):
 
 def create_header(ten_bit_address: bool, address: int, read: bool):
     bin_address = "{:016b}".format(address, "b")
-    print(bin_address)
     addr1 = int(bin_address[8:16], 2)  # LO
     addr0 = int(bin_address[0:8], 2)  # HI
-    print(addr0, addr1)
     if ten_bit_address:
         addr0 = (addr0 & 3) | 120
     else:
@@ -120,15 +119,16 @@ class WorlControllerSetting(typing.NamedTuple):
 def parse_header(header_word: I2CHeaderWord, data_in: int, ten_bit_addr_ack: bool):
     data_in = data_in % 256  # limited to U8
     ten_bit_addr_detected = (data_in & 248) == 240
-    valid_out = not (ten_bit_addr_ack and ten_bit_addr_detected)
+    valid_out = (not ten_bit_addr_ack) and ten_bit_addr_detected
     if ten_bit_addr_ack:
         address_out = (header_word.Address << 8) | data_in
         read_out = header_word.Read
     else:
-        address_out = data_in >> 1
         read_out = bool(data_in % 2)
-        if not valid_out:
+        address_out = data_in >> 1
+        if valid_out:
             address_out = address_out & 3
+    valid_out = not valid_out
     return I2CHeaderWord(address_out, read_out, valid_out), ten_bit_addr_detected
 
 
@@ -216,21 +216,31 @@ class States(Enum):  # DIO Line State with I2C
     I2C = 3
 
 
-class LineLocation:  # Channel
+class LineLocation(typing.NamedTuple):  # Channel
+    channel: DIOLines
+    connector: Connectors
+    '''
     def __init__(self, channel: DIOLines, connector: Connectors):
         self.channel = channel
         self.connector = connector
+        '''
 
 
-class DIOLineLocationandStaticState(LineLocation):
+class DIOLineLocationandStaticState(typing.NamedTuple):  # Channel
+    channel: DIOLines
+    connector: Connectors
     state: StaticStates
 
 
-class LineLocationandStates(LineLocation):
+class LineLocationandStates(typing.NamedTuple):  # Channel
+    channel: DIOLines
+    connector: Connectors
     state: States
 
 
-class DIOLineLocationandReadState(LineLocation):
+class DIOLineLocationandReadState(typing.NamedTuple):  # Channel
+    channel: DIOLines
+    connector: Connectors
     state: bool
 
 
@@ -279,8 +289,7 @@ class _SSCFPGA(typing.NamedTuple):
             r_list.append(int(ch) % 32)
         lines_to_write = []
         for s_s, iq, r in zip(static_states, iq_list, r_list):
-            element = DIOLineLocationandStaticState(DIOLines(r), Connectors(iq))
-            element.state = s_s
+            element = DIOLineLocationandStaticState(DIOLines(r), Connectors(iq), s_s)
             lines_to_write.append(element)
         self.write_multiple_dio_lines(lines_to_write)
 
@@ -293,8 +302,7 @@ class _SSCFPGA(typing.NamedTuple):
             r_list.append(int(ch) % 32)
         lines_to_write = []
         for s_s, iq, r in zip(static_states, iq_list, r_list):
-            element = DIOLineLocationandStaticState(DIOLines(r), Connectors(iq))
-            element.state = s_s
+            element = DIOLineLocationandStaticState(DIOLines(r), Connectors(iq), s_s)
             lines_to_write.append(element)
         self.write_multiple_dio_lines(lines_to_write)
         # TODO Check difference with ss_wr_static_array
@@ -334,16 +342,29 @@ class _SSCFPGA(typing.NamedTuple):
         """
         self.Session.close(reset_if_last_session)
 
-    def configure_i2c_master_sda_scl_lines(self,
-                                           i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
-                                           sda_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0),
-                                           scl_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0)
-                                           ):
+    def w_master_lc(self, control_label: str, cluster: I2CMasterLineConfiguration):
+        control = self.Session.registers[control_label]
+        sda = collections.OrderedDict()
+        sda['Channel'] = cluster.SDA.channel.value
+        sda['Connector'] = cluster.SDA.connector.value
+        scl = collections.OrderedDict()
+        scl['Channel'] = cluster.SCL.channel.value
+        scl['Connector'] = cluster.SCL.connector.value
+        data = collections.OrderedDict()
+        data['SDA'] = sda
+        data['SCL'] = scl
+        control.write(data)
+
+    def configure_master_sda_scl_lines(self,
+                                       i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+                                       sda_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0),
+                                       scl_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0)
+                                       ):
         """"""
         cluster = I2CMasterLineConfiguration(sda_channel, scl_channel)
         if 0 <= i2c_master.value <= 3:
-            master = self.Session.registers['I2C Master%d Line Configuration' % i2c_master.value]
-            master.write(cluster)
+            control = 'I2C Master%d Line Configuration' % i2c_master.value
+            self.w_master_lc(control, cluster)
         else:
             print("Requested I2C_master is not defined")
             raise Exception
@@ -355,10 +376,13 @@ class _SSCFPGA(typing.NamedTuple):
                                       clock_stretching: bool = True
                                       ):
         """"""
-        cluster = WorldControllerSetting(divide=divide, ten_bit_addressing=ten_bit_addressing)
+        #cluster = WorldControllerSetting(divide=divide, ten_bit_addressing=ten_bit_addressing)
         if 0 <= i2c_master.value <= 3:
             master = self.Session.registers['I2C Master%d Configuration' % i2c_master.value]
             clock = self.Session.registers['I2C Master%d Enable Clock Stretching?' % i2c_master.value]
+            cluster = master.read()
+            cluster['10-bit Addressing']=ten_bit_addressing
+            cluster['Divide']=divide
             clock.write(clock_stretching)
             master.write(cluster)  # without all info?
         else:
@@ -489,8 +513,7 @@ class _SSCFPGA(typing.NamedTuple):
                 pass
             else:
                 line_state = States.I2C
-            state = DIOLineLocationandStaticState(line, connector)
-            state.State = line_state
+            state = LineLocationandStates(line, connector, line_state)
             states_list.append(state)
         return states_list
 
@@ -506,8 +529,7 @@ class _SSCFPGA(typing.NamedTuple):
             data = ch_data_list[connector.value]
             state_list = list("{:032b}".format(data, "b"))[::-1]
             line_state = state_list[line.value]
-            state = DIOLineLocationandReadState(line, connector)
-            state.State = line_state
+            state = DIOLineLocationandReadState(line, connector, line_state)
             readings.append(state)
         return readings
 
@@ -618,16 +640,16 @@ class TSMFPGA(typing.NamedTuple):
         session.i2c_master_write(i2c, timeout, slave_address, data_to_write)
 
     def extract_i2c_master_from_sessions(self):
-        session = self.SSC[0].Session
+        session = self.SSC[0]  # .Session
         ch_list = self.SSC[0].ChannelList
         sites_and_pins, sites, pins = channel_list_to_pins(ch_list)
         sites_and_pins.clear()
         sites.clear()
         scan = ''
         for i2c in I2CMaster:
-            if pins[0] in i2c.name:
+            if i2c.name in pins[0]:
                 scan = i2c
-        if scan == '':
+        if type(scan) != I2CMaster:
             raise nifpga.ErrorStatus(5000,
                                      "Invalid I2C Master Session Provided",
                                      "get_i2c_master",
@@ -671,13 +693,13 @@ def channel_list_to_pins(channel_list: str = ""):
     for ch in ch_list:
         ch = ch.lstrip()
         sites_and_pins.append(ch)
-        ch_l = ch.split('\\')
-        if '\\' in ch:
-            site_out = "site_out-1"
-            pin = ch_l[0]
-        else:
+        ch_l = ch.replace('/', '\\').split('\\')
+        if '\\' in ch or '/' in ch:
             site_out = ch_l[0]
             pin = ch_l[1]
+        else:
+            site_out = "site-1"
+            pin = ch_l[0]
         site_out = site_out[4:]
         if site_out[0] == "+" or site_out[0] == "-":
             if site_out[1:].isnumeric():
@@ -708,7 +730,6 @@ def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
         for target in BoardType:
             try:
                 ref_out = open_reference(instrument, target, ldb_type)
-                print(target)
             except Exception:  # TODO Check on baku since the condition seems to be up side down
                 continue
             else:
@@ -720,15 +741,14 @@ def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
 
 
 def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbers: typing.List[int] = []):
-    pin_query_context, session_data, channel_group_ids, channel_lists =\
+    pin_query_context, session_data, channel_group_ids, channels_list =\
         tsm_context.pins_to_custom_sessions(InstrumentTypeId, pins)
     session_data: typing.Tuple[nifpga.Session]
-    # channel = pin_query_context.get_session_and_channel_index() TODO pending TSM PIN Abstraction
-    # new_session = _SSCFPGA(session_data, channel_group_ids, channels, channel_lists)
+    channel_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], site_numbers)
     new_sessions = []
-    for session, channel_id, channel_list in zip(session_data, channel_group_ids, channel_lists):
-        new_sessions.append(_SSCFPGA(session, channel_id, '', channel_list))
-    return TSMFPGA(pin_query_context, new_sessions, site_numbers)
+    for session, channel_id, channel, list_d in zip(session_data, channel_group_ids, channels_list, channel_lists[1]):
+        new_sessions.append(_SSCFPGA(session, channel_id, channel, list_d))
+    return TSMFPGA(pin_query_context, new_sessions, channel_lists[0])
 
 
 def open_reference(rio_resource: str, target: BoardType, ldb_type: str):
@@ -753,7 +773,6 @@ def get_i2c_master_session(tsm_context: TSMContext,
                            apply_i2c_settings: bool = True):
     sda = "%s_SDA" % i2c_master.name
     scl = "%s_SDA" % i2c_master.name
-    print([sda, scl], [])
     session_data = pins_to_sessions(tsm_context, [sda, scl], [])
     session = session_data.SSC[0]
     ch_list = session_data.SSC[0].Channels.split(",")
@@ -762,9 +781,12 @@ def get_i2c_master_session(tsm_context: TSMContext,
     for ch in ch_list[0]:
         iq_list.append(int(ch) // 32)
         r_list.append(int(ch) % 32)
-    session.configure_i2c_master_sda_scl_lines(i2c_master, r_list, iq_list)
+    iq_list = LineLocation(DIOLines(iq_list[0]), Connectors(iq_list[1]))
+    r_list = LineLocation(DIOLines(r_list[0]), Connectors(r_list[1]))
+    session.configure_master_sda_scl_lines(i2c_master, r_list, iq_list)
     if apply_i2c_settings:
         session_data.configure_i2c_bus(False, 64, True)
+    return session_data
 
 
 def check_ui_tool(
