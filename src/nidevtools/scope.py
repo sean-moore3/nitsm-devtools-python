@@ -144,6 +144,11 @@ class _NIScopeSSC:
 
     @property
     def session(self):
+        """This allows to access the session stored in each instance of the class
+
+        Returns:
+            niscope.Session : session of scope
+        """
         return self._session  # This session may contain other pin's channels
 
     @property
