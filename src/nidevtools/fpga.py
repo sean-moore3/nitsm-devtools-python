@@ -699,6 +699,56 @@ def i2c_bus_to_out_enable_and_data(bus: I2CInterface, enable_clk_stretch: bool):
     return bus_out
 
 
+def extract_data_from_connector(con_rd_data: int, sda_ch: DIOLines, scl_ch: DIOLines):
+    con_rd_data = list("{:032b}".format(con_rd_data, "b"))[::-1]
+    bus_out = I2CInterface(con_rd_data[scl_ch.value], con_rd_data[sda_ch.value])
+    return bus_out
+
+
+def extract_data_from_connectors(con0_bus: I2CInterface,
+                                 con1_bus: I2CInterface,
+                                 con2_bus: I2CInterface,
+                                 con3_bus: I2CInterface,
+                                 sda_con: Connectors,
+                                 scl_con: Connectors):
+    con_data = [con0_bus, con1_bus, con2_bus, con3_bus]
+    clock = data = False
+    if sda_con.value < 4:
+        clock = con_data[sda_con.value]
+    if scl_con.value < 4:
+        data = con_data[sda_con.value]
+    bus_out = I2CInterface(clock, data)
+    return bus_out
+
+
+def extract_i2c_data_1_interface(cn0_rd_data: int,
+                                 cn1_rd_data: int,
+                                 cn2_rd_data: int,
+                                 cn3_rd_data: int,
+                                 mstr_ln_cnfg: I2CMasterLineConfiguration):
+    cn0 = extract_data_from_connector(cn0_rd_data, mstr_ln_cnfg.SDA.channel, mstr_ln_cnfg.SCL.channel)
+    cn1 = extract_data_from_connector(cn1_rd_data, mstr_ln_cnfg.SDA.channel, mstr_ln_cnfg.SCL.channel)
+    cn2 = extract_data_from_connector(cn2_rd_data, mstr_ln_cnfg.SDA.channel, mstr_ln_cnfg.SCL.channel)
+    cn3 = extract_data_from_connector(cn3_rd_data, mstr_ln_cnfg.SDA.channel, mstr_ln_cnfg.SCL.channel)
+    bus_out = extract_data_from_connectors(cn0, cn1, cn2, cn3, mstr_ln_cnfg.SDA.connector, mstr_ln_cnfg.SCL.connector)
+    return bus_out
+
+
+def extract_i2c_data_4_interfaces(cn0_rd_data: int,
+                                  cn1_rd_data: int,
+                                  cn2_rd_data: int,
+                                  cn3_rd_data: int,
+                                  mstr0_ln_cnfg: I2CMasterLineConfiguration,
+                                  mstr1_ln_cnfg: I2CMasterLineConfiguration,
+                                  mstr2_ln_cnfg: I2CMasterLineConfiguration,
+                                  mstr3_ln_cnfg: I2CMasterLineConfiguration):
+    bus0 = extract_i2c_data_1_interface(cn0_rd_data, cn1_rd_data, cn2_rd_data, cn3_rd_data, mstr0_ln_cnfg)
+    bus1 = extract_i2c_data_1_interface(cn0_rd_data, cn1_rd_data, cn2_rd_data, cn3_rd_data, mstr1_ln_cnfg)
+    bus2 = extract_i2c_data_1_interface(cn0_rd_data, cn1_rd_data, cn2_rd_data, cn3_rd_data, mstr2_ln_cnfg)
+    bus3 = extract_i2c_data_1_interface(cn0_rd_data, cn1_rd_data, cn2_rd_data, cn3_rd_data, mstr3_ln_cnfg)
+    return bus0, bus1, bus2, bus3
+
+
 def create_header(ten_bit_address: bool, address: int, read: bool):
     bin_address = "{:016b}".format(address, "b")
     addr1 = int(bin_address[8:16], 2)  # LO
