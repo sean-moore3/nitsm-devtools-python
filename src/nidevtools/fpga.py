@@ -59,6 +59,12 @@ class MasterState(Enum):
     StopConditionSetUp = 8
 
 
+class ConnectorOverride(typing.NamedTuple):
+    Output_Enable: int
+    Output_Data: int
+    Enable_Mask: int
+
+
 class SlaveCaptureDataInterface(typing.NamedTuple):
     reset_data: bool
     capture_data: bool
@@ -96,40 +102,12 @@ class I2CInterface(typing.NamedTuple):
     Data: bool
 
 
-def create_header(ten_bit_address: bool, address: int, read: bool):
-    bin_address = "{:016b}".format(address, "b")
-    addr1 = int(bin_address[8:16], 2)  # LO
-    addr0 = int(bin_address[0:8], 2)  # HI
-    if ten_bit_address:
-        addr0 = (addr0 & 3) | 120
-    else:
-        addr0 = addr1
-    addr0 = (addr0 << 1) | int(read)
-    return addr0, addr1
-
-
 class WorlControllerSetting(typing.NamedTuple):
     Device_Address: int
     Read: bool
     Number_of_Bytes: int
     ten_bit_Addresing: bool
     Divide: int
-
-
-def parse_header(header_word: I2CHeaderWord, data_in: int, ten_bit_addr_ack: bool):
-    data_in = data_in % 256  # limited to U8
-    ten_bit_addr_detected = (data_in & 248) == 240
-    valid_out = (not ten_bit_addr_ack) and ten_bit_addr_detected
-    if ten_bit_addr_ack:
-        address_out = (header_word.Address << 8) | data_in
-        read_out = header_word.Read
-    else:
-        read_out = bool(data_in % 2)
-        address_out = data_in >> 1
-        if valid_out:
-            address_out = address_out & 3
-    valid_out = not valid_out
-    return I2CHeaderWord(address_out, read_out, valid_out), ten_bit_addr_detected
 
 
 class ReadData(typing.NamedTuple):  # AllConnector Data
@@ -264,16 +242,6 @@ class WorldControllerSetting:
         self.Divide = divide
 
 
-def search_line(line: LineLocation, ch_list: typing.List[LineLocation]):
-    index = 0
-    for element in ch_list:
-        if element.channel == line.channel and element.connector == line.connector:
-            return index
-        else:
-            index += 1
-    return -1
-
-
 class _SSCFPGA(typing.NamedTuple):
     Session: nifpga.Session
     ChannelGroupID: str
@@ -395,6 +363,7 @@ class _SSCFPGA(typing.NamedTuple):
                                     timeout: float = 0.0
                                     ):
         """"""
+
         if timeout == 0:
             timeout = start_time
         if 0 <= i2c_master.value <= 3:
@@ -404,10 +373,11 @@ class _SSCFPGA(typing.NamedTuple):
             raise Exception
         stop = False
         data = False
+        print(timeout)
         while not stop:
             data = master_ready.read()
             time_count = time() - start_time
-            stop = data and (time_count > timeout)
+            stop = data or (time_count > timeout)
         if data:
             pass
         else:
@@ -439,6 +409,7 @@ class _SSCFPGA(typing.NamedTuple):
             raise Exception
         # config: WorldControllerSetting
         config = master_config.read()
+
         '''
         config.Device_Address = device_address
         config.Number_of_Bytes = number_of_bytes
@@ -447,13 +418,10 @@ class _SSCFPGA(typing.NamedTuple):
         config['Device Address'] = device_address
         config['Number of Bytes'] = number_of_bytes
         config['Read'] = True
-
-        print('Test', config)
         self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
         master_config.write(config)
         master_go.write(True)
         self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
-        raise Exception
         data = master_data.read()
         data = data[0:number_of_bytes+1]
         return data
@@ -587,36 +555,6 @@ class _SSCFPGA(typing.NamedTuple):
             con_data.write(data)
 
 
-def update_line_on_connector(enable_in: int = 0,
-                             data_in: int = 0,
-                             dio_line: DIOLines = DIOLines.DIO0,
-                             line_state: StaticStates = StaticStates.Zero):
-    dio_index = dio_line.value
-    output_data = ((-dio_index << data_in) & 1) > 0
-    data, enable = line_state_to_out(line_state, output_data)
-    ch1 = ~(dio_index << 1)
-    ch2 = dio_index << enable
-    ch3 = dio_index << data
-    enable_out = ch2 | (enable_in & ch1)
-    data_out = (ch1 & data_in) | ch3
-    return enable_out, data_out
-
-
-def line_state_to_out(line: StaticStates, out_data: bool):
-    data = False
-    enable = False
-    if line.value == 0:
-        data = False
-        enable = True
-    elif line.value == 1:
-        data = True
-        enable = True
-    elif line.value == 2:
-        data = out_data
-        enable = False
-    return data, enable
-
-
 class TSMFPGA(typing.NamedTuple):
     pin_query_context: Any
     SSC: typing.List[_SSCFPGA]
@@ -634,6 +572,7 @@ class TSMFPGA(typing.NamedTuple):
                       timeout: float = 1,
                       slave_address: int = 0,
                       number_of_bytes: int = 1):
+        print(timeout)
         session: _SSCFPGA
         session, i2c = self.extract_i2c_master_from_sessions()
         i2c_read_data = session.i2c_master_read(i2c, slave_address, timeout, number_of_bytes)
@@ -691,6 +630,141 @@ class TSMFPGA(typing.NamedTuple):
     def write_static(self, static_state: typing.List[StaticStates]):
         for ss in self.SSC:
             ss.ss_wr_static(static_state)
+
+
+def override_connector_data(static_data: int, override_enable: int, override_data: int):
+    connector_data = (static_data & (not override_enable)) | (override_enable & override_data)
+    return connector_data
+
+
+def map_out_to_connector(out_data: bool, out_enable: bool, channel: DIOLines):
+    ch_id = channel.value
+    data = ['0'] * 32
+    enable = ['0'] * 32
+    mask = ['0'] * 32
+    data[ch_id] = str(int(out_data))
+    enable[ch_id] = str(int(out_enable))
+    mask[ch_id] = '1'
+    data = int(''.join(data), 2)
+    enable = int(''.join(enable), 2)
+    mask = int(''.join(mask), 2)
+    connector_overrides = ConnectorOverride(enable, data, mask)
+    return connector_overrides
+
+
+def out_data_to_connector_1_interface(bus: I2CBusOutputEnableAndData, master_line_cnfg: I2CMasterLineConfiguration):
+    map_sda = map_out_to_connector(bus.SDA_Output_Data, bus.SDA_Output_Enable, master_line_cnfg.SDA.channel)
+    map_scl = map_out_to_connector(bus.SCL_Output_Data, bus.SCL_Output_Enable, master_line_cnfg.SCL.channel)
+    sda = [ConnectorOverride(0, 0, 0)] * 4
+    scl = [ConnectorOverride(0, 0, 0)] * 4
+    if master_line_cnfg.SDA.connector.value < 4:
+        sda[master_line_cnfg.SDA.connector.value] = map_sda
+    if master_line_cnfg.SCL.connector.value < 4:
+        scl[master_line_cnfg.SCL.connector.value] = map_scl
+    connector_data = []
+    for con in range(4):
+        enable = sda[con].Output_Enable | sda[con].Output_Enable
+        data = sda[con].Output_Data | sda[con].Output_Data
+        mask = sda[con].Enable_Mask | sda[con].Enable_Mask
+        connector_data.append(ConnectorOverride(enable, data, mask))
+    return connector_data
+
+
+def out_data_to_connector_4_interfaces(bus0: I2CBusOutputEnableAndData,
+                                       bus1: I2CBusOutputEnableAndData,
+                                       bus2: I2CBusOutputEnableAndData,
+                                       bus3: I2CBusOutputEnableAndData,
+                                       mstr0_ln_cnfg: I2CMasterLineConfiguration,
+                                       mstr1_ln_cnfg: I2CMasterLineConfiguration,
+                                       mstr2_ln_cnfg: I2CMasterLineConfiguration,
+                                       mstr3_ln_cnfg: I2CMasterLineConfiguration):
+    map0 = out_data_to_connector_1_interface(bus0, mstr0_ln_cnfg)
+    map1 = out_data_to_connector_1_interface(bus1, mstr1_ln_cnfg)
+    map2 = out_data_to_connector_1_interface(bus2, mstr2_ln_cnfg)
+    map3 = out_data_to_connector_1_interface(bus3, mstr3_ln_cnfg)
+    connector_data = []
+    for con in range(4):
+        enable = map0[con].Output_Enable | map1[con].Output_Enable | map2[con].Output_Enable | map3[con].Output_Enable
+        data = map0[con].Output_Data | map1[con].Output_Data | map2[con].Output_Data | map3[con].Output_Data
+        mask = map0[con].Enable_Mask | map1[con].Enable_Mask | map2[con].Enable_Mask | map3[con].Enable_Mask
+        connector_data.append(ConnectorOverride(enable, data, mask))
+    return connector_data
+
+
+def i2c_bus_to_out_enable_and_data(bus: I2CInterface, enable_clk_stretch: bool):
+    bus_out = I2CBusOutputEnableAndData(False,
+                                        not bus.Data,
+                                        bus.Clock and (not enable_clk_stretch),
+                                        not (enable_clk_stretch and bus.Clock))
+    return bus_out
+
+
+def create_header(ten_bit_address: bool, address: int, read: bool):
+    bin_address = "{:016b}".format(address, "b")
+    addr1 = int(bin_address[8:16], 2)  # LO
+    addr0 = int(bin_address[0:8], 2)  # HI
+    if ten_bit_address:
+        addr0 = (addr0 & 3) | 120
+    else:
+        addr0 = addr1
+    addr0 = (addr0 << 1) | int(read)
+    return addr0, addr1
+
+
+def parse_header(header_word: I2CHeaderWord, data_in: int, ten_bit_addr_ack: bool):
+    data_in = data_in % 256  # limited to U8
+    ten_bit_addr_detected = (data_in & 248) == 240
+    valid_out = (not ten_bit_addr_ack) and ten_bit_addr_detected
+    if ten_bit_addr_ack:
+        address_out = (header_word.Address << 8) | data_in
+        read_out = header_word.Read
+    else:
+        read_out = bool(data_in % 2)
+        address_out = data_in >> 1
+        if valid_out:
+            address_out = address_out & 3
+    valid_out = not valid_out
+    return I2CHeaderWord(address_out, read_out, valid_out), ten_bit_addr_detected
+
+
+def search_line(line: LineLocation, ch_list: typing.List[LineLocation]):
+    index = 0
+    for element in ch_list:
+        if element.channel == line.channel and element.connector == line.connector:
+            return index
+        else:
+            index += 1
+    return -1
+
+
+def update_line_on_connector(enable_in: int = 0,
+                             data_in: int = 0,
+                             dio_line: DIOLines = DIOLines.DIO0,
+                             line_state: StaticStates = StaticStates.Zero):
+    dio_index = dio_line.value
+    output_data = ((-dio_index << data_in) & 1) > 0
+    data, enable = line_state_to_out(line_state, output_data)
+    ch1 = ~(dio_index << 1)
+    ch2 = dio_index << enable
+    ch3 = dio_index << data
+    enable_out = ch2 | (enable_in & ch1)
+    data_out = (ch1 & data_in) | ch3
+    return enable_out, data_out
+
+
+def line_state_to_out(line: StaticStates, out_data: bool):
+    data = False
+    enable = False
+    if line.value == 0:
+        data = False
+        enable = True
+    elif line.value == 1:
+        data = True
+        enable = True
+    elif line.value == 2:
+        data = out_data
+        enable = False
+    return data, enable
 
 
 def channel_list_to_pins(channel_list: str = ""):

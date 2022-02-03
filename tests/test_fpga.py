@@ -106,7 +106,7 @@ class TestFPGA:
 
     def test_write_and_read(self, tsm_context):
         data = ni_fpga.get_i2c_master_session(tsm_context, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True)
-        print('Read: ', data.read_i2c_data(number_of_bytes=8, slave_address=23))
+        print('Read: ', data.read_i2c_data(number_of_bytes=8, slave_address=23, timeout=100))
         array = [1,0,1,0,1,0,1,0]
-        data.write_i2c_data(data_to_write=array, slave_address=23)
-        print('Read: ', data.read_i2c_data(number_of_bytes=8, slave_address=23))
+        data.write_i2c_data(data_to_write=array, slave_address=23, timeout=100)
+        print('Read: ', data.read_i2c_data(number_of_bytes=8, slave_address=23, timeout=100))
