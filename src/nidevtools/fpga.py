@@ -749,6 +749,19 @@ def extract_i2c_data_4_interfaces(cn0_rd_data: int,
     return bus0, bus1, bus2, bus3
 
 
+bus_input = None
+
+
+def simple_register(bus_in: int, bus_wr_strobe: bool, bus_addr: int, reg_addr: int):
+    if (bus_input is None) or (bus_addr == reg_addr) and bus_wr_strobe:
+        global bus_input
+        bus_input = bus_in
+    bus_out = 0
+    if (bus_addr == reg_addr):
+        bus_out = bus_input
+    return bus_input, bus_out
+
+
 def create_header(ten_bit_address: bool, address: int, read: bool):
     bin_address = "{:016b}".format(address, "b")
     addr1 = int(bin_address[8:16], 2)  # LO
