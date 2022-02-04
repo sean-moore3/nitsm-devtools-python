@@ -871,6 +871,7 @@ condition_md2 = False
 valid_reg = False
 data_pre_reg = 0
 
+
 def byte_controller(data_in: I2CInterface,
                     transfer_settings: I2CTransferSettings,
                     write_data: I2CDataType,
@@ -890,7 +891,7 @@ def byte_controller(data_in: I2CInterface,
     valid = valid_reg
     data = data_pre_reg >> 1
     ack = transfer_settings_reg.Read or (data_pre_reg & 1 == 0)
-    read_data = I2CDataType(data, ack, valid)  #2nd out
+    read_data = I2CDataType(data, ack, valid)  # 2nd out
     write_data_temp = write_data if write_data.Valid else write_data_reg
     transfer_setting_temp = transfer_settings if write_data.Valid else transfer_settings_reg
     if master_state_reg == MasterState.Idle:
@@ -913,13 +914,13 @@ def byte_controller(data_in: I2CInterface,
         out8 = state_counter_reg
     elif master_state_reg == MasterState.SendData:
         if transfer_settings_reg.Read:
-            release_SDA = not write_data_reg.ACK
+            release_sda = not write_data_reg.ACK
             data_index = '11111111'
         else:
-            release_SDA = True
+            release_sda = True
             data_index = "{:08b}".format(write_data_reg.Data, "b")
-        word = '1'+str(int(release_SDA))+data_index
-        word_list=[]
+        word = '1' + str(int(release_sda)) + data_index
+        word_list = []
         word_list[:0] = word
         ack_data = word_list[state_counter_reg]
         out1 = False
@@ -990,9 +991,7 @@ def byte_controller(data_in: I2CInterface,
     match_divide_reg = transfer_settings_reg.Divide == master_value_reg
     if (master_state_reg.value != MasterState.Idle.value) and direction_ready:
         master_value_reg = 0 if match_divide_reg or out2 else master_value_reg+1
-        #TODO 7 REGS
-
-
+        # TODO 7 REGS
 
 
 
