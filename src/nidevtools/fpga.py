@@ -102,14 +102,6 @@ class I2CInterface(typing.NamedTuple):
     Data: bool
 
 
-class WorlControllerSetting(typing.NamedTuple):
-    Device_Address: int
-    Read: bool
-    Number_of_Bytes: int
-    ten_bit_Addresing: bool
-    Divide: int
-
-
 class ReadData(typing.NamedTuple):  # AllConnector Data
     Connector0: int
     Connector1: int
@@ -753,11 +745,11 @@ bus_input = None
 
 
 def simple_register(bus_in: int, bus_wr_strobe: bool, bus_addr: int, reg_addr: int):
+    global bus_input
     if (bus_input is None) or (bus_addr == reg_addr) and bus_wr_strobe:
-        global bus_input
         bus_input = bus_in
     bus_out = 0
-    if (bus_addr == reg_addr):
+    if bus_addr == reg_addr:
         bus_out = bus_input
     return bus_input, bus_out
 
@@ -788,6 +780,83 @@ def parse_header(header_word: I2CHeaderWord, data_in: int, ten_bit_addr_ack: boo
             address_out = address_out & 3
     valid_out = not valid_out
     return I2CHeaderWord(address_out, read_out, valid_out), ten_bit_addr_detected
+
+
+capture_header_reg = hd_enable_reg = rd_data_shft_reg = False
+in_data_reg = 0
+rd_data_reg = [0]*8
+
+
+def data_and_header_capture(header_word_in: I2CHeaderWord,
+                            i2c_input: I2CInterface,
+                            control_interface: SlaveCaptureDataInterface,
+                            index: int,
+                            ten_bit_addr_ack: bool):
+    global capture_header_reg, in_data_reg, hd_enable_reg, rd_data_shft_reg, rd_data_reg
+    reset = control_interface.reset_data
+    capture_d = control_interface.capture_data
+    store = control_interface.store_data
+    ack_request = rd_data_shft_reg or hd_enable_reg  #
+    read_data_shifted = rd_data_shft_reg  #
+    read_data = rd_data_reg  #
+    header_enable = capture_header_reg or reset  #
+    header_word_out, ten_bit_addr_detected = parse_header(header_word_in, index, ten_bit_addr_ack)  #
+    if reset:
+        header_word_out = I2CHeaderWord(0, False, False)
+        in_data_temp = 0
+        rd_data_temp = [0]*8
+    else:
+        in_data_temp = in_data_reg
+        if capture_d:
+            in_data_temp = int(i2c_input.Data) | (in_data_reg << 1)
+        rd_data_temp = rd_data_reg[:]
+        rd_data_temp[index] = in_data_reg
+    rd_data_updt = reset or store
+    hd_enable_reg = header_enable
+    capture_header_reg = control_interface.capture_header
+    rd_data_shft_reg = store
+    if rd_data_updt:
+        rd_data_reg = rd_data_temp
+    in_data_reg = in_data_temp
+    return read_data, read_data_shifted, ack_request, header_enable, header_word_out, ten_bit_addr_detected
+
+
+input_reg = I2CInterface(False, False)
+clk_md_reg = data_md_reg = 0
+clk_reg = data_reg = False
+
+
+def filter_input(filter_delay: int, input_interface: I2CInterface):
+    global input_reg, clk_md_reg, data_md_reg, clk_reg, data_reg
+    clock_in = input_reg.Clock == input_interface.Clock
+    if clock_in:
+        clk_md_temp = clk_md_reg
+        if filter_delay != clk_md_reg:
+            clk_md_temp += 1
+    else:
+        clk_md_temp = 0
+    if clk_md_temp == filter_delay:
+        clk_temp = input_interface.Clock
+    else:
+        clk_temp = clk_reg
+    data_in = input_reg.Data == input_interface.Data
+    if data_in:
+        data_md_temp = data_md_reg
+        if filter_delay != data_md_reg:
+            data_md_temp += 1
+    else:
+        data_md_temp = 0
+    if data_md_temp == filter_delay:
+        data_temp = input_interface.Data
+    else:
+        data_temp = data_reg
+    output = I2CInterface(clk_temp, data_temp)
+    clk_reg = clk_temp
+    data_reg = data_temp
+    clk_md_reg = clk_md_temp
+    data_md_reg = data_md_temp
+    input_reg = input_interface
+    return output
 
 
 def search_line(line: LineLocation, ch_list: typing.List[LineLocation]):
