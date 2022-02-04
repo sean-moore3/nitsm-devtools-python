@@ -316,30 +316,30 @@ class _SSCFPGA(typing.NamedTuple):
         control.write(data)
 
     def configure_master_sda_scl_lines(self,
-                                       i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+                                       i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
                                        sda_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0),
                                        scl_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0)
                                        ):
         """"""
         cluster = I2CMasterLineConfiguration(sda_channel, scl_channel)
-        if 0 <= i2c_master.value <= 3:
-            control = 'I2C Master%d Line Configuration' % i2c_master.value
+        if 0 <= i2c_master_in.value <= 3:
+            control = 'I2C Master%d Line Configuration' % i2c_master_in.value
             self.w_master_lc(control, cluster)
         else:
             print("Requested I2C_master is not defined")
             raise Exception
 
     def configure_i2c_master_settings(self,
-                                      i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+                                      i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
                                       divide: int = 8,
                                       ten_bit_addressing: bool = False,
                                       clock_stretching: bool = True
                                       ):
         """"""
         # cluster = WorldControllerSetting(divide=divide, ten_bit_addressing=ten_bit_addressing)
-        if 0 <= i2c_master.value <= 3:
-            master = self.Session.registers['I2C Master%d Configuration' % i2c_master.value]
-            clock = self.Session.registers['I2C Master%d Enable Clock Stretching?' % i2c_master.value]
+        if 0 <= i2c_master_in.value <= 3:
+            master = self.Session.registers['I2C Master%d Configuration' % i2c_master_in.value]
+            clock = self.Session.registers['I2C Master%d Enable Clock Stretching?' % i2c_master_in.value]
             cluster = master.read()
             cluster['10-bit Addressing'] = ten_bit_addressing
             cluster['Divide'] = divide
@@ -350,7 +350,7 @@ class _SSCFPGA(typing.NamedTuple):
             raise Exception
 
     def i2c_master_poll_until_ready(self,
-                                    i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+                                    i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
                                     start_time: float = 0.0,
                                     timeout: float = 0.0
                                     ):
@@ -358,8 +358,8 @@ class _SSCFPGA(typing.NamedTuple):
 
         if timeout == 0:
             timeout = start_time
-        if 0 <= i2c_master.value <= 3:
-            master_ready = self.Session.registers['I2C Master%d ready for input' % i2c_master.value]
+        if 0 <= i2c_master_in.value <= 3:
+            master_ready = self.Session.registers['I2C Master%d ready for input' % i2c_master_in.value]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
@@ -374,13 +374,13 @@ class _SSCFPGA(typing.NamedTuple):
             pass
         else:
             raise nifpga.ErrorStatus(5000,
-                                     ("I2C %s not ready for input" % i2c_master.name),
+                                     ("I2C %s not ready for input" % i2c_master_in.name),
                                      "i2c_master_poll_until_ready()",
                                      ["i2c_master", "timeout"],
-                                     (i2c_master, timeout))
+                                     (i2c_master_in, timeout))
 
     def i2c_master_read(self,
-                        i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+                        i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
                         device_address: int = 0,
                         timeout: float = 1,
                         number_of_bytes: int = 1
@@ -392,10 +392,10 @@ class _SSCFPGA(typing.NamedTuple):
             timeout = 0
         else:
             pass
-        if 0 <= i2c_master.value <= 3:
-            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master.value]
-            master_go = self.Session.registers['I2C Master%d Go' % i2c_master.value]
-            master_data = self.Session.registers['I2C Master%d Read Data' % i2c_master.value]
+        if 0 <= i2c_master_in.value <= 3:
+            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master_in.value]
+            master_go = self.Session.registers['I2C Master%d Go' % i2c_master_in.value]
+            master_data = self.Session.registers['I2C Master%d Read Data' % i2c_master_in.value]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
@@ -410,24 +410,24 @@ class _SSCFPGA(typing.NamedTuple):
         config['Device Address'] = device_address
         config['Number of Bytes'] = number_of_bytes
         config['Read'] = True
-        self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
+        self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         master_config.write(config)
         master_go.write(True)
-        self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
+        self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         data = master_data.read()
         data = data[0:number_of_bytes+1]
         return data
 
     def i2c_master_write(self,
-                         i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+                         i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
                          timeout: float = 1,
                          device_address: int = 0,
                          data_to_write: typing.List[int] = []):
         start_time = time()
-        if 0 <= i2c_master.value <= 3:
-            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master.value]
-            master_go = self.Session.registers['I2C Master%d Go' % i2c_master.value]
-            master_data = self.Session.registers['I2C Master%d Write Data' % i2c_master.value]
+        if 0 <= i2c_master_in.value <= 3:
+            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master_in.value]
+            master_go = self.Session.registers['I2C Master%d Go' % i2c_master_in.value]
+            master_data = self.Session.registers['I2C Master%d Write Data' % i2c_master_in.value]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
@@ -436,7 +436,7 @@ class _SSCFPGA(typing.NamedTuple):
         master_read.Device_Address = device_address
         master_read.Number_of_Bytes = len(data_to_write)
         master_read.Read = False
-        self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
+        self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         master_config.write(master_read)
         master_data.write(data_to_write)
         master_go.write(True)
@@ -859,6 +859,151 @@ def filter_input(filter_delay: int, input_interface: I2CInterface):
     return output
 
 
+transfer_settings_reg = I2CTransferSettings(False, 0, False)
+write_data_reg = I2CDataType(0, False, False)
+master_value_reg = 0
+match_divide_reg = False
+master_state_reg = MasterState.Idle
+state_counter_reg = 0
+state_condition_reg = False
+condition_md1 = False
+condition_md2 = False
+valid_reg = False
+data_pre_reg = 0
+
+def byte_controller(data_in: I2CInterface,
+                    transfer_settings: I2CTransferSettings,
+                    write_data: I2CDataType,
+                    abort: bool,
+                    direction_ready: bool):
+    global transfer_settings_reg,\
+        write_data_reg,\
+        master_value_reg,\
+        match_divide_reg,\
+        master_state_reg,\
+        state_counter_reg,\
+        state_condition_reg,\
+        condition_md1,\
+        condition_md2,\
+        valid_reg,\
+        data_pre_reg
+    valid = valid_reg
+    data = data_pre_reg >> 1
+    ack = transfer_settings_reg.Read or (data_pre_reg & 1 == 0)
+    read_data = I2CDataType(data, ack, valid)  #2nd out
+    write_data_temp = write_data if write_data.Valid else write_data_reg
+    transfer_setting_temp = transfer_settings if write_data.Valid else transfer_settings_reg
+    if master_state_reg == MasterState.Idle:
+        out1 = direction_ready
+        out2 = write_data.Valid
+        out3 = False
+        out4 = MasterState.SendStartCondition if write_data.Valid else MasterState.Idle
+        out5 = True
+        out6 = False
+        out7 = not write_data.Valid
+        out8 = 9
+    elif master_state_reg == MasterState.SendStartCondition:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.SendData if match_divide_reg else MasterState.SendStartCondition
+        out5 = not match_divide_reg
+        out6 = False
+        out7 = False
+        out8 = state_counter_reg
+    elif master_state_reg == MasterState.SendData:
+        if transfer_settings_reg.Read:
+            release_SDA = not write_data_reg.ACK
+            data_index = '11111111'
+        else:
+            release_SDA = True
+            data_index = "{:08b}".format(write_data_reg.Data, "b")
+        word = '1'+str(int(release_SDA))+data_index
+        word_list=[]
+        word_list[:0] = word
+        ack_data = word_list[state_counter_reg]
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.SendRisingClock if match_divide_reg else MasterState.SendData
+        out5 = False
+        out6 = False
+        out7 = ack_data if match_divide_reg else state_condition_reg
+        out8 = state_counter_reg-1 if match_divide_reg else state_counter_reg
+    elif master_state_reg == MasterState.SendRisingClock:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.SendFallingClock if match_divide_reg else MasterState.SendRisingClock
+        out5 = False
+        out6 = False
+        out7 = False
+        out8 = state_counter_reg
+    elif master_state_reg == MasterState.SendFallingClock:
+        out1 = False
+        out2 = False
+        out3 = match_divide_reg
+        temp_stat = MasterState.StopConditionSetUp if transfer_settings_reg.SendStopCondition else MasterState.Waiting
+        temp_stat = temp_stat if state_counter_reg == 0 else MasterState.SendData
+        out4 = temp_stat if match_divide_reg else MasterState.SendFallingClock
+        out5 = not match_divide_reg
+        out6 = state_counter_reg == 0
+        out7 = state_condition_reg
+        out8 = state_counter_reg
+    elif master_state_reg == MasterState.Waiting:
+        out1 = direction_ready
+        out2 = write_data.Valid
+        out3 = False
+        temp_state = MasterState.SendData if write_data.Valid else MasterState.Waiting
+        out4 = MasterState.StopConditionSetUp if match_divide_reg else temp_state
+        out5 = False
+        out6 = False
+        out7 = state_condition_reg
+        out8 = 9
+    elif master_state_reg == MasterState.ReleaseClock:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.ReleaseData if match_divide_reg else MasterState.ReleaseClock
+        out5 = match_divide_reg
+        out6 = False
+        out7 = False
+        out8 = state_counter_reg
+    elif master_state_reg == MasterState.ReleaseData:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.Idle if match_divide_reg else MasterState.ReleaseData
+        out5 = True
+        out6 = False
+        out7 = match_divide_reg
+        out8 = state_counter_reg
+    elif master_state_reg == MasterState.StopConditionSetUp:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.ReleaseClock if match_divide_reg else MasterState.StopConditionSetUp
+        out5 = False
+        out6 = False
+        out7 = False if match_divide_reg else state_condition_reg
+        out8 = state_counter_reg
+    match_divide_reg = transfer_settings_reg.Divide == master_value_reg
+    if (master_state_reg.value != MasterState.Idle.value) and direction_ready:
+        master_value_reg = 0 if match_divide_reg or out2 else master_value_reg+1
+        #TODO 7 REGS
+
+
+
+
+
+
+"""def i2c_master(i2c_bus_in: I2CInterface,
+               direction_ready: bool,
+               settings: WorldControllerSetting,
+               write_data: typing.List[int],
+               go: bool)"""
+
+
 def search_line(line: LineLocation, ch_list: typing.List[LineLocation]):
     index = 0
     for element in ch_list:
@@ -983,10 +1128,10 @@ def open_reference(rio_resource: str, target: BoardType, ldb_type: str):
 
 
 def get_i2c_master_session(tsm_context: TSMContext,
-                           i2c_master: I2CMaster.I2C_3V3_7822_SINK,
+                           i2c_master_in: I2CMaster.I2C_3V3_7822_SINK,
                            apply_i2c_settings: bool = True):
-    sda = "%s_SDA" % i2c_master.name
-    scl = "%s_SDA" % i2c_master.name
+    sda = "%s_SDA" % i2c_master_in.name
+    scl = "%s_SDA" % i2c_master_in.name
     session_data = pins_to_sessions(tsm_context, [sda, scl], [])
     session = session_data.SSC[0]
     ch_list = session_data.SSC[0].Channels.split(",")
@@ -997,7 +1142,7 @@ def get_i2c_master_session(tsm_context: TSMContext,
         r_list.append(int(ch) % 32)
     iq_list = LineLocation(DIOLines(iq_list[0]), Connectors(iq_list[1]))
     r_list = LineLocation(DIOLines(r_list[0]), Connectors(r_list[1]))
-    session.configure_master_sda_scl_lines(i2c_master, r_list, iq_list)
+    session.configure_master_sda_scl_lines(i2c_master_in, r_list, iq_list)
     if apply_i2c_settings:
         session_data.configure_i2c_bus(False, 64, True)
     return session_data
