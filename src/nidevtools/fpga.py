@@ -59,6 +59,12 @@ class MasterState(Enum):
     StopConditionSetUp = 8
 
 
+class ConnectorOverride(typing.NamedTuple):
+    Output_Enable: int
+    Output_Data: int
+    Enable_Mask: int
+
+
 class SlaveCaptureDataInterface(typing.NamedTuple):
     reset_data: bool
     capture_data: bool
@@ -94,42 +100,6 @@ class I2CHeaderWord(typing.NamedTuple):
 class I2CInterface(typing.NamedTuple):
     Clock: bool
     Data: bool
-
-
-def create_header(ten_bit_address: bool, address: int, read: bool):
-    bin_address = "{:016b}".format(address, "b")
-    addr1 = int(bin_address[8:16], 2)  # LO
-    addr0 = int(bin_address[0:8], 2)  # HI
-    if ten_bit_address:
-        addr0 = (addr0 & 3) | 120
-    else:
-        addr0 = addr1
-    addr0 = (addr0 << 1) | int(read)
-    return addr0, addr1
-
-
-class WorlControllerSetting(typing.NamedTuple):
-    Device_Address: int
-    Read: bool
-    Number_of_Bytes: int
-    ten_bit_Addresing: bool
-    Divide: int
-
-
-def parse_header(header_word: I2CHeaderWord, data_in: int, ten_bit_addr_ack: bool):
-    data_in = data_in % 256  # limited to U8
-    ten_bit_addr_detected = (data_in & 248) == 240
-    valid_out = (not ten_bit_addr_ack) and ten_bit_addr_detected
-    if ten_bit_addr_ack:
-        address_out = (header_word.Address << 8) | data_in
-        read_out = header_word.Read
-    else:
-        read_out = bool(data_in % 2)
-        address_out = data_in >> 1
-        if valid_out:
-            address_out = address_out & 3
-    valid_out = not valid_out
-    return I2CHeaderWord(address_out, read_out, valid_out), ten_bit_addr_detected
 
 
 class ReadData(typing.NamedTuple):  # AllConnector Data
@@ -264,16 +234,6 @@ class WorldControllerSetting:
         self.Divide = divide
 
 
-def search_line(line: LineLocation, ch_list: typing.List[LineLocation]):
-    index = 0
-    for element in ch_list:
-        if element.channel == line.channel and element.connector == line.connector:
-            return index
-        else:
-            index += 1
-    return -1
-
-
 class _SSCFPGA(typing.NamedTuple):
     Session: nifpga.Session
     ChannelGroupID: str
@@ -356,33 +316,33 @@ class _SSCFPGA(typing.NamedTuple):
         control.write(data)
 
     def configure_master_sda_scl_lines(self,
-                                       i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+                                       i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
                                        sda_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0),
                                        scl_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0)
                                        ):
         """"""
         cluster = I2CMasterLineConfiguration(sda_channel, scl_channel)
-        if 0 <= i2c_master.value <= 3:
-            control = 'I2C Master%d Line Configuration' % i2c_master.value
+        if 0 <= i2c_master_in.value <= 3:
+            control = 'I2C Master%d Line Configuration' % i2c_master_in.value
             self.w_master_lc(control, cluster)
         else:
             print("Requested I2C_master is not defined")
             raise Exception
 
     def configure_i2c_master_settings(self,
-                                      i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+                                      i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
                                       divide: int = 8,
                                       ten_bit_addressing: bool = False,
                                       clock_stretching: bool = True
                                       ):
         """"""
-        #cluster = WorldControllerSetting(divide=divide, ten_bit_addressing=ten_bit_addressing)
-        if 0 <= i2c_master.value <= 3:
-            master = self.Session.registers['I2C Master%d Configuration' % i2c_master.value]
-            clock = self.Session.registers['I2C Master%d Enable Clock Stretching?' % i2c_master.value]
+        # cluster = WorldControllerSetting(divide=divide, ten_bit_addressing=ten_bit_addressing)
+        if 0 <= i2c_master_in.value <= 3:
+            master = self.Session.registers['I2C Master%d Configuration' % i2c_master_in.value]
+            clock = self.Session.registers['I2C Master%d Enable Clock Stretching?' % i2c_master_in.value]
             cluster = master.read()
-            cluster['10-bit Addressing']=ten_bit_addressing
-            cluster['Divide']=divide
+            cluster['10-bit Addressing'] = ten_bit_addressing
+            cluster['Divide'] = divide
             clock.write(clock_stretching)
             master.write(cluster)  # without all info?
         else:
@@ -390,35 +350,37 @@ class _SSCFPGA(typing.NamedTuple):
             raise Exception
 
     def i2c_master_poll_until_ready(self,
-                                    i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+                                    i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
                                     start_time: float = 0.0,
                                     timeout: float = 0.0
                                     ):
         """"""
+
         if timeout == 0:
             timeout = start_time
-        if 0 <= i2c_master.value <= 3:
-            master_ready = self.Session.registers['I2C Master%d ready for input' % i2c_master.value]
+        if 0 <= i2c_master_in.value <= 3:
+            master_ready = self.Session.registers['I2C Master%d ready for input' % i2c_master_in.value]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
         stop = False
         data = False
+        print(timeout)
         while not stop:
             data = master_ready.read()
             time_count = time() - start_time
-            stop = data and time_count > timeout
+            stop = data or (time_count > timeout)
         if data:
             pass
         else:
             raise nifpga.ErrorStatus(5000,
-                                     ("I2C %s not ready for input" % i2c_master.name),
+                                     ("I2C %s not ready for input" % i2c_master_in.name),
                                      "i2c_master_poll_until_ready()",
                                      ["i2c_master", "timeout"],
-                                     (i2c_master, timeout))
+                                     (i2c_master_in, timeout))
 
     def i2c_master_read(self,
-                        i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+                        i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
                         device_address: int = 0,
                         timeout: float = 1,
                         number_of_bytes: int = 1
@@ -430,36 +392,42 @@ class _SSCFPGA(typing.NamedTuple):
             timeout = 0
         else:
             pass
-        if 0 <= i2c_master.value <= 3:
-            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master.value]
-            master_go = self.Session.registers['I2C Master%d Go' % i2c_master.value]
-            master_data = self.Session.registers['I2C Master%d Read Data' % i2c_master.value]
+        if 0 <= i2c_master_in.value <= 3:
+            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master_in.value]
+            master_go = self.Session.registers['I2C Master%d Go' % i2c_master_in.value]
+            master_data = self.Session.registers['I2C Master%d Read Data' % i2c_master_in.value]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
-        config: WorldControllerSetting
+        # config: WorldControllerSetting
         config = master_config.read()
+
+        '''
         config.Device_Address = device_address
         config.Number_of_Bytes = number_of_bytes
         config.Read = True
-        self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
+        '''
+        config['Device Address'] = device_address
+        config['Number of Bytes'] = number_of_bytes
+        config['Read'] = True
+        self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         master_config.write(config)
         master_go.write(True)
-        self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
+        self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         data = master_data.read()
         data = data[0:number_of_bytes+1]
         return data
 
     def i2c_master_write(self,
-                         i2c_master: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+                         i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
                          timeout: float = 1,
                          device_address: int = 0,
                          data_to_write: typing.List[int] = []):
         start_time = time()
-        if 0 <= i2c_master.value <= 3:
-            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master.value]
-            master_go = self.Session.registers['I2C Master%d Go' % i2c_master.value]
-            master_data = self.Session.registers['I2C Master%d Write Data' % i2c_master.value]
+        if 0 <= i2c_master_in.value <= 3:
+            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master_in.value]
+            master_go = self.Session.registers['I2C Master%d Go' % i2c_master_in.value]
+            master_data = self.Session.registers['I2C Master%d Write Data' % i2c_master_in.value]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
@@ -468,7 +436,7 @@ class _SSCFPGA(typing.NamedTuple):
         master_read.Device_Address = device_address
         master_read.Number_of_Bytes = len(data_to_write)
         master_read.Read = False
-        self.i2c_master_poll_until_ready(i2c_master, start_time, timeout)
+        self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         master_config.write(master_read)
         master_data.write(data_to_write)
         master_go.write(True)
@@ -579,36 +547,6 @@ class _SSCFPGA(typing.NamedTuple):
             con_data.write(data)
 
 
-def update_line_on_connector(enable_in: int = 0,
-                             data_in: int = 0,
-                             dio_line: DIOLines = DIOLines.DIO0,
-                             line_state: StaticStates = StaticStates.Zero):
-    dio_index = dio_line.value
-    output_data = ((-dio_index << data_in) & 1) > 0
-    data, enable = line_state_to_out(line_state, output_data)
-    ch1 = ~(dio_index << 1)
-    ch2 = dio_index << enable
-    ch3 = dio_index << data
-    enable_out = ch2 | (enable_in & ch1)
-    data_out = (ch1 & data_in) | ch3
-    return enable_out, data_out
-
-
-def line_state_to_out(line: StaticStates, out_data: bool):
-    data = False
-    enable = False
-    if line.value == 0:
-        data = False
-        enable = True
-    elif line.value == 1:
-        data = True
-        enable = True
-    elif line.value == 2:
-        data = out_data
-        enable = False
-    return data, enable
-
-
 class TSMFPGA(typing.NamedTuple):
     pin_query_context: Any
     SSC: typing.List[_SSCFPGA]
@@ -626,6 +564,7 @@ class TSMFPGA(typing.NamedTuple):
                       timeout: float = 1,
                       slave_address: int = 0,
                       number_of_bytes: int = 1):
+        print(timeout)
         session: _SSCFPGA
         session, i2c = self.extract_i2c_master_from_sessions()
         i2c_read_data = session.i2c_master_read(i2c, slave_address, timeout, number_of_bytes)
@@ -652,7 +591,7 @@ class TSMFPGA(typing.NamedTuple):
         if type(scan) != I2CMaster:
             raise nifpga.ErrorStatus(5000,
                                      "Invalid I2C Master Session Provided",
-                                     "get_i2c_master",
+                                     "extract_i2c_master_from_sessions",
                                      ["self"],
                                      self)
         return session, scan
@@ -683,6 +622,425 @@ class TSMFPGA(typing.NamedTuple):
     def write_static(self, static_state: typing.List[StaticStates]):
         for ss in self.SSC:
             ss.ss_wr_static(static_state)
+
+
+def override_connector_data(static_data: int, override_enable: int, override_data: int):
+    connector_data = (static_data & (not override_enable)) | (override_enable & override_data)
+    return connector_data
+
+
+def map_out_to_connector(out_data: bool, out_enable: bool, channel: DIOLines):
+    ch_id = channel.value
+    data = ['0'] * 32
+    enable = ['0'] * 32
+    mask = ['0'] * 32
+    data[ch_id] = str(int(out_data))
+    enable[ch_id] = str(int(out_enable))
+    mask[ch_id] = '1'
+    data = int(''.join(data), 2)
+    enable = int(''.join(enable), 2)
+    mask = int(''.join(mask), 2)
+    connector_overrides = ConnectorOverride(enable, data, mask)
+    return connector_overrides
+
+
+def out_data_to_connector_1_interface(bus: I2CBusOutputEnableAndData, master_line_cnfg: I2CMasterLineConfiguration):
+    map_sda = map_out_to_connector(bus.SDA_Output_Data, bus.SDA_Output_Enable, master_line_cnfg.SDA.channel)
+    map_scl = map_out_to_connector(bus.SCL_Output_Data, bus.SCL_Output_Enable, master_line_cnfg.SCL.channel)
+    sda = [ConnectorOverride(0, 0, 0)] * 4
+    scl = [ConnectorOverride(0, 0, 0)] * 4
+    if master_line_cnfg.SDA.connector.value < 4:
+        sda[master_line_cnfg.SDA.connector.value] = map_sda
+    if master_line_cnfg.SCL.connector.value < 4:
+        scl[master_line_cnfg.SCL.connector.value] = map_scl
+    connector_data = []
+    for con in range(4):
+        enable = sda[con].Output_Enable | sda[con].Output_Enable
+        data = sda[con].Output_Data | sda[con].Output_Data
+        mask = sda[con].Enable_Mask | sda[con].Enable_Mask
+        connector_data.append(ConnectorOverride(enable, data, mask))
+    return connector_data
+
+
+def out_data_to_connector_4_interfaces(bus0: I2CBusOutputEnableAndData,
+                                       bus1: I2CBusOutputEnableAndData,
+                                       bus2: I2CBusOutputEnableAndData,
+                                       bus3: I2CBusOutputEnableAndData,
+                                       mstr0_ln_cnfg: I2CMasterLineConfiguration,
+                                       mstr1_ln_cnfg: I2CMasterLineConfiguration,
+                                       mstr2_ln_cnfg: I2CMasterLineConfiguration,
+                                       mstr3_ln_cnfg: I2CMasterLineConfiguration):
+    map0 = out_data_to_connector_1_interface(bus0, mstr0_ln_cnfg)
+    map1 = out_data_to_connector_1_interface(bus1, mstr1_ln_cnfg)
+    map2 = out_data_to_connector_1_interface(bus2, mstr2_ln_cnfg)
+    map3 = out_data_to_connector_1_interface(bus3, mstr3_ln_cnfg)
+    connector_data = []
+    for con in range(4):
+        enable = map0[con].Output_Enable | map1[con].Output_Enable | map2[con].Output_Enable | map3[con].Output_Enable
+        data = map0[con].Output_Data | map1[con].Output_Data | map2[con].Output_Data | map3[con].Output_Data
+        mask = map0[con].Enable_Mask | map1[con].Enable_Mask | map2[con].Enable_Mask | map3[con].Enable_Mask
+        connector_data.append(ConnectorOverride(enable, data, mask))
+    return connector_data
+
+
+def i2c_bus_to_out_enable_and_data(bus: I2CInterface, enable_clk_stretch: bool):
+    bus_out = I2CBusOutputEnableAndData(False,
+                                        not bus.Data,
+                                        bus.Clock and (not enable_clk_stretch),
+                                        not (enable_clk_stretch and bus.Clock))
+    return bus_out
+
+
+def extract_data_from_connector(con_rd_data: int, sda_ch: DIOLines, scl_ch: DIOLines):
+    con_rd_data = list("{:032b}".format(con_rd_data, "b"))[::-1]
+    bus_out = I2CInterface(con_rd_data[scl_ch.value], con_rd_data[sda_ch.value])
+    return bus_out
+
+
+def extract_data_from_connectors(con0_bus: I2CInterface,
+                                 con1_bus: I2CInterface,
+                                 con2_bus: I2CInterface,
+                                 con3_bus: I2CInterface,
+                                 sda_con: Connectors,
+                                 scl_con: Connectors):
+    con_data = [con0_bus, con1_bus, con2_bus, con3_bus]
+    clock = data = False
+    if sda_con.value < 4:
+        clock = con_data[sda_con.value]
+    if scl_con.value < 4:
+        data = con_data[sda_con.value]
+    bus_out = I2CInterface(clock, data)
+    return bus_out
+
+
+def extract_i2c_data_1_interface(cn0_rd_data: int,
+                                 cn1_rd_data: int,
+                                 cn2_rd_data: int,
+                                 cn3_rd_data: int,
+                                 mstr_ln_cnfg: I2CMasterLineConfiguration):
+    cn0 = extract_data_from_connector(cn0_rd_data, mstr_ln_cnfg.SDA.channel, mstr_ln_cnfg.SCL.channel)
+    cn1 = extract_data_from_connector(cn1_rd_data, mstr_ln_cnfg.SDA.channel, mstr_ln_cnfg.SCL.channel)
+    cn2 = extract_data_from_connector(cn2_rd_data, mstr_ln_cnfg.SDA.channel, mstr_ln_cnfg.SCL.channel)
+    cn3 = extract_data_from_connector(cn3_rd_data, mstr_ln_cnfg.SDA.channel, mstr_ln_cnfg.SCL.channel)
+    bus_out = extract_data_from_connectors(cn0, cn1, cn2, cn3, mstr_ln_cnfg.SDA.connector, mstr_ln_cnfg.SCL.connector)
+    return bus_out
+
+
+def extract_i2c_data_4_interfaces(cn0_rd_data: int,
+                                  cn1_rd_data: int,
+                                  cn2_rd_data: int,
+                                  cn3_rd_data: int,
+                                  mstr0_ln_cnfg: I2CMasterLineConfiguration,
+                                  mstr1_ln_cnfg: I2CMasterLineConfiguration,
+                                  mstr2_ln_cnfg: I2CMasterLineConfiguration,
+                                  mstr3_ln_cnfg: I2CMasterLineConfiguration):
+    bus0 = extract_i2c_data_1_interface(cn0_rd_data, cn1_rd_data, cn2_rd_data, cn3_rd_data, mstr0_ln_cnfg)
+    bus1 = extract_i2c_data_1_interface(cn0_rd_data, cn1_rd_data, cn2_rd_data, cn3_rd_data, mstr1_ln_cnfg)
+    bus2 = extract_i2c_data_1_interface(cn0_rd_data, cn1_rd_data, cn2_rd_data, cn3_rd_data, mstr2_ln_cnfg)
+    bus3 = extract_i2c_data_1_interface(cn0_rd_data, cn1_rd_data, cn2_rd_data, cn3_rd_data, mstr3_ln_cnfg)
+    return bus0, bus1, bus2, bus3
+
+
+bus_input = None
+
+
+def simple_register(bus_in: int, bus_wr_strobe: bool, bus_addr: int, reg_addr: int):
+    global bus_input
+    if (bus_input is None) or (bus_addr == reg_addr) and bus_wr_strobe:
+        bus_input = bus_in
+    bus_out = 0
+    if bus_addr == reg_addr:
+        bus_out = bus_input
+    return bus_input, bus_out
+
+
+def create_header(ten_bit_address: bool, address: int, read: bool):
+    bin_address = "{:016b}".format(address, "b")
+    addr1 = int(bin_address[8:16], 2)  # LO
+    addr0 = int(bin_address[0:8], 2)  # HI
+    if ten_bit_address:
+        addr0 = (addr0 & 3) | 120
+    else:
+        addr0 = addr1
+    addr0 = (addr0 << 1) | int(read)
+    return addr0, addr1
+
+
+def parse_header(header_word: I2CHeaderWord, data_in: int, ten_bit_addr_ack: bool):
+    data_in = data_in % 256  # limited to U8
+    ten_bit_addr_detected = (data_in & 248) == 240
+    valid_out = (not ten_bit_addr_ack) and ten_bit_addr_detected
+    if ten_bit_addr_ack:
+        address_out = (header_word.Address << 8) | data_in
+        read_out = header_word.Read
+    else:
+        read_out = bool(data_in % 2)
+        address_out = data_in >> 1
+        if valid_out:
+            address_out = address_out & 3
+    valid_out = not valid_out
+    return I2CHeaderWord(address_out, read_out, valid_out), ten_bit_addr_detected
+
+
+capture_header_reg = hd_enable_reg = rd_data_shft_reg = False
+in_data_reg = 0
+rd_data_reg = [0]*8
+
+
+def data_and_header_capture(header_word_in: I2CHeaderWord,
+                            i2c_input: I2CInterface,
+                            control_interface: SlaveCaptureDataInterface,
+                            index: int,
+                            ten_bit_addr_ack: bool):
+    global capture_header_reg, in_data_reg, hd_enable_reg, rd_data_shft_reg, rd_data_reg
+    reset = control_interface.reset_data
+    capture_d = control_interface.capture_data
+    store = control_interface.store_data
+    ack_request = rd_data_shft_reg or hd_enable_reg  #
+    read_data_shifted = rd_data_shft_reg  #
+    read_data = rd_data_reg  #
+    header_enable = capture_header_reg or reset  #
+    header_word_out, ten_bit_addr_detected = parse_header(header_word_in, index, ten_bit_addr_ack)  #
+    if reset:
+        header_word_out = I2CHeaderWord(0, False, False)
+        in_data_temp = 0
+        rd_data_temp = [0]*8
+    else:
+        in_data_temp = in_data_reg
+        if capture_d:
+            in_data_temp = int(i2c_input.Data) | (in_data_reg << 1)
+        rd_data_temp = rd_data_reg[:]
+        rd_data_temp[index] = in_data_reg
+    rd_data_updt = reset or store
+    hd_enable_reg = header_enable
+    capture_header_reg = control_interface.capture_header
+    rd_data_shft_reg = store
+    if rd_data_updt:
+        rd_data_reg = rd_data_temp
+    in_data_reg = in_data_temp
+    return read_data, read_data_shifted, ack_request, header_enable, header_word_out, ten_bit_addr_detected
+
+
+input_reg = I2CInterface(False, False)
+clk_md_reg = data_md_reg = 0
+clk_reg = data_reg = False
+
+
+def filter_input(filter_delay: int, input_interface: I2CInterface):
+    global input_reg, clk_md_reg, data_md_reg, clk_reg, data_reg
+    clock_in = input_reg.Clock == input_interface.Clock
+    if clock_in:
+        clk_md_temp = clk_md_reg
+        if filter_delay != clk_md_reg:
+            clk_md_temp += 1
+    else:
+        clk_md_temp = 0
+    if clk_md_temp == filter_delay:
+        clk_temp = input_interface.Clock
+    else:
+        clk_temp = clk_reg
+    data_in = input_reg.Data == input_interface.Data
+    if data_in:
+        data_md_temp = data_md_reg
+        if filter_delay != data_md_reg:
+            data_md_temp += 1
+    else:
+        data_md_temp = 0
+    if data_md_temp == filter_delay:
+        data_temp = input_interface.Data
+    else:
+        data_temp = data_reg
+    output = I2CInterface(clk_temp, data_temp)
+    clk_reg = clk_temp
+    data_reg = data_temp
+    clk_md_reg = clk_md_temp
+    data_md_reg = data_md_temp
+    input_reg = input_interface
+    return output
+
+
+transfer_settings_reg = I2CTransferSettings(False, 0, False)
+write_data_reg = I2CDataType(0, False, False)
+master_value_reg = 0
+match_divide_reg = False
+master_state_reg = MasterState.Idle
+state_counter_reg = 0
+state_condition_reg = False
+condition_md1 = False
+condition_md2 = False
+valid_reg = False
+data_pre_reg = 0
+
+
+def byte_controller(data_in: I2CInterface,
+                    transfer_settings: I2CTransferSettings,
+                    write_data: I2CDataType,
+                    abort: bool,
+                    direction_ready: bool):
+    global transfer_settings_reg,\
+        write_data_reg,\
+        master_value_reg,\
+        match_divide_reg,\
+        master_state_reg,\
+        state_counter_reg,\
+        state_condition_reg,\
+        condition_md1,\
+        condition_md2,\
+        valid_reg,\
+        data_pre_reg
+    valid = valid_reg
+    data = data_pre_reg >> 1
+    ack = transfer_settings_reg.Read or (data_pre_reg & 1 == 0)
+    read_data = I2CDataType(data, ack, valid)  # 2nd out
+    write_data_temp = write_data if write_data.Valid else write_data_reg
+    transfer_setting_temp = transfer_settings if write_data.Valid else transfer_settings_reg
+    if master_state_reg == MasterState.Idle:
+        out1 = direction_ready
+        out2 = write_data.Valid
+        out3 = False
+        out4 = MasterState.SendStartCondition if write_data.Valid else MasterState.Idle
+        out5 = True
+        out6 = False
+        out7 = not write_data.Valid
+        out8 = 9
+    elif master_state_reg == MasterState.SendStartCondition:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.SendData if match_divide_reg else MasterState.SendStartCondition
+        out5 = not match_divide_reg
+        out6 = False
+        out7 = False
+        out8 = state_counter_reg
+    elif master_state_reg == MasterState.SendData:
+        if transfer_settings_reg.Read:
+            release_sda = not write_data_reg.ACK
+            data_index = '11111111'
+        else:
+            release_sda = True
+            data_index = "{:08b}".format(write_data_reg.Data, "b")
+        word = '1' + str(int(release_sda)) + data_index
+        word_list = []
+        word_list[:0] = word
+        ack_data = word_list[state_counter_reg]
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.SendRisingClock if match_divide_reg else MasterState.SendData
+        out5 = False
+        out6 = False
+        out7 = ack_data if match_divide_reg else state_condition_reg
+        out8 = state_counter_reg-1 if match_divide_reg else state_counter_reg
+    elif master_state_reg == MasterState.SendRisingClock:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.SendFallingClock if match_divide_reg else MasterState.SendRisingClock
+        out5 = False
+        out6 = False
+        out7 = False
+        out8 = state_counter_reg
+    elif master_state_reg == MasterState.SendFallingClock:
+        out1 = False
+        out2 = False
+        out3 = match_divide_reg
+        temp_stat = MasterState.StopConditionSetUp if transfer_settings_reg.SendStopCondition else MasterState.Waiting
+        temp_stat = temp_stat if state_counter_reg == 0 else MasterState.SendData
+        out4 = temp_stat if match_divide_reg else MasterState.SendFallingClock
+        out5 = not match_divide_reg
+        out6 = state_counter_reg == 0
+        out7 = state_condition_reg
+        out8 = state_counter_reg
+    elif master_state_reg == MasterState.Waiting:
+        out1 = direction_ready
+        out2 = write_data.Valid
+        out3 = False
+        temp_state = MasterState.SendData if write_data.Valid else MasterState.Waiting
+        out4 = MasterState.StopConditionSetUp if match_divide_reg else temp_state
+        out5 = False
+        out6 = False
+        out7 = state_condition_reg
+        out8 = 9
+    elif master_state_reg == MasterState.ReleaseClock:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.ReleaseData if match_divide_reg else MasterState.ReleaseClock
+        out5 = match_divide_reg
+        out6 = False
+        out7 = False
+        out8 = state_counter_reg
+    elif master_state_reg == MasterState.ReleaseData:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.Idle if match_divide_reg else MasterState.ReleaseData
+        out5 = True
+        out6 = False
+        out7 = match_divide_reg
+        out8 = state_counter_reg
+    elif master_state_reg == MasterState.StopConditionSetUp:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = MasterState.ReleaseClock if match_divide_reg else MasterState.StopConditionSetUp
+        out5 = False
+        out6 = False
+        out7 = False if match_divide_reg else state_condition_reg
+        out8 = state_counter_reg
+    match_divide_reg = transfer_settings_reg.Divide == master_value_reg
+    if (master_state_reg.value != MasterState.Idle.value) and direction_ready:
+        master_value_reg = 0 if match_divide_reg or out2 else master_value_reg+1
+        # TODO 7 REGS
+
+
+
+
+"""def i2c_master(i2c_bus_in: I2CInterface,
+               direction_ready: bool,
+               settings: WorldControllerSetting,
+               write_data: typing.List[int],
+               go: bool)"""
+
+
+def search_line(line: LineLocation, ch_list: typing.List[LineLocation]):
+    index = 0
+    for element in ch_list:
+        if element.channel == line.channel and element.connector == line.connector:
+            return index
+        else:
+            index += 1
+    return -1
+
+
+def update_line_on_connector(enable_in: int = 0,
+                             data_in: int = 0,
+                             dio_line: DIOLines = DIOLines.DIO0,
+                             line_state: StaticStates = StaticStates.Zero):
+    dio_index = dio_line.value
+    output_data = ((-dio_index << data_in) & 1) > 0
+    data, enable = line_state_to_out(line_state, output_data)
+    ch1 = ~(dio_index << 1)
+    ch2 = dio_index << enable
+    ch3 = dio_index << data
+    enable_out = ch2 | (enable_in & ch1)
+    data_out = (ch1 & data_in) | ch3
+    return enable_out, data_out
+
+
+def line_state_to_out(line: StaticStates, out_data: bool):
+    data = False
+    enable = False
+    if line.value == 0:
+        data = False
+        enable = True
+    elif line.value == 1:
+        data = True
+        enable = True
+    elif line.value == 2:
+        data = out_data
+        enable = False
+    return data, enable
 
 
 def channel_list_to_pins(channel_list: str = ""):
@@ -716,7 +1074,7 @@ def channel_list_to_pins(channel_list: str = ""):
     return sites_and_pins, sites, pins
 
 
-def close_session(tsm_context: TSMContext):
+def close_sessions(tsm_context: TSMContext):
     session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(InstrumentTypeId)
     for session in session_data:
         session.close()
@@ -741,14 +1099,14 @@ def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
 
 
 def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbers: typing.List[int] = []):
-    pin_query_context, session_data, channel_group_ids, channels_list =\
+    pin_query_context, session_data, channel_group_ids, channels_lists =\
         tsm_context.pins_to_custom_sessions(InstrumentTypeId, pins)
     session_data: typing.Tuple[nifpga.Session]
-    channel_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], site_numbers)
+    channel_list = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], site_numbers)
     new_sessions = []
-    for session, channel_id, channel, list_d in zip(session_data, channel_group_ids, channels_list, channel_lists[1]):
+    for session, channel_id, channel, list_d in zip(session_data, channel_group_ids, channels_lists, channel_list[1]):
         new_sessions.append(_SSCFPGA(session, channel_id, channel, list_d))
-    return TSMFPGA(pin_query_context, new_sessions, channel_lists[0])
+    return TSMFPGA(pin_query_context, new_sessions, channel_list[0])
 
 
 def open_reference(rio_resource: str, target: BoardType, ldb_type: str):
@@ -769,10 +1127,10 @@ def open_reference(rio_resource: str, target: BoardType, ldb_type: str):
 
 
 def get_i2c_master_session(tsm_context: TSMContext,
-                           i2c_master: I2CMaster.I2C_3V3_7822_SINK,
+                           i2c_master_in: I2CMaster.I2C_3V3_7822_SINK,
                            apply_i2c_settings: bool = True):
-    sda = "%s_SDA" % i2c_master.name
-    scl = "%s_SDA" % i2c_master.name
+    sda = "%s_SDA" % i2c_master_in.name
+    scl = "%s_SDA" % i2c_master_in.name
     session_data = pins_to_sessions(tsm_context, [sda, scl], [])
     session = session_data.SSC[0]
     ch_list = session_data.SSC[0].Channels.split(",")
@@ -783,7 +1141,7 @@ def get_i2c_master_session(tsm_context: TSMContext,
         r_list.append(int(ch) % 32)
     iq_list = LineLocation(DIOLines(iq_list[0]), Connectors(iq_list[1]))
     r_list = LineLocation(DIOLines(r_list[0]), Connectors(r_list[1]))
-    session.configure_master_sda_scl_lines(i2c_master, r_list, iq_list)
+    session.configure_master_sda_scl_lines(i2c_master_in, r_list, iq_list)
     if apply_i2c_settings:
         session_data.configure_i2c_bus(False, 64, True)
     return session_data

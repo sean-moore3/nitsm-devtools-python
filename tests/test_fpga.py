@@ -34,7 +34,7 @@ def tsm_context(standalone_tsm):
     print("\nSimulated driver?", SIMULATE)
     ni_fpga.initialize_sessions(standalone_tsm)
     yield standalone_tsm
-    ni_fpga.close_session(standalone_tsm)
+    ni_fpga.close_sessions(standalone_tsm)
 
 
 @pytest.fixture
@@ -78,11 +78,11 @@ class TestFPGA:
             for addr in range(256):
                 result = ni_fpga.parse_header(ni_fpga.I2CHeaderWord(addr, True, False), addr, True)
                 assert (result[0].Address == ((addr << 8) | addr))
-                assert (result[0].Read == True)
-                assert (result[0].Valid == True)
+                assert (result[0].Read is True)
+                assert (result[0].Valid is True)
                 result = ni_fpga.parse_header(ni_fpga.I2CHeaderWord(addr, False, False), addr, False)
                 if (addr & 248) == 240:
-                    assert (result[0].Address == ((addr >> 1)&3))
+                    assert (result[0].Address == ((addr >> 1) & 3))
                 else:
                     assert (result[0].Address == (addr >> 1))
                 assert (result[0].Read == bool(addr % 2))
@@ -102,3 +102,10 @@ class TestFPGA:
 
     def test_get_i2c_master_session(self, tsm_context):
         print(ni_fpga.get_i2c_master_session(tsm_context, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True))
+
+    def test_write_and_read(self, tsm_context):
+        data = ni_fpga.get_i2c_master_session(tsm_context, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True)
+        print('Read: ', data.read_i2c_data(number_of_bytes=8, slave_address=23, timeout=100))
+        array = [1, 0, 1, 0, 1, 0, 1, 0]
+        data.write_i2c_data(data_to_write=array, slave_address=23, timeout=100)
+        print('Read: ', data.read_i2c_data(number_of_bytes=8, slave_address=23, timeout=100))
