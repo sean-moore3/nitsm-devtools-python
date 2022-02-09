@@ -25,6 +25,13 @@ CurrentPath = os.getcwd()
 PinQuery = nitsm.pinquerycontexts.PinQueryContext
 
 
+class ConnectorResources(typing.NamedTuple):
+    Port0: str
+    Port1: str  # TODO Missing Port type
+    Port2: str
+    Port3: str
+
+
 class I2CDataType(typing.NamedTuple):
     Data: int
     ACK: bool
@@ -866,8 +873,8 @@ match_divide_reg = False
 master_state_reg = MasterState.Idle
 state_counter_reg = 0
 state_condition_reg = False
-condition_md1 = False
-condition_md2 = False
+condition_md1_reg = False
+condition_md2_reg = False
 valid_reg = False
 data_pre_reg = 0
 
@@ -884,8 +891,8 @@ def byte_controller(data_in: I2CInterface,
         master_state_reg,\
         state_counter_reg,\
         state_condition_reg,\
-        condition_md1,\
-        condition_md2,\
+        condition_md1_reg,\
+        condition_md2_reg,\
         valid_reg,\
         data_pre_reg
     valid = valid_reg
@@ -956,7 +963,7 @@ def byte_controller(data_in: I2CInterface,
         out2 = write_data.Valid
         out3 = False
         temp_state = MasterState.SendData if write_data.Valid else MasterState.Waiting
-        out4 = MasterState.StopConditionSetUp if match_divide_reg else temp_state
+        out4 = MasterState.StopConditionSetUp if abort else temp_state
         out5 = False
         out6 = False
         out7 = state_condition_reg
@@ -988,19 +995,395 @@ def byte_controller(data_in: I2CInterface,
         out6 = False
         out7 = False if match_divide_reg else state_condition_reg
         out8 = state_counter_reg
+    else:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = 0
+        out5 = False
+        out6 = False
+        out7 = False
+        out8 = 0
     match_divide_reg = transfer_settings_reg.Divide == master_value_reg
     if (master_state_reg.value != MasterState.Idle.value) and direction_ready:
-        master_value_reg = 0 if match_divide_reg or out2 else master_value_reg+1
-        # TODO 7 REGS
+        master_value_reg = 0 if (match_divide_reg or out2) else master_value_reg+1
+    master_state_reg = out4
+    state_condition_reg = out7
+    state_counter_reg = out8
+    valid_reg = condition_md2_reg
+    data_pre_reg = int(data_in.Data) | (data_pre_reg << 1)
+    condition_md1_reg = out3
+    condition_md2_reg = out3 and out6
+    data_out = I2CInterface(out5, out7)
+    ready = out1
+    write_data_reg = write_data_temp
+    transfer_settings_reg = transfer_setting_temp
+    return ready, read_data, data_out
 
 
+go_reg = True
+i2c_master_state_reg = WorldControllerState.Idle
+i2c_master_valid_reg = False
+i2c_ready_reg = False
+i2c_value_reg = 0
+i2c_master_ack_reg = False
+cond_md1_reg = False
+cond_md2_reg = False
+rd_master_data_reg = 0
+rd_master_data_list_reg: typing.List[int] = [0]*8
 
 
-"""def i2c_master(i2c_bus_in: I2CInterface,
+def i2c_master(i2c_bus_in: I2CInterface,
                direction_ready: bool,
                settings: WorldControllerSetting,
                write_data: typing.List[int],
-               go: bool)"""
+               go: bool):
+    global go_reg, i2c_master_state_reg, i2c_master_valid_reg, i2c_ready_reg, i2c_value_reg, i2c_master_ack_reg,\
+        cond_md1_reg, cond_md2_reg, rd_master_data_reg, rd_master_data_list_reg
+    in1, in2 = create_header(settings.Ten_Bit_Addressing, settings.Device_Address, settings.Read)
+    if i2c_master_state_reg == WorldControllerState.Idle:
+        out2 = (settings.Number_of_Bytes == 0) and (go and not go_reg)
+        out1 = not out2
+        out3 = 0
+        out4 = False
+        out5 = WorldControllerState.WaitForReady if out2 else WorldControllerState.Idle
+        out6 = False
+        out7 = False
+        out8 = False
+        out9 = False
+        out10 = 0
+    elif i2c_master_state_reg == WorldControllerState.WaitForReady:
+        out1 = False
+        out2 = False
+        out3 = in1
+        out4 = False
+        out5 = WorldControllerState.Address if i2c_ready_reg else WorldControllerState.WaitForReady
+        out6 = i2c_ready_reg
+        out7 = False
+        out8 = False
+        out9 = False
+        out10 = 0
+    elif i2c_master_state_reg == WorldControllerState.Address:
+        out1 = False
+        out2 = False
+        out3 = in2 if settings.Ten_Bit_Addressing else write_data[i2c_value_reg]
+        temp1 = (not settings.Ten_Bit_Addressing) and settings.Read
+        t2 = settings.Number_of_Bytes <= 1
+        out4 = temp1 and not t2
+        out6 = i2c_master_valid_reg and i2c_master_ack_reg
+        out7 = temp1
+        out8 = t2 and not settings.Ten_Bit_Addressing
+        out9 = i2c_master_valid_reg and not i2c_master_ack_reg
+        out10 = int(i2c_master_valid_reg and not settings.Ten_Bit_Addressing)
+        temp_status = WorldControllerState.Waiting if out8 else WorldControllerState.Data
+        temp_status = WorldControllerState.Idle if out9 else temp_status
+        out5 = temp_status if i2c_master_valid_reg else WorldControllerState.Address
+    elif i2c_master_state_reg == WorldControllerState.Data:
+        out1 = False
+        out2 = False
+        out3 = write_data[i2c_value_reg]
+        temp1 = (settings.Number_of_Bytes == (i2c_value_reg+1))
+        out4 = settings.Read and not temp1
+        t2 = i2c_master_valid_reg and not i2c_master_ack_reg
+        t3 = i2c_master_valid_reg and temp1
+        out5 = WorldControllerState.Idle if t2 else WorldControllerState.Waiting if t3 else WorldControllerState.Data
+        out6 = i2c_master_valid_reg and i2c_master_ack_reg
+        out7 = settings.Read
+        out8 = temp1
+        out9 = t2
+        out10 = i2c_value_reg+1 if out6 else i2c_value_reg
+    elif i2c_master_state_reg == WorldControllerState.Waiting:
+        out1 = False
+        out2 = False
+        out3 = 0
+        out4 = False
+        out5 = WorldControllerState.Idle if i2c_master_valid_reg else WorldControllerState.Waiting
+        out6 = False
+        out7 = False
+        out8 = False
+        out9 = False
+        out10 = i2c_value_reg
+    else:
+        out1 = False
+        out2 = False
+        out3 = 0
+        out4 = False
+        out5 = WorldControllerState.Idle
+        out6 = False
+        out7 = False
+        out8 = False
+        out9 = False
+        out10 = 0
+    read_data = rd_master_data_list_reg
+    ready_for_input = out1
+    transfer_set = I2CTransferSettings(out8, settings.Divide, out7)
+    write_data_out = I2CDataType(out3, out4, out6)
+    i2c_bus_out, data, i2c_ready_temp =\
+        byte_controller(i2c_bus_in, transfer_set, write_data_out, out9, direction_ready)
+    read_data[rd_master_data_reg] = data.Data
+    temp2 = data.Valid and (cond_md2_reg if settings.Ten_Bit_Addressing else cond_md1_reg)
+    rd_master_data_list_reg = [0]*8 if out2 or temp2 else read_data
+    rd_master_data_reg = 0 if out1 else rd_master_data_reg+1 if temp2 else rd_master_data_reg
+    condition = data.Valid or out1
+    cond_md2_reg = cond_md1_reg if condition else cond_md2_reg
+    cond_md1_reg = not out1 if condition else cond_md1_reg
+    i2c_master_ack_reg = data.ACK
+    i2c_ready_reg = i2c_ready_temp
+    i2c_master_valid_reg = data.Valid
+    i2c_value_reg = out10
+    i2c_master_state_reg = out5
+    go_reg = go
+    return i2c_bus_out, ready_for_input, read_data
+
+
+filter_input_reg = I2CInterface(False, False)
+ack_in_reg = False
+slave_state_reg = I2CSlaveStates.WaitOnStartCondition
+bit_counter_reg = 0
+next_state_reg = 0
+byte_counter_reg = 0
+ten_bit_addr_reg = False
+ten_bit_addr_detected_reg = False
+ack_requested_reg = False
+case_out_reg = False
+data_header_reg = I2CHeaderWord(0, False, False)
+
+
+def i2c_slave(i2c_input: I2CInterface, return_data: typing.List[int], filter_in: int, ack_in: bool):
+    global filter_input_reg, ack_in_reg, slave_state_reg, bit_counter_reg, next_state_reg, byte_counter_reg,\
+        ten_bit_addr_detected_reg, ack_requested_reg, case_out_reg, data_header_reg, ten_bit_addr_reg
+    filtered_input = filter_input(filter_in, i2c_input)
+    falling_edge = I2CInterface(filter_input_reg.Clock and not filtered_input.Clock,
+                                filter_input_reg.Data and not filtered_input.Data)
+    rising_edge = I2CInterface(filtered_input.Clock and not filter_input_reg.Clock,
+                               filtered_input.Data and not filter_input_reg.Data)
+    filter_input_reg = filtered_input
+    in9 = rising_edge.Data and filter_input_reg.Clock  # STOP_CON
+    in4 = falling_edge.Data and filter_input_reg.Clock  # start_con
+    in1 = i2c_input
+    in3 = ten_bit_addr_detected_reg
+    in5 = ten_bit_addr_reg
+    in6 = rising_edge.Clock
+    in7 = byte_counter_reg
+    in8 = falling_edge.Clock
+    in10 = ack_in_reg
+    ack_in_reg = ack_in
+    in11 = next_state_reg
+    in12 = data_header_reg
+    in13 = bit_counter_reg
+    in14 = bit_counter_reg-1
+    in2 = list("{:08b}".format(return_data[in7], "b"))[in13]
+    if slave_state_reg == I2CSlaveStates.WaitOnStartCondition:
+        out1 = in4
+        out2 = False
+        out3 = False
+        out4 = False
+        out5 = True
+        out6 = True
+        out7 = 0
+        out8 = 7
+        out9 = I2CSlaveStates.WaitOnStartCondition
+        out10 = False
+        out11 = I2CSlaveStates.Addressing if in4 else I2CSlaveStates.WaitOnStartCondition
+    elif slave_state_reg == I2CSlaveStates.Addressing:
+        out1 = False
+        out2 = in5
+        out3 = in6
+        out4 = (in14 == 0) and in6
+        out5 = True
+        out6 = True
+        out7 = 0
+        out8 = 10 if out4 else in14 if out3 else in13
+        out9 = 0
+        out10 = False
+        temp = I2CSlaveStates.AddressAck if out4 else I2CSlaveStates.Addressing
+        out11 = I2CSlaveStates.WaitOnStartCondition if in9 else temp
+    elif slave_state_reg == I2CSlaveStates.AddressAck:
+        out1 = False
+        temp = in3 and (not in5) and (in13 == 7)
+        out2 = in5 or temp
+        out3 = False
+        out4 = False
+        out5 = True
+        temp2 = not (in3 or in10)
+        if in13 == 7:
+            out6 = in2 or temp2 or not in12.Read
+        elif in13 == 8:
+            out6 = temp2
+        elif in13 == 9:
+            out6 = temp2
+        else:
+            out6 = True
+        out7 = 0
+        out8 = 7 if temp else in14 if in6 or in8 else in13
+        out9 = I2CSlaveStates.WaitOnStartCondition
+        out10 = False
+        out11 = I2CSlaveStates.MasterReadingData if in12.Read else I2CSlaveStates.MasterWritingData
+        out11 = I2CSlaveStates.WaitOnStartCondition if temp2 else out11
+        out11 = I2CSlaveStates.Addressing if temp else out11
+        out11 = out11 if in13 == 7 else I2CSlaveStates.AddressAck
+    elif slave_state_reg == I2CSlaveStates.MasterReadingData:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = False
+        out5 = True
+        out6 = in2
+        out7 = in7
+        out8 = in14 if in8 else in13
+        out9 = I2CSlaveStates.WaitOnStartCondition
+        out10 = False
+        temp = I2CSlaveStates.RetrieveAck if (in8 and (in13 == 0)) else I2CSlaveStates.MasterReadingData
+        out11 = I2CSlaveStates.WaitOnStartCondition if in9 else temp
+    elif slave_state_reg == I2CSlaveStates.RetrieveAck:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = False
+        out5 = True
+        out6 = True
+        out7 = in7+1 if in8 else in7
+        out8 = 7
+        temp = I2CSlaveStates.WaitOnStartCondition if in1.Data else I2CSlaveStates.MasterReadingData
+        out9 = temp if in6 else in11
+        out10 = False
+        out11 = I2CSlaveStates.WaitOnStartCondition if in9 else (in11 if in8 else I2CSlaveStates.RetrieveAck)
+    elif slave_state_reg == I2CSlaveStates.MasterWritingData:
+        out1 = False
+        out2 = False
+        out3 = in6
+        out4 = False
+        out5 = True
+        out6 = True
+        out7 = in7
+        temp = in6 and (in13 == 0)
+        out8 = 3 if temp else in14 if in6 else in13
+        out9 = I2CSlaveStates.WaitOnStartCondition
+        out10 = temp
+        temp2 = I2CSlaveStates.SendAck if temp else I2CSlaveStates.MasterWritingData
+        out11 = I2CSlaveStates.WaitOnStartCondition if in9 else temp2
+    elif slave_state_reg == I2CSlaveStates.SendAck:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = False
+        out5 = True
+        out6 = True if in13 == 0 else not in10 if in13 == 1 or in13 == 2 else True
+        out7 = in7 + 1 if in13 == 0 else in7
+        out8 = 7 if in13 == 0 else in14 if in6 or in8 else in13
+        out9 = I2CSlaveStates.WaitOnStartCondition
+        out10 = False
+        temp = I2CSlaveStates.MasterWritingData if in10 else I2CSlaveStates.WaitOnStartCondition
+        temp = temp if in13 == 0 else I2CSlaveStates.SendAck
+        out11 = I2CSlaveStates.WaitOnStartCondition if in9 else temp
+    else:
+        out1 = False
+        out2 = False
+        out3 = False
+        out4 = False
+        out5 = False
+        out6 = False
+        out7 = 0
+        out8 = 0
+        out9 = I2CSlaveStates.WaitOnStartCondition
+        out10 = False
+        out11 = I2CSlaveStates.WaitOnStartCondition
+    slave_state_reg = out11
+    bit_counter_reg = out8
+    next_state_reg = out9
+    byte_counter_reg = out7
+    ten_bit_addr_reg = out2
+    temp = SlaveCaptureDataInterface(out1, out3, case_out_reg, out4)
+    read_data, read_data_shifted, ack_requested, header_enable, header_word, ten_bit_addr_detect =\
+        data_and_header_capture(data_header_reg, i2c_input, temp, in7, out2)
+    case_out_reg = out10
+    header = data_header_reg
+    data_header_reg = header_word if header_enable else data_header_reg
+    ten_bit_addr_detected_reg = ten_bit_addr_detect
+    ack_requested_reg = ack_requested
+    i2c_output = I2CInterface(out5, out6)
+    return read_data, read_data_shifted, ack_requested, i2c_output, header
+
+
+def join_numbers_8bit(hi_in: int, lo_in: int):
+    hi = "{:08b}".format(hi_in, "b")
+    lo = "{:08b}".format(lo_in, "b")
+    return int(hi + lo, 2)
+
+
+def join_numbers_16bit(hi_in: int, lo_in: int):
+    hi = "{:16b}".format(hi_in, "b")
+    lo = "{:16b}".format(lo_in, "b")
+    return int(hi + lo, 2)
+
+
+def split_number_32_to_8(num: int):
+    num = "{:32b}".format(num, "b")
+    hi_hi = int(num[16:32], 2)
+    hi_lo = int(num[16:24], 2)
+    lo_hi = int(num[8:16], 2)
+    lo_lo = int(num[0:8], 2)
+    return [hi_hi, hi_lo, lo_hi, lo_lo]
+
+
+reg_1 = 0
+reg_2 = 0
+
+
+def user_logic(ack_in: bool, device_addr: int, header: I2CHeaderWord, read_data_shft: bool, data_in: typing.List[int]):
+    global reg_1, reg_2
+    temp = (reg_1 != 4) if read_data_shft else (device_addr == header.Address)
+    ack_out = ack_in and temp
+    temp = reg_2 if header.Read else data_in[0]
+    temp2 = reg_1 == 5
+    reg_1 = 0 if temp2 or not header.Valid else reg_1+1 if read_data_shft else reg_1
+    reg_2 = data_in[1] if data_in[0] == 0 else reg_2
+    num = join_numbers_8bit(join_numbers_8bit(data_in[1], data_in[2]), join_numbers_8bit(data_in[3], data_in[4]))
+    simp_reg_1 = simple_register(int("12345678", 16), True, temp, 1)
+    simp_reg_2 = simple_register(num, temp2 and not header.Read, temp, 129)
+    simp_reg = simp_reg_1[1] | simp_reg_2[1]
+    data_out = split_number_32_to_8(simp_reg)
+    return ack_out, data_out
+
+
+def read_and_write_port(port_resourse: bool, output_data: int, output_en: int):
+    write_port(port_resourse, output_data, output_en)
+    read_data = read_port(port_resourse)
+    return read_data
+
+
+def read_port(port_resourse: str):
+    read_data = 0  # TODO set IO item
+    return read_data
+
+
+def write_port(port_resourse: str, output_data: int, output_en: int):
+    # TODO set output data
+    # TODO set output enable
+    pass
+
+
+def read_connector(resources: ConnectorResources):
+    p0 = read_port(resources.Port0)
+    p1 = read_port(resources.Port1)
+    p2 = read_port(resources.Port2)
+    p3 = read_port(resources.Port3)
+    p10 = join_numbers_8bit(p1, p0)
+    p32 = join_numbers_8bit(p3, p2)
+    return join_numbers_16bit(p32, p10)
+
+
+def write_connector(resources: ConnectorResources, out_data: int, out_enable: int):
+    data = split_number_32_to_8(out_data)
+    enable = split_number_32_to_8(out_enable)
+    write_port(resources.Port3, data[3], enable[3])
+    write_port(resources.Port2, data[2], enable[2])
+    write_port(resources.Port1, data[1], enable[1])
+    write_port(resources.Port0, data[0], enable[0])
+
+
+def debug_ui_launcher(semiconductor_module_manager: nitsm.codemoduleapi.SemiconductorModuleContext):  # TODO missing Type?
+    pass
 
 
 def search_line(line: LineLocation, ch_list: typing.List[LineLocation]):
