@@ -133,6 +133,11 @@
 				<Channel id="127" />
 			</ChannelGroup>
 		</Instrument>
+		<Instrument name="RIO2" instrumentTypeId="782xFPGA">
+			<ChannelGroup id="DIO">
+				<Channel id="0" />
+			</ChannelGroup>
+		</Instrument>
 	</Instruments>
 	<Pins>
 		<DUTPin name="DIB_CONN_DETECT4_L" />
@@ -259,6 +264,7 @@
 		<DUTPin name="En_RTRAN_DAMP2_PWR_EN" />
 		<DUTPin name="RTRAN_DET2_L" />
 		<DUTPin name="En_MUX_SNKSW_EN" />
+		<DUTPin name="SGL1" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="RIO_Pins">
@@ -386,6 +392,7 @@
 			<PinReference pin="En_RTRAN_DAMP2_PWR_EN" />
 			<PinReference pin="RTRAN_DET2_L" />
 			<PinReference pin="En_MUX_SNKSW_EN" />
+			<PinReference pin="SGL1" />
 		</PinGroup>
 	</PinGroups>
 	<Sites>
@@ -516,5 +523,6 @@
 		<Connection channel="125" instrument="RIO1" pin="En_RTRAN_DAMP2_PWR_EN" siteNumber="0" />
 		<Connection channel="126" instrument="RIO1" pin="RTRAN_DET2_L" siteNumber="0" />
 		<Connection channel="127" instrument="RIO1" pin="En_MUX_SNKSW_EN" siteNumber="0" />
+		<Connection pin="SGL1" siteNumber="0" instrument="RIO2" channel="0" />
 	</Connections>
 </PinMap>

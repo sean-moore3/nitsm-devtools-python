@@ -46,6 +46,7 @@ def fpga_tsm_s(tsm_context, tests_pins):
         data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
         fpga_tsms.append(data)
         sessions += data.SSC
+        print(len(sessions))
     yield tsm_context, fpga_tsms
 
 
@@ -109,3 +110,23 @@ class TestFPGA:
         array = [1, 0, 1, 0, 1, 0, 1, 0]
         data.write_i2c_data(data_to_write=array, slave_address=23, timeout=100)
         print('Read: ', data.read_i2c_data(number_of_bytes=8, slave_address=23, timeout=100))
+
+    def test_update_line_on_connectors(self):
+        result = ni_fpga.update_line_on_connector(496, 241, ni_fpga.DIOLines(7), ni_fpga.StaticStates(0))
+        print(result)
+        for i in range(8):
+            dioline = ni_fpga.DIOLines(i)
+            state = ni_fpga.StaticStates(0)
+            result = ni_fpga.update_line_on_connector(480,193,dioline,state)
+            #assert(result[1] == 2**i)
+
+    def test_wr_and_rd_single_dio_line(self, fpga_tsm_s):
+        fpga_session7821 = fpga_tsm_s[1][0].SSC[0]
+        fpga_session7820 = fpga_tsm_s[1][0].SSC[1]
+        fpga_session7820.write_single_dio_line(ni_fpga.Connectors.Connector0, ni_fpga.DIOLines.DIO7, ni_fpga.StaticStates.Zero)
+        print('hello', fpga_session7821.read_all_lines())
+        #wr1 = ni_fpga.DIOLineLocationandStaticState(ni_fpga.DIOLines(7),ni_fpga.Connectors(0),ni_fpga.StaticStates(0))
+        #wr2 = ni_fpga.DIOLineLocationandStaticState(ni_fpga.DIOLines(6), ni_fpga.Connectors(0), ni_fpga.StaticStates(1))
+        #fpga_session7820.write_multiple_dio_lines([wr1,wr2])
+        #assert (fpga_session7821.read_all_lines().Connector0 == 128)
+

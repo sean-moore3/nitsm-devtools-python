@@ -549,7 +549,10 @@ class _SSCFPGA(typing.NamedTuple):
         if 0 <= connector.value <= 3:
             con_enable = self.Session.registers['Connector%d Output Enable' % connector.value]
             con_data = self.Session.registers['Connector%d Output Data' % connector.value]
+            print(con_enable.read())
+            print(con_data.read())
             enable, data = update_line_on_connector(con_enable.read(), con_data.read(), line, state)
+            print(enable, data)
             con_enable.write(enable)
             con_data.write(data)
 
@@ -1403,9 +1406,13 @@ def update_line_on_connector(enable_in: int = 0,
     dio_index = dio_line.value
     output_data = ((-dio_index << data_in) & 1) > 0
     data, enable = line_state_to_out(line_state, output_data)
-    ch1 = ~(dio_index << 1)
-    ch2 = dio_index << enable
-    ch3 = dio_index << data
+    print(data, enable)
+    ch1 = (dio_index << 1)
+    ch2 = int(enable) << dio_index
+    ch3 = int(data) << dio_index
+    print('CH1 ', ch1)
+    print('CH2 ', ch2)
+    print('CH3 ', ch3)
     enable_out = ch2 | (enable_in & ch1)
     data_out = (ch1 & data_in) | ch3
     return enable_out, data_out
