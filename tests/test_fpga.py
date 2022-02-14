@@ -112,21 +112,35 @@ class TestFPGA:
         print('Read: ', data.read_i2c_data(number_of_bytes=8, slave_address=23, timeout=100))
 
     def test_update_line_on_connectors(self):
-        result = ni_fpga.update_line_on_connector(496, 241, ni_fpga.DIOLines(7), ni_fpga.StaticStates(0))
-        print(result)
         for i in range(8):
             dioline = ni_fpga.DIOLines(i)
-            state = ni_fpga.StaticStates(0)
-            result = ni_fpga.update_line_on_connector(480,193,dioline,state)
-            #assert(result[1] == 2**i)
+            state = ni_fpga.StaticStates(1)
+            result = ni_fpga.update_line_on_connector(0,0,dioline,state)
+            assert(result[1] == 2**i)
 
-    def test_wr_and_rd_single_dio_line(self, fpga_tsm_s):
+    def test_wr_and_rd(self, fpga_tsm_s):
         fpga_session7821 = fpga_tsm_s[1][0].SSC[0]
         fpga_session7820 = fpga_tsm_s[1][0].SSC[1]
+        for i in range(8):
+            fpga_session7820.write_single_dio_line(ni_fpga.Connectors.Connector0, ni_fpga.DIOLines(i),
+                                                   ni_fpga.StaticStates.Zero)
+        fpga_session7820.write_single_dio_line(ni_fpga.Connectors.Connector0, ni_fpga.DIOLines.DIO7, ni_fpga.StaticStates.One)
+        assert(fpga_session7821.read_all_lines().Connector0==128)
         fpga_session7820.write_single_dio_line(ni_fpga.Connectors.Connector0, ni_fpga.DIOLines.DIO7, ni_fpga.StaticStates.Zero)
-        print('hello', fpga_session7821.read_all_lines())
-        #wr1 = ni_fpga.DIOLineLocationandStaticState(ni_fpga.DIOLines(7),ni_fpga.Connectors(0),ni_fpga.StaticStates(0))
-        #wr2 = ni_fpga.DIOLineLocationandStaticState(ni_fpga.DIOLines(6), ni_fpga.Connectors(0), ni_fpga.StaticStates(1))
-        #fpga_session7820.write_multiple_dio_lines([wr1,wr2])
-        #assert (fpga_session7821.read_all_lines().Connector0 == 128)
+        assert (fpga_session7821.read_all_lines().Connector0 == 0)
+        wr1 = ni_fpga.DIOLineLocationandStaticState(ni_fpga.DIOLines(7),ni_fpga.Connectors(0),ni_fpga.StaticStates(0))
+        wr2 = ni_fpga.DIOLineLocationandStaticState(ni_fpga.DIOLines(6), ni_fpga.Connectors(0), ni_fpga.StaticStates(1))
+        fpga_session7820.write_multiple_dio_lines([wr2,wr1])
+        assert (fpga_session7821.read_single_dio_line(ni_fpga.Connectors.Connector0, ni_fpga.DIOLines.DIO6) == '1')
+        assert (fpga_session7821.read_single_dio_line(ni_fpga.Connectors.Connector0, ni_fpga.DIOLines.DIO7) == '0')
+        assert(fpga_session7821.read_single_connector(ni_fpga.Connectors(0))==64)
+        data = fpga_session7821.read_multiple_lines([ni_fpga.LineLocation(ni_fpga.DIOLines(7),ni_fpga.Connectors(0)),
+                                                     ni_fpga.LineLocation(ni_fpga.DIOLines(6),ni_fpga.Connectors(0))])
+        assert(data[0].state == '0')
+        assert (data[1].state == '1')
+  #      data = fpga_session7821.read_multiple_dio_commanded_states([
+#            ni_fpga.LineLocation(ni_fpga.DIOLines(7),ni_fpga.Connectors(0)),
+ #           ni_fpga.LineLocation(ni_fpga.DIOLines(6),ni_fpga.Connectors(0))])
+        print(data)
+
 
