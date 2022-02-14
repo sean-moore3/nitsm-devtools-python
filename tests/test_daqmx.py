@@ -1,11 +1,12 @@
-import nitsm
+import os
 import typing
+
 import nidaqmx
 import nidaqmx.constants as constant
-import pytest
-import os
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
 import nidevtools.daqmx as ni_daqmx
+import nitsm
+import pytest
+from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))

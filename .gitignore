@@ -1,6 +1,9 @@
 # PyCharm
 .idea/
 
+# OS specific
+.DS_Store
+
 # Python
 __pycache__
 *.pyc
@@ -18,3 +21,6 @@ __pycache__
 *.digiprojcache
 *Simulate.driver
 /venv/*
+
+tests/_வணக்கம்.py
+

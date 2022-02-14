@@ -1,11 +1,12 @@
-import pytest
-import typing
 import os
 import time
+import typing
+
+import nidevtools.scope as scope
 import niscope
 import nitsm.codemoduleapi
+import pytest
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
-import nidevtools.scope as scope
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
