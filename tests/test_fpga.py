@@ -138,9 +138,11 @@ class TestFPGA:
                                                      ni_fpga.LineLocation(ni_fpga.DIOLines(6),ni_fpga.Connectors(0))])
         assert(data[0].state == '0')
         assert (data[1].state == '1')
-  #      data = fpga_session7821.read_multiple_dio_commanded_states([
-#            ni_fpga.LineLocation(ni_fpga.DIOLines(7),ni_fpga.Connectors(0)),
- #           ni_fpga.LineLocation(ni_fpga.DIOLines(6),ni_fpga.Connectors(0))])
-        print(data)
-
+        data = fpga_session7821.read_multiple_dio_commanded_states(
+            [ni_fpga.LineLocation(ni_fpga.DIOLines(7),ni_fpga.Connectors(0)),
+            ni_fpga.LineLocation(ni_fpga.DIOLines(6),ni_fpga.Connectors(0))]
+        )
+        assert(data[0].channel==ni_fpga.DIOLines.DIO7)
+        assert (data[1].channel == ni_fpga.DIOLines.DIO6)
+        assert (data[0].connector == data[0].connector)
 

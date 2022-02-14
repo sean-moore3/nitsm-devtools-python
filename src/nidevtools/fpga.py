@@ -463,10 +463,14 @@ class _SSCFPGA(typing.NamedTuple):
             connector_data = self.Session.registers["Connector%d Output Data" % i]
             merge = (connector_enable.read(), connector_data.read())
             out_list.append(merge)
-            master = self.Session.registers["I2C_Master%d_Line_Configuration" % i]
+            master = self.Session.registers["I2C Master%d Line Configuration" % i]
             master_data: I2CMasterLineConfiguration = master.read()
-            config_list.append(master_data.SDA)
-            config_list.append(master_data.SCL)
+            sda = master_data['SDA']
+            scl = master_data['SCL']
+            line_sda = LineLocation(sda['Channel'],sda['Connector'])
+            line_scl = LineLocation(scl['Channel'], scl['Connector'])
+            config_list.append(line_sda)
+            config_list.append(line_scl)
         states_list = []
         for element in lines_to_read:
             index = search_line(element, config_list)
