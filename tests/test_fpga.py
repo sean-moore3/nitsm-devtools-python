@@ -61,7 +61,7 @@ class TestFPGA:
             print("\nTest_Init/Clear_Sessions\n", session)
             assert isinstance(session, nifpga.session.Session)  # Type verification
             assert len(queried_sessions[0]) != 0  # not void
-            assert len(queried_sessions[0]) == 1  # Matching quantity
+            assert len(queried_sessions[0]) == 2  # Matching quantity
 
     def test_pin_to_sessions(self, fpga_tsm_s):
         tsm_context = fpga_tsm_s[0]
@@ -71,7 +71,6 @@ class TestFPGA:
             assert isinstance(fpga_tsm, ni_fpga.TSMFPGA)
             assert isinstance(fpga_tsm.pin_query_context, ni_fpga.PinQuery)
             assert isinstance(fpga_tsm.SSC, typing.List)
-            assert len(fpga_tsm.SSC) == len(tsm_context.site_numbers)
 
     def test_parse_header(self):
         for data in range(254):
@@ -145,4 +144,9 @@ class TestFPGA:
         assert(data[0].channel==ni_fpga.DIOLines.DIO7)
         assert (data[1].channel == ni_fpga.DIOLines.DIO6)
         assert (data[0].connector == data[0].connector)
+
+    def test_rd_wr_static(self, fpga_tsm_s):
+        print(fpga_tsm_s[1][0].read_static())
+        fpga_tsm_s[1][0].write_static(ni_fpga.StaticStates.Zero)
+
 

@@ -261,13 +261,17 @@ class _SSCFPGA(typing.NamedTuple):
         self.write_multiple_dio_lines(lines_to_write)
 
     def ss_wr_static(self, static_states: typing.List[StaticStates]):
-        ch_list = self.ChannelList.split(",")
+        ch_list = self.Channels.split(",")
         iq_list = []
         r_list = []
+        print("CH: ", ch_list)
         for ch in ch_list[0]:
             iq_list.append(int(ch) // 32)
             r_list.append(int(ch) % 32)
         lines_to_write = []
+        print(static_states)
+        print(iq_list)
+        print(r_list)
         for s_s, iq, r in zip(static_states, iq_list, r_list):
             element = DIOLineLocationandStaticState(DIOLines(r), Connectors(iq), s_s)
             lines_to_write.append(element)
@@ -276,9 +280,11 @@ class _SSCFPGA(typing.NamedTuple):
 
     def ss_read_static(self):
         line_states = []
-        ch_list = self.ChannelList.split(",")
+        ch_list = self.Channels.split(",")
         channels = []
+        print(ch_list)
         for ch in ch_list[0]:
+            print(ch)
             iq = int(ch) // 32
             r = int(ch) % 32
             channels.append(LineLocation(DIOLines(iq), Connectors(r)))
