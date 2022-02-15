@@ -283,14 +283,11 @@ class _SSCFPGA(typing.NamedTuple):
             r = int(ch) % 32
             channels.append(LineLocation(DIOLines(r), Connectors(iq)))
         data = self.read_multiple_lines(channels)
-        print('CH:', channels)
-        print('D: ', data)
         for bit in data:
             line_states.append(bit.state)
-        print("LINE_STATE: ", line_states)
         return data, line_states
             
-    def ss_read_c_states(self): #TODO CHECK
+    def ss_read_c_states(self):  # TODO CHECK
         commanded_states = []
         ch_list = self.ChannelList.split(",")
         channels = []
@@ -467,10 +464,10 @@ class _SSCFPGA(typing.NamedTuple):
             merge = (connector_enable.read(), connector_data.read())
             out_list.append(merge)
             master = self.Session.registers["I2C Master%d Line Configuration" % i]
-            master_data: I2CMasterLineConfiguration = master.read()
+            master_data = master.read()
             sda = master_data['SDA']
             scl = master_data['SCL']
-            line_sda = LineLocation(sda['Channel'],sda['Connector'])
+            line_sda = LineLocation(sda['Channel'], sda['Connector'])
             line_scl = LineLocation(scl['Channel'], scl['Connector'])
             config_list.append(line_sda)
             config_list.append(line_scl)
@@ -508,7 +505,6 @@ class _SSCFPGA(typing.NamedTuple):
             connector = lines.connector
             line = lines.channel
             data = ch_data_list[connector.value]
-            print('L:', data)
             state_list = list("{:032b}".format(data, "b"))[::-1]
             line_state = state_list[line.value]
             state = DIOLineLocationandReadState(line, connector, line_state)
@@ -546,12 +542,10 @@ class _SSCFPGA(typing.NamedTuple):
                               connector: Connectors = Connectors.Connector0,
                               line: DIOLines = DIOLines.DIO0,
                               state: StaticStates = StaticStates.Zero):
-        print(connector, line, state)
         if 0 <= connector.value <= 3:
             con_enable = self.Session.registers['Connector%d Output Enable' % connector.value]
             con_data = self.Session.registers['Connector%d Output Data' % connector.value]
             enable, data = update_line_on_connector(con_enable.read(), con_data.read(), line, state)
-            print("wr", data, enable)
             con_enable.write(enable)
             con_data.write(data)
 
@@ -1347,21 +1341,17 @@ def user_logic(ack_in: bool, device_addr: int, header: I2CHeaderWord, read_data_
     return ack_out, data_out
 
 
-def read_and_write_port(port_resourse: bool, output_data: int, output_en: int):
-    write_port(port_resourse, output_data, output_en)
+def read_and_write_port(port_resourse: str, output_data: int, output_en: int):
+    print(port_resourse, output_data, output_en)
+    # write_port(port_resourse, output_data, output_en)
     read_data = read_port(port_resourse)
     return read_data
 
 
 def read_port(port_resourse: str):
+    print(port_resourse)
     read_data = 0  # TODO set IO item
     return read_data
-
-
-def write_port(port_resourse: str, output_data: int, output_en: int):
-    # TODO set output data
-    # TODO set output enable
-    pass
 
 
 def read_connector(resources: ConnectorResources):
@@ -1377,13 +1367,16 @@ def read_connector(resources: ConnectorResources):
 def write_connector(resources: ConnectorResources, out_data: int, out_enable: int):
     data = split_number_32_to_8(out_data)
     enable = split_number_32_to_8(out_enable)
-    write_port(resources.Port3, data[3], enable[3])
-    write_port(resources.Port2, data[2], enable[2])
-    write_port(resources.Port1, data[1], enable[1])
-    write_port(resources.Port0, data[0], enable[0])
+    print(resources, data, enable)
+    # write_port(resources.Port3, data[3], enable[3])
+    # write_port(resources.Port2, data[2], enable[2])
+    # write_port(resources.Port1, data[1], enable[1])
+    # write_port(resources.Port0, data[0], enable[0])
 
 
-def debug_ui_launcher(semiconductor_module_manager: nitsm.codemoduleapi.SemiconductorModuleContext):  # TODO missing Type?
+def debug_ui_launcher(semiconductor_module_manager: nitsm.codemoduleapi.SemiconductorModuleContext):
+    # TODO missing Type?
+    print(semiconductor_module_manager)
     pass
 
 
@@ -1520,7 +1513,7 @@ def get_i2c_master_session(tsm_context: TSMContext,
     ch_list = session_data.SSC[0].Channels.split(",")
     iq_list = []
     r_list = []
-    for ch in ch_list: #TODO CHECK
+    for ch in ch_list:  # TODO CHECK
         iq_list.append(int(ch) // 32)
         r_list.append(int(ch) % 32)
     e0 = LineLocation(DIOLines(r_list[0]), Connectors(iq_list[0]))
