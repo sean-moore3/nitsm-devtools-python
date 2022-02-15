@@ -264,14 +264,11 @@ class _SSCFPGA(typing.NamedTuple):
         ch_list = self.Channels.split(",")
         iq_list = []
         r_list = []
-        print("CH: ", ch_list)
-        for ch in ch_list[0]:
+        for ch in ch_list:
             iq_list.append(int(ch) // 32)
             r_list.append(int(ch) % 32)
-        lines_to_write = []
-        print(static_states)
-        print(iq_list)
         print(r_list)
+        lines_to_write = []
         for s_s, iq, r in zip(static_states, iq_list, r_list):
             element = DIOLineLocationandStaticState(DIOLines(r), Connectors(iq), s_s)
             lines_to_write.append(element)
@@ -282,25 +279,23 @@ class _SSCFPGA(typing.NamedTuple):
         line_states = []
         ch_list = self.Channels.split(",")
         channels = []
-        print(ch_list)
-        for ch in ch_list[0]:
-            print(ch)
+        for ch in ch_list:
             iq = int(ch) // 32
             r = int(ch) % 32
-            channels.append(LineLocation(DIOLines(iq), Connectors(r)))
+            channels.append(LineLocation(DIOLines(r), Connectors(iq)))
         data = self.read_multiple_lines(channels)
         for bit in data:
             line_states.append(bit.state)
         return data, line_states
             
-    def ss_read_c_states(self):
+    def ss_read_c_states(self): #TODO CHECK
         commanded_states = []
         ch_list = self.ChannelList.split(",")
         channels = []
-        for ch in ch_list[0]:
+        for ch in ch_list:
             iq = int(ch) // 32
             r = int(ch) % 32
-            channels.append(LineLocation(DIOLines(iq), Connectors(r)))
+            channels.append(LineLocation(DIOLines(r), Connectors(iq)))
         states = self.read_multiple_dio_commanded_states(channels)
         for state in states:
             commanded_states.append(state.state)
@@ -1520,12 +1515,12 @@ def get_i2c_master_session(tsm_context: TSMContext,
     ch_list = session_data.SSC[0].Channels.split(",")
     iq_list = []
     r_list = []
-    for ch in ch_list[0]:
+    for ch in ch_list: #TODO CHECK
         iq_list.append(int(ch) // 32)
         r_list.append(int(ch) % 32)
-    iq_list = LineLocation(DIOLines(iq_list[0]), Connectors(iq_list[1]))
-    r_list = LineLocation(DIOLines(r_list[0]), Connectors(r_list[1]))
-    session.configure_master_sda_scl_lines(i2c_master_in, r_list, iq_list)
+    e0 = LineLocation(DIOLines(r_list[0]), Connectors(iq_list[0]))
+    e1 = LineLocation(DIOLines(r_list[1]), Connectors(iq_list[1]))
+    session.configure_master_sda_scl_lines(i2c_master_in, e0, e1)
     if apply_i2c_settings:
         session_data.configure_i2c_bus(False, 64, True)
     return session_data

@@ -146,7 +146,10 @@ class TestFPGA:
         assert (data[0].connector == data[0].connector)
 
     def test_rd_wr_static(self, fpga_tsm_s):
+        fpga_tsm_s[1][0].write_static([ni_fpga.StaticStates.Zero]*128)
         print(fpga_tsm_s[1][0].read_static())
-        fpga_tsm_s[1][0].write_static(ni_fpga.StaticStates.Zero)
+        fpga_tsm_s[1][0].write_static([ni_fpga.StaticStates.One] * 128)
+        print(fpga_tsm_s[1][0].read_static())
+        fpga_tsm_s[1][0].write_static([ni_fpga.StaticStates.Zero] * 128)
 
 
