@@ -267,7 +267,6 @@ class _SSCFPGA(typing.NamedTuple):
         for ch in ch_list:
             iq_list.append(int(ch) // 32)
             r_list.append(int(ch) % 32)
-        print(r_list)
         lines_to_write = []
         for s_s, iq, r in zip(static_states, iq_list, r_list):
             element = DIOLineLocationandStaticState(DIOLines(r), Connectors(iq), s_s)
@@ -284,8 +283,11 @@ class _SSCFPGA(typing.NamedTuple):
             r = int(ch) % 32
             channels.append(LineLocation(DIOLines(r), Connectors(iq)))
         data = self.read_multiple_lines(channels)
+        print('CH:', channels)
+        print('D: ', data)
         for bit in data:
             line_states.append(bit.state)
+        print("LINE_STATE: ", line_states)
         return data, line_states
             
     def ss_read_c_states(self): #TODO CHECK
@@ -506,6 +508,7 @@ class _SSCFPGA(typing.NamedTuple):
             connector = lines.connector
             line = lines.channel
             data = ch_data_list[connector.value]
+            print('L:', data)
             state_list = list("{:032b}".format(data, "b"))[::-1]
             line_state = state_list[line.value]
             state = DIOLineLocationandReadState(line, connector, line_state)
@@ -547,6 +550,7 @@ class _SSCFPGA(typing.NamedTuple):
             con_enable = self.Session.registers['Connector%d Output Enable' % connector.value]
             con_data = self.Session.registers['Connector%d Output Data' % connector.value]
             enable, data = update_line_on_connector(con_enable.read(), con_data.read(), line, state)
+            print(line, state, enable, data)
             con_enable.write(enable)
             con_data.write(data)
 
