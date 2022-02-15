@@ -546,11 +546,12 @@ class _SSCFPGA(typing.NamedTuple):
                               connector: Connectors = Connectors.Connector0,
                               line: DIOLines = DIOLines.DIO0,
                               state: StaticStates = StaticStates.Zero):
+        print(connector, line, state)
         if 0 <= connector.value <= 3:
             con_enable = self.Session.registers['Connector%d Output Enable' % connector.value]
             con_data = self.Session.registers['Connector%d Output Data' % connector.value]
             enable, data = update_line_on_connector(con_enable.read(), con_data.read(), line, state)
-            print(line, state, enable, data)
+            print("wr", data, enable)
             con_enable.write(enable)
             con_data.write(data)
 
@@ -1513,7 +1514,7 @@ def get_i2c_master_session(tsm_context: TSMContext,
                            i2c_master_in: I2CMaster.I2C_3V3_7822_SINK,
                            apply_i2c_settings: bool = True):
     sda = "%s_SDA" % i2c_master_in.name
-    scl = "%s_SDA" % i2c_master_in.name
+    scl = "%s_SCL" % i2c_master_in.name
     session_data = pins_to_sessions(tsm_context, [sda, scl], [])
     session = session_data.SSC[0]
     ch_list = session_data.SSC[0].Channels.split(",")
