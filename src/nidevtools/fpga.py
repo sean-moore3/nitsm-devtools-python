@@ -289,7 +289,7 @@ class _SSCFPGA(typing.NamedTuple):
             
     def ss_read_c_states(self):  # TODO CHECK
         commanded_states = []
-        ch_list = self.ChannelList.split(",")
+        ch_list = self.Channels.split(",")
         channels = []
         for ch in ch_list:
             iq = int(ch) // 32

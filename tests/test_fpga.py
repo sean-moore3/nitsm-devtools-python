@@ -119,9 +119,20 @@ class TestFPGA:
             result = ni_fpga.update_line_on_connector(0, 0, dioline, state)
             assert(result[1] == 2**i)
 
+    def test_wr(self, fpga_tsm_s):
+        fpga_session7821 = fpga_tsm_s[1][0].SSC[1]
+        fpga_session7820 = fpga_tsm_s[1][0].SSC[0]
+        for i in range(4):
+            con_enable = fpga_session7820.Session.registers['Connector%d Output Enable' % i]
+            con_data = fpga_session7820.Session.registers['Connector%d Output Data' % i]
+            con_enable.write(0)
+            con_data.write(0)
+            print('READ_CON', con_enable.read(), con_data.read())
+            print('READ', fpga_session7821.Session.registers['Connector%d Read Data' % i].read())
+
     def test_wr_and_rd(self, fpga_tsm_s):
-        fpga_session7821 = fpga_tsm_s[1][0].SSC[0]
-        fpga_session7820 = fpga_tsm_s[1][0].SSC[1]
+        fpga_session7821 = fpga_tsm_s[1][0].SSC[1]
+        fpga_session7820 = fpga_tsm_s[1][0].SSC[0]
         print('Start', fpga_session7821.read_all_lines())
         for i in range(8):
             fpga_session7820.write_single_dio_line(ni_fpga.Connectors.Connector0, ni_fpga.DIOLines(i),
@@ -155,8 +166,18 @@ class TestFPGA:
         assert (data[0].connector == data[0].connector)
 
     def test_rd_wr_static(self, fpga_tsm_s):
-        fpga_tsm_s[1][0].write_static([ni_fpga.StaticStates.One]*128)  # TODO Check why Loosing LSB
-        print(fpga_tsm_s[1][0].read_static())
+        fpga_tsm_s[1][0].write_static([ni_fpga.StaticStates.Zero]*128)  # TODO Check why Loosing LSB
+        list_s = fpga_tsm_s[1][0].read_static()
+        for data in list_s[0][0]:
+            assert(data.state == '0')
         fpga_tsm_s[1][0].write_static([ni_fpga.StaticStates.One] * 128)
-        print(fpga_tsm_s[1][0].read_static())
+        list_s = fpga_tsm_s[1][0].read_static()
+        for data in list_s[0][0]:
+            print(data.state)
         fpga_tsm_s[1][0].write_static([ni_fpga.StaticStates.Zero] * 128)
+        list_s = fpga_tsm_s[1][0].read_static()
+        for data in list_s[0][0]:
+            assert(data.state == '0')
+
+    def test_rd_commanded(self, fpga_tsm_s):
+        print(fpga_tsm_s[1][0].read_commanded_line_states())
