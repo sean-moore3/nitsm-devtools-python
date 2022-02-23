@@ -659,6 +659,7 @@ def pins_to_session_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconductor
     pin_list = tsm_context.filter_pins_by_instrument_type(pins,
                                                           nitsm.enums.InstrumentTypeIdConstants.NI_DAQMX,
                                                           nitsm.enums.Capability.ALL)
+    print(pin_list)
     (pin_query_contex, task, channel_list) = tsm_context.pins_to_nidaqmx_task(pin_list)
     sites = tsm_context.site_numbers
     multiple_session_info = MultipleSessions(pin_query_contex, [])

@@ -2,7 +2,7 @@
 <PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.5">
 	<Instruments>
 		<Multiplexer multiplexerTypeId="Matrix" name="Masterconnect" />
-		<NIDAQmxTask name="DAQ2" taskType="" channelList="DAQ_6368_C1_S16/port0/line2" />
+		<NIDAQmxTask name="DAQ2" taskType="DigitalOutput" channelList="DAQ2/port0/line2" />
 		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Digital" />
 		<Instrument name="RIO1" instrumentTypeId="782xFPGA">
 			<ChannelGroup id="DIO">
@@ -12,7 +12,7 @@
 		<Instrument name="Switch" instrumentTypeId="_niSwitch">
 			<Channel id="0" />
 		</Instrument>
-		<Instrument instrumentTypeId="Matrix" name="AbstractInstrument">
+		<Instrument instrumentTypeId="abstinst" name="AbstractInstrument">
 			<Channel id="0" />
 		</Instrument>
 	</Instruments>
@@ -53,7 +53,7 @@
 	</Sites>
 	<Connections>
 		<Connection pin="EN_FPGA" siteNumber="0" instrument="RIO1" channel="0" />
-		<Connection pin="En_Daq" siteNumber="0" instrument="DAQ2" channel="DAQ_6368_C1_S16/port0/line2" />
+		<Connection pin="En_Daq" siteNumber="0" instrument="DAQ2" channel="DAQ2/port0/line2" />
 		<Connection pin="eN_Digital" siteNumber="0" instrument="DPI1" channel="0" />
 		<Connection pin="en_Switch" siteNumber="0" instrument="Switch" channel="0" />
 		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
