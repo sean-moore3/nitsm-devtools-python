@@ -1,19 +1,22 @@
-import os
-# import site
 import collections
-import nidevtools.common as ni_dt_common
-import nifpga
+import os
+import shutil
+import typing
 from enum import Enum
 from time import time
 # from time import sleep
-import shutil
+# import site
+
+import nifpga
+import nitsm.pinquerycontexts
+from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 # import nitsm.codemoduleapi
 # from nitsm.enums import Capability
 # from nidaqmx.constants import TerminalConfiguration
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 # from nitsm.enums import InstrumentTypeIdConstants
-import nitsm.pinquerycontexts
-import typing
+
+
+import nidevtools.common as ni_dt_common
 
 # Types Definition
 
