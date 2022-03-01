@@ -347,6 +347,7 @@ def pin_name_to_instrument(pinmap_path: str = ''):
         for j in reference:
             subarray22.append(j.attrib['pin'])
         #TODO Join Sub21 and Sub22
+
 def enable_pins_to_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, enable_pins: typing.List[str]):
     sessions = get_all_sessions(tsm_context)
     array = []
