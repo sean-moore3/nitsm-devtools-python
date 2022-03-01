@@ -647,10 +647,10 @@ def misc(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm_context: SMClass):
-    # ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
-    # print(tsm_context.pin_map_file_path)
-    # pins = ni_dt_digital.SemiconductorModuleContext.get_pin_names(tsm_context, instrument_type_id=tsm_enums.InstrumentTypeIdConstants.NI_DIGITAL_PATTERN)
-    # print(pins)
+    ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
+    print(tsm_context.pin_map_file_path)
+    pins = ni_dt_digital.SemiconductorModuleContext.get_pin_names(tsm_context, instrument_type_id=tsm_enums.InstrumentTypeIdConstants.NI_DIGITAL_PATTERN)
+    print(pins)
     ni_dt_digital.tsm_initialize_sessions(tsm_context, options=OPTIONS)
     tsm_i_o = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["DPI_PG_Inputs", "DPI_PG_Outputs"])
     ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm_i_o, "I2C_Levels", "I2C_Timing")
