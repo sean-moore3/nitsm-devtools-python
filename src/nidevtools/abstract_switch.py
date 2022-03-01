@@ -14,8 +14,7 @@ import nidevtools.fpga
 import nidevtools.switch
 import nidevtools.daqmx
 import time
-import numpy as np
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as Et
 
 instrument_type_id = "Matrix"
 PinsArg = typing.Union[str, typing.Sequence[str]]
@@ -36,7 +35,7 @@ class InstrumentTypes:
     switch = '_niSwitch'
 
 
-class Session():
+class Session:
     def __init__(self,
                  enable_pin: str,
                  instrument_type: typing.Union[InstrumentTypes, str],
@@ -49,7 +48,6 @@ class Session():
         self.site = site
         self.status = status
 
-
     def ss_connect(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
         if self.instrument_type == InstrumentTypes.daqmx:
             multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(tsm_context, self.enable_pin)
@@ -58,7 +56,6 @@ class Session():
             multiple_session.sessions[0].Task.stop()
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
             multiple_session.sessions[0].Task.write(bool(self.route_value), True)
-
         elif self.instrument_type == InstrumentTypes.digitalpattern:
             multiple_session = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
             multiple_session = nidevtools.digital.tsm_ssc_select_function(multiple_session,
@@ -70,7 +67,6 @@ class Session():
             else:
                 data = nidigital.enums.WriteStaticPinState.X
             nidevtools.digital.tsm_ssc_write_static(multiple_session, data)
-
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
             if self.route_value == "0":
@@ -104,7 +100,7 @@ class Session():
 
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
-            data = [nidevtools.fpga.StaticStates.X]  #*128 todo check
+            data = [nidevtools.fpga.StaticStates.X]  # *128 todo check
             print('D:', data)
             multiple_session.write_static(data)
 
@@ -123,9 +119,9 @@ class Session():
         if self.instrument_type == InstrumentTypes.daqmx:
             multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(tsm_context, self.enable_pin)
             multiple_session: nidevtools.daqmx.MultipleSessions
-            data=''
+            data = ''
             for bit in multiple_session.sessions[0].Task.read(1):
-                data+=str(bit)
+                data += str(bit)
             self.status = data
 
         elif self.instrument_type == InstrumentTypes.digitalpattern:
@@ -249,7 +245,7 @@ def initialize_tsm_context(tsm_context: nitsm.codemoduleapi.SemiconductorModuleC
         for instrument in ['niDAQmx', 'niDigitalPattern', '782xFPGA', '_niSwitch']:
             filtered_pins = tsm_context.filter_pins_by_instrument_type(array, instrument, nitsm.enums.Capability.ALL)
             for pin in filtered_pins:
-                session = Session(pin, instrument, '', 0, '')  # TODO Not all info
+                session = Session(pin, instrument, '', 0, '')
                 data.append(session)
         multi_session = AbstractSession(data)
         multi_session.set_sessions(tsm_context, switch_names[0])
@@ -309,15 +305,18 @@ def pin_fgv(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
         elif action == Control.init:
             pinmap_path = tsm_context.pin_map_file_path
             connections += pin_name_to_instrument(pinmap_path)
+        # break
 
-def get_first_matched_node(tree: ET.ElementTree, key: str):
-    key = "{http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd}"+key
+
+def get_first_matched_node(tree: Et.ElementTree, key: str):
+    key = "{http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd}" + key
     root = tree.getroot()
     for i in root:
         if key in i.tag:
             return i
 
-def get_all_matched_nodes(element: ET.Element, key: str):
+
+def get_all_matched_nodes(element: Et.Element, key: str):
     key = "{http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd}"+key
     children = element.getchildren()
     output = []
@@ -326,27 +325,55 @@ def get_all_matched_nodes(element: ET.Element, key: str):
             output.append(i)
     return output
 
+
 def pin_name_to_instrument(pinmap_path: str = ''):
-    tree = ET.parse(pinmap_path)
-    connections = get_first_matched_node(tree,'Connections')
+    tree = Et.parse(pinmap_path)
+    connections = get_first_matched_node(tree, 'Connections')
     pingroups = get_first_matched_node(tree, 'PinGroups')
     connection = get_all_matched_nodes(connections, 'Connection')
     multiplexedconnection = get_all_matched_nodes(connections, 'MultiplexedConnection')
     pingroup = get_all_matched_nodes(pingroups, 'PinGroup')
     subarray1 = []
+    subarray2 = []
     for element in connection:
-         subarray1.append([element.attrib['pin'],element.attrib['instrument'],element.attrib['channel'],"","",""])
+        var1 = [element.attrib['pin'], element.attrib['instrument'], element.attrib['channel'], "", "", ""]
+        subarray1.append(var1)
     for element in multiplexedconnection:
-        dut_route = get_all_matched_nodes(element,"MultiplexedDUTPinRoute")
+        dut_route = get_all_matched_nodes(element, "MultiplexedDUTPinRoute")
         subarray21 = []
         for j in dut_route:
             subarray21.append([j.attrib['pin'], element.attrib['instrument'], element.attrib['channel']])
+    subarray22 = []
     for element in pingroup:
-        reference = get_all_matched_nodes(element,"PinReference")
-        subarray22 = [element.attrib['name']]
+        reference = get_all_matched_nodes(element, "PinReference")
+        subarray22_e = [element.attrib['name'] + '_DUT']
         for j in reference:
-            subarray22.append(j.attrib['pin'])
-        #TODO Join Sub21 and Sub22
+            subarray22_e.append(j.attrib['pin'])
+        subarray22.append(subarray22_e)
+    for element in subarray21:
+        print(element)
+        r = 0
+        for j in subarray22:
+            print("COMPARISON", j[0], element[0])
+            if j[0] == element[0]:
+                break
+            else:
+                r += 1
+        print(r)
+        if element[1] == 'AbstractInstrument':
+            out1 = subarray22[r][2]
+        else:
+            out1 = ""
+        r = 0
+        for j in subarray1:
+            if j[0] == out1:
+                break
+            else:
+                r += 1
+        out2 = "%s, %s" % (subarray1[r][1], subarray1[r][2])
+        subarray2.append(element+[out1]+[out2]+['Disconnected'])
+    return subarray1+subarray2
+
 
 def enable_pins_to_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, enable_pins: typing.List[str]):
     sessions = get_all_sessions(tsm_context)

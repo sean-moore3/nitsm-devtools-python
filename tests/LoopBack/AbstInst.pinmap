@@ -21,31 +21,47 @@
 		<DUTPin name="eN_Digital" />
 		<DUTPin name="EN_FPGA" />
 		<DUTPin name="en_Switch" />
-		<DUTPin name="BuckSGL_1" />
-		<DUTPin name="BuckSGL_2" />
-		<DUTPin name="BuckSGL_3" />
-		<DUTPin name="BuckSGL_4" />
-		<DUTPin name="BuckSGL_5" />
-		<DUTPin name="BuckSGL_6" />
-		<DUTPin name="BuckSGL_7" />
-		<DUTPin name="BuckSGL_8" />
+		<DUTPin name="BuckSGL_1_DUT" />
+		<DUTPin name="BuckSGL_2_DUT" />
+		<DUTPin name="BuckSGL_3_DUT" />
+		<DUTPin name="BuckSGL_4_DUT" />
+		<DUTPin name="BuckSGL_5_DUT" />
+		<DUTPin name="BuckSGL_6_DUT" />
+		<DUTPin name="BuckSGL_7_DUT" />
+		<DUTPin name="BuckSGL_8_DUT" />
 	</Pins>
 	<PinGroups>
-		<PinGroup name="Enablers">
-			<PinReference pin="En_Daq" />
-			<PinReference pin="eN_Digital" />
+		<PinGroup name="BuckSGL_1">
+			<PinReference pin="BuckSGL_1_DUT" />
 			<PinReference pin="EN_FPGA" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_2">
+			<PinReference pin="BuckSGL_2_DUT" />
+			<PinReference pin="EN_FPGA" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_3">
+			<PinReference pin="BuckSGL_3_DUT" />
+			<PinReference pin="En_Daq" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_4">
+			<PinReference pin="BuckSGL_4_DUT" />
+			<PinReference pin="En_Daq" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_5">
+			<PinReference pin="BuckSGL_5_DUT" />
+			<PinReference pin="eN_Digital" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_6">
+			<PinReference pin="BuckSGL_6_DUT" />
+			<PinReference pin="eN_Digital" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_7">
+			<PinReference pin="BuckSGL_7_DUT" />
 			<PinReference pin="en_Switch" />
 		</PinGroup>
-		<PinGroup name="Buck">
-			<PinReference pin="BuckSGL_1" />
-			<PinReference pin="BuckSGL_2" />
-			<PinReference pin="BuckSGL_3" />
-			<PinReference pin="BuckSGL_4" />
-			<PinReference pin="BuckSGL_5" />
-			<PinReference pin="BuckSGL_6" />
-			<PinReference pin="BuckSGL_7" />
-			<PinReference pin="BuckSGL_8" />
+		<PinGroup name="BuckSGL_8">
+			<PinReference pin="BuckSGL_8_DUT" />
+			<PinReference pin="en_Switch" />
 		</PinGroup>
 	</PinGroups>
 	<Sites>
@@ -57,14 +73,14 @@
 		<Connection pin="eN_Digital" siteNumber="0" instrument="DPI1" channel="0" />
 		<Connection pin="en_Switch" siteNumber="0" instrument="Switch" channel="0" />
 		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
-			<MultiplexedDUTPinRoute pin="BuckSGL_1" siteNumber="0" multiplexer="Masterconnect" routeName="EN_FPGA=0" />
-			<MultiplexedDUTPinRoute pin="BuckSGL_2" siteNumber="0" multiplexer="Masterconnect" routeName="EN_FPGA=1" />
-			<MultiplexedDUTPinRoute pin="BuckSGL_3" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq=0" />
-			<MultiplexedDUTPinRoute pin="BuckSGL_4" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq=1" />
-			<MultiplexedDUTPinRoute pin="BuckSGL_5" siteNumber="0" multiplexer="Masterconnect" routeName="eN_Digital=0" />
-			<MultiplexedDUTPinRoute pin="BuckSGL_6" siteNumber="0" multiplexer="Masterconnect" routeName="eN_Digital=1" />
-			<MultiplexedDUTPinRoute pin="BuckSGL_7" siteNumber="0" multiplexer="Masterconnect" routeName="en_Switch=0" />
-			<MultiplexedDUTPinRoute pin="BuckSGL_8" siteNumber="0" multiplexer="Masterconnect" routeName="en_Switch=1" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_1_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="EN_FPGA=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_2_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="EN_FPGA=1" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_3_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_4_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq=1" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_5_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="eN_Digital=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_6_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="eN_Digital=1" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_7_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="en_Switch=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_8_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="en_Switch=1" />
 		</MultiplexedConnection>
 	</Connections>
 </PinMap>

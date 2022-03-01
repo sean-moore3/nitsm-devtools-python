@@ -1,18 +1,14 @@
-import nitsm
-import typing
 import pytest
 import os
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
 import nidevtools.abstract_switch as ni_abstract
 import nidevtools.daqmx as ni_daqmx
 import nidevtools.fpga as ni_fpga
-import nidevtools.digital as ni_dt_digital
 
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["AbstInst.pinmap", "Rainbow.pinmap"]
+pin_file_names = ["AbstInst.pinmap", 'C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap']
 # Change index below to change the pin map to use
 pin_file_name = pin_file_names[0]
 message = "With" + pin_file_name + "Pinmap"
@@ -76,9 +72,16 @@ class TestAbstract:
         # ni_abstract.disconnect_all(tsm_context)
         abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm_context, 'BuckSGL_1')
         enabled.read_state(tsm_context)
-        ni_abstract.pins_to_task_and_connect(tsm_context, ['En_Daq'], ['BuckSGL_3','BuckSGL_4'])
-        #ni_abstract.disconnect_all(tsm_context)
+        ni_abstract.pins_to_task_and_connect(tsm_context, ['En_Daq'], ['BuckSGL_3', 'BuckSGL_4'])
+        # ni_abstract.disconnect_all(tsm_context)
         ni_abstract.disconnect_pin(tsm_context, "BuckSGL_5")
 
-    def test_pin_name_to_instrument(self):
-        ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')
+    def test_pin_name_to_instrument(self, tsm_context):
+        # ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')
+        # print(tsm_context.pin_map_file_path)
+        print('INIT')
+        ni_abstract.pin_fgv(tsm_context, '', ni_abstract.Control.init)
+        print('GET CONNECTIONS')
+        ni_abstract.pin_fgv(tsm_context, '', ni_abstract.Control.get_connections)
+        print('DISCONNECT ALL')
+        # ni_abstract.pin_fgv(tsm_context, '', ni_abstract.Control.disconnect_all)
