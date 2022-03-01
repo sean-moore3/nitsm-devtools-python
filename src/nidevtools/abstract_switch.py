@@ -94,19 +94,15 @@ class Session:
             multiple_session.sessions[0].Task.stop()
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
+            multiple_session_info = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
             data = nidigital.enums.WriteStaticPinState.X
-            nidevtools.digital.tsm_ssc_write_static(multiple_session, data)
-
+            nidevtools.digital.tsm_ssc_write_static(multiple_session_info, data)
         elif self.instrument_type == InstrumentTypes.fpga:
-            multiple_session = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
+            multiple_session_info = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
             data = [nidevtools.fpga.StaticStates.X]  # *128 todo check
-            print('D:', data)
-            multiple_session.write_static(data)
-
+            multiple_session_info.write_static(data)
         elif self.instrument_type == InstrumentTypes.switch:
             data = nidevtools.switch.pin_to_sessions_session_info(tsm_context, self.enable_pin)
-            print("SD:", self.enable_pin)
             data = nidevtools.switch.MultipleSessions([data])
             if self.route_value == '':
                 data.action_session_info(self.route_value, nidevtools.switch.Action.Disconnect_All)
@@ -125,21 +121,19 @@ class Session:
             self.status = data
 
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
-            multiple_session = nidevtools.digital.tsm_ssc_select_function(multiple_session,
-                                                                          nidigital.enums.SelectedFunction.DIGITAL)
-            data = nidevtools.digital.tsm_ssc_read_static(multiple_session)
+            multiple_session_info = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
+            multiple_session_info = nidevtools.digital.tsm_ssc_select_function(multiple_session_info,
+                                                                               nidigital.enums.SelectedFunction.DIGITAL)
+            data = nidevtools.digital.tsm_ssc_read_static(multiple_session_info)
             status = ['0', '1', '', 'L', 'H', 'X', 'M', 'V', 'D', 'E']
             self.status = status[data[0][0]]
-
         elif self.instrument_type == InstrumentTypes.fpga:
-            multiple_session = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
-            data = multiple_session.read_static()
+            multiple_session_info = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
+            data = multiple_session_info.read_static()
             text = 'Disconnected'
             if data[0]:
                 text = 'Connected'
             self.status = text
-
         elif self.instrument_type == InstrumentTypes.switch:
             data = nidevtools.switch.pin_to_sessions_session_info(tsm_context, self.enable_pin)
             data = nidevtools.switch.MultipleSessions([data])
@@ -211,7 +205,7 @@ def close_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
 # Not used
 '''
 def debug_ui(tsm_context: TSMContext):
-    pass  # TODO CHECK
+    pass
 '''
 
 
@@ -299,7 +293,7 @@ def pin_fgv(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
                     if condition:
                         connections[5] = 'Connected'
                     else:
-                        connections[5] = 'Disconnected'  # TODO Why Element 5?
+                        connections[5] = 'Disconnected'
         elif action == Control.disconnect_all:
             disconnect_all(tsm_context)
         elif action == Control.init:
