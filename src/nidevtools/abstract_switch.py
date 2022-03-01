@@ -14,7 +14,8 @@ import nidevtools.fpga
 import nidevtools.switch
 import nidevtools.daqmx
 import time
-
+import numpy as np
+import xml.etree.ElementTree as ET
 
 instrument_type_id = "Matrix"
 PinsArg = typing.Union[str, typing.Sequence[str]]
@@ -103,11 +104,13 @@ class Session():
 
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
-            data = nidevtools.fpga.StaticStates.X
+            data = [nidevtools.fpga.StaticStates.X]  #*128 todo check
+            print('D:', data)
             multiple_session.write_static(data)
 
         elif self.instrument_type == InstrumentTypes.switch:
             data = nidevtools.switch.pin_to_sessions_session_info(tsm_context, self.enable_pin)
+            print("SD:", self.enable_pin)
             data = nidevtools.switch.MultipleSessions([data])
             if self.route_value == '':
                 data.action_session_info(self.route_value, nidevtools.switch.Action.Disconnect_All)
@@ -307,12 +310,43 @@ def pin_fgv(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
             pinmap_path = tsm_context.pin_map_file_path
             connections += pin_name_to_instrument(pinmap_path)
 
+def get_first_matched_node(tree: ET.ElementTree, key: str):
+    key = "{http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd}"+key
+    root = tree.getroot()
+    for i in root:
+        if key in i.tag:
+            return i
+
+def get_all_matched_nodes(element: ET.Element, key: str):
+    key = "{http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd}"+key
+    children = element.getchildren()
+    output = []
+    for i in children:
+        if i.tag == key:
+            output.append(i)
+    return output
 
 def pin_name_to_instrument(pinmap_path: str = ''):
-    pass  # TODO CHECK XML
-    # use any xml parser to get the desired output LabVIEW array (python List)
-
-
+    tree = ET.parse(pinmap_path)
+    connections = get_first_matched_node(tree,'Connections')
+    pingroups = get_first_matched_node(tree, 'PinGroups')
+    connection = get_all_matched_nodes(connections, 'Connection')
+    multiplexedconnection = get_all_matched_nodes(connections, 'MultiplexedConnection')
+    pingroup = get_all_matched_nodes(pingroups, 'PinGroup')
+    subarray1 = []
+    for element in connection:
+         subarray1.append([element.attrib['pin'],element.attrib['instrument'],element.attrib['channel'],"","",""])
+    for element in multiplexedconnection:
+        dut_route = get_all_matched_nodes(element,"MultiplexedDUTPinRoute")
+        subarray21 = []
+        for j in dut_route:
+            subarray21.append([j.attrib['pin'], element.attrib['instrument'], element.attrib['channel']])
+    for element in pingroup:
+        reference = get_all_matched_nodes(element,"PinReference")
+        subarray22 = [element.attrib['name']]
+        for j in reference:
+            subarray22.append(j.attrib['pin'])
+        #TODO Join Sub21 and Sub22
 def enable_pins_to_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, enable_pins: typing.List[str]):
     sessions = get_all_sessions(tsm_context)
     array = []

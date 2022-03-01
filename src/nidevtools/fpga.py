@@ -625,6 +625,7 @@ class TSMFPGA(typing.NamedTuple):
             ss.ss_wr_static_array(static_state)
 
     def write_static(self, static_state: typing.List[StaticStates]):
+        print('SS:', self)
         for ss in self.SSC:
             ss.ss_wr_static(static_state)
 

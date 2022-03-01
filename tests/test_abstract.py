@@ -5,6 +5,9 @@ import os
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
 import nidevtools.abstract_switch as ni_abstract
 import nidevtools.daqmx as ni_daqmx
+import nidevtools.fpga as ni_fpga
+import nidevtools.digital as ni_dt_digital
+
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
@@ -27,8 +30,9 @@ def tsm_context(standalone_tsm):
     """
     print("\nSimulated driver?", SIMULATE)
     ni_daqmx.set_task(standalone_tsm)
-    print('SET',ni_daqmx.get_all_sessions(standalone_tsm))
+    ni_fpga.initialize_sessions(standalone_tsm)
     yield standalone_tsm
+    ni_fpga.close_sessions(standalone_tsm)
     ni_daqmx.clear_task(standalone_tsm)
 
 
@@ -73,4 +77,8 @@ class TestAbstract:
         abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm_context, 'BuckSGL_1')
         enabled.read_state(tsm_context)
         ni_abstract.pins_to_task_and_connect(tsm_context, ['En_Daq'], ['BuckSGL_3','BuckSGL_4'])
-        ni_abstract.disconnect_pin(tsm_context, "BuckSGL_1")
+        #ni_abstract.disconnect_all(tsm_context)
+        ni_abstract.disconnect_pin(tsm_context, "BuckSGL_5")
+
+    def test_pin_name_to_instrument(self):
+        ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')
