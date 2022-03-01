@@ -30,7 +30,7 @@ PinQuery = nitsm.pinquerycontexts.PinQueryContext
 
 class ConnectorResources(typing.NamedTuple):
     Port0: str
-    Port1: str  # TODO Missing Port type
+    Port1: str
     Port2: str
     Port3: str
 
@@ -136,7 +136,7 @@ class I2CMaster(Enum):
 class BoardType(Enum):
     PXIe_7822R = 0
     PXIe_7821R = 1
-    PXIe_7820R = 2  # TODO Does order matters?
+    PXIe_7820R = 2
 
 
 class DIOLines(Enum):
@@ -1354,7 +1354,7 @@ def read_and_write_port(port_resourse: str, output_data: int, output_en: int):
 
 def read_port(port_resourse: str):
     print(port_resourse)
-    read_data = 0  # TODO set IO item
+    read_data = 0
     return read_data
 
 
@@ -1379,7 +1379,6 @@ def write_connector(resources: ConnectorResources, out_data: int, out_enable: in
 
 
 def debug_ui_launcher(semiconductor_module_manager: nitsm.codemoduleapi.SemiconductorModuleContext):
-    # TODO missing Type?
     print(semiconductor_module_manager)
     pass
 
@@ -1462,7 +1461,11 @@ def close_sessions(tsm_context: TSMContext):
         session.close()
 
 
+debug = []
+
+
 def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
+    global debug
     instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(InstrumentTypeId)
     # when the output from a function is unused use _ instead of variables like below
     # instrument_names, channel_group_ids, _ = tsm_context.get_custom_instrument_names(InstrumentTypeId) 
@@ -1478,9 +1481,7 @@ def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
                 break
         tsm_context.set_custom_session(InstrumentTypeId, instrument, group_id, ref_out)
     dut_pins, system_pins = tsm_context.get_pin_names(InstrumentTypeId)
-    debug = tsm_context.pins_to_custom_sessions(InstrumentTypeId, dut_pins+system_pins)
-    # Todo - debug is global variable in labview how is it handled in here.
-    return debug
+    debug = list(tsm_context.pins_to_custom_sessions(InstrumentTypeId, dut_pins+system_pins))
 
 
 def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbers: typing.List[int] = []):
@@ -1521,7 +1522,7 @@ def get_i2c_master_session(tsm_context: TSMContext,
     ch_list = session_data.SSC[0].Channels.split(",")
     iq_list = []
     r_list = []
-    for ch in ch_list:  # TODO CHECK
+    for ch in ch_list:
         iq_list.append(int(ch) // 32)
         r_list.append(int(ch) % 32)
     e0 = LineLocation(DIOLines(r_list[0]), Connectors(iq_list[0]))
@@ -1547,7 +1548,7 @@ def check_ui_tool(
     path_debug = os.path.join(path_panels, '782x FPGA Debug UI.seq')
     path_debug2 = os.path.join(path_panels, '782x FPGA Debug UI')
     condition = os.path.exists(path_debug) and os.path.exists(path_debug2)
-    if not False:  # TODO connected to condition?
+    if not False:
         source = os.path.join(path_in, '.\\782x FPGA Debug UI\\')
         target = path_panels
         shutil.copy2(source, target)
