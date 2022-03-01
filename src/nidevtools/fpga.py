@@ -1455,13 +1455,16 @@ def channel_list_to_pins(channel_list: str = ""):
 
 
 def close_sessions(tsm_context: TSMContext):
-    session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(InstrumentTypeId)
+    # session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(InstrumentTypeId)
+    session_data, _, _ = tsm_context.get_all_custom_sessions(InstrumentTypeId)
     for session in session_data:
         session.close()
 
 
 def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
     instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(InstrumentTypeId)
+    # when the output from a function is unused use _ instead of variables like below
+    # instrument_names, channel_group_ids, _ = tsm_context.get_custom_instrument_names(InstrumentTypeId) 
     for instrument, group_id in zip(instrument_names, channel_group_ids):
         # target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
         ref_out = ""
@@ -1475,6 +1478,7 @@ def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
         tsm_context.set_custom_session(InstrumentTypeId, instrument, group_id, ref_out)
     dut_pins, system_pins = tsm_context.get_pin_names(InstrumentTypeId)
     debug = tsm_context.pins_to_custom_sessions(InstrumentTypeId, dut_pins+system_pins)
+    # Todo - debug is global variable in labview how is it handled in here.
     return debug
 
 
@@ -1483,6 +1487,7 @@ def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbe
         tsm_context.pins_to_custom_sessions(InstrumentTypeId, pins)
     session_data: typing.Tuple[nifpga.Session]
     channel_list = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], site_numbers)
+    #Todo - use two variables to store the channel_list and sites
     new_sessions = []
     for session, channel_id, channel, list_d in zip(session_data, channel_group_ids, channels_lists, channel_list[1]):
         new_sessions.append(_SSCFPGA(session, channel_id, channel, list_d))

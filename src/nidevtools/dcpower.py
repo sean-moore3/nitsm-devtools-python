@@ -1,8 +1,9 @@
 import datetime
-import re
 import math
+import re
 import typing
 from datetime import datetime
+
 import nidcpower
 import nidcpower.enums as enums
 import nidcpower.errors
@@ -206,6 +207,14 @@ class _NIDCPowerSSC:
     """
 
     def __init__(self, session: nidcpower.Session, channels: str, pins: str):
+        """NI DC power SSC class initialisation for session related operations.
+
+        Args:
+            session (nidcpower.Session): This is a shared session. Need to use this with channel 
+                subset notation.
+            channels (str): List of channels that are part of this session. 
+            pins (str): List of pins that are part of this session.
+        """
         self._session = session  # mostly shared session depends on pinmap file.
         self._channels = channels  # specific channel(s) of that session
         self._pins = pins  # pin names mapped to the channels
@@ -256,18 +265,56 @@ class _NIDCPowerSSC:
         return self._channels_session.abort()
 
     def cs_commit(self):
+        """
+        Applies previously configured settings to the specified channel(s) under current session.
+        Calling this method moves the NI-DCPower session from the Uncommitted state into
+        the Committed state. After calling this method, modifying any
+        property reverts the NI-DCPower session to the Uncommitted state. Use
+        the initiate method to transition to the Running state.
 
+        Returns:
+            None: when this operation is completed successfully, i.e. no error.
+        """
         return self._channels_session.commit()
 
     def cs_initiate(self):
+        """
+        Starts generation or acquisition, causing the specified channel(s) to
+        leave the Uncommitted state or Committed state and enter the Running
+        state. To return to the Uncommitted state call the abort
+        method.
+
+        Returns:
+            context manager: This method will return a Python context manager that will initiate on entering and abort on exit.
+        """
         return self._channels_session.initiate()
 
     def cs_reset(self):
+        """Resets the specified channel(s) to a known state. This method disables power
+        generation, resets session properties to their default values, commits
+        the session properties, and leaves the session in the Uncommitted state.
+
+        Returns:
+            None: when this operation is completed successfully, i.e. no error.
+        """
         return self._channels_session.reset()
 
     def cs_configure_aperture_time_with_abort_and_initiate(
         self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS
     ):
+        """
+        Aborts current operation and configures the measurement aperture time for the 
+        current channel configuration. Later initiates the session.
+        Aperture time is specified in the units set by the aperture_time_units property.
+        for information about supported devices.Refer to the Aperture Time topic in the 
+        NI DC Power Supplies and SMUs Help for more information about how to configure your 
+        measurements and for information about valid values.
+    
+
+        Args:
+            aperture_time (_type_, optional): _description_. Defaults to 16.667e-03.
+            aperture_time_units (_type_, optional): _description_. Defaults to enums.ApertureTimeUnits.SECONDS.
+        """
         self._channels_session.abort()
         self._channels_session.aperture_time = aperture_time
         self._channels_session.aperture_time_units = aperture_time_units
@@ -276,9 +323,31 @@ class _NIDCPowerSSC:
     def cs_configure_aperture_time(
         self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS
     ):
+        """
+        Configures the measurement aperture time for the channel configuration. 
+        Aperture time is specified in the units set by the aperture_time_units property.
+        for information about supported devices.
+        Refer to the Aperture Time topic in the NI DC Power Supplies and SMUs Help for 
+        more information about how to configure your measurements and for information about valid values.
+    
+
+        Args:
+            aperture_time (float, optional): in seconds by default. Defaults to 16.667e-03.
+            aperture_time_units (enum, optional): seconds. Defaults to enums.ApertureTimeUnits.SECONDS.
+
+        Returns:
+            None: when this operation is completed successfully, i.e. no error.
+        """
         return self._channels_session.configure_aperture_time(aperture_time, aperture_time_units)
 
     def cs_configure_power_line_frequency(self, power_line_frequency=60.0):
+        """
+        Stores the session object variable power line frequency for other operations 
+        that uses power line frequency.
+
+        Args:
+            power_line_frequency (float, optional): _description_. Defaults to 60.0.
+        """
         self.power_line_frequency = power_line_frequency
         self._channels_session.power_line_frequency = power_line_frequency
 
