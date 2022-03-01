@@ -72,6 +72,7 @@ def get_all_sessions(tsm_context: TSMContext):
 
 
 def pin_to_sessions_session_info(tsm_context: TSMContext, pin: str = ''):
+    print(pin)
     try:
         pin_query_context, session_data, channel_group_id, channel_list =\
             tsm_context.pins_to_custom_session(instrument_type_id, pin)
