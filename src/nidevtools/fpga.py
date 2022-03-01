@@ -1487,12 +1487,11 @@ def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbe
     pin_query_context, session_data, channel_group_ids, channels_lists =\
         tsm_context.pins_to_custom_sessions(InstrumentTypeId, pins)
     session_data: typing.Tuple[nifpga.Session]
-    channel_list = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], site_numbers)
-    #Todo - use two variables to store the channel_list and sites
+    channel_list, sites = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], site_numbers)
     new_sessions = []
-    for session, channel_id, channel, list_d in zip(session_data, channel_group_ids, channels_lists, channel_list[1]):
-        new_sessions.append(_SSCFPGA(session, channel_id, channel, list_d))
-    return TSMFPGA(pin_query_context, new_sessions, channel_list[0])
+    for session, channel_id, channel, site in zip(session_data, channel_group_ids, channels_lists, sites):
+        new_sessions.append(_SSCFPGA(session, channel_id, channel, site))
+    return TSMFPGA(pin_query_context, new_sessions, channel_list)
 
 
 def open_reference(rio_resource: str, target: BoardType, ldb_type: str):

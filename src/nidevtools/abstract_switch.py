@@ -338,6 +338,7 @@ def pin_name_to_instrument(pinmap_path: str = ''):
     for element in connection:
         var1 = [element.attrib['pin'], element.attrib['instrument'], element.attrib['channel'], "", "", ""]
         subarray1.append(var1)
+    subarray21 = []
     for element in multiplexedconnection:
         dut_route = get_all_matched_nodes(element, "MultiplexedDUTPinRoute")
         subarray21 = []
