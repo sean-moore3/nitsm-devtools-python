@@ -1,3 +1,4 @@
+from cmath import nan
 import datetime
 import math
 import re
@@ -115,6 +116,19 @@ class CustomTransientResponse:
             float: returns the pole zero ratio stored in object
         """
         return self._pole_zero_ratio
+
+
+class ChannelProperties(typing.NamedTuple):
+    pin: str
+    channel: str
+    level: float
+    limit:float
+    voltage_range: float
+    current_range: float
+    output_function: str
+    model: str
+    transient_response: str
+    output_connected : str
 
 
 def model_to_ranges(model: int, channel: int):
@@ -290,7 +304,8 @@ class _NIDCPowerSSC:
         return self._channels_session.initiate()
 
     def cs_reset(self):
-        """Resets the specified channel(s) to a known state. This method disables power
+        """
+        Resets the specified channel(s) to a known state. This method disables power
         generation, resets session properties to their default values, commits
         the session properties, and leaves the session in the Uncommitted state.
 
@@ -351,7 +366,12 @@ class _NIDCPowerSSC:
         self.power_line_frequency = power_line_frequency
         self._channels_session.power_line_frequency = power_line_frequency
 
-    def cs_configure_sense(self, sense=enums.Sense.LOCAL):
+    def cs_configure_sense(self, sense=enums.Sense.REMOTE):
+        """cofigures the sense for all channels in the session that are part to pinquery context
+
+        Args:
+            sense (enum, optional): _description_. Defaults to enums.Sense.REMOTE.
+        """
         self._channels_session.sense = sense
 
     def cs_configure_settings(
@@ -416,6 +436,13 @@ class _NIDCPowerSSC:
             self._channels_session.sense = sense
 
     def cs_get_aperture_time_in_seconds(self):
+        """
+        get the aperture time in seconds for all channels in the session. if the model has diffent units convert 
+        them into seconds. 
+
+        Returns:
+            float: aperture time in seconds
+        """
         match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
         all_supported_models = [
             "4135",
@@ -449,6 +476,12 @@ class _NIDCPowerSSC:
         return actual_aperture_time
 
     def cs_get_power_line_frequency(self):
+        """
+        get the power line frequency stored in the object or from the instrument based on the supported model
+
+        Returns:
+            float: power line frequency in hertz
+        """
         match = re.search("\d\d\d\d", self._session.instrument_model, re.RegexFlag.ASCII)[0]
         configured_power_line_frequency = self._channels_session.power_line_frequency
         if match in ["4110", "4130"]:
@@ -458,6 +491,11 @@ class _NIDCPowerSSC:
         return configured_power_line_frequency
 
     def cs_query_in_compliance(self):
+        """get the in compliance status of each channel under the current session.
+
+        Returns:
+            bool list: list of status one for each channel
+        """
         compliance_states = []
         for ch in self._ch_list:
             comp = self.session.channels[ch].query_in_compliance()  # access one channel at a time.
@@ -465,6 +503,15 @@ class _NIDCPowerSSC:
         return compliance_states
 
     def cs_query_output_state(self, output_state: nidcpower.OutputStates):
+        """
+        compares the state of the output against the desired state
+
+        Args:
+            output_state (nidcpower.OutputStates): desired output state
+
+        Returns:
+            bool list: indicates output state is same as desired state or not. 
+        """
         output_states = []
         for ch in self._ch_list:
             state = self.session.channels[ch].query_output_state(
@@ -474,9 +521,19 @@ class _NIDCPowerSSC:
         return output_states
 
     def cs_configure_current_level_range(self, current_level_range=0.0):
+        """upates the property 
+
+        Args:
+            current_level_range (float, optional): updates the range property. Defaults to 0.0.
+        """
         self._channels_session.current_level_range = current_level_range
 
     def cs_configure_current_level(self, current_level=0.0):
+        """updates the current level property.
+
+        Args:
+            current_level (float, optional): updates the level property. Defaults to 0.0.
+        """
         self._channels_session.current_level = current_level
 
     def configure_single_point_force_dc_current_asymmetric_limits(
@@ -804,6 +861,67 @@ class _NIDCPowerSSC:
             currents.append(s[1])
             in_compliance.append(s[2])
         return voltages, currents
+
+    def cs_get_properties(self):
+        pins = self._pins
+        for pin, channel in zip(self._pins,self.cs_channels):
+            ss = self.session.channels[channel]
+            output_fn = ss.output_function
+            if output_fn == enums.OutputFunction.DC_VOLTAGE:
+                level = ss.voltage_level
+                limit = ss.current_limit
+                v_range = ss.voltage_level_range
+                i_range = ss.current_limit_range
+                output_function = "DC Voltage"
+            elif output_fn == enums.OutputFunction.DC_CURRENT:
+                level = ss.current_level
+                limit = ss.voltage_limit
+                v_range = ss.voltage_limit_range
+                i_range = ss.current_level_range
+                output_function = "DC Current"
+            elif output_fn == enums.OutputFunction.PULSE_VOLTAGE:
+                level = ss.pulse_voltage_level
+                limit = ss.pulse_current_limit
+                v_range = ss.pulse_voltage_level_range
+                i_range = ss.pulse_current_limit_range
+                output_function = "Pulse Voltage"
+            elif output_fn == enums.OutputFunction.PULSE_CURRENT:
+                level = ss.pulse_current_level
+                limit = ss.pulse_voltage_limit
+                v_range = ss.pulse_voltage_limit_range
+                i_range = ss.pulse_current_level_range
+                output_function = "Pulse Current"
+            else:
+                level = nan
+                limit = nan
+                v_range = nan
+                i_range = nan
+                output_function = "un defined"
+            model = ss.instrument_model
+            match = re.search("\d\d\d\d", model, re.RegexFlag.ASCII)[0]
+            if match in [4110,4112,4113,4130,4132]:
+                tr_response = "N/A"
+            elif match == 4154 and channel == "1":
+                tr_response = "N/A"
+            else:
+                tr_response = str(ss.transient_response)
+            if match in [4110,4130,4140,4141,4142,4143,4144,4145]:
+                output_connected = "N/A"
+            else:
+                output_connected = str(ss.output_connected)
+            
+            ap_time = self.cs_get_aperture_time_in_seconds()
+            sense = self.cs_get
+            ch_prop = ChannelProperties(pin,channel,level,limit,v_range,i_range,
+                                    output_function,model,tr_response,output_connected)
+            
+
+
+
+                    
+                
+
+
 
 
 class _NIDCPowerTSM:
@@ -1270,14 +1388,32 @@ class _NIDCPowerTSM:
             ssc.cs_configure_current_level(current_level)
 
     def configure_voltage_limit_range(self, voltage_limit_range=0.0):
+        """
+        configure same voltage limit for all channels in each session.
+
+        Args:
+            voltage_limit_range (float, optional): for all channels. Defaults to 0.0.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_voltage_limit_range(voltage_limit_range)
 
     def configure_voltage_limit(self, voltage_limit=0.0):
+        """
+        configure the same voltage limit for all channels in each session.
+
+        Args:
+            voltage_limit (float, optional): for all channels. Defaults to 0.0.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_voltage_limit(voltage_limit)
 
     def configure_voltage_limit_array(self, voltage_limits_array):
+        """
+        configure different the voltage limit for all channels in each session. 
+
+        Args:
+            voltage_limits_array (List of float): one voltage limit for each channel
+        """
         voltage_limits = self._expand_array_to_sessions(voltage_limits_array)
         i = 0
         for ssc in self._sscs:
@@ -1285,14 +1421,32 @@ class _NIDCPowerTSM:
             i += 1
 
     def configure_voltage_level_range(self, voltage_level_range=0.0):
+        """
+        configures the same voltage level range for all channels in the sessions
+
+        Args:
+            voltage_level_range (float, optional): for all channels. Defaults to 0.0.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_voltage_level_range(voltage_level_range)
 
     def configure_voltage_level(self, voltage_level=0.0):
+        """
+        configure the same voltage level for all channels in the session
+
+        Args:
+            voltage_level (float, optional): for all channels. Defaults to 0.0.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_voltage_level(voltage_level)
 
     def configure_voltage_level_array(self, voltage_levels_array):
+        """
+        Configures different voltage level for each channel in the sessions
+
+        Args:
+            voltage_levels_array (float): for each channel
+        """
         voltage_levels = self._expand_array_to_sessions(voltage_levels_array)
         i = 0
         for ssc in self._sscs:
@@ -1300,14 +1454,32 @@ class _NIDCPowerTSM:
             i += 1
 
     def configure_current_limit_range(self, current_limit_range=0.0):
+        """
+        configures same current limit range for all channels in the sessions
+
+        Args:
+            current_limit_range (float, optional): for all channels. Defaults to 0.0.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_current_limit_range(current_limit_range)
 
     def configure_current_limit(self, current_limit=0.0):
+        """
+        configures same current limit for all channels in the sessions
+
+        Args:
+            current_limit (float, optional): for all channels. Defaults to 0.0.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_current_limit(current_limit)
 
     def configure_current_limit_array(self, current_limits_array):
+        """
+        configures the current limit for each channel in the sessions
+
+        Args:
+            current_limits_array (float): one for each channel in the session
+        """
         current_limits = self._expand_array_to_sessions(current_limits_array)
         i = 0
         for ssc in self._sscs:
@@ -1322,6 +1494,16 @@ class _NIDCPowerTSM:
         voltage_limit_low,
         voltage_limit_range,
     ):
+        """
+                Source different voltage limits on both sides (positive and negative)
+
+        Args:
+            current_level (float): to be applied on the channels.
+            current_level_range (float): for the desired current level.
+            voltage_limit_high (float): maximum allowed positive side voltage.
+            voltage_limit_low (float): maximum allowed negative side voltage.
+            voltage_limit_range (float): range selection for voltage limit. 
+        """
         current_levels = self._expand_array_to_sessions(current_level)
         current_level_ranges = self._expand_array_to_sessions(current_level_range)
         voltage_limit_highs = self._expand_array_to_sessions(voltage_limit_high)
@@ -1338,6 +1520,15 @@ class _NIDCPowerTSM:
     def force_current_symmetric_limits(
         self, current_level, current_level_range, voltage_limit, voltage_limit_range
     ):
+        """
+               Source same voltage limit on both sides (positive and negative)
+
+        Args:
+            current_level (float): to be applied on the channels
+            current_level_range (float): for the desired current level
+            voltage_limit (float): maximum allowed voltage
+            voltage_limit_range (float): range selection for voltage limit
+        """
         current_levels = self._expand_array_to_sessions(current_level)
         current_level_ranges = self._expand_array_to_sessions(current_level_range)
         voltage_limits = self._expand_array_to_sessions(voltage_limit)
@@ -1354,6 +1545,16 @@ class _NIDCPowerTSM:
         current_limit_low,
         current_limit_range,
     ):
+        """
+         Source different current limits on both sides (positive and negative)
+
+        Args:
+            voltage_level (float): to be applied on the channels.
+            voltage_level_range (float): for the desired voltage level.
+            current_limit_high (float): maximum allowed positive side current.
+            current_limit_low (float): maximum allowed negative side current.
+            current_limit_range (float): range selection for current limit. 
+        """
         voltage_levels = self._expand_array_to_sessions(voltage_level)
         voltage_level_ranges = self._expand_array_to_sessions(voltage_level_range)
         current_limit_highs = self._expand_array_to_sessions(current_limit_high)
@@ -1370,6 +1571,15 @@ class _NIDCPowerTSM:
     def force_voltage_symmetric_limits(
         self, voltage_level=0.0, voltage_level_range=0.0, current_limit=0.0, current_limit_range=0.0
     ):
+        """
+        Source same current limit on both sides (positive and negative)
+
+        Args:
+            voltage_level (float, optional): to be applied on the channels. Defaults to 0.0.
+            voltage_level_range (float, optional): for the desired voltage level. Defaults to 0.0.
+            current_limit (float, optional): maximum allowed current . Defaults to 0.0.
+            current_limit_range (float, optional): range selection for current limit. Defaults to 0.0.
+        """
         voltage_levels = self._expand_array_to_sessions(voltage_level)
         voltage_level_ranges = self._expand_array_to_sessions(voltage_level_range)
         current_limits = self._expand_array_to_sessions(current_limit)
@@ -1379,6 +1589,16 @@ class _NIDCPowerTSM:
         )
 
     def measure(self, measurement_mode=MeasurementMode.AUTO):
+        """
+        measure the data by seting uo the measurement mode 
+        reads all data from all the sessions.
+
+        Args:
+            measurement_mode (enum, optional): specifies the desired measurement mode. Defaults to MeasurementMode.AUTO.
+
+        Returns:
+            voltages, current: tuple of list of voltages and currents
+        """
         fetch_or_measure_array = []
         voltages = []
         currents = []
@@ -1395,6 +1615,12 @@ class _NIDCPowerTSM:
     def configure_source_adapt(
         self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse
     ):
+        """configures the transient responses for both voltage and current 
+
+        Args:
+            voltage_ctr (CustomTransientResponse): for voltage control
+            current_ctr (CustomTransientResponse): for current control 
+        """
         for ssc in self._sscs:
             ssc.cs_configure_source_adapt(voltage_ctr, current_ctr)
 
@@ -1455,6 +1681,11 @@ class _NIDCPowerTSM:
 
 
 class TSMDCPower(typing.NamedTuple):
+    """data type of the DCPower_Tsm objects
+
+    Args:
+        typing (tuple): 5 entites for storing them togather. 
+    """
     pin_query_context: typing.Any
     ssc: _NIDCPowerTSM
     sites: typing.List[int]
@@ -1474,11 +1705,11 @@ def pins_to_sessions(
     Args:
         tsm_context (TSMContext): tsm context for nidcpower
         pins (typing.List[str]): desired pins for which the TSMDCPower object is created
-        sites (typing.List[int], optional): _description_. Defaults to [].
-        fill_pin_site_info (bool, optional): _description_. Defaults to True.
+        sites (typing.List[int], optional): list of desired sites. Defaults to [].
+        fill_pin_site_info (bool, optional): if true updates the sites. Defaults to True.
 
     Returns:
-        _type_: _description_
+        dcpower_tsm: pinquery context variable
     """
     if len(sites) == 0:
         sites = list(tsm_context.site_numbers)  # This is tested and works
@@ -1540,11 +1771,11 @@ def filter_sites(dc_power_tsm: TSMDCPower, sites):
     """from tsm context select only desired sites
 
     Args:
-        dc_power_tsm (TSMDCPower): _description_
-        sites (_type_): _description_
+        dc_power_tsm (TSMDCPower): pin query context 
+        sites (int list): desired site numbers
 
     Returns:
-        _type_: _description_
+        dc power tsm: same as input but with desired sites only
     """
     dc_power_tsm.ssc = dc_power_tsm.ssc.filter_sites(sites)
     dc_power_tsm.site_numbers = sites
