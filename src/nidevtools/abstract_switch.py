@@ -165,6 +165,10 @@ class AbstractSession(typing.NamedTuple):
             session.ss_connect(tsm_context)
 
     def disconnect_sessions_info(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):  # CHECK
+        """
+        Disconnects the provided session from the TSM contect it works for DAQmx, Digital Pattern, FPGA and Switch
+        sessions only
+        """
         for session in self.enable_pins:
             session.ss_disconnect(tsm_context)
 
@@ -210,6 +214,9 @@ def debug_ui(tsm_context: TSMContext):
 
 
 def disconnect_all(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):  # CHECK
+    """
+    Disconnects all abstract switch related pins in the context provided
+    """
     sessions = get_all_sessions(tsm_context).enable_pins
     array1 = []
     array2 = []
@@ -223,11 +230,19 @@ def disconnect_all(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
 
 
 def disconnect_pin(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pin: str):
+    """
+    Disconnects the pin provided on the TSM context, the pin provided should be part of the pinmap
+    """
     sessions = pins_to_sessions_sessions_info(tsm_context, pin)
     sessions.disconnect_sessions_info(tsm_context)
 
 
 def initialize_tsm_context(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):  # CHECK
+    """
+    Initialize the TSM context with all the Abstract switch sessions
+    Args:
+        tsm_context: TSM context where the sessions will be initialized
+    """
     switch_names = tsm_context.get_all_switch_names(instrument_type_id)
     if len(switch_names) == 1:
         dut_pins, sys_pins = tsm_context.get_pin_names()
@@ -255,6 +270,9 @@ def initialize_tsm_context(tsm_context: nitsm.codemoduleapi.SemiconductorModuleC
 def pin_fgv(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
             pin: str = '',
             action: Control = Control.get_connections):
+    """
+
+    """
     connections = []
     while True:
         if action == Control.get_connections:
@@ -321,6 +339,11 @@ def get_all_matched_nodes(element: Et.Element, key: str):
 
 
 def pin_name_to_instrument(pinmap_path: str = ''):
+    '''
+    From pinmap location it parce the abstract switch connections into an Array.
+    Args:
+        pinmap_path: Location of the pinmap to use
+    '''
     tree = Et.parse(pinmap_path)
     connections = get_first_matched_node(tree, 'Connections')
     pingroups = get_first_matched_node(tree, 'PinGroups')
@@ -371,6 +394,14 @@ def pin_name_to_instrument(pinmap_path: str = ''):
 
 
 def enable_pins_to_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, enable_pins: typing.List[str]):
+    '''
+    Receives enable pins list and return a Multisession object with the sessions corresponding to those pins
+    Args:
+        tsm_context: Pin context
+        enable_pins: List of pins for session creation
+    Returns:
+        MultipleSession object that contains the session for the selected pins.
+    '''
     sessions = get_all_sessions(tsm_context)
     array = []
     for pin in enable_pins:

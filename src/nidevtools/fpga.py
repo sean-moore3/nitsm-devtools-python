@@ -410,12 +410,6 @@ class _SSCFPGA(typing.NamedTuple):
             raise Exception
         # config: WorldControllerSetting
         config = master_config.read()
-
-        '''
-        config.Device_Address = device_address
-        config.Number_of_Bytes = number_of_bytes
-        config.Read = True
-        '''
         config['Device Address'] = device_address
         config['Number of Bytes'] = number_of_bytes
         config['Read'] = True
