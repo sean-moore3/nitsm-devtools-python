@@ -119,17 +119,21 @@ class CustomTransientResponse:
 
 
 class ChannelProperties(typing.NamedTuple):
-    pin: str
-    channel: str
-    level: float
-    limit:float
-    voltage_range: float
-    current_range: float
-    output_function: str
-    model: str
-    transient_response: str
+    instrument_name : str
+    model : str
+    channel : str
+    pin : str
+    output_function : str
+    level : float
+    limit : float
+    voltage_range : float
+    current_range : float
+    sense : str
+    aperture_time : float
+    transient_response : str
+    output_enabled : str
     output_connected : str
-
+    
 
 def model_to_ranges(model: int, channel: int):
     """Returns current, voltage and resistance (for voltage and current) ranges"""
@@ -863,8 +867,12 @@ class _NIDCPowerSSC:
         return voltages, currents
 
     def cs_get_properties(self):
-        pins = self._pins
-        for pin, channel in zip(self._pins,self.cs_channels):
+        channel_properties=[]
+        # ap_times = list(self.cs_get_aperture_time_in_seconds())
+        chnls= self.cs_channels.split(",")
+        pns = self._pins.split(",")
+        print("Pins And Channels", pns, chnls)
+        for pin, channel in zip(pns, chnls):
             ss = self.session.channels[channel]
             output_fn = ss.output_function
             if output_fn == enums.OutputFunction.DC_VOLTAGE:
@@ -897,7 +905,7 @@ class _NIDCPowerSSC:
                 v_range = nan
                 i_range = nan
                 output_function = "un defined"
-            model = ss.instrument_model
+            model = self.session.instruments[channel].instrument_model
             match = re.search("\d\d\d\d", model, re.RegexFlag.ASCII)[0]
             if match in [4110,4112,4113,4130,4132]:
                 tr_response = "N/A"
@@ -909,19 +917,14 @@ class _NIDCPowerSSC:
                 output_connected = "N/A"
             else:
                 output_connected = str(ss.output_connected)
-            
-            ap_time = self.cs_get_aperture_time_in_seconds()
-            sense = self.cs_get
-            ch_prop = ChannelProperties(pin,channel,level,limit,v_range,i_range,
-                                    output_function,model,tr_response,output_connected)
-            
-
-
-
-                    
-                
-
-
+            sense = str(ss.sense)
+            ap_time = ss.aperture_time
+            output_en = ss.output_enabled
+            instr_name = ss.instrument_manufacturer
+            ch_prop = ChannelProperties(instr_name, model, channel, pin, output_function, level, limit, v_range, i_range, 
+                                   sense, ap_time, tr_response, output_en, output_connected)
+            channel_properties.append(ch_prop)        
+        return channel_properties
 
 
 class _NIDCPowerTSM:
@@ -1332,6 +1335,13 @@ class _NIDCPowerTSM:
             settings = ssc.cs_get_measurement_settings()
             meas_settings.append(settings)
         return meas_settings
+
+    def get_properties(self):
+        all_ch_prop = []
+        for ssc in self._sscs:
+            prop = ssc.cs_get_properties()
+            all_ch_prop.append(prop)
+        return all_ch_prop
 
     def set_measurement_settings(self, meas_settings):
         i = 0

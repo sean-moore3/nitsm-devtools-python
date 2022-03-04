@@ -226,6 +226,23 @@ class TestDCPower:
             # dcpower_tsm.ssc.configure_output_enabled_and_connected(output_enabled_and_connected=False)
             i += 1
 
+    def test_get_properties(self, dcpower_tsm_s):
+        voltage_set_point = 1.0  # we measured current consumed for this voltage.
+        i = 0
+        for dcpower_tsm in dcpower_tsm_s:
+            dcpower_tsm.ssc.configure_output_connected(output_connected=True)
+            dcpower_tsm.ssc.force_voltage_symmetric_limits(voltage_set_point, 1.0, 0.1, 0.1)
+            aperture_times_in_seconds = dcpower_tsm.ssc.get_aperture_times_in_seconds()
+            print("aperture_times_in_seconds\n", aperture_times_in_seconds)
+            dcpower_tsm.ssc.abort()
+            dcpower_tsm.ssc.reset()
+            print("Iteration number", i)
+            dcpower_tsm.ssc.configure_output_connected(output_connected=True)
+            # dcpower_tsm.ssc.configure_output_enabled_and_connected(output_enabled_and_connected=False)
+            all_props = dcpower_tsm.ssc.get_properties()
+            print(all_props)
+            i += 1
+
 
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm_context: SMClass):
