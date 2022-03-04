@@ -77,7 +77,7 @@ class TestAbstract:
         enabled.read_state(tsm_context)
         ni_abstract.pins_to_task_and_connect(tsm_context, ['En_Daq'], ['BuckSGL_3', 'BuckSGL_4'])
         #ni_abstract.disconnect_all(tsm_context)
-        ni_abstract.disconnect_pin(tsm_context, "BuckSGL_5")
+        ni_abstract.disconnect_pin(tsm_context, "BuckSGL_1")
 
     def test_pin_name_to_instrument(self, tsm_context):
         # ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')

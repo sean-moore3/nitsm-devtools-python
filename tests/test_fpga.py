@@ -72,45 +72,8 @@ class TestFPGA:
             assert isinstance(fpga_tsm.pin_query_context, ni_fpga.PinQuery)
             assert isinstance(fpga_tsm.SSC, typing.List)
 
-    def test_parse_header(self):
-        for data in range(254):
-            print('Test Address/Read/Valid')
-            for addr in range(256):
-                result = ni_fpga.parse_header(ni_fpga.I2CHeaderWord(addr, True, False), addr, True)
-                assert (result[0].Address == ((addr << 8) | addr))
-                assert (result[0].Read is True)
-                assert (result[0].Valid is True)
-                result = ni_fpga.parse_header(ni_fpga.I2CHeaderWord(addr, False, False), addr, False)
-                if (addr & 248) == 240:
-                    assert (result[0].Address == ((addr >> 1) & 3))
-                else:
-                    assert (result[0].Address == (addr >> 1))
-                assert (result[0].Read == bool(addr % 2))
-                assert (result[0].Valid != result[1])
-        print('Value test completed: Pass')
-
-    def test_create_header(self):
-        print('Test Create Header')
-        result = ni_fpga.create_header(False, 15, False)
-        assert (result == (30, 15))
-        result = ni_fpga.create_header(False, 25, True)
-        assert (result == (51, 25))
-        result = ni_fpga.create_header(True, 35, False)
-        assert (result == (240, 35))
-        result = ni_fpga.create_header(True, 45, True)
-        assert (result == (241, 45))
-
     def test_get_i2c_master_session(self, tsm_context):
         print(ni_fpga.get_i2c_master_session(tsm_context, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True))
-
-    '''SKIPPED
-    def test_write_and_read(self, tsm_context):
-        data = ni_fpga.get_i2c_master_session(tsm_context, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True)
-        print('Read: ', data.read_i2c_data(number_of_bytes=8, slave_address=23, timeout=100))
-        array = [1, 0, 1, 0, 1, 0, 1, 0]
-        data.write_i2c_data(data_to_write=array, slave_address=23, timeout=100)
-        print('Read: ', data.read_i2c_data(number_of_bytes=8, slave_address=23, timeout=100))
-    '''
 
     def test_update_line_on_connectors(self):
         for i in range(8):
