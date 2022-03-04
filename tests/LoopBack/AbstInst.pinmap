@@ -33,35 +33,27 @@
 	<PinGroups>
 		<PinGroup name="BuckSGL_1">
 			<PinReference pin="BuckSGL_1_DUT" />
-			<PinReference pin="EN_FPGA" />
 		</PinGroup>
 		<PinGroup name="BuckSGL_2">
 			<PinReference pin="BuckSGL_2_DUT" />
-			<PinReference pin="EN_FPGA" />
 		</PinGroup>
 		<PinGroup name="BuckSGL_3">
 			<PinReference pin="BuckSGL_3_DUT" />
-			<PinReference pin="En_Daq" />
 		</PinGroup>
 		<PinGroup name="BuckSGL_4">
 			<PinReference pin="BuckSGL_4_DUT" />
-			<PinReference pin="En_Daq" />
 		</PinGroup>
 		<PinGroup name="BuckSGL_5">
 			<PinReference pin="BuckSGL_5_DUT" />
-			<PinReference pin="eN_Digital" />
 		</PinGroup>
 		<PinGroup name="BuckSGL_6">
 			<PinReference pin="BuckSGL_6_DUT" />
-			<PinReference pin="eN_Digital" />
 		</PinGroup>
 		<PinGroup name="BuckSGL_7">
 			<PinReference pin="BuckSGL_7_DUT" />
-			<PinReference pin="en_Switch" />
 		</PinGroup>
 		<PinGroup name="BuckSGL_8">
 			<PinReference pin="BuckSGL_8_DUT" />
-			<PinReference pin="en_Switch" />
 		</PinGroup>
 	</PinGroups>
 	<Sites>

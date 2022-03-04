@@ -664,7 +664,6 @@ def pins_to_session_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconductor
     sites = tsm_context.site_numbers
     multiple_session_info = MultipleSessions(pin_query_contex, [])
     for site in sites:
-        pin_data = ",".join(pin_list)
         session = _Session(task, channel_list, pin_data, site)
         multiple_session_info.sessions.append(session)
     return multiple_session_info

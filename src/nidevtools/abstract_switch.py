@@ -154,7 +154,9 @@ class AbstractSession(typing.NamedTuple):
         tsm_context.set_switch_session(switch_name, self, instrument_type_id)
 
     def connect_sessions_info(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
-        print('QQ', self)
+        """
+        Connects the sessions in the pinmap to the TSM context
+        """
         for session in self.enable_pins:
 
             if session.instrument_type == InstrumentTypes.switch or session.instrument_type == '_niSwitch':
@@ -183,6 +185,9 @@ class AbstractSession(typing.NamedTuple):
 def check_debug_ui_tool(
         path_in: str,
         path_teststand: str = 'C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)'):
+    """
+
+    """
     path_icons = os.path.join(path_teststand, 'Components\\Icons')
     path_in = os.path.join(path_in, '..\\Code Modules\\Common\\Instrument Control\\Abstract Switch\\Debug UI')
     path_debug = os.path.join(path_icons, 'Abstract Switch Debug UI.ico')
