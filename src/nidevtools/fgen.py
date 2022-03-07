@@ -21,6 +21,14 @@ class _NIFGenSSC:
     """
 
     def __init__(self, session: nifgen.Session, channels: str, pin_list: str):
+        """
+        Updates the sessions in the class object for pin name based operations
+
+        Args:
+            session (nifgen.Session): stores the session of the fgen card
+            channels (str): comma seperated list of channels in the session
+            pin_list (str): pinnames from the pinmap corresponding to the channels
+        """
         self._session = (
             session  # mostly shared session  (very rarely unique session) depends on pinmap file.
         )
@@ -38,6 +46,17 @@ class _NIFGenSSC:
     def cs_generate_sine_wave(
         self, waveform_data, sample_rate=1.0, gain=1.0, offset=0.0, enable_filter=True
     ):
+        """
+        generates the sine waveform of desired sampling rate, gain and offset using the waveform data
+
+        Args:
+            waveform_data (_type_): this is the data reference in memory for signal generation
+            sample_rate (float, optional): number of samples per second. Defaults to 1.0.
+            gain (float, optional): gain to be applied on the signal during generation. Defaults to 1.0.
+            offset (float, optional): any dc offset to add on the generated signal. Defaults to 0.0.
+            enable_filter (bool, optional): enable filter for smooth signal generation so the higher order singals are
+                removed in the output. Defaults to True.
+        """
         self.session.abort()
         self.session.clear_arb_memory()
         self.session.output_mode = nifgen.OutputMode.ARB
@@ -55,6 +74,17 @@ class _NIFGenTSM:
 
     @staticmethod
     def create_waveform_data(samples=128, frequency=7.8125e-3, phase_degree=0):
+        """
+        generate the samples on the waveform so that it is stored and played back
+
+        Args:
+            samples (int, optional): number of points to generate. Defaults to 128.
+            frequency (_type_, optional): frequency of the sine signal generated. Defaults to 7.8125e-3.
+            phase_degree (int, optional): phase of the sinewave. Defaults to 0.
+
+        Returns:
+            waveform list: list of samples in the waveform
+        """
         waveform_data = []
         angle_offset = phase_degree * math.pi / 180  # in radians
         angle_per_sample = 2 * math.pi * frequency
@@ -74,6 +104,21 @@ class _NIFGenTSM:
         generation_rate: float = 100e6,
         enable_filter: bool = True,
     ):
+        """
+        generate the sine signal on the current pins. 
+
+        Args:
+            frequency (float, optional): of the sine waveform. Defaults to 100e3.
+            amplitude (float, optional): of the sine waveform. Defaults to 1.0.
+            offset (float, optional): dc signal added to the sine waveform. Defaults to 0.0.
+            wfm_len_min (int, optional): minimum number of points to be there in the waveform. Defaults to 4.
+            wfm_len_inc (int, optional): step size for length. Defaults to 16.
+            generation_rate (float, optional): determines the speed of waveform driven out. Defaults to 100e6.
+            enable_filter (bool, optional): for filtering high frequency signals. Defaults to True.
+
+        Returns:
+            waveform data: sine waveform data to be loaded in memory.
+        """
         f_inv = 1 / frequency
         pts = int(math.ceil(f_inv * generation_rate))
         if pts < 2:
@@ -110,6 +155,19 @@ class TSMFGen(typing.NamedTuple):
 
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int]):
+    """
+    Retruns the pinquery context object for the given pins at given sites. 
+
+    Args:
+        tsm_context (TSMContext): Semiconductore module Reference from the teststand.
+        pins (typing.List[str]): Pins names defined in the current the pinmap. 
+        sites (typing.List[int]): if you need to control only on specific sites, 
+        then provide site numbers. Defaults to [].
+
+    Returns:
+        TSMScope object :  for the selected pins. All instrument specific operations 
+        are be available as properties and methods of this object. 
+    """
     pin_query_context, sessions, channels = tsm_context.pins_to_nifgen_sessions(pins)
     sites_out, pin_list_per_session = ni_dt_common.pin_query_context_to_channel_list(
         pin_query_context, [], sites
