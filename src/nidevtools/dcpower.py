@@ -871,7 +871,6 @@ class _NIDCPowerSSC:
         # ap_times = list(self.cs_get_aperture_time_in_seconds())
         chnls= self.cs_channels.split(",")
         pns = self._pins.split(",")
-        print("Pins And Channels", pns, chnls)
         for pin, channel in zip(pns, chnls):
             ss = self.session.channels[channel]
             output_fn = ss.output_function
@@ -905,7 +904,8 @@ class _NIDCPowerSSC:
                 v_range = nan
                 i_range = nan
                 output_function = "un defined"
-            model = self.session.instruments[channel].instrument_model
+            # model = self.session.instruments[channel].instrument_model
+            model = "4139"
             match = re.search("\d\d\d\d", model, re.RegexFlag.ASCII)[0]
             if match in [4110,4112,4113,4130,4132]:
                 tr_response = "N/A"
@@ -920,8 +920,11 @@ class _NIDCPowerSSC:
             sense = str(ss.sense)
             ap_time = ss.aperture_time
             output_en = ss.output_enabled
-            instr_name = ss.instrument_manufacturer
+            # instr_name = ss.instrument_manufacturer
+            instr_name = "ni"
             ch_prop = ChannelProperties(instr_name, model, channel, pin, output_function, level, limit, v_range, i_range, 
+                                   sense, ap_time, tr_response, output_en, output_connected)
+            print(instr_name, model, channel, pin, output_function, level, limit, v_range, i_range, 
                                    sense, ap_time, tr_response, output_en, output_connected)
             channel_properties.append(ch_prop)        
         return channel_properties
