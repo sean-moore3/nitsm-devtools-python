@@ -119,7 +119,6 @@ class Session:
             for bit in multiple_session.sessions[0].Task.read(1):
                 data += str(bit)
             self.status = data
-
         elif self.instrument_type == InstrumentTypes.digitalpattern:
             multiple_session_info = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
             multiple_session_info = nidevtools.digital.tsm_ssc_select_function(multiple_session_info,
@@ -151,6 +150,9 @@ class AbstractSession(typing.NamedTuple):
     enable_pins: typing.List[Session]
 
     def set_sessions(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, switch_name: str = ''):  # CHECK
+        """
+        Sets abstract switch sessions contained in the Abstract Switch object
+        """
         tsm_context.set_switch_session(switch_name, self, instrument_type_id)
 
     def connect_sessions_info(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
@@ -175,8 +177,10 @@ class AbstractSession(typing.NamedTuple):
             session.ss_disconnect(tsm_context)
 
     def read_state(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
+        """
+        Reads the state of each session in AbstractSession object and returns a list of values
+        """
         data = []
-        print(self.enable_pins)
         for session in self.enable_pins:
             data.append(session.ss_read_state(tsm_context))
         return data
@@ -344,11 +348,11 @@ def get_all_matched_nodes(element: Et.Element, key: str):
 
 
 def pin_name_to_instrument(pinmap_path: str = ''):
-    '''
+    """
     From pinmap location it parce the abstract switch connections into an Array.
     Args:
         pinmap_path: Location of the pinmap to use
-    '''
+    """
     tree = Et.parse(pinmap_path)
     connections = get_first_matched_node(tree, 'Connections')
     pingroups = get_first_matched_node(tree, 'PinGroups')
@@ -374,15 +378,12 @@ def pin_name_to_instrument(pinmap_path: str = ''):
             subarray22_e.append(j.attrib['pin'])
         subarray22.append(subarray22_e)
     for element in subarray21:
-        print(element)
         r = 0
         for j in subarray22:
-            print("COMPARISON", j[0], element[0])
             if j[0] == element[0]:
                 break
             else:
                 r += 1
-        print(r)
         if element[1] == 'AbstractInstrument':
             out1 = subarray22[r][2]
         else:
@@ -399,14 +400,14 @@ def pin_name_to_instrument(pinmap_path: str = ''):
 
 
 def enable_pins_to_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, enable_pins: typing.List[str]):
-    '''
+    """
     Receives enable pins list and return a Multisession object with the sessions corresponding to those pins
     Args:
         tsm_context: Pin context
         enable_pins: List of pins for session creation
     Returns:
         MultipleSession object that contains the session for the selected pins.
-    '''
+    """
     sessions = get_all_sessions(tsm_context)
     array = []
     for pin in enable_pins:
@@ -417,11 +418,17 @@ def enable_pins_to_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModule
 
 
 def get_all_instruments_names(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
+    """
+    Gets a list of all instrument names set on TSM context for Abstract switch
+    """
     switch_names = tsm_context.get_all_switch_names(instrument_type_id)
     return switch_names
 
 
 def get_all_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):  # CHECK
+    """
+    Gets a list of Abstract Switch references corresponding to the set Abstract sessions on TSM Context
+    """
     session_data = tsm_context.get_all_switch_sessions(instrument_type_id)
     if len(session_data) == 0:
         # Raise Error?
@@ -433,6 +440,14 @@ def get_all_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext
 
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions_sessions_info(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pin: str):
+    """
+    Returns an AbstractSession object containing a list al Abstract switch sessions detailed on the pinmap
+    Args:
+        tsm_context: Pin context defined by pin map
+        pin: The name of the pin to translate to a session.
+    Return:
+        session: An object that tracks the session associated with pin provided.
+    """
     session_list = []
     contexts, sessions, switch_routes = tsm_context.pin_to_switch_sessions(pin, instrument_type_id)
     i = 0
@@ -452,7 +467,6 @@ def pins_to_sessions_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconducto
                 single_session.route_value = element2
                 single_session.site = i
                 if single_session.enable_pin.strip().lower() == element1.lower():
-                    print("E:", single_session)
                     session_list.append(single_session)
                     break
         del tsm_context
@@ -463,7 +477,17 @@ def pins_to_sessions_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconducto
 def pins_to_task_and_connect(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
                              task_name: PinsArg,
                              pins: PinsArg):
-    print('TT', pins)
+    """
+    Returns a pin query contex and a list of properties defined in the pin map.
+    The list of properties returned can be used to fill a new object type MultipleSessions
+    Args:
+        tsm_context: Pin context defined by pin map
+        task_name: The name of the pin(s) or pin group(s) to translate to a set of tasks.
+        pins: The name of the pin(s) or pin group(s) to translate to a set of abstract sessions.
+    Return:
+        session: An object that tracks the tasks associated with this pin query. Use this object to publish
+        measurements and extract data from a set of measurements.
+    """
     pin_list = tsm_context.filter_pins_by_instrument_type(pins, 'abstinst', nitsm.enums.Capability.ALL)
     multiple_session_info = nidevtools.daqmx.pins_to_session_sessions_info(tsm_context, task_name)
     sessions = []

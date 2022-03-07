@@ -28,9 +28,9 @@ def tsm_context(standalone_tsm):
     print("\nSimulated driver?", SIMULATE)
     ni_daqmx.set_task(standalone_tsm)
     ni_fpga.initialize_sessions(standalone_tsm)
-    ni_dt_digital.tsm_initialize_sessions(standalone_tsm)
+    #ni_dt_digital.tsm_initialize_sessions(standalone_tsm)
     yield standalone_tsm
-    ni_dt_digital.tsm_close_sessions(standalone_tsm)
+    #ni_dt_digital.tsm_close_sessions(standalone_tsm)
     ni_fpga.close_sessions(standalone_tsm)
     ni_daqmx.clear_task(standalone_tsm)
 
@@ -61,7 +61,7 @@ class TestAbstract:
         ni_abstract.close_sessions(tsm_context)
 
     def test_check_debug(self):
-        ni_abstract.check_debug_ui_tool("")
+        ni_abstract.check_debug_ui_tool("")  # TODO add path
 
     def test_pins_to_session_sessions_info(self, tsm_context):
         ni_abstract.initialize_tsm_context(tsm_context)
