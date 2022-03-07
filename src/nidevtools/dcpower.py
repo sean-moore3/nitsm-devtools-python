@@ -904,8 +904,9 @@ class _NIDCPowerSSC:
                 v_range = nan
                 i_range = nan
                 output_function = "un defined"
-            # model = self.session.instruments[channel].instrument_model
-            model = "4139"
+            max_instr_name = channel.split("/")[0]
+            print (max_instr_name, max_instr_name)
+            model = self.session.instruments[max_instr_name].instrument_model
             match = re.search("\d\d\d\d", model, re.RegexFlag.ASCII)[0]
             if match in [4110,4112,4113,4130,4132]:
                 tr_response = "N/A"
@@ -913,18 +914,15 @@ class _NIDCPowerSSC:
                 tr_response = "N/A"
             else:
                 tr_response = str(ss.transient_response)
-            if match in [4110,4130,4140,4141,4142,4143,4144,4145]:
+            if match in [4110, 4130, 4140, 4141, 4142, 4143, 4144, 4145]:
                 output_connected = "N/A"
             else:
                 output_connected = str(ss.output_connected)
             sense = str(ss.sense)
             ap_time = ss.aperture_time
             output_en = ss.output_enabled
-            # instr_name = ss.instrument_manufacturer
-            instr_name = "ni"
+            instr_name = self.session.instruments[max_instr_name].instrument_manufacturer
             ch_prop = ChannelProperties(instr_name, model, channel, pin, output_function, level, limit, v_range, i_range, 
-                                   sense, ap_time, tr_response, output_en, output_connected)
-            print(instr_name, model, channel, pin, output_function, level, limit, v_range, i_range, 
                                    sense, ap_time, tr_response, output_en, output_connected)
             channel_properties.append(ch_prop)        
         return channel_properties
