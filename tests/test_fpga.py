@@ -62,7 +62,6 @@ class TestFPGA:
             assert len(queried_sessions[0]) == 2  # Matching quantity
 
     def test_pin_to_sessions(self, fpga_tsm_s):
-        tsm_context = fpga_tsm_s[0]
         list_fpga_tsm = fpga_tsm_s[1]
         for fpga_tsm in list_fpga_tsm:
             print("\nTest_pin_to_sessions\n", fpga_tsm)
@@ -145,17 +144,17 @@ class TestFPGA:
 
 
 @nitsm.codemoduleapi.code_module
-def open_sessions(tsm_context: TSM_Context):
+def ts_open_sessions(tsm_context: TSM_Context):
     ni_fpga.initialize_sessions(tsm_context)
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: TSM_Context):
+def ts_close_sessions(tsm_context: TSM_Context):
     ni_fpga.close_sessions(tsm_context)
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context):
+def ts_initialize_sessions(tsm_context):
     print(tsm_context.pin_map_file_path)
     queried_sessions = tsm_context.get_all_custom_sessions("782xFPGA")
     assert isinstance(queried_sessions[0], tuple)  # Type verification
@@ -167,8 +166,7 @@ def initialize_sessions(tsm_context):
 
 
 @nitsm.codemoduleapi.code_module
-def pin_to_sessions(fpga_tsm_s):
-    tsm_context = fpga_tsm_s[0]
+def ts_pin_to_sessions(fpga_tsm_s):
     list_fpga_tsm = fpga_tsm_s[1]
     for fpga_tsm in list_fpga_tsm:
         print("\nTest_pin_to_sessions\n", fpga_tsm)
@@ -178,12 +176,12 @@ def pin_to_sessions(fpga_tsm_s):
 
 
 @nitsm.codemoduleapi.code_module
-def get_i2c_master_session(tsm_context):
+def ts_get_i2c_master_session(tsm_context):
     print(ni_fpga.get_i2c_master_session(tsm_context, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True))
 
 
 @nitsm.codemoduleapi.code_module
-def update_line_on_connectors():
+def ts_update_line_on_connectors():
     for i in range(8):
         dioline = ni_fpga.DIOLines(i)
         state = ni_fpga.StaticStates(1)
@@ -192,10 +190,10 @@ def update_line_on_connectors():
 
 
 @nitsm.codemoduleapi.code_module
-def wr(tsm_context):
+def ts_wr(tsm_context):
     fpga_tsms = []
     sessions = []
-    tests_pins = ["RIO_Pins"]
+    tests_pins = [["RIO_Pins"]]
     for test_pin_group in tests_pins:
         data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
         fpga_tsms.append(data)
@@ -212,10 +210,10 @@ def wr(tsm_context):
 
 
 @nitsm.codemoduleapi.code_module
-def wr_and_rd(tsm_context):
+def ts_wr_and_rd(tsm_context):
     fpga_tsms = []
     sessions = []
-    tests_pins = ["RIO_Pins"]
+    tests_pins = [["RIO_Pins"]]
     for test_pin_group in tests_pins:
         data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
         fpga_tsms.append(data)
@@ -256,10 +254,10 @@ def wr_and_rd(tsm_context):
 
 
 @nitsm.codemoduleapi.code_module
-def rd_wr_static(tsm_context):
+def ts_rd_wr_static(tsm_context):
     fpga_tsms = []
     sessions = []
-    tests_pins = ["RIO_Pins"]
+    tests_pins = [["RIO_Pins"]]
     for test_pin_group in tests_pins:
         data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
         fpga_tsms.append(data)
@@ -279,10 +277,10 @@ def rd_wr_static(tsm_context):
 
 
 @nitsm.codemoduleapi.code_module
-def rd_commanded(tsm_context):
+def ts_rd_commanded(tsm_context):
     fpga_tsms = []
     sessions = []
-    tests_pins = ["RIO_Pins"]
+    tests_pins = [["RIO_Pins"]]
     for test_pin_group in tests_pins:
         data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
         fpga_tsms.append(data)
