@@ -799,7 +799,7 @@ def _ssc_initiate(ssc: typing.List[_NIDigitalSSC]):
 
 class TSMDigital(typing.NamedTuple):
     pin_query_context: typing.Any
-    ssc: typing.List[_NIDigitalSSC]
+    ssc: _NIDigitalTSM
     site_numbers: typing.List[int]
     pins: typing.List[str]
 
@@ -1760,6 +1760,7 @@ def _ssc_calculate_per_site_to_per_instrument_lut(
 # TSMContext #
 @nitsm.codemoduleapi.code_module
 def tsm_close_sessions(tsm_context: TSMContext):
+    """Closes the sessions associated with the tsm context"""
     sessions = tsm_context.get_all_nidigital_sessions()
     for session in sessions:
         session.reset()
@@ -1768,6 +1769,7 @@ def tsm_close_sessions(tsm_context: TSMContext):
 
 @nitsm.codemoduleapi.code_module
 def tsm_initialize_sessions(tsm_context: TSMContext, options: dict = {}):
+    """Creates the sessions for all the nidigital resource string available in the tsm_context for instruments"""
     pin_map_file_path = tsm_context.pin_map_file_path
     instrument_names = tsm_context.get_all_nidigital_instrument_names()
     if instrument_names:
@@ -1803,8 +1805,7 @@ def tsm_initialize_sessions(tsm_context: TSMContext, options: dict = {}):
 
 @nitsm.codemoduleapi.code_module
 def tsm_ssc_1_pin_to_n_sessions(tsm_context: TSMContext, pin: str):
-    tsm = tsm_ssc_n_pins_to_m_sessions(tsm_context, [pin])
-    return tsm
+    return tsm_ssc_n_pins_to_m_sessions(tsm_context, [pin])
 
 
 @nitsm.codemoduleapi.code_module
@@ -1818,7 +1819,7 @@ def tsm_ssc_n_pins_to_m_sessions(
         sites = list(tsm_context.site_numbers)
     if turn_pin_groups_to_pins:
         pins = list(tsm_context.get_pins_in_pin_groups(pins))
-    ssc: typing.List[_NIDigitalSSC] = []
+    sscs: typing.List[_NIDigitalSSC] = []
     (
         pin_query_context,
         sessions,
@@ -1826,9 +1827,9 @@ def tsm_ssc_n_pins_to_m_sessions(
     ) = tsm_context.pins_to_nidigital_sessions_for_ppmu(pins)
     _, _, site_lists = tsm_context.pins_to_nidigital_sessions_for_pattern(pins)
     for session, pin_set_string, site_list in zip(sessions, pin_set_strings, site_lists):
-        ssc.append(_NIDigitalSSC(session, pin_set_string, site_list))
-    tsm = TSMDigital(pin_query_context, ssc, sites, pins)
-    return tsm
+        sscs.append(_NIDigitalSSC(session, pin_set_string, site_list))
+    nidigital_tsm = _NIDigitalTSM(sscs)
+    return TSMDigital(pin_query_context, nidigital_tsm, sites, pins)    
 
 
 def tsm_ssc_filter_sites(tsm: TSMDigital, desired_sites: typing.List[int]):
