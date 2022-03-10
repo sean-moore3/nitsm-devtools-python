@@ -113,6 +113,7 @@ class _NIDigitalSSC:
         return self._channels_session.frequency_counter_measure_frequency()
     # HRAM #
 
+
 class _NIDigitalTSM:
     # SSC Digital array or list #
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDigitalSSC]):
@@ -217,11 +218,11 @@ class _NIDigitalTSM:
         buffer_size_per_site: int = 32000,
     ):
         for ssc in self.sscs:
-            ssc.session.history_ram_cycles_to_acquire = cycles_to_acquire
-            ssc.session.history_ram_pretrigger_samples = pretrigger_samples
-            ssc.session.history_ram_max_samples_to_acquire_per_site = max_samples_to_acquire_per_site
-            ssc.session.history_ram_number_of_samples_is_finite = number_of_samples_is_finite
-            ssc.session.history_ram_buffer_size_per_site = buffer_size_per_site
+            ssc._session.history_ram_cycles_to_acquire = cycles_to_acquire
+            ssc._session.history_ram_pretrigger_samples = pretrigger_samples
+            ssc._session.history_ram_max_samples_to_acquire_per_site = max_samples_to_acquire_per_site
+            ssc._session.history_ram_number_of_samples_is_finite = number_of_samples_is_finite
+            ssc._session.history_ram_buffer_size_per_site = buffer_size_per_site
 
     def configure_hram_trigger(
         self,
@@ -233,15 +234,15 @@ class _NIDigitalTSM:
     ):
         for ssc in self.sscs:
             if triggers_type == enums.HistoryRAMTriggerType.FIRST_FAILURE:
-                ssc.session.history_ram_trigger_type = triggers_type
+                ssc._session.history_ram_trigger_type = triggers_type
             elif triggers_type == enums.HistoryRAMTriggerType.CYCLE_NUMBER:
-                ssc.session.history_ram_trigger_type = triggers_type
-                ssc.session.cycle_number_history_ram_trigger_cycle_number = cycle_number
+                ssc._session.history_ram_trigger_type = triggers_type
+                ssc._session.cycle_number_history_ram_trigger_cycle_number = cycle_number
             elif triggers_type == enums.HistoryRAMTriggerType.PATTERN_LABEL:
-                ssc.session.history_ram_trigger_type = triggers_type
-                ssc.session.pattern_label_history_ram_trigger_label = pattern_label
-                ssc.session.pattern_label_history_ram_trigger_cycle_offset = cycle_offset
-                ssc.session.pattern_label_history_ram_trigger_vector_offset = vector_offset
+                ssc._session.history_ram_trigger_type = triggers_type
+                ssc._session.pattern_label_history_ram_trigger_label = pattern_label
+                ssc._session.pattern_label_history_ram_trigger_cycle_offset = cycle_offset
+                ssc._session.pattern_label_history_ram_trigger_vector_offset = vector_offset
 
     def get_hram_settings(self):
         per_instrument_cycles_to_acquire: typing.List[enums.HistoryRAMCyclesToAcquire] = []
@@ -250,15 +251,15 @@ class _NIDigitalTSM:
         per_instrument_number_of_samples_is_finite: typing.List[bool] = []
         per_instrument_buffer_size_per_site: typing.List[int] = []
         for ssc in self.sscs:
-            per_instrument_cycles_to_acquire.append(ssc.session.history_ram_cycles_to_acquire)
-            per_instrument_pretrigger_samples.append(ssc.session.history_ram_pretrigger_samples)
+            per_instrument_cycles_to_acquire.append(ssc._session.history_ram_cycles_to_acquire)
+            per_instrument_pretrigger_samples.append(ssc._session.history_ram_pretrigger_samples)
             per_instrument_max_samples_to_acquire_per_site.append(
-                ssc.session.history_ram_max_samples_to_acquire_per_site
+                ssc._session.history_ram_max_samples_to_acquire_per_site
             )
             per_instrument_number_of_samples_is_finite.append(
-                ssc.session.history_ram_number_of_samples_is_finite
+                ssc._session.history_ram_number_of_samples_is_finite
             )
-            per_instrument_buffer_size_per_site.append(ssc.session.history_ram_buffer_size_per_site)
+            per_instrument_buffer_size_per_site.append(ssc._session.history_ram_buffer_size_per_site)
         return (
             per_instrument_cycles_to_acquire,
             per_instrument_pretrigger_samples,
@@ -275,16 +276,16 @@ class _NIDigitalTSM:
         per_instrument_cycle_offset: typing.List[int] = []
         per_instrument_vector_offset: typing.List[int] = []
         for ssc in self.sscs:
-            per_instrument_triggers_type.append(ssc.session.history_ram_trigger_type)
+            per_instrument_triggers_type.append(ssc._session.history_ram_trigger_type)
             per_instrument_cycle_number.append(
-                ssc.session.cycle_number_history_ram_trigger_cycle_number
+                ssc._session.cycle_number_history_ram_trigger_cycle_number
             )
-            per_instrument_pattern_label.append(ssc.session.pattern_label_history_ram_trigger_label)
+            per_instrument_pattern_label.append(ssc._session.pattern_label_history_ram_trigger_label)
             per_instrument_cycle_offset.append(
-                ssc.session.pattern_label_history_ram_trigger_cycle_offset
+                ssc._session.pattern_label_history_ram_trigger_cycle_offset
             )
             per_instrument_vector_offset.append(
-                ssc.session.pattern_label_history_ram_trigger_vector_offset
+                ssc._session.pattern_label_history_ram_trigger_vector_offset
             )
         return (
             per_instrument_triggers_type,
@@ -298,10 +299,10 @@ class _NIDigitalTSM:
         per_instrument_per_site_array: typing.List[_NIDigitalSSC] = []
         for _ssc in self.sscs:
             channel_list_array, site_list_array, _ = _arrange_channels_per_site(
-                _ssc.channel_list, _ssc.site_list
+                _ssc._channels, _ssc._pins
             )
             for channel, site in zip(channel_list_array, site_list_array):
-                per_instrument_per_site_array.append(_NIDigitalSSC(_ssc.session, channel, site))
+                per_instrument_per_site_array.append(_NIDigitalSSC(_ssc._session, channel, site))
         per_instrument_per_site_cycle_information: typing.List[
             typing.List[HistoryRAMCycleInformation]
         ] = []
@@ -312,12 +313,12 @@ class _NIDigitalTSM:
             sum_of_samples_to_read = 0
             stop = False
             while not stop:
-                done = _ssc.session.is_done()
-                _, pins, _ = _channel_list_to_pins(_ssc.channel_list)
-                sample_count = _ssc.session.sites[_ssc.site_list].get_history_ram_sample_count()
+                done = _ssc._session.is_done()
+                _, pins, _ = _channel_list_to_pins(_ssc._channels)
+                sample_count = _ssc._session.sites[_ssc._pins].get_history_ram_sample_count()
                 samples_to_read = sample_count - read_position
                 cycle_information += (
-                    _ssc.session.sites[_ssc.site_list]
+                    _ssc._session.sites[_ssc._pins]
                     .pins_info[pins]
                     .fetch_history_ram_cycle_information(read_position, samples_to_read)
                 )
@@ -333,7 +334,7 @@ class _NIDigitalTSM:
     # Pattern Actions #
     def abort(self):
         for _ssc in self.sscs:
-            _ssc.session.abort()
+            _ssc._session.abort()
 
     def burst_pattern_pass_fail(
         self,
@@ -345,7 +346,7 @@ class _NIDigitalTSM:
         for ssc in self.sscs:
             per_instrument_pass.append(
                 list(
-                    ssc.session.sites[ssc.site_list]
+                    ssc._session.sites[ssc._pins]
                     .burst_pattern(start_label, select_digital_function, True, timeout)
                     .values()
                 )
@@ -360,7 +361,7 @@ class _NIDigitalTSM:
         wait_until_done: bool = True,
     ):
         for ssc in self.sscs:
-            ssc.session.sites[ssc.site_list].burst_pattern(
+            ssc._session.sites[ssc._pins].burst_pattern(
                 start_label, select_digital_function, wait_until_done, timeout
             )
 
@@ -368,7 +369,7 @@ class _NIDigitalTSM:
         per_instrument_failure_counts: typing.List[typing.List[int]] = []
         for ssc in self.sscs:
             per_instrument_failure_counts.append(
-                ssc.session.channels[ssc.channel_list].get_fail_count()
+                ssc._session.channels[ssc._channels].get_fail_count()
             )
         return per_instrument_failure_counts
 
@@ -376,13 +377,13 @@ class _NIDigitalTSM:
         per_instrument_pass: typing.List[typing.List[bool]] = []
         for ssc in self.sscs:
             per_instrument_pass.append(
-                list(ssc.session.sites[ssc.site_list].get_site_pass_fail().values())
+                list(ssc._session.sites[ssc._pins].get_site_pass_fail().values())
             )
         return per_instrument_pass
 
     def wait_until_done(self, timeout: float = 10):
         for ssc in self.sscs:
-            ssc.session.wait_until_done(timeout)
+            ssc._session.wait_until_done(timeout)
     # End of Pattern Actions #
 
     # Pin Levels and Timing #
@@ -390,15 +391,15 @@ class _NIDigitalTSM:
         self, levels_sheet: str, timing_sheet: str
     ):
         for ssc in self.sscs:
-            ssc.session.sites[ssc.site_list].apply_levels_and_timing(levels_sheet, timing_sheet)
+            ssc._session.sites[ssc._pins].apply_levels_and_timing(levels_sheet, timing_sheet)
 
     def apply_tdr_offsets(self, per_instrument_offsets: typing.List[typing.List[float]]):
         for ssc, per_instrument_offset in zip(self.sscs, per_instrument_offsets):
-            ssc.session.channels[ssc.channel_list].apply_tdr_offsets(per_instrument_offset)
+            ssc._session.channels[ssc._channels].apply_tdr_offsets(per_instrument_offset)
 
     def configure_active_load(self, vcom: float, iol: float, ioh: float):
         for ssc in self.sscs:
-            ssc.session.channels[ssc.channel_list].configure_active_load_levels(iol, ioh, vcom)
+            ssc._session.channels[ssc._channels].configure_active_load_levels(iol, ioh, vcom)
 
     def configure_single_level_per_site(
         self,
@@ -406,49 +407,49 @@ class _NIDigitalTSM:
         per_site_value: typing.List[typing.List[float]],
     ):
         for ssc, settings in zip(self.sscs, per_site_value):
-            channel_list_array, _, _ = _arrange_channels_per_site(ssc.channel_list, ssc.site_list)
+            channel_list_array, _, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
             for channel, setting in zip(channel_list_array, settings):
                 if level_type_to_set == LevelTypeToSet.VIL:
-                    ssc.session.channels[channel].vil = setting
+                    ssc._session.channels[channel].vil = setting
                 elif level_type_to_set == LevelTypeToSet.VIH:
-                    ssc.session.channels[channel].vih = setting
+                    ssc._session.channels[channel].vih = setting
                 elif level_type_to_set == LevelTypeToSet.VOL:
-                    ssc.session.channels[channel].vol = setting
+                    ssc._session.channels[channel].vol = setting
                 elif level_type_to_set == LevelTypeToSet.VOH:
-                    ssc.session.channels[channel].voh = setting
+                    ssc._session.channels[channel].voh = setting
                 elif level_type_to_set == LevelTypeToSet.VTERM:
-                    ssc.session.channels[channel].vterm = setting
+                    ssc._session.channels[channel].vterm = setting
                 elif level_type_to_set == LevelTypeToSet.LOL:
-                    ssc.session.channels[channel].lol = setting
+                    ssc._session.channels[channel].lol = setting
                 elif level_type_to_set == LevelTypeToSet.LOH:
-                    ssc.session.channels[channel].loh = setting
+                    ssc._session.channels[channel].loh = setting
                 elif level_type_to_set == LevelTypeToSet.VCOM:
-                    ssc.session.channels[channel].vcom = setting
-                ssc.session.commit()
+                    ssc._session.channels[channel].vcom = setting
+                ssc._session.commit()
 
     def configure_single_level(self, level_type_to_set: LevelTypeToSet, setting: float):
         for ssc in self.sscs:
             if level_type_to_set == LevelTypeToSet.VIL:
-                ssc.session.channels[ssc.channel_list].vil = setting
+                ssc._session.channels[ssc._channels].vil = setting
             elif level_type_to_set == LevelTypeToSet.VIH:
-                ssc.session.channels[ssc.channel_list].vih = setting
+                ssc._session.channels[ssc._channels].vih = setting
             elif level_type_to_set == LevelTypeToSet.VOL:
-                ssc.session.channels[ssc.channel_list].vol = setting
+                ssc._session.channels[ssc._channels].vol = setting
             elif level_type_to_set == LevelTypeToSet.VOH:
-                ssc.session.channels[ssc.channel_list].voh = setting
+                ssc._session.channels[ssc._channels].voh = setting
             elif level_type_to_set == LevelTypeToSet.VTERM:
-                ssc.session.channels[ssc.channel_list].vterm = setting
+                ssc._session.channels[ssc._channels].vterm = setting
             elif level_type_to_set == LevelTypeToSet.LOL:
-                ssc.session.channels[ssc.channel_list].lol = setting
+                ssc._session.channels[ssc._channels].lol = setting
             elif level_type_to_set == LevelTypeToSet.LOH:
-                ssc.session.channels[ssc.channel_list].loh = setting
+                ssc._session.channels[ssc._channels].loh = setting
             elif level_type_to_set == LevelTypeToSet.VCOM:
-                ssc.session.channels[ssc.channel_list].vcom = setting
-            ssc.session.commit()
+                ssc._session.channels[ssc._channels].vcom = setting
+            ssc._session.commit()
 
     def configure_termination_mode(self, termination_mode: enums.TerminationMode):
         for ssc in self.sscs:
-            ssc.session.channels[ssc.channel_list].termination_mode = termination_mode
+            ssc._session.channels[ssc._channels].termination_mode = termination_mode
 
     def configure_time_set_compare_edge_per_site_per_pin(
         self,
@@ -456,9 +457,9 @@ class _NIDigitalTSM:
         per_site_per_pin_compare_strobe: typing.List[typing.List[float]],
     ):
         for ssc, compare_strobes in zip(self.sscs, per_site_per_pin_compare_strobe):
-            channels, _, _ = _channel_list_to_pins(ssc.channel_list)
+            channels, _, _ = _channel_list_to_pins(ssc._channels)
             for channel, compare_strobe in zip(channels, compare_strobes):
-                ssc.session.channels[channel].configure_time_set_compare_edges_strobe(
+                ssc._session.channels[channel].configure_time_set_compare_edges_strobe(
                     time_set, compare_strobe
                 )
 
@@ -468,15 +469,15 @@ class _NIDigitalTSM:
         per_site_compare_strobe: typing.List[typing.List[float]],
     ):
         for ssc, compare_strobes in zip(self.sscs, per_site_compare_strobe):
-            channel_list_array, _, _ = _arrange_channels_per_site(ssc.channel_list, ssc.site_list)
+            channel_list_array, _, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
             for channel, compare_strobe in zip(channel_list_array, compare_strobes):
-                ssc.session.channels[channel].configure_time_set_compare_edges_strobe(
+                ssc._session.channels[channel].configure_time_set_compare_edges_strobe(
                     time_set, compare_strobe
                 )
 
     def configure_time_set_compare_edge(self, time_set: str, compare_strobe: float):
         for ssc in self.sscs:
-            ssc.session.channels[ssc.channel_list].configure_time_set_compare_edges_strobe(
+            ssc._session.channels[ssc._channels].configure_time_set_compare_edges_strobe(
                 time_set, compare_strobe
             )
 
@@ -487,7 +488,7 @@ class _NIDigitalTSM:
         elif configured_period < 10e-9:
             configured_period = 10e-9
         for ssc in self.sscs:
-            ssc.session.configure_time_set_period(time_set, configured_period)
+            ssc._session.configure_time_set_period(time_set, configured_period)
         return configured_period
 
     def configure_voltage_levels(
@@ -499,29 +500,29 @@ class _NIDigitalTSM:
         vterm: float,
     ):
         for ssc in self.sscs:
-            ssc.session.channels[ssc.channel_list].configure_voltage_levels(vil, vih, vol, voh, vterm)
+            ssc._session.channels[ssc._channels].configure_voltage_levels(vil, vih, vol, voh, vterm)
     # End of Pin Levels and Timing #
 
     # PPMU #
     def ppmu_configure_aperture_time(self, aperture_time: float):
         for ssc in self.sscs:
-            ssc.session.channels[ssc.channel_list].ppmu_aperture_time = aperture_time
+            ssc._session.channels[ssc._channels].ppmu_aperture_time = aperture_time
 
     def ppmu_configure_current_limit_range(self, current_limit_range: float):
         current_limit_range = abs(current_limit_range)
         for _ssc in self.sscs:
-            _ssc.session.channels[_ssc.channel_list].ppmu_current_limit_range = current_limit_range
+            _ssc._session.channels[_ssc._channels].ppmu_current_limit_range = current_limit_range
 
     def ppmu_configure_voltage_limits(self, voltage_limit_high: float, voltage_limit_low: float):
         for ssc in self.sscs:
-            ssc.session.channels[ssc.channel_list].ppmu_voltage_limit_high = voltage_limit_high
-            ssc.session.channels[ssc.channel_list].ppmu_voltage_limit_low = voltage_limit_low
+            ssc._session.channels[ssc._channels].ppmu_voltage_limit_high = voltage_limit_high
+            ssc._session.channels[ssc._channels].ppmu_voltage_limit_low = voltage_limit_low
 
     def ppmu_measure(self, measurement_type: enums.PPMUMeasurementType):
         per_instrument_measurements: typing.List[typing.List[float]] = []
         for ssc in self.sscs:
             per_instrument_measurements.append(
-                ssc.session.channels[ssc.channel_list].ppmu_measure(measurement_type)
+                ssc._session.channels[ssc._channels].ppmu_measure(measurement_type)
             )
         return per_instrument_measurements
 
@@ -534,12 +535,12 @@ class _NIDigitalTSM:
             elif current_level_range < 2e-6:
                 current_level_range = 2e-6
         for ssc in self.sscs:
-            ssc.session.channels[
-                ssc.channel_list
+            ssc._session.channels[
+                ssc._channels
             ].ppmu_output_function = enums.PPMUOutputFunction.CURRENT
-            ssc.session.channels[ssc.channel_list].ppmu_current_level_range = current_level_range
-            ssc.session.channels[ssc.channel_list].ppmu_current_level = current_level
-            ssc.session.channels[ssc.channel_list].ppmu_source()
+            ssc._session.channels[ssc._channels].ppmu_current_level_range = current_level_range
+            ssc._session.channels[ssc._channels].ppmu_current_level = current_level
+            ssc._session.channels[ssc._channels].ppmu_source()
 
 
     def ppmu_source_voltage_per_site_per_pin(
@@ -549,14 +550,14 @@ class _NIDigitalTSM:
     ):
         current_limit_range = abs(current_limit_range)
         for ssc, source_voltages in zip(self.sscs, per_site_per_pin_source_voltages):
-            ssc.session.channels[
-                ssc.channel_list
+            ssc._session.channels[
+                ssc._channels
             ].ppmu_output_function = enums.PPMUOutputFunction.VOLTAGE
-            ssc.session.channels[ssc.channel_list].ppmu_current_limit_range = current_limit_range
-            channels, _, _ = _channel_list_to_pins(ssc.channel_list)
+            ssc._session.channels[ssc._channels].ppmu_current_limit_range = current_limit_range
+            channels, _, _ = _channel_list_to_pins(ssc._channels)
             for channel, source_voltage in zip(channels, source_voltages):
-                ssc.session.channels[channel].ppmu_voltage_level = source_voltage
-            ssc.session.channels[ssc.channel_list].ppmu_source()
+                ssc._session.channels[channel].ppmu_voltage_level = source_voltage
+            ssc._session.channels[ssc._channels].ppmu_source()
 
 
     def ppmu_source_voltage_per_site(
@@ -566,14 +567,14 @@ class _NIDigitalTSM:
     ):
         current_limit_range = abs(current_limit_range)
         for ssc, source_voltages in zip(self.sscs, per_site_source_voltages):
-            ssc.session.channels[
-                ssc.channel_list
+            ssc._session.channels[
+                ssc._channels
             ].ppmu_output_function = enums.PPMUOutputFunction.VOLTAGE
-            ssc.session.channels[ssc.channel_list].ppmu_current_limit_range = current_limit_range
-            channel_list_array, _, _ = _arrange_channels_per_site(ssc.channel_list, ssc.site_list)
+            ssc._session.channels[ssc._channels].ppmu_current_limit_range = current_limit_range
+            channel_list_array, _, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
             for channel, source_voltage in zip(channel_list_array, source_voltages):
-                ssc.session.channels[channel].ppmu_voltage_level = source_voltage
-            ssc.session.channels[ssc.channel_list].ppmu_source()
+                ssc._session.channels[channel].ppmu_voltage_level = source_voltage
+            ssc._session.channels[ssc._channels].ppmu_source()
 
 
     def ppmu_source_voltage(self, voltage_level: float, current_limit_range: float):
@@ -585,17 +586,17 @@ class _NIDigitalTSM:
 
         current_limit_range = abs(current_limit_range)
         for ssc in self.sscs:
-            ssc.session.channels[
-                ssc.channel_list
+            ssc._session.channels[
+                ssc._channels
             ].ppmu_output_function = enums.PPMUOutputFunction.VOLTAGE
-            ssc.session.channels[ssc.channel_list].ppmu_current_limit_range = current_limit_range
-            ssc.session.channels[ssc.channel_list].ppmu_voltage_level = voltage_level
-            ssc.session.channels[ssc.channel_list].ppmu_source()
+            ssc._session.channels[ssc._channels].ppmu_current_limit_range = current_limit_range
+            ssc._session.channels[ssc._channels].ppmu_voltage_level = voltage_level
+            ssc._session.channels[ssc._channels].ppmu_source()
 
 
     def ppmu_source(self):
         for ssc in self.sscs:
-            ssc.session.channels[ssc.channel_list].ppmu_source()
+            ssc._session.channels[ssc._channels].ppmu_source()
     # End of PPMU #
 
     # Sequencer Flags and Registers #
@@ -604,7 +605,7 @@ class _NIDigitalTSM:
 def _ssc_read_sequencer_flag(ssc: typing.List[_NIDigitalSSC], sequencer_flag: enums.SequencerFlag):
     per_instrument_state: typing.List[bool] = []
     for _ssc in ssc:
-        per_instrument_state.append(_ssc.session.read_sequencer_flag(sequencer_flag))
+        per_instrument_state.append(_ssc._session.read_sequencer_flag(sequencer_flag))
     return ssc, per_instrument_state
 
 
@@ -614,7 +615,7 @@ def _ssc_read_sequencer_register(
     per_instrument_register_values: typing.List[int] = []
     for _ssc in ssc:
         per_instrument_register_values.append(
-            _ssc.session.read_sequencer_register(sequencer_register)
+            _ssc._session.read_sequencer_register(sequencer_register)
         )
     return ssc, per_instrument_register_values
 
@@ -625,7 +626,7 @@ def _ssc_write_sequencer_flag(
     state: bool = True,
 ):
     for _ssc in ssc:
-        _ssc.session.write_sequencer_flag(sequencer_flag, state)
+        _ssc._session.write_sequencer_flag(sequencer_flag, state)
     return ssc
 
 
@@ -635,7 +636,7 @@ def _ssc_write_sequencer_register(
     value: int = 0,
 ):
     for _ssc in ssc:
-        _ssc.session.write_sequencer_register(sequencer_register, value)
+        _ssc._session.write_sequencer_register(sequencer_register, value)
     return ssc
     # End of Sequencer Flags and Registers #
 
@@ -650,7 +651,7 @@ def _ssc_fetch_capture_waveform(
 ):
     per_instrument_capture: typing.List[typing.List[typing.List[int]]] = []
     for _ssc in ssc:
-        waveforms = _ssc.session.sites[_ssc.site_list].fetch_capture_waveform(
+        waveforms = _ssc._session.sites[_ssc._pins].fetch_capture_waveform(
             waveform_name, samples_to_read, timeout
         )
         per_instrument_capture.append([list(waveforms[i]) for i in waveforms.keys()])
@@ -670,7 +671,7 @@ def _ssc_write_source_waveform_broadcast(
             initialized_array[i] = waveform_data[i]
         waveform_data = initialized_array
     for _ssc in ssc:
-        _ssc.session.write_source_waveform_broadcast(waveform_name, waveform_data)
+        _ssc._session.write_source_waveform_broadcast(waveform_name, waveform_data)
     return ssc
 
 
@@ -683,7 +684,7 @@ def _ssc_write_source_waveform_site_unique(
 ):
     for _ssc, per_instrument_waveform in zip(ssc, per_instrument_waveforms):
         rows, cols = numpy.shape(per_instrument_waveform)
-        site_numbers, _ = _site_list_to_site_numbers(_ssc.site_list)
+        site_numbers, _ = _site_list_to_site_numbers(_ssc._pins)
         if minimum_size > cols and expand_to_minimum_size:
             initialized_array = [[0 for _ in range(minimum_size)] for _ in range(len(site_numbers))]
             for row in range(rows):
@@ -693,7 +694,7 @@ def _ssc_write_source_waveform_site_unique(
         waveform_data = {}
         for site_number, waveform in zip(site_numbers, per_instrument_waveform):
             waveform_data[site_number] = waveform
-        _ssc.session.write_source_waveform_site_unique(waveform_name, waveform_data)
+        _ssc._session.write_source_waveform_site_unique(waveform_name, waveform_data)
     return ssc
     # End of Source and Capture Waveforms #
 
@@ -703,13 +704,13 @@ def _ssc_write_source_waveform_site_unique(
 def _ssc_read_static(ssc: typing.List[_NIDigitalSSC]):
     per_instrument_data: typing.List[typing.List[enums.PinState]] = []
     for _ssc in ssc:
-        per_instrument_data.append(_ssc.session.channels[_ssc.channel_list].read_static())
+        per_instrument_data.append(_ssc._session.channels[_ssc._channels].read_static())
     return ssc, per_instrument_data
 
 
 def _ssc_write_static(ssc: typing.List[_NIDigitalSSC], state: enums.WriteStaticPinState):
     for _ssc in ssc:
-        _ssc.session.channels[_ssc.channel_list].write_static(state)
+        _ssc._session.channels[_ssc._channels].write_static(state)
     return ssc
 
 
@@ -718,9 +719,9 @@ def _ssc_write_static_per_site_per_pin(
     per_site_per_pin_state: typing.List[typing.List[enums.WriteStaticPinState]],
 ):
     for _ssc, states in zip(ssc, per_site_per_pin_state):
-        channels, _, _ = _channel_list_to_pins(_ssc.channel_list)
+        channels, _, _ = _channel_list_to_pins(_ssc._channels)
         for channel, state in zip(channels, states):
-            _ssc.session.channels[channel].write_static(state)
+            _ssc._session.channels[channel].write_static(state)
     return ssc
 
 
@@ -729,9 +730,9 @@ def _ssc_write_static_per_site(
     per_site_state: typing.List[typing.List[enums.WriteStaticPinState]],
 ):
     for _ssc, states in zip(ssc, per_site_state):
-        channel_list_array, _, _ = _arrange_channels_per_site(_ssc.channel_list, _ssc.site_list)
+        channel_list_array, _, _ = _arrange_channels_per_site(_ssc._channels, _ssc._pins)
         for channel, state in zip(channel_list_array, states):
-            _ssc.session.channels[channel].write_static(state)
+            _ssc._session.channels[channel].write_static(state)
     return ssc
     # End of Static #
 
@@ -740,7 +741,7 @@ def _ssc_write_static_per_site(
 
 def _ssc_clear_start_trigger_signal(ssc: typing.List[_NIDigitalSSC]):
     for _ssc in ssc:
-        _ssc.session.start_trigger_type = enums.TriggerType.NONE
+        _ssc._session.start_trigger_type = enums.TriggerType.NONE
     return ssc
 
 
@@ -750,8 +751,8 @@ def _ssc_configure_trigger_signal(
     edge: enums.DigitalEdge = enums.DigitalEdge.RISING,
 ):
     for _ssc in ssc:
-        _ssc.session.digital_edge_start_trigger_source = source
-        _ssc.session.digital_edge_start_trigger_edge = edge
+        _ssc._session.digital_edge_start_trigger_source = source
+        _ssc._session.digital_edge_start_trigger_edge = edge
     return ssc
 
 
@@ -759,7 +760,7 @@ def _ssc_export_opcode_trigger_signal(
     ssc: typing.List[_NIDigitalSSC], signal_id: str, output_terminal: str = ""
 ):
     for _ssc in ssc:
-        _ssc.session.pattern_opcode_events[
+        _ssc._session.pattern_opcode_events[
             signal_id
         ].exported_pattern_opcode_event_output_terminal = output_terminal
     return ssc
@@ -770,7 +771,7 @@ def _ssc_filter_sites(ssc: typing.List[_NIDigitalSSC], desired_sites: typing.Lis
     ssc_with_requested_sites: typing.List[_NIDigitalSSC] = []
     for _ssc in ssc:
         channel_list_array, site_list_array, site_numbers = _arrange_channels_per_site(
-            _ssc.channel_list, _ssc.site_list
+            _ssc._channels, _ssc._pins
         )
         channel_list: typing.List[str] = []
         site_list: typing.List[str] = []
@@ -782,14 +783,14 @@ def _ssc_filter_sites(ssc: typing.List[_NIDigitalSSC], desired_sites: typing.Lis
                 site_list.append(_site_list)
         if site_list:
             ssc_with_requested_sites.append(
-                _NIDigitalSSC(_ssc.session, ",".join(channel_list), ",".join(site_list))
+                _NIDigitalSSC(_ssc._session, ",".join(channel_list), ",".join(site_list))
             )
     return ssc_with_requested_sites
 
 
 def _ssc_initiate(ssc: typing.List[_NIDigitalSSC]):
     for _ssc in ssc:
-        _ssc.session.initiate()
+        _ssc._session.initiate()
     return ssc
 
 
@@ -1416,12 +1417,12 @@ def tsm_ssc_get_properties(tsm: TSMDigital):  # checked _
         session_properties.append(
             Session_Properties(
                 instrument_name,
-                _ssc.session.channels[_ssc.channel_list].voh,
-                _ssc.session.channels[_ssc.channel_list].vol,
-                _ssc.session.channels[_ssc.channel_list].vih,
-                _ssc.session.channels[_ssc.channel_list].vil,
-                _ssc.session.channels[_ssc.channel_list].vterm,
-                _ssc.session.channels[_ssc.channel_list].frequency_counter_measurement_time,
+                _ssc._session.channels[_ssc._channels].voh,
+                _ssc._session.channels[_ssc._channels].vol,
+                _ssc._session.channels[_ssc._channels].vih,
+                _ssc._session.channels[_ssc._channels].vil,
+                _ssc._session.channels[_ssc._channels].vterm,
+                _ssc._session.channels[_ssc._channels].frequency_counter_measurement_time,
             )
         )
     return tsm, session_properties
@@ -1493,11 +1494,10 @@ def tsm_ssc_write_source_waveform_site_unique(
 # End of Source and Capture Waveforms #
 
 
-
 # Static #
 def tsm_ssc_read_static(tsm: TSMDigital, auto_select=True):
     """
-    auto_select=True, specifies this function to configures the output function as digital automatically.
+    auto_select=True, specifies this function to configure the output function as digital automatically.
     auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
     Without configuring as digital and auto_select as false, this function will not work as expected.
     """
@@ -1520,7 +1520,7 @@ def tsm_ssc_write_static_per_site_per_pin(
     auto_select=True,
 ):
     """
-    auto_select=True, specifies this function to configures the output function as digital automatically.
+    auto_select=True, specifies this function to configure the output function as digital automatically.
     auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
     Without configuring as digital and auto_select as false, this function will not work as expected.
     """
@@ -1548,7 +1548,7 @@ def tsm_ssc_write_static_per_site(
     tsm: TSMDigital, per_site_state: typing.List[enums.WriteStaticPinState], auto_select=True
 ):
     """
-    auto_select=True, specifies this function to configures the output function as digital automatically.
+    auto_select=True, specifies this function to configure the output function as digital automatically.
     auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
     Without configuring as digital and auto_select as false, this function will not work as expected.
     """
@@ -1572,7 +1572,7 @@ def tsm_ssc_write_static_per_site(
 
 def tsm_ssc_write_static(tsm: TSMDigital, state: enums.WriteStaticPinState, auto_select=True):
     """
-    auto_select=True, specifies this function to configures the output function as digital automatically.
+    auto_select=True, specifies this function to configure the output function as digital automatically.
     auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
     Without configuring as digital and auto_select as false, this function will not work as expected.
     """
@@ -1671,7 +1671,7 @@ def _ssc_calculate_per_instrument_per_site_to_per_site_lut(
 ):
     per_instrument_per_site_to_per_site_lut: typing.List[Location_1D_Array] = []
     for _ssc in ssc:
-        site_numbers, _ = _site_list_to_site_numbers(_ssc.site_list)
+        site_numbers, _ = _site_list_to_site_numbers(_ssc._pins)
         array: typing.List[Location_1D_Array] = []
         for site_number in site_numbers:
             array.append(Location_1D_Array([sites.index(site_number)]))
@@ -1684,7 +1684,7 @@ def _ssc_calculate_per_instrument_to_per_site_lut(
 ):
     per_instrument_to_per_site_lut: typing.List[Location_1D_Array] = []
     for _ssc in ssc:
-        site_numbers, _ = _site_list_to_site_numbers(_ssc.site_list)
+        site_numbers, _ = _site_list_to_site_numbers(_ssc._pins)
         array: typing.List[int] = []
         for site_number in site_numbers:
             array.append(sites.index(site_number))
@@ -1697,7 +1697,7 @@ def _ssc_calculate_per_instrument_to_per_site_per_pin_lut(
 ):
     per_instrument_to_per_site_per_pin_lut: typing.List[Location_2D_Array] = []
     for _ssc in ssc:
-        _, _pins, _sites = _channel_list_to_pins(_ssc.channel_list)
+        _, _pins, _sites = _channel_list_to_pins(_ssc._channels)
         array: typing.List[Location_2D] = []
         for pin, site in zip(_pins, _sites):
             array.append(Location_2D(sites.index(site), pins.index(pin)))
@@ -1715,7 +1715,7 @@ def _ssc_calculate_per_site_per_pin_to_per_instrument_lut(
     pins_sites_array: typing.List[typing.Any] = []
     per_site_per_pin_to_per_instrument_lut: typing.List[typing.List[Location_2D]] = []
     for _ssc in ssc:
-        _, _pins, _sites = _channel_list_to_pins(_ssc.channel_list)
+        _, _pins, _sites = _channel_list_to_pins(_ssc._channels)
         pins_sites_array += list(map(list, zip(_pins, _sites)))
         max_sites_on_instrument = max(max_sites_on_instrument, len(_pins))
         location_2d_array += [Location_2D(i, j) for j in range(len(_pins))]
@@ -1743,7 +1743,7 @@ def _ssc_calculate_per_site_to_per_instrument_lut(
     sites_array: typing.List[int] = []
     per_site_to_per_instrument_lut: typing.List[Location_2D] = []
     for _ssc in ssc:
-        site_numbers, _ = _site_list_to_site_numbers(_ssc.site_list)
+        site_numbers, _ = _site_list_to_site_numbers(_ssc._pins)
         sites_array += site_numbers
         max_sites_on_instrument = max(max_sites_on_instrument, len(site_numbers))
         location_2d_array += [Location_2D(i, j) for j in range(len(site_numbers))]
