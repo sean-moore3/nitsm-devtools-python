@@ -1,7 +1,8 @@
 import typing
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
-import niswitch
 from enum import Enum
+
+import niswitch
+from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 
 
 class Action(Enum):

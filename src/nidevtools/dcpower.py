@@ -1,8 +1,8 @@
-from cmath import nan
 import datetime
 import math
 import re
 import typing
+from cmath import nan
 from datetime import datetime
 
 import nidcpower

@@ -1,7 +1,8 @@
-import nitsm.codemoduleapi
-import re
 import enum
+import re
 import typing
+
+import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 from nitsm.pinquerycontexts import PinQueryContext
 

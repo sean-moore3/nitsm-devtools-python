@@ -1,11 +1,13 @@
 import re
 import typing
-import numpy
+from enum import Enum
+
 import niscope
 import nitsm.codemoduleapi
+import numpy
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 from nitsm.pinquerycontexts import PinQueryContext
-from enum import Enum
+
 import nidevtools.common as ni_dt_common
 
 

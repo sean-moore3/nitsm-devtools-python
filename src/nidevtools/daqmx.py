@@ -1,12 +1,11 @@
-import nidaqmx
-import nitsm.codemoduleapi
-import nitsm.enums
-import nitsm.codemoduleapi
-import nitsm.pinquerycontexts
-import nidaqmx.constants
 import enum
 import typing
 
+import nidaqmx
+import nidaqmx.constants
+import nitsm.codemoduleapi
+import nitsm.enums
+import nitsm.pinquerycontexts
 
 # Types Definition
 PinsArg = typing.Union[str, typing.Sequence[str]]

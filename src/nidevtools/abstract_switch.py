@@ -1,20 +1,22 @@
-import typing
+import enum
 import os.path
 import shutil
+import time
+import typing
+import xml.etree.ElementTree as Et
+
+import nidaqmx.constants
+import nidigital
 import nifpga
 import niswitch
 import nitsm.codemoduleapi
 import nitsm.enums
 import nitsm.pinquerycontexts
-import enum
-import nidigital
-import nidaqmx.constants
+
+import nidevtools.daqmx
 import nidevtools.digital
 import nidevtools.fpga
 import nidevtools.switch
-import nidevtools.daqmx
-import time
-import xml.etree.ElementTree as Et
 
 instrument_type_id = "Matrix"
 PinsArg = typing.Union[str, typing.Sequence[str]]

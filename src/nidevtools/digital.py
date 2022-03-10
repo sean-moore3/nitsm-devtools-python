@@ -1,14 +1,15 @@
+import copy
+import os
 import re
 import typing
-import os
-import copy
-import numpy
-import nidigital
-from enum import Enum
-from nidigital import enums
 from datetime import datetime
-from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
+from enum import Enum
+
+import nidigital
 import nitsm.codemoduleapi
+import numpy
+from nidigital import enums
+from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 
 

@@ -1,9 +1,11 @@
-import typing
 import math
+import typing
+
 import nifgen
 import nitsm.codemoduleapi
 import nitsm.enums
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
+
 import nidevtools.common as ni_dt_common
 
 
