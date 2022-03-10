@@ -4,7 +4,7 @@ import nitsm
 import nidevtools.abstract_switch as ni_abstract
 import nidevtools.daqmx as ni_daqmx
 import nidevtools.fpga as ni_fpga
-import nidevtools.digital as ni_dt_digital
+# import nidevtools.digital as ni_dt_digital
 
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
@@ -75,17 +75,20 @@ class TestAbstract:
         print('DISCONNECT ALL')
         ni_abstract.pin_fgv(tsm_context, '', ni_abstract.Control.disconnect_all)
 
+
 @nitsm.codemoduleapi.code_module
 def ts_open_session(tsm_context):
     ni_daqmx.set_task(tsm_context)
     ni_fpga.initialize_sessions(tsm_context)
     # ni_dt_digital.tsm_initialize_sessions(tsm_context)
 
+
 @nitsm.codemoduleapi.code_module
 def ts_close_session(tsm_context):
     # ni_dt_digital.tsm_close_sessions(tsm_context)
     ni_fpga.close_sessions(tsm_context)
     ni_daqmx.clear_task(tsm_context)
+
 
 @nitsm.codemoduleapi.code_module
 def ts_initialize_and_close(tsm_context):
@@ -94,9 +97,11 @@ def ts_initialize_and_close(tsm_context):
     assert(ni_abstract.get_all_instruments_names(tsm_context)[0] == 'Masterconnect')
     ni_abstract.close_sessions(tsm_context)
 
+
 @nitsm.codemoduleapi.code_module
 def ts_check_debug():
     ni_abstract.check_debug_ui_tool("")  # TODO add path
+
 
 @nitsm.codemoduleapi.code_module
 def ts_pins_to_session_sessions_info(tsm_context):
@@ -115,6 +120,7 @@ def ts_pins_to_session_sessions_info(tsm_context):
     ni_abstract.pins_to_task_and_connect(tsm_context, ['En_Daq'], ['BuckSGL_3', 'BuckSGL_4'])
     # ni_abstract.disconnect_all(tsm_context)
     ni_abstract.disconnect_pin(tsm_context, "BuckSGL_1")
+
 
 @nitsm.codemoduleapi.code_module
 def ts_pin_name_to_instrument(tsm_context):
