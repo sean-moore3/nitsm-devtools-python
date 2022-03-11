@@ -31,9 +31,9 @@ def tsm_context(standalone_tsm):
     in a dictionary format.
     """
     print("\nTest is running on Simulated driver?", SIMULATE_HARDWARE)
-    ni_dt_digital.tsm_initialize_sessions(standalone_tsm, options=OPTIONS)
+    ni_dt_digital.initialize_sessions(standalone_tsm, options=OPTIONS)
     yield standalone_tsm
-    ni_dt_digital.tsm_close_sessions(standalone_tsm)
+    ni_dt_digital.close_sessions(standalone_tsm)
 
 
 @pytest.fixture
@@ -44,9 +44,9 @@ def digital_tsm_s(tsm_context, tests_pins):
     digital_tsms = []
     for test_pin in tests_pins:
         if isinstance(test_pin, str):
-            digital_tsms.append(ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, test_pin))
+            digital_tsms.append(ni_dt_digital.pin_to_n_sessions(tsm_context, test_pin))
         elif isinstance(test_pin, list):
-            digital_tsms.append(ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, test_pin))
+            digital_tsms.append(ni_dt_digital.n_pins_to_m_sessions(tsm_context, test_pin))
         else:
             assert False  # unexpected datatype
     return digital_tsms
@@ -85,8 +85,9 @@ class TestNIDigital:
         """TSM SSC Digital Select Function.vi
         Need to add logic to check back if the selected function is applied or not"""
         function_to_select = enums.SelectedFunction.DIGITAL
-        temp_tsm = ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], function_to_select)
-        assert isinstance(temp_tsm, ni_dt_digital.TSMDigital)
+        for tsm in digital_tsm_s:
+            tsm.ssc.select_function(function_to_select)
+            assert isinstance(tsm, ni_dt_digital.TSMDigital)
 
     def test_tsm_ssc_write_read_static_loop_back_pin_low(self, digital_tsm_s):
         """TSM SSC Digital Write Static.vi
@@ -95,12 +96,14 @@ class TestNIDigital:
         This test may pass on simulated device as low is the default value.
         Test with write ZERO and read Low
         """
-
-        ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
-        ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[1], enums.SelectedFunction.DIGITAL)
-        ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
+        for tsm in digital_tsm_s:
+            tsm.ssc.select_function(enums.SelectedFunction.DIGITAL)
+        # ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
+        # ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[1], enums.SelectedFunction.DIGITAL)
+        digital_tsm_s[0].ssc.write_static(enums.WriteStaticPinState.ZERO)
+        # ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
         # sleep(1)
-        _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[1])
+        per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[1])
         print(per_site_per_pin_data)
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
@@ -193,7 +196,7 @@ class TestNIDigital:
         print(str(level))
         print(str(timing))
         ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2], str(level), str(timing))
-        _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(
+        per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(
             digital_tsm_s[2], "I2C_Write_Loop"
         )
         print(per_site_pass)
@@ -213,9 +216,7 @@ class TestNIDigital:
         print(str(level))
         print(str(timing))
         ni_dt_digital.tsm_ssc_apply_levels_and_timing(digital_tsm_s[2], str(level), str(timing))
-        _, configured_period = ni_dt_digital.tsm_ssc_configure_time_set_period(
-            digital_tsm_s[0], "Idle", 40e-6
-        )
+        configured_period = ni_dt_digital.tsm_ssc_configure_time_set_period(digital_tsm_s[0], "Idle", 40e-6)
         assert math.isclose(configured_period, 40e-6, abs_tol=5e-6)
         ni_dt_digital.tsm_ssc_burst_pattern(digital_tsm_s[2], "I2C_Read_Loop")
 
@@ -225,9 +226,7 @@ class TestNIDigital:
         test_voltages = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0]
         for test_voltage in test_voltages:
             ni_dt_digital.tsm_ssc_ppmu_source_voltage(digital_tsm_s[0], test_voltage, 0.02)
-            _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(
-                digital_tsm_s[1]
-            )
+            per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(digital_tsm_s[1])
             print(per_site_per_pin_measurements)
             for per_site_measurements in per_site_per_pin_measurements:
                 for per_pin_measurement in per_site_measurements:
@@ -235,7 +234,7 @@ class TestNIDigital:
                     assert test_voltage - 0.1 <= per_pin_measurement <= test_voltage + 0.1
 
     def test_tsm_ssc_get_properties(self, digital_tsm_s):
-        _, session_properties = ni_dt_digital.tsm_ssc_get_properties(digital_tsm_s[0])
+        session_properties = ni_dt_digital.tsm_ssc_get_properties(digital_tsm_s[0])
         for session_property in session_properties:
             print("instrument_name")
             assert session_property[0].startswith("DPI")

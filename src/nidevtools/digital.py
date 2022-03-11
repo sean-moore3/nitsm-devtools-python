@@ -1556,7 +1556,7 @@ def tsm_ssc_write_sequencer_register(
 # Session Properties #
 def tsm_ssc_get_properties(tsm: TSMDigital):  # checked _
     session_properties: typing.List[Session_Properties] = []
-    for _ssc in tsm.ssc:
+    for _ssc in tsm.ssc.sscs:
         instrument_name = ""
         match = re.search(r"[A-Za-z]+[1-9]+", str(_ssc.session))
         if match:
@@ -1572,7 +1572,7 @@ def tsm_ssc_get_properties(tsm: TSMDigital):  # checked _
                 _ssc._session.channels[_ssc._channels].frequency_counter_measurement_time,
             )
         )
-    return tsm, session_properties
+    return session_properties
 
 
 # End of Session Properties #
@@ -1655,7 +1655,7 @@ def tsm_ssc_read_static(tsm: TSMDigital, auto_select=True):
     per_site_per_pin_data = _apply_lut_per_instrument_to_per_site_per_pin(
         initialized_array, per_instrument_to_per_site_per_pin_lut, per_instrument_data
     )
-    return tsm, per_site_per_pin_data
+    return per_site_per_pin_data
 
 
 def tsm_ssc_write_static_per_site_per_pin(
