@@ -13,6 +13,17 @@ from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
 
 
+class LevelTypeToSet(Enum):
+    VIL = 0
+    VIH = 1
+    VOL = 2
+    VOH = 3
+    VTERM = 4
+    LOL = 5
+    LOH = 6
+    VCOM = 7
+
+
 class _NIDigitalSSC:
     """
     _Site specific _Session and _Channel.
@@ -947,17 +958,6 @@ class Session_Properties(typing.NamedTuple):
     vil: float
     vterm: float
     measurement_time: float
-
-
-class LevelTypeToSet(Enum):
-    VIL = 0
-    VIH = 1
-    VOL = 2
-    VOH = 3
-    VTERM = 4
-    LOL = 5
-    LOH = 6
-    VCOM = 7
 
 
 class HRAM_Configuration:
