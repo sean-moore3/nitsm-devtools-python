@@ -1704,47 +1704,6 @@ class TSMDCPower(typing.NamedTuple):
     pins_expanded: typing.List[ni_dt_common.ExpandedPinInformation]
 
 
-@nitsm.codemoduleapi.code_module
-def pins_to_sessions(
-    tsm_context: TSMContext,
-    pins: typing.List[str],
-    sites: typing.List[int] = [],
-    fill_pin_site_info=True,
-):
-    """get the sessions for the selected pins
-
-    Args:
-        tsm_context (TSMContext): tsm context for nidcpower
-        pins (typing.List[str]): desired pins for which the TSMDCPower object is created
-        sites (typing.List[int], optional): list of desired sites. Defaults to [].
-        fill_pin_site_info (bool, optional): if true updates the sites. Defaults to True.
-
-    Returns:
-        dcpower_tsm: pinquery context variable
-    """
-    if len(sites) == 0:
-        sites = list(tsm_context.site_numbers)  # This is tested and works
-    pins_expanded = []
-    pins_info = []
-    pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
-    if fill_pin_site_info:
-        pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(
-            tsm_context, pins
-        )  # This is tested and working fine.
-    else:
-        for pin in pins:
-            a = ni_dt_common.PinInformation  # create instance of class
-            a.pin = pin
-            pins_info.append(a)
-    _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(
-        pin_query_context, pins_expanded, sites
-    )
-    sscs = [_NIDCPowerSSC(session, channel, pin_list)
-            for session, channel, pin_list in zip(sessions, channels, pin_lists)]
-    dc_power_tsm = _NIDCPowerTSM(sscs)
-    return TSMDCPower(pin_query_context, dc_power_tsm, sites, pins_info, pins_expanded)
-
-
 def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
     """From the tsm context select only desired pins 
 
@@ -1824,6 +1783,47 @@ def initialize_sessions(tsm_context: TSMContext, power_line_frequency=60.0, **kw
 
         # set session in the tsm context
         tsm_context.set_nidcpower_session(resource_string, session)
+
+
+@nitsm.codemoduleapi.code_module
+def pins_to_sessions(
+    tsm_context: TSMContext,
+    pins: typing.List[str],
+    sites: typing.List[int] = [],
+    fill_pin_site_info=True,
+):
+    """get the sessions for the selected pins
+
+    Args:
+        tsm_context (TSMContext): tsm context for nidcpower
+        pins (typing.List[str]): desired pins for which the TSMDCPower object is created
+        sites (typing.List[int], optional): list of desired sites. Defaults to [].
+        fill_pin_site_info (bool, optional): if true updates the sites. Defaults to True.
+
+    Returns:
+        dcpower_tsm: pinquery context variable
+    """
+    if len(sites) == 0:
+        sites = list(tsm_context.site_numbers)  # This is tested and works
+    pins_expanded = []
+    pins_info = []
+    pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
+    if fill_pin_site_info:
+        pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(
+            tsm_context, pins
+        )  # This is tested and working fine.
+    else:
+        for pin in pins:
+            a = ni_dt_common.PinInformation  # create instance of class
+            a.pin = pin
+            pins_info.append(a)
+    _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(
+        pin_query_context, pins_expanded, sites
+    )
+    sscs = [_NIDCPowerSSC(session, channel, pin_list)
+            for session, channel, pin_list in zip(sessions, channels, pin_lists)]
+    dc_power_tsm = _NIDCPowerTSM(sscs)
+    return TSMDCPower(pin_query_context, dc_power_tsm, sites, pins_info, pins_expanded)
 
 
 @nitsm.codemoduleapi.code_module
