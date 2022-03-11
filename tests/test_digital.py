@@ -281,22 +281,22 @@ class TestNIDigital:
         assert numpy.shape(per_instrument_state) == (1,)
         for state in per_instrument_state:
             assert isinstance(state, bool)
-        per_instrument_register_values = ni_dt_digital.tsm_ssc_read_sequencer_register(digital_tsm_s[0],
-                                                                                       enums.SequencerRegister.REGISTER1)
-        assert isinstance(per_instrument_register_values, list)
-        assert numpy.shape(per_instrument_register_values) == (1,)
-        for register_value in per_instrument_register_values:
+        register_values = ni_dt_digital.tsm_ssc_read_sequencer_register(digital_tsm_s[0],
+                                                                        enums.SequencerRegister.REGISTER1)
+        assert isinstance(register_values, list)
+        assert numpy.shape(register_values) == (1,)
+        for register_value in register_values:
             assert isinstance(register_value, int)
 
 
 @nitsm.codemoduleapi.code_module
 def open_sessions(tsm_context: SMClass):
-    ni_dt_digital.tsm_initialize_sessions(tsm_context, options=OPTIONS)
+    ni_dt_digital.initialize_sessions(tsm_context, options=OPTIONS)
 
 
 @nitsm.codemoduleapi.code_module
 def close_sessions(tsm_context: SMClass):
-    ni_dt_digital.tsm_close_sessions(tsm_context)
+    ni_dt_digital.close_sessions(tsm_context)
 
 
 @nitsm.codemoduleapi.code_module
@@ -342,7 +342,7 @@ def frequency_measurement_func(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def hram(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context,pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
     hram_configuration = ni_dt_digital.HRAM_Configuration()
     hram_configuration.trigger_type = enums.HistoryRAMTriggerType.PATTERN_LABEL
     hram_configuration.pattern_label = "start_burst"
@@ -538,7 +538,7 @@ def sequencer_flags_and_registers(tsm_context: SMClass, pins: typing.List[str]):
 def session_properties_func(tsm_context: SMClass, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
-    session_properties = ni_dt_digital.tsm_ssc_get_properties(tsm)
+    session_properties = tsm.ssc.get_properties()
     for session_property in session_properties:
         assert session_property[0].startswith("DPI")
         assert math.isclose(session_property[1], 0.0015, abs_tol=5e-6)
@@ -603,9 +603,7 @@ def misc(tsm_context: SMClass, pins: typing.List[str]):
         assert ssc.site_list == "site2"
     ni_dt_digital.tsm_ssc_initiate(tsm)
     ni_dt_digital.tsm_ssc_abort(tsm)
-    per_instrument_to_per_site_lut = ni_dt_digital._ssc_calculate_per_instrument_to_per_site_lut(
-        tsm.ssc, tsm.site_numbers
-    )
+    per_instrument_to_per_site_lut = tsm.ssc.calculate_per_instrument_to_per_site_lut(tsm.site_numbers)
     per_site_data = ni_dt_digital._apply_lut_per_instrument_to_per_site(
         [False, False, False],
         per_instrument_to_per_site_lut,
@@ -619,9 +617,7 @@ def misc(tsm_context: SMClass, pins: typing.List[str]):
     )
     assert per_site_data == [[True, True]] * 3
     per_instrument_to_per_site_per_pin_lut = (
-        ni_dt_digital._ssc_calculate_per_instrument_to_per_site_per_pin_lut(
-            tsm.ssc, tsm.site_numbers, tsm.pins_info
-        )
+        tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(tsm.site_numbers, tsm.pins_info)
     )
     per_site_per_pin_data = ni_dt_digital._apply_lut_per_instrument_to_per_site_per_pin(
         [[0, 0], [0, 0], [0, 0]],
@@ -668,8 +664,8 @@ def initialize_sessions(tsm_context: SMClass):
         tsm_context, instrument_type_id=tsm_enums.InstrumentTypeIdConstants.NI_DIGITAL_PATTERN
     )
     print(pins)
-    ni_dt_digital.tsm_initialize_sessions(tsm_context, options=OPTIONS)
-    tsm_i_o = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(
+    ni_dt_digital.initialize_sessions(tsm_context, options=OPTIONS)
+    tsm_i_o = ni_dt_digital.n_pins_to_m_sessions(
         tsm_context, ["DPI_PG_Inputs", "DPI_PG_Outputs"]
     )
     ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm_i_o, "I2C_Levels", "I2C_Timing")
@@ -678,7 +674,7 @@ def initialize_sessions(tsm_context: SMClass):
 
 @nitsm.codemoduleapi.code_module
 def configure_pins(tsm_context: SMClass):
-    tsm_o = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["DPI_PG_Outputs"])
+    tsm_o = ni_dt_digital.n_pins_to_m_sessions(tsm_context, ["DPI_PG_Outputs"])
     # ni_dt_digital.tsm_ssc_select_function(tsm_o, ni_dt_digital.enums.SelectedFunction.DIGITAL)
     ni_dt_digital.tsm_ssc_write_static(tsm_o, ni_dt_digital.enums.WriteStaticPinState.ZERO)
 
