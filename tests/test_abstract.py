@@ -4,7 +4,8 @@ import nitsm
 import nidevtools.abstract_switch as ni_abstract
 import nidevtools.daqmx as ni_daqmx
 import nidevtools.fpga as ni_fpga
-# import nidevtools.digital as ni_dt_digital
+#import nidevtools.digital as ni_dt_digital
+import nidevtools.switch as ni_switch
 
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
@@ -29,9 +30,12 @@ def tsm_context(standalone_tsm):
     print("\nSimulated driver?", SIMULATE)
     ni_daqmx.set_task(standalone_tsm)
     ni_fpga.initialize_sessions(standalone_tsm)
+    ni_switch.initialize_sessions(standalone_tsm)
     # ni_dt_digital.tsm_initialize_sessions(standalone_tsm)
+    print("INIT DONE")
     yield standalone_tsm
     # ni_dt_digital.tsm_close_sessions(standalone_tsm)
+    ni_switch.close_sessions(standalone_tsm)
     ni_fpga.close_sessions(standalone_tsm)
     ni_daqmx.clear_task(standalone_tsm)
 
@@ -58,16 +62,16 @@ class TestAbstract:
         t.stop()
         enabled.disconnect_sessions_info(tsm_context)
         # ni_abstract.disconnect_all(tsm_context)
-        abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm_context, 'BuckSGL_1')
+        abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm_context, 'BuckSGL_1_DUT')
         print(abst_session)
         enabled.read_state(tsm_context)
-        ni_abstract.pins_to_task_and_connect(tsm_context, ['En_Daq'], ['BuckSGL_3', 'BuckSGL_4'])
-        # ni_abstract.disconnect_all(tsm_context)
-        ni_abstract.disconnect_pin(tsm_context, "BuckSGL_1")
+        ni_abstract.pins_to_task_and_connect(tsm_context, ['En_Daq'], ['BuckSGL_3_DUT', 'BuckSGL_4_DUT'])
+        #ni_abstract.disconnect_all(tsm_context)
+        ni_abstract.disconnect_pin(tsm_context, "BuckSGL_1_DUT")
 
     def test_pin_name_to_instrument(self, tsm_context):
-        # ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')
-        # print(tsm_context.pin_map_file_path)
+        #ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')
+        print(tsm_context.pin_map_file_path)
         print('INIT')
         ni_abstract.pin_fgv(tsm_context, '', ni_abstract.Control.init)
         print('GET CONNECTIONS')
@@ -113,12 +117,12 @@ def ts_pins_to_session_sessions_info(tsm_context):
     t = ni_daqmx.get_all_sessions(tsm_context)[0]
     t.stop()
     enabled.disconnect_sessions_info(tsm_context)
-    # ni_abstract.disconnect_all(tsm_context)
+    ni_abstract.disconnect_all(tsm_context)
     abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm_context, 'BuckSGL_1')
     print(abst_session)
     enabled.read_state(tsm_context)
     ni_abstract.pins_to_task_and_connect(tsm_context, ['En_Daq'], ['BuckSGL_3', 'BuckSGL_4'])
-    # ni_abstract.disconnect_all(tsm_context)
+    ni_abstract.disconnect_all(tsm_context)
     ni_abstract.disconnect_pin(tsm_context, "BuckSGL_1")
 
 

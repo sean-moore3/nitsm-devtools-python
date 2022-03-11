@@ -25,7 +25,6 @@ class Session(typing.NamedTuple):
 
     def info(self, route_value: str, action: Action, timeout: int):
         data = []
-        print(self.Channel)
         if action == Action.Disconnect_All:
             self.Session.disconnect_all()
         elif action == Action.Connect:
@@ -49,7 +48,6 @@ class MultipleSessions:
 
     def action_session_info(self, route_value: str = '', action: Action = Action.Disconnect, timeout: int = 40):
         read_path_capability = []
-        print(self.Sessions)
         for session in self.Sessions:
             data = session.info(route_value, action, timeout)
             read_path_capability += data
@@ -73,14 +71,12 @@ def get_all_sessions(tsm_context: TSMContext):
 
 
 def pin_to_sessions_session_info(tsm_context: TSMContext, pin: str = ''):
-    print(pin)
     try:
         pin_query_context, session_data, channel_group_id, channel_list =\
             tsm_context.pins_to_custom_session(instrument_type_id, pin)
         relay_name = channel_group_id
         # TODO CHECK for better equivalent
         data = MultipleSessions([Session(session_data, pin, relay_name)])
-        print('data', type(data))
         return data
     except Exception:
         return None

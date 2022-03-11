@@ -4,7 +4,6 @@ import shutil
 import time
 import typing
 import xml.etree.ElementTree as Et
-
 import nidaqmx.constants
 import nidigital
 import nifpga
@@ -12,9 +11,8 @@ import niswitch
 import nitsm.codemoduleapi
 import nitsm.enums
 import nitsm.pinquerycontexts
-
 import nidevtools.daqmx
-import nidevtools.digital
+# import nidevtools.digital
 import nidevtools.fpga
 import nidevtools.switch
 
@@ -58,6 +56,7 @@ class Session:
             multiple_session.sessions[0].Task.stop()
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
             multiple_session.sessions[0].Task.write(bool(self.route_value), True)
+            """
         elif self.instrument_type == InstrumentTypes.digitalpattern:
             multiple_session = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
             multiple_session = nidevtools.digital.tsm_ssc_select_function(multiple_session,
@@ -69,6 +68,7 @@ class Session:
             else:
                 data = nidigital.enums.WriteStaticPinState.X
             nidevtools.digital.tsm_ssc_write_static(multiple_session, data)
+            """
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
             if self.route_value == "0":
@@ -95,10 +95,12 @@ class Session:
             multiple_session: nidevtools.daqmx.MultipleSessions
             multiple_session.sessions[0].Task.stop()
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
+            """
         elif self.instrument_type == InstrumentTypes.digitalpattern:
             multiple_session_info = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
             data = nidigital.enums.WriteStaticPinState.X
             nidevtools.digital.tsm_ssc_write_static(multiple_session_info, data)
+            """
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session_info = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
             data = [nidevtools.fpga.StaticStates.X]  # *128 todo check
@@ -121,6 +123,7 @@ class Session:
             for bit in multiple_session.sessions[0].Task.read(1):
                 data += str(bit)
             self.status = data
+            """
         elif self.instrument_type == InstrumentTypes.digitalpattern:
             multiple_session_info = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
             multiple_session_info = nidevtools.digital.tsm_ssc_select_function(multiple_session_info,
@@ -128,6 +131,7 @@ class Session:
             data = nidevtools.digital.tsm_ssc_read_static(multiple_session_info)
             status = ['0', '1', '', 'L', 'H', 'X', 'M', 'V', 'D', 'E']
             self.status = status[data[0][0]]
+            """
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session_info = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
             data = multiple_session_info.read_static()
@@ -328,7 +332,7 @@ def pin_fgv(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
         elif action == Control.init:
             pinmap_path = tsm_context.pin_map_file_path
             connections += pin_name_to_instrument(pinmap_path)
-        # break
+        break
 
 
 def get_first_matched_node(tree: Et.ElementTree, key: str):
@@ -387,6 +391,7 @@ def pin_name_to_instrument(pinmap_path: str = ''):
             else:
                 r += 1
         if element[1] == 'AbstractInstrument':
+            print(subarray22)
             out1 = subarray22[r][2]
         else:
             out1 = ""

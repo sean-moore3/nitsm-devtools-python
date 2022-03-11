@@ -194,7 +194,7 @@ def tests_pins(request):
         pins_selected = [input_dut_pins]
     elif file_name == "test_Switch.py":
         # for function generator driver i.e. niswitch testing
-        input_dut_pins = ["Pin1","Pin2", 'TestIn', 'TestOut2']
+        input_dut_pins = ["Pin1","Pin2","Pin3","Pin4","Pin5","Pin6","Pin7","Pin8","Pin9"]
         pins_selected = input_dut_pins
     elif file_name == "test_fpga.py":
         # for function generator driver i.e. nifpga testing
