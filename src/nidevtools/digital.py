@@ -10,7 +10,7 @@ import nitsm.codemoduleapi
 import numpy
 from nidigital import enums
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
 
 
 class LevelTypeToSet(Enum):
@@ -22,6 +22,82 @@ class LevelTypeToSet(Enum):
     LOL = 5
     LOH = 6
     VCOM = 7
+
+
+class Location_1D_Array(typing.NamedTuple):
+    location_1d_array: typing.List[int]
+
+
+class Location_2D(typing.NamedTuple):
+    row: int
+    col: int
+
+
+class Location_2D_Array(typing.NamedTuple):
+    location_2d_array: typing.List[Location_2D]
+
+
+class Session_Properties(typing.NamedTuple):
+    instrument_name: str
+    voh: float
+    vol: float
+    vih: float
+    vil: float
+    vterm: float
+    measurement_time: float
+
+
+class HRAM_Configuration:
+    finite_samples: bool = True
+    cycles_to_acquire: enums.HistoryRAMCyclesToAcquire = enums.HistoryRAMCyclesToAcquire.FAILED
+    max_samples_to_acquire_per_site: int = 8191
+    buffer_size_per_site: int = 32000
+    pretrigger_samples: int = 0
+    trigger_type: enums.HistoryRAMTriggerType = enums.HistoryRAMTriggerType.FIRST_FAILURE
+    cycle_number: int = 0
+    pattern_label: str = ""
+    vector_offset: int = 0
+    cycle_offset: int = 0
+
+
+class PXITriggerLine(typing.NamedTuple):
+    NONE: str
+    PXI_TRIG0: str
+    PXI_TRIG1: str
+    PXI_TRIG2: str
+    PXI_TRIG3: str
+    PXI_TRIG4: str
+    PXI_TRIG5: str
+    PXI_TRIG6: str
+    PXI_TRIG7: str
+
+
+PXI_TRIGGER_LINE = PXITriggerLine(
+    "",
+    "PXI_Trig0",
+    "PXI_Trig1",
+    "PXI_Trig2",
+    "PXI_Trig3",
+    "PXI_Trig4",
+    "PXI_Trig5",
+    "PXI_Trig6",
+    "PXI_Trig7",
+)
+
+
+class SignalId(typing.NamedTuple):
+    PATTERN_OPCODE_EVENT0: str
+    PATTERN_OPCODE_EVENT1: str
+    PATTERN_OPCODE_EVENT2: str
+    PATTERN_OPCODE_EVENT3: str
+
+
+SIGNAL_ID = SignalId(
+    "patternOpcodeEvent0",
+    "patternOpcodeEvent1",
+    "patternOpcodeEvent2",
+    "patternOpcodeEvent3",
+)
 
 
 class _NIDigitalSSC:
@@ -957,81 +1033,6 @@ class TSMDigital(typing.NamedTuple):
     pins: typing.List[str]
 
 
-class Location_1D_Array(typing.NamedTuple):
-    location_1d_array: typing.List[int]
-
-
-class Location_2D(typing.NamedTuple):
-    row: int
-    col: int
-
-
-class Location_2D_Array(typing.NamedTuple):
-    location_2d_array: typing.List[Location_2D]
-
-
-class Session_Properties(typing.NamedTuple):
-    instrument_name: str
-    voh: float
-    vol: float
-    vih: float
-    vil: float
-    vterm: float
-    measurement_time: float
-
-
-class HRAM_Configuration:
-    finite_samples: bool = True
-    cycles_to_acquire: enums.HistoryRAMCyclesToAcquire = enums.HistoryRAMCyclesToAcquire.FAILED
-    max_samples_to_acquire_per_site: int = 8191
-    buffer_size_per_site: int = 32000
-    pretrigger_samples: int = 0
-    trigger_type: enums.HistoryRAMTriggerType = enums.HistoryRAMTriggerType.FIRST_FAILURE
-    cycle_number: int = 0
-    pattern_label: str = ""
-    vector_offset: int = 0
-    cycle_offset: int = 0
-
-
-class PXITriggerLine(typing.NamedTuple):
-    NONE: str
-    PXI_TRIG0: str
-    PXI_TRIG1: str
-    PXI_TRIG2: str
-    PXI_TRIG3: str
-    PXI_TRIG4: str
-    PXI_TRIG5: str
-    PXI_TRIG6: str
-    PXI_TRIG7: str
-
-
-PXI_TRIGGER_LINE = PXITriggerLine(
-    "",
-    "PXI_Trig0",
-    "PXI_Trig1",
-    "PXI_Trig2",
-    "PXI_Trig3",
-    "PXI_Trig4",
-    "PXI_Trig5",
-    "PXI_Trig6",
-    "PXI_Trig7",
-)
-
-
-class SignalId(typing.NamedTuple):
-    PATTERN_OPCODE_EVENT0: str
-    PATTERN_OPCODE_EVENT1: str
-    PATTERN_OPCODE_EVENT2: str
-    PATTERN_OPCODE_EVENT3: str
-
-
-SIGNAL_ID = SignalId(
-    "patternOpcodeEvent0",
-    "patternOpcodeEvent1",
-    "patternOpcodeEvent2",
-    "patternOpcodeEvent3",
-)
-
 
 def tsm_ssc_clock_generator_abort(tsm: TSMDigital):
     tsm.ssc.clock_generator_abort()
@@ -1843,7 +1844,7 @@ def tsm_ssc_publish(
 
 # TSMContext #
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: TSMContext, options: dict = {}):
+def initialize_sessions(tsm_context: SMClass, options: dict = {}):
     """Creates the sessions for all the nidigital resource string available in the tsm_context for instruments"""
     pin_map_file_path = tsm_context.pin_map_file_path
     instrument_names = tsm_context.get_all_nidigital_instrument_names()
@@ -1879,13 +1880,13 @@ def initialize_sessions(tsm_context: TSMContext, options: dict = {}):
 
 
 @nitsm.codemoduleapi.code_module
-def pin_to_n_sessions(tsm_context: TSMContext, pin: str):
+def pin_to_n_sessions(tsm_context: SMClass, pin: str):
     return n_pins_to_m_sessions(tsm_context, [pin])
 
 
 @nitsm.codemoduleapi.code_module
 def n_pins_to_m_sessions(
-    tsm_context: TSMContext,
+    tsm_context: SMClass,
     pins: typing.List[str],
     sites: typing.List[int] = [],
     turn_pin_groups_to_pins: bool = True,
@@ -1908,7 +1909,7 @@ def n_pins_to_m_sessions(
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: TSMContext):
+def close_sessions(tsm_context: SMClass):
     """Closes the sessions associated with the tsm context"""
     sessions = tsm_context.get_all_nidigital_sessions()
     for session in sessions:
