@@ -926,7 +926,27 @@ class _NIDigitalTSM:
             per_site_to_per_instrument_lut.append(location_2d_array[index])
         return per_site_to_per_instrument_lut, instrument_count, max_sites_on_instrument
 
-
+    # Session Properties #
+    def get_properties(self):  # checked _
+        session_properties: typing.List[Session_Properties] = []
+        for _ssc in self.sscs:
+            instrument_name = ""
+            match = re.search(r"[A-Za-z]+[1-9]+", str(_ssc._session))
+            if match:
+                instrument_name = match.group()
+            session_properties.append(
+                Session_Properties(
+                    instrument_name,
+                    _ssc._session.channels[_ssc._channels].voh,
+                    _ssc._session.channels[_ssc._channels].vol,
+                    _ssc._session.channels[_ssc._channels].vih,
+                    _ssc._session.channels[_ssc._channels].vil,
+                    _ssc._session.channels[_ssc._channels].vterm,
+                    _ssc._session.channels[_ssc._channels].frequency_counter_measurement_time,
+                )
+            )
+        return session_properties
+    # End of Session Properties #
 # End of SSC Digital #
 
 
@@ -1032,25 +1052,20 @@ def tsm_ssc_modify_time_set_for_clock_generation(
 # Configuration #
 def tsm_ssc_clear_start_trigger_signal(tsm: TSMDigital):
     tsm.ssc.clear_start_trigger_signal()
-    return tsm
 
 
 def tsm_ssc_configure_trigger_signal(
     tsm: TSMDigital, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING
 ):
     tsm.ssc.configure_trigger_signal(source, edge)
-    return tsm
 
 
 def tsm_ssc_select_function(tsm: TSMDigital, function: enums.SelectedFunction):
     tsm.ssc.select_function(function)
 
 
-def tsm_ssc_export_opcode_trigger_signal(
-    tsm: TSMDigital, signal_id: str, output_terminal: str = ""
-):
+def tsm_ssc_export_opcode_trigger_signal(tsm: TSMDigital, signal_id: str, output_terminal: str = ""):
     tsm.ssc.export_opcode_trigger_signal(signal_id, output_terminal)
-    return tsm
 
 
 # End of Configuration #
@@ -1101,7 +1116,6 @@ def tsm_ssc_configure_hram(
     tsm.ssc.configure_hram_trigger(
         triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset
     )
-    return tsm
 
 
 def tsm_ssc_get_hram_configuration(tsm: TSMDigital):
@@ -1133,7 +1147,7 @@ def tsm_ssc_get_hram_configuration(tsm: TSMDigital):
     hram_configuration.max_samples_to_acquire_per_site = (
         per_instrument_max_samples_to_acquire_per_site[-1]
     )
-    return tsm, hram_configuration
+    return hram_configuration
 
 
 def tsm_ssc_log_hram_results(
@@ -1208,7 +1222,7 @@ def tsm_ssc_log_hram_results(
                 file_handle.write("%s\t" % col)
             file_handle.write("\n")
         file_handle.close()
-    return tsm, files_generated
+    return files_generated
 
 
 def tsm_ssc_stream_hram_results(tsm: TSMDigital):
@@ -1228,7 +1242,7 @@ def tsm_ssc_stream_hram_results(tsm: TSMDigital):
     ):
         for index in lut.location_1d_array:
             per_site_cycle_information[index] = cycle_information
-    return tsm, per_site_cycle_information
+    return per_site_cycle_information
 
 
 # End of HRAM #
@@ -1266,7 +1280,6 @@ def tsm_ssc_burst_pattern(
     wait_until_done: bool = True,
 ):
     tsm.ssc.burst_pattern(start_label, select_digital_function, timeout, wait_until_done)
-    return tsm
 
 
 def tsm_ssc_get_fail_count(tsm: TSMDigital):
@@ -1280,7 +1293,7 @@ def tsm_ssc_get_fail_count(tsm: TSMDigital):
         per_instrument_to_per_site_per_pin_lut,
         per_instrument_failure_counts,
     )
-    return tsm, per_site_per_pin_fail_counts
+    return per_site_per_pin_fail_counts
 
 
 def tsm_ssc_get_site_pass_fail(tsm: TSMDigital):
@@ -1292,7 +1305,7 @@ def tsm_ssc_get_site_pass_fail(tsm: TSMDigital):
     per_site_pass = _apply_lut_per_instrument_to_per_site(
         initialized_array, per_instrument_to_per_site_lut, per_instrument_pass
     )
-    return tsm, per_site_pass
+    return per_site_pass
 
 
 def tsm_ssc_wait_until_done(tsm: TSMDigital, timeout: float = 10):
@@ -1463,7 +1476,7 @@ def tsm_ssc_ppmu_measure_voltage(tsm: TSMDigital):
         per_instrument_to_per_site_per_pin_lut,
         per_instrument_measurements,
     )
-    return tsm, per_site_per_pin_measurements
+    return per_site_per_pin_measurements
 
 
 def tsm_ssc_ppmu_source_current(
@@ -1512,12 +1525,10 @@ def tsm_ssc_ppmu_source_voltage_per_site(
         initialized_array, per_site_to_per_instrument_lut, per_site_source_voltages
     )
     tsm.ssc.ppmu_source_voltage_per_site(current_limit_range, per_instrument_source_voltages)
-    return tsm
 
 
 def tsm_ssc_ppmu_source_voltage(tsm: TSMDigital, voltage_level: float, current_limit_range: float):
     tsm.ssc.ppmu_source_voltage(voltage_level, current_limit_range)
-    return tsm
 
 
 def tsm_ssc_ppmu_source(tsm: TSMDigital):
@@ -1553,29 +1564,7 @@ def tsm_ssc_write_sequencer_register(
 # End of Sequencer Flags and Registers #
 
 
-# Session Properties #
-def tsm_ssc_get_properties(tsm: TSMDigital):  # checked _
-    session_properties: typing.List[Session_Properties] = []
-    for _ssc in tsm.ssc.sscs:
-        instrument_name = ""
-        match = re.search(r"[A-Za-z]+[1-9]+", str(_ssc.session))
-        if match:
-            instrument_name = match.group()
-        session_properties.append(
-            Session_Properties(
-                instrument_name,
-                _ssc._session.channels[_ssc._channels].voh,
-                _ssc._session.channels[_ssc._channels].vol,
-                _ssc._session.channels[_ssc._channels].vih,
-                _ssc._session.channels[_ssc._channels].vil,
-                _ssc._session.channels[_ssc._channels].vterm,
-                _ssc._session.channels[_ssc._channels].frequency_counter_measurement_time,
-            )
-        )
-    return session_properties
 
-
-# End of Session Properties #
 
 
 # Source and Capture Waveforms #
@@ -1590,7 +1579,7 @@ def tsm_ssc_fetch_capture_waveform(
     per_site_waveforms = _apply_lut_per_instrument_to_per_site(
         initialized_array, per_instrument_to_per_site_lut, per_instrument_capture
     )
-    return tsm, per_site_waveforms
+    return per_site_waveforms
 
 
 def tsm_ssc_write_source_waveform_broadcast(
@@ -1603,7 +1592,6 @@ def tsm_ssc_write_source_waveform_broadcast(
     tsm.ssc.write_source_waveform_broadcast(
         waveform_name, waveform_data, expand_to_minimum_size, minimum_size
     )
-    return tsm
 
 
 def tsm_ssc_write_source_waveform_site_unique(
@@ -1632,7 +1620,6 @@ def tsm_ssc_write_source_waveform_site_unique(
         expand_to_minimum_size,
         minimum_size,
     )
-    return tsm
 
 
 # End of Source and Capture Waveforms #
@@ -1710,7 +1697,6 @@ def tsm_ssc_write_static_per_site(
         initialized_array, per_site_to_per_instrument_lut, per_site_state
     )
     tsm.ssc.write_static_per_site(per_instrument_state)
-    return tsm
 
 
 def tsm_ssc_write_static(tsm: TSMDigital, state: enums.WriteStaticPinState, auto_select=True):

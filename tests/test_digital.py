@@ -119,7 +119,7 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[1], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
-        _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[1])
+        per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[1])
         print(per_site_per_pin_data)
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
@@ -134,7 +134,7 @@ class TestNIDigital:
         """
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ZERO)
-        _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
+        per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
@@ -148,7 +148,7 @@ class TestNIDigital:
         """
         ni_dt_digital.tsm_ssc_select_function(digital_tsm_s[0], enums.SelectedFunction.DIGITAL)
         ni_dt_digital.tsm_ssc_write_static(digital_tsm_s[0], enums.WriteStaticPinState.ONE)
-        _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
+        per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(digital_tsm_s[0])
         for per_site_data in per_site_per_pin_data:
             for per_pin_data in per_site_data:
                 assert isinstance(per_pin_data, enums.PinState)
@@ -160,9 +160,7 @@ class TestNIDigital:
         test_voltages = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0]
         for test_voltage in test_voltages:
             ni_dt_digital.tsm_ssc_ppmu_source_voltage(digital_tsm_s[0], test_voltage, 0.02)
-            _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(
-                digital_tsm_s[1]
-            )
+            per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(digital_tsm_s[1])
             print(per_site_per_pin_measurements)
             for per_site_measurements in per_site_per_pin_measurements:
                 for per_pin_measurement in per_site_measurements:
@@ -175,7 +173,7 @@ class TestNIDigital:
         test_voltages = [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0]
         for test_voltage in test_voltages:
             ni_dt_digital.tsm_ssc_ppmu_source_voltage(digital_tsm_s[0], test_voltage, 0.02)
-            _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(
+            per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(
                 digital_tsm_s[0]
             )
             print(per_site_per_pin_measurements)
@@ -234,7 +232,7 @@ class TestNIDigital:
                     assert test_voltage - 0.1 <= per_pin_measurement <= test_voltage + 0.1
 
     def test_tsm_ssc_get_properties(self, digital_tsm_s):
-        session_properties = ni_dt_digital.tsm_ssc_get_properties(digital_tsm_s[0])
+        session_properties = digital_tsm_s[0].ssc.get_properties()
         for session_property in session_properties:
             print("instrument_name")
             assert session_property[0].startswith("DPI")
@@ -278,16 +276,13 @@ class TestNIDigital:
         ni_dt_digital.tsm_ssc_write_sequencer_register(
             digital_tsm_s[0], enums.SequencerRegister.REGISTER1, 1
         )
-        _, per_instrument_state = ni_dt_digital.tsm_ssc_read_sequencer_flag(
-            digital_tsm_s[0], enums.SequencerFlag.FLAG1
-        )
+        per_instrument_state = ni_dt_digital.tsm_ssc_read_sequencer_flag(digital_tsm_s[0], enums.SequencerFlag.FLAG1)
         assert isinstance(per_instrument_state, list)
         assert numpy.shape(per_instrument_state) == (1,)
         for state in per_instrument_state:
             assert isinstance(state, bool)
-        _, per_instrument_register_values = ni_dt_digital.tsm_ssc_read_sequencer_register(
-            digital_tsm_s[0], enums.SequencerRegister.REGISTER1
-        )
+        per_instrument_register_values = ni_dt_digital.tsm_ssc_read_sequencer_register(digital_tsm_s[0],
+                                                                                       enums.SequencerRegister.REGISTER1)
         assert isinstance(per_instrument_register_values, list)
         assert numpy.shape(per_instrument_register_values) == (1,)
         for register_value in per_instrument_register_values:
@@ -306,7 +301,7 @@ def close_sessions(tsm_context: SMClass):
 
 @nitsm.codemoduleapi.code_module
 def clock_generation(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     frequency = 25000
     ni_dt_digital.tsm_ssc_modify_time_set_for_clock_generation(tsm, frequency, 0.5, "time_set")
@@ -321,7 +316,7 @@ def clock_generation(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def configuration(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_clear_start_trigger_signal(tsm)
     ni_dt_digital.tsm_ssc_configure_trigger_signal(tsm, ni_dt_digital.PXI_TRIGGER_LINE.PXI_TRIG0)
@@ -333,13 +328,10 @@ def configuration(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def frequency_measurement_func(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_frequency_counter_configure_measurement_time(tsm, 0.5)
-    (
-        _,
-        per_site_per_pin_frequency_measurements,
-    ) = ni_dt_digital.tsm_ssc_frequency_counter_measure_frequency(tsm)
+    per_site_per_pin_frequency_measurements = ni_dt_digital.tsm_ssc_frequency_counter_measure_frequency(tsm)
     assert isinstance(per_site_per_pin_frequency_measurements, list)
     print(numpy.shape(per_site_per_pin_frequency_measurements))
     assert numpy.shape(per_site_per_pin_frequency_measurements) == (1, 2)
@@ -350,14 +342,13 @@ def frequency_measurement_func(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def hram(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
-
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context,pins[0])
     hram_configuration = ni_dt_digital.HRAM_Configuration()
     hram_configuration.trigger_type = enums.HistoryRAMTriggerType.PATTERN_LABEL
     hram_configuration.pattern_label = "start_burst"
     hram_configuration.cycles_to_acquire = enums.HistoryRAMCyclesToAcquire.ALL
     ni_dt_digital.tsm_ssc_configure_hram(tsm, hram_configuration)
-    _, hram_configuration = ni_dt_digital.tsm_ssc_get_hram_configuration(tsm)
+    hram_configuration = ni_dt_digital.tsm_ssc_get_hram_configuration(tsm)
     assert isinstance(hram_configuration, ni_dt_digital.HRAM_Configuration)
     assert isinstance(hram_configuration.finite_samples, bool)
     assert isinstance(hram_configuration.cycles_to_acquire, enums.HistoryRAMCyclesToAcquire)
@@ -371,10 +362,10 @@ def hram(tsm_context: SMClass, pins: typing.List[str]):
     assert isinstance(hram_configuration.cycle_offset, int)
     ni_dt_digital.tsm_ssc_burst_pattern(tsm, "start_burst")
     ni_dt_digital.tsm_ssc_wait_until_done(tsm)
-    _, per_site_cycle_information = ni_dt_digital.tsm_ssc_stream_hram_results(tsm)
+    per_site_cycle_information = ni_dt_digital.tsm_ssc_stream_hram_results(tsm)
     for cycle_information in per_site_cycle_information:
         assert not cycle_information
-    _, files_generated = ni_dt_digital.tsm_ssc_log_hram_results(
+    files_generated = ni_dt_digital.tsm_ssc_log_hram_results(
         tsm,
         [
             [
@@ -401,25 +392,25 @@ def hram(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def pattern_actions(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_abort(tsm)
     ni_dt_digital.tsm_ssc_burst_pattern(tsm, "start_burst")
     ni_dt_digital.tsm_ssc_wait_until_done(tsm)
-    _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(tsm, "start_burst")
+    per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(tsm, "start_burst")
     assert isinstance(per_site_pass, list)
     print(numpy.shape(per_site_pass))
     assert numpy.shape(per_site_pass) == (1,)
     for status in per_site_pass:
         assert isinstance(status, bool)
-    _, per_site_per_pin_fail_counts = ni_dt_digital.tsm_ssc_get_fail_count(tsm)
+    per_site_per_pin_fail_counts = ni_dt_digital.tsm_ssc_get_fail_count(tsm)
     assert isinstance(per_site_per_pin_fail_counts, list)
     print(numpy.shape(per_site_per_pin_fail_counts))
     assert numpy.shape(per_site_per_pin_fail_counts) == (1, 2)
     for fail_counts in per_site_per_pin_fail_counts:
         for fail_count in fail_counts:
             assert isinstance(fail_count, int)
-    _, per_site_pass = ni_dt_digital.tsm_ssc_get_site_pass_fail(tsm)
+    per_site_pass = ni_dt_digital.tsm_ssc_get_site_pass_fail(tsm)
     assert isinstance(per_site_pass, list)
     assert numpy.shape(per_site_pass) == (1,)
     for status in per_site_pass:
@@ -428,7 +419,7 @@ def pattern_actions(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def pin_levels_and_timing(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm, "PinLevels", "Timing")
     ni_dt_digital.tsm_ssc_apply_tdr_offsets_per_site_per_pin(
@@ -471,7 +462,7 @@ def pin_levels_and_timing(tsm_context: SMClass, pins: typing.List[str]):
     )
     ni_dt_digital.tsm_ssc_configure_time_set_compare_edge(tsm, "time_set", 40e-6)
     ni_dt_digital.tsm_ssc_configure_voltage_levels(tsm, 0.0015, 0.0015, 0.0015, 0.0015, 0.0015)
-    _, configured_period = ni_dt_digital.tsm_ssc_configure_time_set_period(tsm, "time_set", 40e-6)
+    configured_period = ni_dt_digital.tsm_ssc_configure_time_set_period(tsm, "time_set", 40e-6)
     assert math.isclose(configured_period, 40e-6, abs_tol=5e-6)
     for ssc in tsm.ssc:
         assert math.isclose(
@@ -497,7 +488,7 @@ def pin_levels_and_timing(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def ppmu(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_ppmu_configure_aperture_time(tsm, 0.01)
     ni_dt_digital.tsm_ssc_ppmu_configure_current_limit_range(tsm, 0.01)
@@ -506,14 +497,14 @@ def ppmu(tsm_context: SMClass, pins: typing.List[str]):
     ni_dt_digital.tsm_ssc_ppmu_source_voltage_per_site_per_pin(tsm, 0.01, [[0.01, 0.01]] * 3)
     ni_dt_digital.tsm_ssc_ppmu_source_voltage_per_site(tsm, 0.01, [0.01, 0.01, 0.01])
     ni_dt_digital.tsm_ssc_ppmu_source(tsm)
-    _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_current(tsm)
+    per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_current(tsm)
     assert isinstance(per_site_per_pin_measurements, list)
     assert numpy.shape(per_site_per_pin_measurements) == (1, 2)
     for measurements in per_site_per_pin_measurements:
         for measurement in measurements:
             assert isinstance(measurement, float)
     ni_dt_digital.tsm_ssc_ppmu_source_voltage(tsm, 0.01, 0.01)
-    _, per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(tsm)
+    per_site_per_pin_measurements = ni_dt_digital.tsm_ssc_ppmu_measure_voltage(tsm)
     assert isinstance(per_site_per_pin_measurements, list)
     assert numpy.shape(per_site_per_pin_measurements) == (1, 2)
     for measurements in per_site_per_pin_measurements:
@@ -523,18 +514,18 @@ def ppmu(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def sequencer_flags_and_registers(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_write_sequencer_flag(tsm, enums.SequencerFlag.FLAG1, True)
     ni_dt_digital.tsm_ssc_write_sequencer_register(tsm, enums.SequencerRegister.REGISTER1, 1)
-    _, per_instrument_state = ni_dt_digital.tsm_ssc_read_sequencer_flag(
+    per_instrument_state = ni_dt_digital.tsm_ssc_read_sequencer_flag(
         tsm, enums.SequencerFlag.FLAG1
     )
     assert isinstance(per_instrument_state, list)
     assert numpy.shape(per_instrument_state) == (1,)
     for state in per_instrument_state:
         assert isinstance(state, bool)
-    _, per_instrument_register_values = ni_dt_digital.tsm_ssc_read_sequencer_register(
+    per_instrument_register_values = ni_dt_digital.tsm_ssc_read_sequencer_register(
         tsm, enums.SequencerRegister.REGISTER1
     )
     assert isinstance(per_instrument_register_values, list)
@@ -545,9 +536,9 @@ def sequencer_flags_and_registers(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def session_properties_func(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
-    _, session_properties = ni_dt_digital.tsm_ssc_get_properties(tsm)
+    session_properties = ni_dt_digital.tsm_ssc_get_properties(tsm)
     for session_property in session_properties:
         assert session_property[0].startswith("DPI")
         assert math.isclose(session_property[1], 0.0015, abs_tol=5e-6)
@@ -559,7 +550,7 @@ def session_properties_func(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def source_and_capture_waveforms(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_write_source_waveform_site_unique(
         tsm,
@@ -571,7 +562,7 @@ def source_and_capture_waveforms(tsm_context: SMClass, pins: typing.List[str]):
         tsm, "SourceWaveform", [1, 2, 3, 4, 5], True
     )
     ni_dt_digital.tsm_ssc_burst_pattern(tsm, "start_capture")
-    _, per_site_waveforms = ni_dt_digital.tsm_ssc_fetch_capture_waveform(tsm, "CaptureWaveform", 2)
+    per_site_waveforms = ni_dt_digital.tsm_ssc_fetch_capture_waveform(tsm, "CaptureWaveform", 2)
     assert isinstance(per_site_waveforms, list)
     assert numpy.shape(per_site_waveforms) == (3, 2)
     for waveforms in per_site_waveforms:
@@ -581,14 +572,14 @@ def source_and_capture_waveforms(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def static(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_write_static(tsm, enums.WriteStaticPinState.ONE)
     ni_dt_digital.tsm_ssc_write_static_per_site(tsm, [enums.WriteStaticPinState.ONE] * 3)
     ni_dt_digital.tsm_ssc_write_static_per_site_per_pin(
         tsm, [[enums.WriteStaticPinState.ONE, enums.WriteStaticPinState.ONE]] * 3
     )
-    _, per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(tsm)
+    per_site_per_pin_data = ni_dt_digital.tsm_ssc_read_static(tsm)
     assert isinstance(per_site_per_pin_data, list)
     print(numpy.shape(per_site_per_pin_data))
     assert numpy.shape(per_site_per_pin_data) == (1, 2)
@@ -599,7 +590,7 @@ def static(tsm_context: SMClass, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def misc(tsm_context: SMClass, pins: typing.List[str]):
-    tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
+    tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     _tsm = ni_dt_digital.tsm_ssc_filter_sites(tsm, [0])
     for ssc in _tsm.ssc:
@@ -642,7 +633,7 @@ def misc(tsm_context: SMClass, pins: typing.List[str]):
         per_site_to_per_instrument_lut,
         _,
         _,
-    ) = ni_dt_digital._ssc_calculate_per_site_to_per_instrument_lut(tsm.ssc, tsm.site_numbers)
+    ) = tsm.ssc.calculate_per_site_to_per_instrument_lut(tsm.site_numbers)
     per_instrument_data = ni_dt_digital._apply_lut_per_site_to_per_instrument(
         [[0, 0, 0], [0, 0, 0]], per_site_to_per_instrument_lut, [1, 2, 3]
     )
@@ -651,9 +642,7 @@ def misc(tsm_context: SMClass, pins: typing.List[str]):
         per_site_per_pin_to_per_instrument_lut,
         _,
         _,
-    ) = ni_dt_digital._ssc_calculate_per_site_per_pin_to_per_instrument_lut(
-        tsm.ssc, tsm.site_numbers, tsm.pins_info
-    )
+    ) = tsm.ssc.calculate_per_site_per_pin_to_per_instrument_lut(tsm.site_numbers, tsm.pins_info)
     per_instrument_data = ni_dt_digital._apply_lut_per_site_per_pin_to_per_instrument(
         [[0, 0, 0], [0, 0, 0]],
         per_site_per_pin_to_per_instrument_lut,
@@ -696,16 +685,16 @@ def configure_pins(tsm_context: SMClass):
 
 @nitsm.codemoduleapi.code_module
 def read_pins(tsm_context: SMClass):
-    tsm_i = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["DPI_PG_Inputs"])
+    tsm_i = ni_dt_digital.n_pins_to_m_sessions(tsm_context, ["DPI_PG_Inputs"])
     # ni_dt_digital.tsm_ssc_select_function(tsm_i, ni_dt_digital.enums.SelectedFunction.DIGITAL)
-    _, data = ni_dt_digital.tsm_ssc_read_static(tsm_i)
+    data = ni_dt_digital.tsm_ssc_read_static(tsm_i)
     print(data)
     return data
 
 
 @nitsm.codemoduleapi.code_module
 def burst_pattern(tsm_context: SMClass):
-    tsm = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["DPI_SR_VDD", "DPI_PM_VDD"])
+    tsm = ni_dt_digital.n_pins_to_m_sessions(tsm_context, ["DPI_SR_VDD", "DPI_PM_VDD"])
     ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm, "I2C_Levels", "I2C_Timing")
-    _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(tsm, "I2C_Write")
+    per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(tsm, "I2C_Write")
     print(per_site_pass)
