@@ -432,8 +432,25 @@ def pin_levels_and_timing(tsm_context: SMClass, pins: typing.List[str]):
     tsm = ni_dt_digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm, "PinLevels", "Timing")
-    ni_dt_digital.tsm_ssc_apply_tdr_offsets_per_site_per_pin(tsm, [[1e-9, ]] * 3)
-    ni_dt_digital.tsm_ssc_apply_tdr_offsets(tsm, [[1e-9, 1e-9, ]] * 1)
+    ni_dt_digital.tsm_ssc_apply_tdr_offsets_per_site_per_pin(
+        tsm,
+        [
+            [
+                1e-9,
+            ]
+        ]
+        * 3,
+    )
+    ni_dt_digital.tsm_ssc_apply_tdr_offsets(
+        tsm,
+        [
+            [
+                1e-9,
+                1e-9,
+            ]
+        ]
+        * 1,
+    )
     ni_dt_digital.tsm_ssc_configure_active_load(tsm, 0.0015, 0.0015, -0.0015)
     ni_dt_digital.tsm_ssc_configure_single_level_per_site(
         tsm, ni_dt_digital.LevelTypeToSet.VIL, [0.0015, 0.0015, 0.0015]
@@ -441,7 +458,14 @@ def pin_levels_and_timing(tsm_context: SMClass, pins: typing.List[str]):
     ni_dt_digital.tsm_ssc_configure_single_level(tsm, ni_dt_digital.LevelTypeToSet.VIL, 0.0015)
     ni_dt_digital.tsm_ssc_configure_termination_mode(tsm, enums.TerminationMode.HIGH_Z)
     ni_dt_digital.tsm_ssc_configure_time_set_compare_edge_per_site_per_pin(
-        tsm, "time_set", [[40e-6, ]] * 3
+        tsm,
+        "time_set",
+        [
+            [
+                40e-6,
+            ]
+        ]
+        * 3,
     )
     ni_dt_digital.tsm_ssc_configure_time_set_compare_edge_per_site(
         tsm, "time_set", [40e-6, 40e-6, 40e-6]
@@ -643,16 +667,23 @@ def misc(tsm_context: SMClass, pins: typing.List[str]):
     ni_dt_digital.tsm_ssc_publish(tsm, [[True, True], [True, True], [True, True]], "Publish_4")
 
 
-
-
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm_context: SMClass):
-    ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
+    ctypes.windll.user32.MessageBoxW(
+        None,
+        "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()),
+        "Attach debugger",
+        0,
+    )
     print(tsm_context.pin_map_file_path)
-    pins = ni_dt_digital.SemiconductorModuleContext.get_pin_names(tsm_context, instrument_type_id=tsm_enums.InstrumentTypeIdConstants.NI_DIGITAL_PATTERN)
+    pins = ni_dt_digital.SemiconductorModuleContext.get_pin_names(
+        tsm_context, instrument_type_id=tsm_enums.InstrumentTypeIdConstants.NI_DIGITAL_PATTERN
+    )
     print(pins)
     ni_dt_digital.tsm_initialize_sessions(tsm_context, options=OPTIONS)
-    tsm_i_o = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(tsm_context, ["DPI_PG_Inputs", "DPI_PG_Outputs"])
+    tsm_i_o = ni_dt_digital.tsm_ssc_n_pins_to_m_sessions(
+        tsm_context, ["DPI_PG_Inputs", "DPI_PG_Outputs"]
+    )
     ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm_i_o, "I2C_Levels", "I2C_Timing")
     ni_dt_digital.tsm_ssc_select_function(tsm_i_o, ni_dt_digital.enums.SelectedFunction.DIGITAL)
 
@@ -679,5 +710,3 @@ def burst_pattern(tsm_context: SMClass):
     ni_dt_digital.tsm_ssc_apply_levels_and_timing(tsm, "I2C_Levels", "I2C_Timing")
     _, per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(tsm, "I2C_Write")
     print(per_site_pass)
-
-

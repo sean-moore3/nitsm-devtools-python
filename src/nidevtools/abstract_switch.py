@@ -12,6 +12,7 @@ import nitsm.codemoduleapi
 import nitsm.enums
 import nitsm.pinquerycontexts
 import nidevtools.daqmx
+
 # import nidevtools.digital
 import nidevtools.fpga
 import nidevtools.switch
@@ -29,19 +30,21 @@ class Control(enum.Enum):
 
 
 class InstrumentTypes:
-    daqmx = 'niDAQmx'
-    digitalpattern = 'niDigitalPattern'
-    fpga = '782xFPGA'
-    switch = '_niSwitch'
+    daqmx = "niDAQmx"
+    digitalpattern = "niDigitalPattern"
+    fpga = "782xFPGA"
+    switch = "_niSwitch"
 
 
 class Session:
-    def __init__(self,
-                 enable_pin: str,
-                 instrument_type: typing.Union[InstrumentTypes, str],
-                 route_value: str,
-                 site: int,
-                 status: str):
+    def __init__(
+        self,
+        enable_pin: str,
+        instrument_type: typing.Union[InstrumentTypes, str],
+        route_value: str,
+        site: int,
+        status: str,
+    ):
         self.enable_pin = enable_pin
         self.instrument_type = instrument_type
         self.route_value = route_value
@@ -50,7 +53,9 @@ class Session:
 
     def ss_connect(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
         if self.instrument_type == InstrumentTypes.daqmx:
-            multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(tsm_context, self.enable_pin)
+            multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(
+                tsm_context, self.enable_pin
+            )
             for channel in multiple_session.sessions[0].Task.do_channels:
                 channel.do_tristate = False
             multiple_session.sessions[0].Task.stop()
@@ -84,12 +89,14 @@ class Session:
             handler.action_session_info(self.route_value, nidevtools.switch.Action.Connect)
         else:
             pass
-        if 'BUCKLX_DAMP' in self.enable_pin:
+        if "BUCKLX_DAMP" in self.enable_pin:
             time.sleep(0.15)
 
     def ss_disconnect(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
         if self.instrument_type == InstrumentTypes.daqmx:
-            multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(tsm_context, [self.enable_pin])
+            multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(
+                tsm_context, [self.enable_pin]
+            )
             for channel in multiple_session.sessions[0].Task.do_channels:
                 channel.do_tristate = True
             multiple_session: nidevtools.daqmx.MultipleSessions
@@ -102,13 +109,15 @@ class Session:
             nidevtools.digital.tsm_ssc_write_static(multiple_session_info, data)
             """
         elif self.instrument_type == InstrumentTypes.fpga:
-            multiple_session_info = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
+            multiple_session_info = nidevtools.fpga.pins_to_sessions(
+                tsm_context, [self.enable_pin], []
+            )
             data = [nidevtools.fpga.StaticStates.X]  # *128 todo check
             multiple_session_info.write_static(data)
         elif self.instrument_type == InstrumentTypes.switch:
             data = nidevtools.switch.pin_to_sessions_session_info(tsm_context, self.enable_pin)
             data = nidevtools.switch.MultipleSessions([data])
-            if self.route_value == '':
+            if self.route_value == "":
                 data.action_session_info(self.route_value, nidevtools.switch.Action.Disconnect_All)
             else:
                 data.action_session_info(self.route_value, nidevtools.switch.Action.Disconnect)
@@ -117,9 +126,11 @@ class Session:
 
     def ss_read_state(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
         if self.instrument_type == InstrumentTypes.daqmx:
-            multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(tsm_context, self.enable_pin)
+            multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(
+                tsm_context, self.enable_pin
+            )
             multiple_session: nidevtools.daqmx.MultipleSessions
-            data = ''
+            data = ""
             for bit in multiple_session.sessions[0].Task.read(1):
                 data += str(bit)
             self.status = data
@@ -133,20 +144,22 @@ class Session:
             self.status = status[data[0][0]]
             """
         elif self.instrument_type == InstrumentTypes.fpga:
-            multiple_session_info = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
+            multiple_session_info = nidevtools.fpga.pins_to_sessions(
+                tsm_context, [self.enable_pin], []
+            )
             data = multiple_session_info.read_static()
-            text = 'Disconnected'
+            text = "Disconnected"
             if data[0]:
-                text = 'Connected'
+                text = "Connected"
             self.status = text
         elif self.instrument_type == InstrumentTypes.switch:
             data = nidevtools.switch.pin_to_sessions_session_info(tsm_context, self.enable_pin)
             data = nidevtools.switch.MultipleSessions([data])
             capability = data.action_session_info(self.route_value, nidevtools.switch.Action.Read)
             if capability[0] == niswitch.PathCapability.PATH_EXISTS:
-                self.status = 'Connected To: %s' % self.route_value
+                self.status = "Connected To: %s" % self.route_value
             else:
-                self.status = 'Not Connected'
+                self.status = "Not Connected"
         else:
             pass
         return self
@@ -155,7 +168,9 @@ class Session:
 class AbstractSession(typing.NamedTuple):
     enable_pins: typing.List[Session]
 
-    def set_sessions(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, switch_name: str = ''):  # CHECK
+    def set_sessions(
+        self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, switch_name: str = ""
+    ):  # CHECK
         """
         Sets abstract switch sessions contained in the Abstract Switch object
         """
@@ -167,14 +182,21 @@ class AbstractSession(typing.NamedTuple):
         """
         for session in self.enable_pins:
 
-            if session.instrument_type == InstrumentTypes.switch or session.instrument_type == '_niSwitch':
-                data = nidevtools.switch.pin_to_sessions_session_info(tsm_context, session.enable_pin)
+            if (
+                session.instrument_type == InstrumentTypes.switch
+                or session.instrument_type == "_niSwitch"
+            ):
+                data = nidevtools.switch.pin_to_sessions_session_info(
+                    tsm_context, session.enable_pin
+                )
                 session_handler = nidevtools.switch.MultipleSessions([data])
                 session_handler.action_session_info(action=nidevtools.switch.Action.Disconnect_All)
         for session in self.enable_pins:
             session.ss_connect(tsm_context)
 
-    def disconnect_sessions_info(self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):  # CHECK
+    def disconnect_sessions_info(
+        self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext
+    ):  # CHECK
         """
         Disconnects the provided session from the TSM contect it works for DAQmx, Digital Pattern, FPGA and Switch
         sessions only
@@ -193,39 +215,44 @@ class AbstractSession(typing.NamedTuple):
 
 
 def check_debug_ui_tool(
-        path_in: str,
-        path_teststand: str = 'C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)'):
-    """
-
-    """
-    path_icons = os.path.join(path_teststand, 'Components\\Icons')
-    path_in = os.path.join(path_in, '..\\Code Modules\\Common\\Instrument Control\\Abstract Switch\\Debug UI')
-    path_debug = os.path.join(path_icons, 'Abstract Switch Debug UI.ico')
+    path_in: str,
+    path_teststand: str = "C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)",
+):
+    """ """
+    path_icons = os.path.join(path_teststand, "Components\\Icons")
+    path_in = os.path.join(
+        path_in, "..\\Code Modules\\Common\\Instrument Control\\Abstract Switch\\Debug UI"
+    )
+    path_debug = os.path.join(path_icons, "Abstract Switch Debug UI.ico")
     if not os.path.exists(path_debug):
-        source = os.path.join(path_in, 'Abstract Switch Debug UI.ico')
+        source = os.path.join(path_in, "Abstract Switch Debug UI.ico")
         target = path_icons
         shutil.copy2(source, target)
-    path_panels = os.path.join(path_teststand, 'Components\\Modules\\NI_SemiconductorModule\\CustomInstrumentPanels')
-    path_abstract = os.path.join(path_panels, 'Abstract Switch Debug UI.seq')
-    path_abstract2 = os.path.join(path_panels, 'Abstract Switch Debug UI')
+    path_panels = os.path.join(
+        path_teststand, "Components\\Modules\\NI_SemiconductorModule\\CustomInstrumentPanels"
+    )
+    path_abstract = os.path.join(path_panels, "Abstract Switch Debug UI.seq")
+    path_abstract2 = os.path.join(path_panels, "Abstract Switch Debug UI")
     condition = os.path.exists(path_abstract) and os.path.exists(path_abstract2)
     if not False:  # TODO connected to condition?
-        source = os.path.join(path_in, 'CustomInstrument\\Abstract Switch Debug UI\\')
+        source = os.path.join(path_in, "CustomInstrument\\Abstract Switch Debug UI\\")
         target = path_panels
         shutil.copy2(source, target)
-        source = os.path.join(path_in, 'CustomInstrument\\Abstract Switch Debug UI.seq')
+        source = os.path.join(path_in, "CustomInstrument\\Abstract Switch Debug UI.seq")
         shutil.copy2(source, target)
 
 
-def close_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):  # Comment: Nothing to do
+def close_sessions(
+    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
+):  # Comment: Nothing to do
     pass
 
 
 # Not used
-'''
+"""
 def debug_ui(tsm_context: TSMContext):
     pass
-'''
+"""
 
 
 def disconnect_all(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):  # CHECK
@@ -236,7 +263,7 @@ def disconnect_all(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
     array1 = []
     array2 = []
     for session in sessions:
-        if 'BUCKLX_DAMP' in session.enable_pin:
+        if "BUCKLX_DAMP" in session.enable_pin:
             array2.append(session)
         else:
             array1.append(session)
@@ -262,37 +289,43 @@ def initialize_tsm_context(tsm_context: nitsm.codemoduleapi.SemiconductorModuleC
     if len(switch_names) == 1:
         dut_pins, sys_pins = tsm_context.get_pin_names()
         array = []
-        for pin in dut_pins+sys_pins:
-            if pin.lower().find('en_') == 0:
+        for pin in dut_pins + sys_pins:
+            if pin.lower().find("en_") == 0:
                 array.append(pin)
         data = []
-        for instrument in ['niDAQmx', 'niDigitalPattern', '782xFPGA', '_niSwitch']:
-            filtered_pins = tsm_context.filter_pins_by_instrument_type(array, instrument, nitsm.enums.Capability.ALL)
+        for instrument in ["niDAQmx", "niDigitalPattern", "782xFPGA", "_niSwitch"]:
+            filtered_pins = tsm_context.filter_pins_by_instrument_type(
+                array, instrument, nitsm.enums.Capability.ALL
+            )
             for pin in filtered_pins:
-                session = Session(pin, instrument, '', 0, '')
+                session = Session(pin, instrument, "", 0, "")
                 data.append(session)
         multi_session = AbstractSession(data)
         multi_session.set_sessions(tsm_context, switch_names[0])
     else:
-        raise nifpga.ErrorStatus(5000,
-                                 ("Unsupported Pin Map for the Abstract Switch."
-                                  "Ensure you only have one abstract switch in the pinmap"),
-                                 "initialize_tsm_context()",
-                                 ["tsm_context"],
-                                 (tsm_context,))
+        raise nifpga.ErrorStatus(
+            5000,
+            (
+                "Unsupported Pin Map for the Abstract Switch."
+                "Ensure you only have one abstract switch in the pinmap"
+            ),
+            "initialize_tsm_context()",
+            ["tsm_context"],
+            (tsm_context,),
+        )
 
 
-def pin_fgv(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
-            pin: str = '',
-            action: Control = Control.get_connections):
-    """
-
-    """
+def pin_fgv(
+    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
+    pin: str = "",
+    action: Control = Control.get_connections,
+):
+    """ """
     connections = []
     while True:
         if action == Control.get_connections:
             for connection in connections:
-                if connection[1] == 'AbstractInstrument':
+                if connection[1] == "AbstractInstrument":
                     sessions = pins_to_sessions_sessions_info(tsm_context, connection[0])
                     data = sessions.read_state(tsm_context)
                     conditions = []
@@ -304,15 +337,15 @@ def pin_fgv(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
                             else:
                                 condition = not info.status
                         elif info.instrument_type == InstrumentTypes.digitalpattern:
-                            if info.route_value == '1':
-                                condition = info.status == '1'
+                            if info.route_value == "1":
+                                condition = info.status == "1"
                             else:
-                                condition = info.status != '1'
+                                condition = info.status != "1"
                         elif info.instrument_type == InstrumentTypes.fpga:
-                            if info.route_value == '1':
-                                condition = info.status == 'Connected'
+                            if info.route_value == "1":
+                                condition = info.status == "Connected"
                             else:
-                                condition = info.status == 'Disconnected'
+                                condition = info.status == "Disconnected"
                         elif info.instrument_type == InstrumentTypes.switch:
                             condition = info.status in info.route_value
                         conditions.append(condition)
@@ -324,9 +357,9 @@ def pin_fgv(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
                         else:
                             condition = True
                     if condition:
-                        connections[5] = 'Connected'
+                        connections[5] = "Connected"
                     else:
-                        connections[5] = 'Disconnected'
+                        connections[5] = "Disconnected"
         elif action == Control.disconnect_all:
             disconnect_all(tsm_context)
         elif action == Control.init:
@@ -344,7 +377,7 @@ def get_first_matched_node(tree: Et.ElementTree, key: str):
 
 
 def get_all_matched_nodes(element: Et.Element, key: str):
-    key = "{http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd}"+key
+    key = "{http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd}" + key
     children = element.getchildren()
     output = []
     for i in children:
@@ -353,35 +386,44 @@ def get_all_matched_nodes(element: Et.Element, key: str):
     return output
 
 
-def pin_name_to_instrument(pinmap_path: str = ''):
+def pin_name_to_instrument(pinmap_path: str = ""):
     """
     From pinmap location it parce the abstract switch connections into an Array.
     Args:
         pinmap_path: Location of the pinmap to use
     """
     tree = Et.parse(pinmap_path)
-    connections = get_first_matched_node(tree, 'Connections')
-    pingroups = get_first_matched_node(tree, 'PinGroups')
-    connection = get_all_matched_nodes(connections, 'Connection')
-    multiplexedconnection = get_all_matched_nodes(connections, 'MultiplexedConnection')
-    pingroup = get_all_matched_nodes(pingroups, 'PinGroup')
+    connections = get_first_matched_node(tree, "Connections")
+    pingroups = get_first_matched_node(tree, "PinGroups")
+    connection = get_all_matched_nodes(connections, "Connection")
+    multiplexedconnection = get_all_matched_nodes(connections, "MultiplexedConnection")
+    pingroup = get_all_matched_nodes(pingroups, "PinGroup")
     subarray1 = []
     subarray2 = []
     for element in connection:
-        var1 = [element.attrib['pin'], element.attrib['instrument'], element.attrib['channel'], "", "", ""]
+        var1 = [
+            element.attrib["pin"],
+            element.attrib["instrument"],
+            element.attrib["channel"],
+            "",
+            "",
+            "",
+        ]
         subarray1.append(var1)
     subarray21 = []
     for element in multiplexedconnection:
         dut_route = get_all_matched_nodes(element, "MultiplexedDUTPinRoute")
         subarray21 = []
         for j in dut_route:
-            subarray21.append([j.attrib['pin'], element.attrib['instrument'], element.attrib['channel']])
+            subarray21.append(
+                [j.attrib["pin"], element.attrib["instrument"], element.attrib["channel"]]
+            )
     subarray22 = []
     for element in pingroup:
         reference = get_all_matched_nodes(element, "PinReference")
-        subarray22_e = [element.attrib['name'] + '_DUT']
+        subarray22_e = [element.attrib["name"] + "_DUT"]
         for j in reference:
-            subarray22_e.append(j.attrib['pin'])
+            subarray22_e.append(j.attrib["pin"])
         subarray22.append(subarray22_e)
     for element in subarray21:
         r = 0
@@ -390,7 +432,7 @@ def pin_name_to_instrument(pinmap_path: str = ''):
                 break
             else:
                 r += 1
-        if element[1] == 'AbstractInstrument':
+        if element[1] == "AbstractInstrument":
             print(subarray22)
             out1 = subarray22[r][2]
         else:
@@ -402,11 +444,13 @@ def pin_name_to_instrument(pinmap_path: str = ''):
             else:
                 r += 1
         out2 = "%s, %s" % (subarray1[r][1], subarray1[r][2])
-        subarray2.append(element+[out1]+[out2]+['Disconnected'])
-    return subarray1+subarray2
+        subarray2.append(element + [out1] + [out2] + ["Disconnected"])
+    return subarray1 + subarray2
 
 
-def enable_pins_to_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, enable_pins: typing.List[str]):
+def enable_pins_to_sessions(
+    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, enable_pins: typing.List[str]
+):
     """
     Receives enable pins list and return a Multisession object with the sessions corresponding to those pins
     Args:
@@ -446,7 +490,9 @@ def get_all_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions_sessions_info(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pin: str):
+def pins_to_sessions_sessions_info(
+    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pin: str
+):
     """
     Returns an AbstractSession object containing a list al Abstract switch sessions detailed on the pinmap
     Args:
@@ -459,13 +505,13 @@ def pins_to_sessions_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconducto
     contexts, sessions, switch_routes = tsm_context.pin_to_switch_sessions(pin, instrument_type_id)
     i = 0
     for context, session, route in zip(contexts, sessions, switch_routes):
-        data = route.split(',')
+        data = route.split(",")
         list1 = []
         list2 = []
         for route_data in data:
-            data2 = route_data.split('=')
+            data2 = route_data.split("=")
             out1 = data2[0].strip()
-            out2 = ''.join(data2[1:]).strip()
+            out2 = "".join(data2[1:]).strip()
             list1.append(out1)
             list2.append(out2)
         for element1, element2 in zip(list1, list2):
@@ -481,9 +527,9 @@ def pins_to_sessions_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconducto
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_task_and_connect(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext,
-                             task_name: PinsArg,
-                             pins: PinsArg):
+def pins_to_task_and_connect(
+    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, task_name: PinsArg, pins: PinsArg
+):
     """
     Returns a pin query contex and a list of properties defined in the pin map.
     The list of properties returned can be used to fill a new object type MultipleSessions
@@ -495,7 +541,9 @@ def pins_to_task_and_connect(tsm_context: nitsm.codemoduleapi.SemiconductorModul
         session: An object that tracks the tasks associated with this pin query. Use this object to publish
         measurements and extract data from a set of measurements.
     """
-    pin_list = tsm_context.filter_pins_by_instrument_type(pins, 'abstinst', nitsm.enums.Capability.ALL)
+    pin_list = tsm_context.filter_pins_by_instrument_type(
+        pins, "abstinst", nitsm.enums.Capability.ALL
+    )
     multiple_session_info = nidevtools.daqmx.pins_to_session_sessions_info(tsm_context, task_name)
     sessions = []
     for pin in pin_list:

@@ -124,9 +124,7 @@ def published_data_reader(_published_data_reader_factory):
 
 
 data_dir = os.path.join(os.path.dirname(__file__), "LoopBack")
-specification1 = os.path.join(
-    os.path.join(data_dir, "Specifications"), "I2C_Electrical.specs"
-)
+specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C_Electrical.specs")
 specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C_Time.specs")
 level = os.path.join(os.path.join(data_dir, "Levels"), "I2C_Levels.digilevels")
 timing = os.path.join(os.path.join(data_dir, "Timing"), "I2C_Timing.digitiming")
@@ -187,14 +185,14 @@ def tests_pins(request):
         pins_selected = [["DAQ_Pins1"], ["DAQ_Pins2"]]
     elif file_name == "test_abstract.py":
         # for daqmx driver i.e. niabstract testing
-        pins_selected = [["BUCK_TLOAD_CTRL"],["eN_Digital"]]
+        pins_selected = [["BUCK_TLOAD_CTRL"], ["eN_Digital"]]
     elif file_name == "test_fgen.py":
         # for function generator driver i.e. nifgen testing
         input_dut_pins = ["FGN_SI_SGL_In"]
         pins_selected = [input_dut_pins]
     elif file_name == "test_Switch.py":
         # for function generator driver i.e. niswitch testing
-        input_dut_pins = ["Pin1","Pin2","Pin3","Pin4","Pin5","Pin6","Pin7","Pin8","Pin9"]
+        input_dut_pins = ["Pin1", "Pin2", "Pin3", "Pin4", "Pin5", "Pin6", "Pin7", "Pin8", "Pin9"]
         pins_selected = input_dut_pins
     elif file_name == "test_fpga.py":
         # for function generator driver i.e. nifpga testing

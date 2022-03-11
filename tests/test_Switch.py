@@ -44,29 +44,30 @@ def switch_tsm_s(tsm_context, tests_pins):
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestSwitch:
     def test_initialize_and_close(self, tsm_context):
-        session_data, channel_group_ids, channel_lists =\
-            tsm_context.get_all_custom_sessions(ni_switch.instrument_type_id)
-        assert(len(session_data) == len(channel_group_ids) == len(channel_lists))
+        session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(
+            ni_switch.instrument_type_id
+        )
+        assert len(session_data) == len(channel_group_ids) == len(channel_lists)
         instrument_names = ni_switch.get_all_instruments_names(tsm_context)[0]
-        assert (len(session_data) == len(instrument_names))
+        assert len(session_data) == len(instrument_names)
         for name in instrument_names:
-            assert(isinstance(name, str))
+            assert isinstance(name, str)
         sessions = ni_switch.get_all_sessions(tsm_context)
-        assert(len(session_data) == len(sessions))
+        assert len(session_data) == len(sessions)
         for session in sessions:
-            assert(isinstance(session, niswitch.session.Session))
+            assert isinstance(session, niswitch.session.Session)
 
     def test_name_to_topology(self):
-        assert(ni_switch.name_to_topology('Matrix_2738_3') == '2738/2-Wire 8x32 Matrix')
-        assert(ni_switch.name_to_topology('Mux_2525_test') == '2525/2-Wire Octal 8x1 Mux')
-        assert(ni_switch.name_to_topology('Matrix_2503_TEST') == '2503/2-Wire 4x6 Matrix')
-        assert(ni_switch.name_to_topology('Other') == 'Configured Topology')
-        assert(ni_switch.name_to_topology('TEST_Matrix_2738') == 'Configured Topology')
+        assert ni_switch.name_to_topology("Matrix_2738_3") == "2738/2-Wire 8x32 Matrix"
+        assert ni_switch.name_to_topology("Mux_2525_test") == "2525/2-Wire Octal 8x1 Mux"
+        assert ni_switch.name_to_topology("Matrix_2503_TEST") == "2503/2-Wire 4x6 Matrix"
+        assert ni_switch.name_to_topology("Other") == "Configured Topology"
+        assert ni_switch.name_to_topology("TEST_Matrix_2738") == "Configured Topology"
 
     def test_pin_to_session(self, switch_tsm_s):
         pass  # TODO review info
-        #Add Forloop once solver pin2 issue
-        #switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Disconnect_All)
-        #switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Connect, route_value='1')
-        #switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Disconnect)
-        #switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Read, route_value='1')
+        # Add Forloop once solver pin2 issue
+        # switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Disconnect_All)
+        # switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Connect, route_value='1')
+        # switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Disconnect)
+        # switch_tsm_s[1][0].action_session_info(action=ni_switch.Action.Read, route_value='1')

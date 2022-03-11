@@ -107,7 +107,7 @@ class _NIFGenTSM:
         enable_filter: bool = True,
     ):
         """
-        generate the sine signal on the current pins. 
+        generate the sine signal on the current pins.
 
         Args:
             frequency (float, optional): of the sine waveform. Defaults to 100e3.
@@ -135,7 +135,7 @@ class _NIFGenTSM:
             samples = calc_samples
         else:
             samples = min_wav_samples
-        sine_fr = 1 / (2*pts)
+        sine_fr = 1 / (2 * pts)
         waveform_data = self.create_waveform_data(samples, sine_fr, phase_degree=90)
         waveform_data = [amplitude * data for data in waveform_data]
         waveform_data = [offset + data for data in waveform_data]
@@ -158,17 +158,17 @@ class TSMFGen(typing.NamedTuple):
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int]):
     """
-    Retruns the pinquery context object for the given pins at given sites. 
+    Retruns the pinquery context object for the given pins at given sites.
 
     Args:
         tsm_context (TSMContext): Semiconductore module Reference from the teststand.
-        pins (typing.List[str]): Pins names defined in the current the pinmap. 
-        sites (typing.List[int]): if you need to control only on specific sites, 
+        pins (typing.List[str]): Pins names defined in the current the pinmap.
+        sites (typing.List[int]): if you need to control only on specific sites,
         then provide site numbers. Defaults to [].
 
     Returns:
-        TSMScope object :  for the selected pins. All instrument specific operations 
-        are be available as properties and methods of this object. 
+        TSMScope object :  for the selected pins. All instrument specific operations
+        are be available as properties and methods of this object.
     """
     pin_query_context, sessions, channels = tsm_context.pins_to_nifgen_sessions(pins)
     sites_out, pin_list_per_session = ni_dt_common.pin_query_context_to_channel_list(

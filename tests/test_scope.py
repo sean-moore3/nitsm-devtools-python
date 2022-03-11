@@ -135,9 +135,7 @@ class TestNIScope:
             )
             scope_tsm.ssc.configure_timing(20e6, 1000, 50, 1, True)
             scope_tsm.ssc.clear_triggers()
-            scope_tsm.ssc.export_analog_edge_start_trigger(
-                test_pins[0], "/OSC1/PXI_Trig2"
-            )
+            scope_tsm.ssc.export_analog_edge_start_trigger(test_pins[0], "/OSC1/PXI_Trig2")
             scope_tsm.ssc.start_acquisition()
             data1, data2 = scope_tsm.ssc.fetch_waveform(1)
             print(data1, data2, "\n")
@@ -215,7 +213,6 @@ def pins_to_sessions_info(tsm_context: SMClass, pins: typing.List[str], sites: t
     return scope.pins_to_sessions(tsm_context, pins, sites)
 
 
-
 @nitsm.codemoduleapi.code_module
 def configure(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
@@ -225,9 +222,7 @@ def configure(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[i
     scope_tsm.ssc.configure(
         5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True
     )
-    scope_tsm.ssc.configure_vertical_per_channel(
-        5.0, 0.0, 1.0, niscope.VerticalCoupling.DC, True
-    )
+    scope_tsm.ssc.configure_vertical_per_channel(5.0, 0.0, 1.0, niscope.VerticalCoupling.DC, True)
     scope_tsm.ssc.configure_timing(20e6, 1000, 50, 1, True)
 
 
@@ -256,9 +251,7 @@ def trigger(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int
     scope_tsm.ssc.configure_digital_edge_trigger(
         scope.TRIGGER_SOURCE.RTSI0, niscope.TriggerSlope.POSITIVE
     )
-    scope_tsm.ssc.configure_trigger(
-        0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE
-    )
+    scope_tsm.ssc.configure_trigger(0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE)
     scope_tsm.ssc.configure_trigger_immediate()
     scope_tsm.ssc.clear_triggers()
     scope_tsm.ssc.export_start_triggers(scope.OUTPUT_TERMINAL.NONE)

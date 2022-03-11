@@ -18,15 +18,18 @@ class _NIDigitalSSC:
     _Site specific _Session and _Channel.
     Each object of this class is used to store info for a specified pin under specific Site.
     To store a _Session and _Channel(s) for different _Site(s) you need an array of this class object.
-    Prefix cs is used in all methods that operates on a given channels in a session. 
-    These are for internal use only and can be changed any time. 
-    External module should not use these methods with prefix 'cs_' directly.  
+    Prefix cs is used in all methods that operates on a given channels in a session.
+    These are for internal use only and can be changed any time.
+    External module should not use these methods with prefix 'cs_' directly.
     """
+
     def __init__(self, session: nidigital.Session, channels: str, pins: str):
         self._session = session  # mostly shared session depends on pinmap file.
         self._channels = channels  # specific channel(s) of that session
         self._pins = pins  # pin names mapped to the channels
-        self._channels_session = session.channels[channels] # To operate on session on very specific channel(s)
+        self._channels_session = session.channels[
+            channels
+        ]  # To operate on session on very specific channel(s)
 
     def cs_clock_generator_abort(self):
         """
@@ -37,22 +40,34 @@ class _NIDigitalSSC:
         """
         return self._channels_session.clock_generator_abort()
 
-    def cs_clock_generator_generate_clock(self, frequency: float, select_digital_function: bool = True):
-        """        
-        Configures clock generator frequency and initiates clock generation on the specified channel(s) or pin(s) and pin group(s).
+    def cs_clock_generator_generate_clock(
+        self, frequency: float, select_digital_function: bool = True
+    ):
+        """
+        Configures clock generator frequency and initiates clock generation on the specified channel(s)
+        or pin(s) and pin group(s).
 
         Args:
             frequency (float): The frequency of the clock generation, in Hz.
-            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital method for the pins specified prior to starting clock generation. Defaults to True.
+            select_digital_function (bool, optional): A Boolean that specifies whether to select the
+            digital method for the pins specified prior to starting clock generation. Defaults to True.
 
         Returns:
             none: when successful otherwise exception will be thrown.
         """
-        return self._channels_session.clock_generator_generate_clock(frequency, select_digital_function)
+        return self._channels_session.clock_generator_generate_clock(
+            frequency, select_digital_function
+        )
 
-    def cs_modify_time_set_for_clock_generation(self, frequency: float, duty_cycle: float, time_set: str):
+    def cs_modify_time_set_for_clock_generation(
+        self, frequency: float, duty_cycle: float, time_set: str
+    ):
         """
-        Configures the period of a time set, drive format and drive edge placement for the specified pins. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the period of a time set, drive format and drive edge placement for the specified pins.
+        Use this method to modify time set values after applying a timing sheet with the
+        apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets.
+        This method does not modify the timing sheet file or the timing sheet contents that will be
+        used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
 
         Args:
             frequency (float): Is the inverse of Period for this time set, in Hz.
@@ -72,19 +87,41 @@ class _NIDigitalSSC:
 
     def cs_select_function(self, function: enums.SelectedFunction):
         """
-        Specifies whether digital pattern instrument channels are controlled by the pattern sequencer or PPMU, disconnected, or off.
+        Specifies whether digital pattern instrument channels are controlled by the pattern sequencer
+        or PPMU, disconnected, or off.
 
-        +-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        | Defined Values:             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-        +=============================+==============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
-        | SelectedFunction.DIGITAL    | The pin is connected to the driver, comparator, and active load methods. The PPMU is not sourcing, but can make voltage measurements. The state of the digital pin driver when you change the selected_function to Digital is determined by the most recent call to the write_static method or the last vector of the most recently executed pattern burst, whichever happened last. Use the write_static method to control the state of the digital pin driver through software. Use the burst_pattern method to control the state of the digital pin driver through a pattern. Set the **selectDigitalFunction** parameter of the burst_pattern method to True to automatically switch the selected_function of the pins in the pattern burst to SelectedFunction.DIGITAL. |
-        +-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        | SelectedFunction.PPMU       | The pin is connected to the PPMU. The driver, comparator, and active load are off while this method is selected. Call the ppmu_source method to source a voltage or current. The ppmu_source method automatically switches the selected_function to the PPMU state and starts sourcing from the PPMU. Changing the selected_function to SelectedFunction.DISCONNECT, SelectedFunction.OFF, or SelectedFunction.DIGITAL causes the PPMU to stop sourcing. If you set the selected_function property to PPMU, the PPMU is initially not sourcing.                                                                                                                                                                                                                              |
-        +-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        | SelectedFunction.OFF        | The pin is electrically connected, and the PPMU and digital pin driver are off while this method is selected.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-        +-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        | SelectedFunction.DISCONNECT | The pin is electrically disconnected from instrument methods. Selecting this method causes the PPMU to stop sourcing prior to disconnecting the pin.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-        +-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        +-----------------------------+---------------------------------------------------------------------+
+        | Defined Values:             |
+        +=============================+=====================================================================+
+        | SelectedFunction.DIGITAL    | The pin is connected to the driver, comparator, and active
+                                        load methods. The PPMU is not sourcing, but can make voltage
+                                        measurements. The state of the digital pin driver when you change
+                                        the selected_function to Digital is determined by the most recent
+                                        call to the write_static method or the last vector of the most
+                                        recently executed pattern burst, whichever happened last. Use the
+                                        write_static method to control the state of the digital pin driver
+                                        through software. Use the burst_pattern method to control the state
+                                        of the digital pin driver through a pattern. Set the
+                                        **selectDigitalFunction** parameter of the burst_pattern method to
+                                        True to automatically switch the selected_function of the pins in
+                                        the pattern burst to SelectedFunction.DIGITAL. |
+        +-----------------------------+------------------------------------------------------------------------+
+        | SelectedFunction.PPMU       | The pin is connected to the PPMU. The driver, comparator, and active
+                                        load are off while this method is selected. Call the ppmu_source method
+                                        to source a voltage or current. The ppmu_source method automatically
+                                        switches the selected_function to the PPMU state and starts sourcing
+                                        from the PPMU. Changing the selected_function to SelectedFunction.
+                                        DISCONNECT, SelectedFunction.OFF, or SelectedFunction.DIGITAL causes
+                                        the PPMU to stop sourcing. If you set the selected_function property
+                                        to PPMU, the PPMU is initially not sourcing.
+        +-----------------------------+------------------------------------------------------------------------+
+        | SelectedFunction.OFF        | The pin is electrically connected, and the PPMU and digital pin driver
+                                        are off while this method is selected.
+        +-----------------------------+------------------------------------------------------------------------+
+        | SelectedFunction.DISCONNECT | The pin is electrically disconnected from instrument methods.
+                                        Selecting this method causes the PPMU to stop sourcing prior
+                                        to disconnecting the pin.                                             |
+        +-----------------------------+-----------------------------------------------------------------------+
 
 
         Args:
@@ -92,7 +129,7 @@ class _NIDigitalSSC:
         """
         self._session.abort()
         self._channels_session.selected_function = function
-        
+
     def cs_frequency_counter_configure_measurement_time(self, measurement_time: float):
         """
         Specifies the measurement time for the frequency counter.
@@ -104,13 +141,15 @@ class _NIDigitalSSC:
 
     def cs_frequency_counter_measure_frequency(self):
         """
-        Measures the frequency on the specified channel(s) over the specified measurement time. All channels in the repeated capabilities should have the same measurement time.
+        Measures the frequency on the specified channel(s) over the specified measurement time.
+        All channels in the repeated capabilities should have the same measurement time.
 
 
         Returns:
             list[float]: frequencies list
         """
         return self._channels_session.frequency_counter_measure_frequency()
+
     # HRAM #
 
 
@@ -130,13 +169,17 @@ class _NIDigitalTSM:
         for ssc in self.sscs:
             ssc.cs_clock_generator_abort()
 
-    def clock_generator_generate_clock(self, frequency: float, select_digital_function: bool = True):
+    def clock_generator_generate_clock(
+        self, frequency: float, select_digital_function: bool = True
+    ):
         """
-        Configures clock generator frequency and initiates clock generation on all the channel(s) or pin(s) and pin group(s).
+        Configures clock generator frequency and initiates clock generation on all the channel(s) or
+        pin(s) and pin group(s).
 
         Args:
             frequency (float): The frequency of the clock generation, in Hz.
-            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital method for the pins specified prior to starting clock generation. Defaults to True.
+            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital
+            method for the pins specified prior to starting clock generation. Defaults to True.
 
         Returns:
             none: when successful otherwise exception will be thrown.
@@ -144,9 +187,15 @@ class _NIDigitalTSM:
         for ssc in self.sscs:
             ssc.cs_clock_generator_generate_clock(frequency, select_digital_function)
 
-    def modify_time_set_for_clock_generation(self, frequency: float, duty_cycle: float, time_set: str):
+    def modify_time_set_for_clock_generation(
+        self, frequency: float, duty_cycle: float, time_set: str
+    ):
         """
-        Configures the period of a time set, drive format and drive edge placement for all the specified pins. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the period of a time set, drive format and drive edge placement for all the specified pins.
+        Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing
+        method, or to create time sets programmatically without the use of timing sheets. This method does not
+        modify the timing sheet file or the timing sheet contents that will be used in future calls to
+        apply_levels_and_timing; it only affects the values of the current timing context.
 
         Args:
             frequency (float): Is the inverse of Period for this time set, in Hz.
@@ -155,24 +204,46 @@ class _NIDigitalTSM:
         """
         for ssc in self.sscs:
             ssc.cs_modify_time_set_for_clock_generation(frequency, duty_cycle, time_set)
+
     # End of Clock Generation #
 
     # Configuration #
     def select_function(self, function: enums.SelectedFunction):
         """
-        Specifies whether digital pattern instrument channels are controlled by the pattern sequencer or PPMU, disconnected, or off.
+        Specifies whether digital pattern instrument channels are controlled by the
+        pattern sequencer or PPMU, disconnected, or off.
 
+        +-----------------------------+-------------------------------------------------------------------------+
+        | Defined Values:             |                                                                         |
+        +=============================+=========================================================================+
+        | SelectedFunction.DIGITAL    | The pin is connected to the driver, comparator, and active load
+                                        methods. The PPMU is not sourcing, but can make voltage measurements.
+                                        The state of the digital pin driver when you change the selected_function
+                                        to Digital is determined by the most recent call to the write_static method
+                                        or the last vector of the most recently executed pattern burst,
+                                        whichever happened last. Use the write_static method to control
+                                        the state of the digital pin driver through software. Use the burst_pattern
+                                        method to control the state of the digital pin driver through a pattern.
+                                        Set the **selectDigitalFunction** parameter of the burst_pattern method to
+                                        True to automatically switch the selected_function of the pins in the
+                                        pattern burst to SelectedFunction.DIGITAL. |
         +-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        | Defined Values:             |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-        +=============================+==============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
-        | SelectedFunction.DIGITAL    | The pin is connected to the driver, comparator, and active load methods. The PPMU is not sourcing, but can make voltage measurements. The state of the digital pin driver when you change the selected_function to Digital is determined by the most recent call to the write_static method or the last vector of the most recently executed pattern burst, whichever happened last. Use the write_static method to control the state of the digital pin driver through software. Use the burst_pattern method to control the state of the digital pin driver through a pattern. Set the **selectDigitalFunction** parameter of the burst_pattern method to True to automatically switch the selected_function of the pins in the pattern burst to SelectedFunction.DIGITAL. |
-        +-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        | SelectedFunction.PPMU       | The pin is connected to the PPMU. The driver, comparator, and active load are off while this method is selected. Call the ppmu_source method to source a voltage or current. The ppmu_source method automatically switches the selected_function to the PPMU state and starts sourcing from the PPMU. Changing the selected_function to SelectedFunction.DISCONNECT, SelectedFunction.OFF, or SelectedFunction.DIGITAL causes the PPMU to stop sourcing. If you set the selected_function property to PPMU, the PPMU is initially not sourcing.                                                                                                                                                                                                                              |
-        +-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        | SelectedFunction.OFF        | The pin is electrically connected, and the PPMU and digital pin driver are off while this method is selected.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-        +-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-        | SelectedFunction.DISCONNECT | The pin is electrically disconnected from instrument methods. Selecting this method causes the PPMU to stop sourcing prior to disconnecting the pin.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-        +-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        | SelectedFunction.PPMU       | The pin is connected to the PPMU. The driver, comparator, and active
+                                        load are off while this method is selected. Call the ppmu_source
+                                        method to source a voltage or current. The ppmu_source method automatically
+                                        switches the selected_function to the PPMU state and starts sourcing
+                                        from the PPMU. Changing the selected_function to SelectedFunction.DISCONNECT,
+                                        SelectedFunction.OFF, or SelectedFunction.DIGITAL causes
+                                        the PPMU to stop sourcing. If you set the selected_function property
+                                        to PPMU, the PPMU is initially not sourcing. |
+        +-----------------------------+-------------------------------------------------------------------------------+
+        | SelectedFunction.OFF        | The pin is electrically connected, and the PPMU and digital
+                                        pin driver are off while this method is selected.                             |
+        +-----------------------------+-------------------------------------------------------------------------------+
+        | SelectedFunction.DISCONNECT | The pin is electrically disconnected from instrument methods.
+                                        Selecting this method causes the PPMU to stop sourcing prior
+                                        to disconnecting the pin.
+        +-----------------------------+-------------------------------------------------------------------------------+
 
 
         Args:
@@ -180,6 +251,7 @@ class _NIDigitalTSM:
         """
         for ssc in self.sscs:
             ssc.cs_select_function(function)
+
     # End of Configuration #
 
     # Frequency Measurement #
@@ -195,17 +267,17 @@ class _NIDigitalTSM:
 
     def frequency_counter_measure_frequency(self):
         """
-        Measures the frequency on all the channel(s) over the specified measurement time. All channels in the repeated capabilities should have the same measurement time.
+        Measures the frequency on all the channel(s) over the specified measurement time.
+        All channels in the repeated capabilities should have the same measurement time.
 
         Returns:
             list[float]: frequencies list
         """
         per_instrument_frequencies: typing.List[typing.List[float]] = []
         for ssc in self.sscs:
-            per_instrument_frequencies.append(
-                ssc.cs_frequency_counter_measure_frequency()
-            )
+            per_instrument_frequencies.append(ssc.cs_frequency_counter_measure_frequency())
         return per_instrument_frequencies
+
     # End of Frequency Measurement #
 
     # HRAM #
@@ -220,7 +292,9 @@ class _NIDigitalTSM:
         for ssc in self.sscs:
             ssc._session.history_ram_cycles_to_acquire = cycles_to_acquire
             ssc._session.history_ram_pretrigger_samples = pretrigger_samples
-            ssc._session.history_ram_max_samples_to_acquire_per_site = max_samples_to_acquire_per_site
+            ssc._session.history_ram_max_samples_to_acquire_per_site = (
+                max_samples_to_acquire_per_site
+            )
             ssc._session.history_ram_number_of_samples_is_finite = number_of_samples_is_finite
             ssc._session.history_ram_buffer_size_per_site = buffer_size_per_site
 
@@ -259,7 +333,9 @@ class _NIDigitalTSM:
             per_instrument_number_of_samples_is_finite.append(
                 ssc._session.history_ram_number_of_samples_is_finite
             )
-            per_instrument_buffer_size_per_site.append(ssc._session.history_ram_buffer_size_per_site)
+            per_instrument_buffer_size_per_site.append(
+                ssc._session.history_ram_buffer_size_per_site
+            )
         return (
             per_instrument_cycles_to_acquire,
             per_instrument_pretrigger_samples,
@@ -267,7 +343,6 @@ class _NIDigitalTSM:
             per_instrument_number_of_samples_is_finite,
             per_instrument_buffer_size_per_site,
         )
-
 
     def get_hram_trigger_settings(self):
         per_instrument_triggers_type: typing.List[enums.HistoryRAMTriggerType] = []
@@ -280,7 +355,9 @@ class _NIDigitalTSM:
             per_instrument_cycle_number.append(
                 ssc._session.cycle_number_history_ram_trigger_cycle_number
             )
-            per_instrument_pattern_label.append(ssc._session.pattern_label_history_ram_trigger_label)
+            per_instrument_pattern_label.append(
+                ssc._session.pattern_label_history_ram_trigger_label
+            )
             per_instrument_cycle_offset.append(
                 ssc._session.pattern_label_history_ram_trigger_cycle_offset
             )
@@ -329,6 +406,7 @@ class _NIDigitalTSM:
             per_instrument_per_site_cycle_information.append(cycle_information)
             number_of_samples = max(number_of_samples, sum_of_samples_to_read)
         return per_instrument_per_site_cycle_information, number_of_samples
+
     # End of HRAM #
 
     # Pattern Actions #
@@ -384,12 +462,11 @@ class _NIDigitalTSM:
     def wait_until_done(self, timeout: float = 10):
         for ssc in self.sscs:
             ssc._session.wait_until_done(timeout)
+
     # End of Pattern Actions #
 
     # Pin Levels and Timing #
-    def apply_levels_and_timing(
-        self, levels_sheet: str, timing_sheet: str
-    ):
+    def apply_levels_and_timing(self, levels_sheet: str, timing_sheet: str):
         for ssc in self.sscs:
             ssc._session.sites[ssc._pins].apply_levels_and_timing(levels_sheet, timing_sheet)
 
@@ -501,6 +578,7 @@ class _NIDigitalTSM:
     ):
         for ssc in self.sscs:
             ssc._session.channels[ssc._channels].configure_voltage_levels(vil, vih, vol, voh, vterm)
+
     # End of Pin Levels and Timing #
 
     # PPMU #
@@ -526,7 +604,6 @@ class _NIDigitalTSM:
             )
         return per_instrument_measurements
 
-
     def ppmu_source_current(self, current_level: float, current_level_range: float = 0):
         if current_level_range == 0:
             current_level_range = abs(current_level)
@@ -541,7 +618,6 @@ class _NIDigitalTSM:
             ssc._session.channels[ssc._channels].ppmu_current_level_range = current_level_range
             ssc._session.channels[ssc._channels].ppmu_current_level = current_level
             ssc._session.channels[ssc._channels].ppmu_source()
-
 
     def ppmu_source_voltage_per_site_per_pin(
         self,
@@ -559,7 +635,6 @@ class _NIDigitalTSM:
                 ssc._session.channels[channel].ppmu_voltage_level = source_voltage
             ssc._session.channels[ssc._channels].ppmu_source()
 
-
     def ppmu_source_voltage_per_site(
         self,
         current_limit_range: float,
@@ -575,7 +650,6 @@ class _NIDigitalTSM:
             for channel, source_voltage in zip(channel_list_array, source_voltages):
                 ssc._session.channels[channel].ppmu_voltage_level = source_voltage
             ssc._session.channels[ssc._channels].ppmu_source()
-
 
     def ppmu_source_voltage(self, voltage_level: float, current_limit_range: float):
         """
@@ -593,10 +667,10 @@ class _NIDigitalTSM:
             ssc._session.channels[ssc._channels].ppmu_voltage_level = voltage_level
             ssc._session.channels[ssc._channels].ppmu_source()
 
-
     def ppmu_source(self):
         for ssc in self.sscs:
             ssc._session.channels[ssc._channels].ppmu_source()
+
     # End of PPMU #
 
     # Sequencer Flags and Registers #
@@ -606,9 +680,7 @@ class _NIDigitalTSM:
             per_instrument_state.append(ssc._session.read_sequencer_flag(sequencer_flag))
         return per_instrument_state
 
-    def read_sequencer_register(
-        self, sequencer_register: enums.SequencerRegister
-    ):
+    def read_sequencer_register(self, sequencer_register: enums.SequencerRegister):
         per_instrument_register_values: typing.List[int] = []
         for ssc in self.sscs:
             per_instrument_register_values.append(
@@ -629,8 +701,9 @@ class _NIDigitalTSM:
         sequencer_register: enums.SequencerRegister,
         value: int = 0,
     ):
-        for ssc in self.ssc:
+        for ssc in self.sscs:
             ssc._session.write_sequencer_register(sequencer_register, value)
+
     # End of Sequencer Flags and Registers #
 
     # Source and Capture Waveforms #
@@ -674,7 +747,9 @@ class _NIDigitalTSM:
             rows, cols = numpy.shape(per_instrument_waveform)
             site_numbers, _ = _site_list_to_site_numbers(ssc._pins)
             if minimum_size > cols and expand_to_minimum_size:
-                initialized_array = [[0 for _ in range(minimum_size)] for _ in range(len(site_numbers))]
+                initialized_array = [
+                    [0 for _ in range(minimum_size)] for _ in range(len(site_numbers))
+                ]
                 for row in range(rows):
                     for col in range(cols):
                         initialized_array[row][col] = per_instrument_waveform[row][col]
@@ -683,6 +758,7 @@ class _NIDigitalTSM:
             for site_number, waveform in zip(site_numbers, per_instrument_waveform):
                 waveform_data[site_number] = waveform
             ssc._session.write_source_waveform_site_unique(waveform_name, waveform_data)
+
     # End of Source and Capture Waveforms #
 
     # Static #
@@ -716,30 +792,26 @@ class _NIDigitalTSM:
         # End of Static #
 
         # Trigger #
-        def clear_start_trigger_signal(self):
-            for ssc in self.sscs:
-                ssc._session.start_trigger_type = enums.TriggerType.NONE
-            return ssc
 
-        def configure_trigger_signal(
-            self,
-            source: str,
-            edge: enums.DigitalEdge = enums.DigitalEdge.RISING,
-        ):
-            for ssc in self.sscs:
-                ssc._session.digital_edge_start_trigger_source = source
-                ssc._session.digital_edge_start_trigger_edge = edge
-            return ssc
+    def clear_start_trigger_signal(self):
+        for ssc in self.sscs:
+            ssc._session.start_trigger_type = enums.TriggerType.NONE
 
+    def configure_trigger_signal(
+        self,
+        source: str,
+        edge: enums.DigitalEdge = enums.DigitalEdge.RISING,
+    ):
+        for ssc in self.sscs:
+            ssc._session.digital_edge_start_trigger_source = source
+            ssc._session.digital_edge_start_trigger_edge = edge
 
-        def export_opcode_trigger_signal(
-            self, signal_id: str, output_terminal: str = ""
-        ):
-            for ssc in self.sscs:
-                ssc._session.pattern_opcode_events[
-                    signal_id
-                ].exported_pattern_opcode_event_output_terminal = output_terminal
-            return ssc
+    def export_opcode_trigger_signal(self, signal_id: str, output_terminal: str = ""):
+        for ssc in self.sscs:
+            ssc._session.pattern_opcode_events[
+                signal_id
+            ].exported_pattern_opcode_event_output_terminal = output_terminal
+
     # End of Trigger #
 
     def filter_sites(self, desired_sites: typing.List[int]):
@@ -776,7 +848,6 @@ class _NIDigitalTSM:
             per_instrument_per_site_to_per_site_lut += array
         return per_instrument_per_site_to_per_site_lut
 
-
     def calculate_per_instrument_to_per_site_lut(self, sites: typing.List[int]):
         per_instrument_to_per_site_lut: typing.List[Location_1D_Array] = []
         for _ssc in self.sscs:
@@ -787,8 +858,9 @@ class _NIDigitalTSM:
             per_instrument_to_per_site_lut.append(Location_1D_Array(array))
         return per_instrument_to_per_site_lut
 
-
-    def calculate_per_instrument_to_per_site_per_pin_lut(self, sites: typing.List[int], pins: typing.List[str]):
+    def calculate_per_instrument_to_per_site_per_pin_lut(
+        self, sites: typing.List[int], pins: typing.List[str]
+    ):
         per_instrument_to_per_site_per_pin_lut: typing.List[Location_2D_Array] = []
         for ssc in self.sscs:
             _, _pins, _sites = _channel_list_to_pins(ssc._channels)
@@ -798,12 +870,10 @@ class _NIDigitalTSM:
             per_instrument_to_per_site_per_pin_lut.append(Location_2D_Array(array))
         return per_instrument_to_per_site_per_pin_lut
 
-
     def calculate_per_site_per_pin_to_per_instrument_lut(
         self, sites: typing.List[int], pins: typing.List[str]
     ):
         max_sites_on_instrument = 0
-        instrument_count = len(self.sscs)
         i = 0
         location_2d_array: typing.List[Location_2D] = []
         pins_sites_array: typing.List[typing.Any] = []
@@ -814,6 +884,7 @@ class _NIDigitalTSM:
             max_sites_on_instrument = max(max_sites_on_instrument, len(_pins))
             location_2d_array += [Location_2D(i, j) for j in range(len(_pins))]
             i += 1
+        instrument_count = i
         for site in sites:
             array: typing.List[Location_2D] = []
             for pin in pins:
@@ -826,10 +897,8 @@ class _NIDigitalTSM:
             max_sites_on_instrument,
         )
 
-
     def calculate_per_site_to_per_instrument_lut(self, sites: typing.List[int]):
         max_sites_on_instrument = 0
-        instrument_count = len(self.sscs)
         i = 0
         location_2d_array: typing.List[Location_2D] = []
         sites_array: typing.List[int] = []
@@ -840,6 +909,7 @@ class _NIDigitalTSM:
             max_sites_on_instrument = max(max_sites_on_instrument, len(site_numbers))
             location_2d_array += [Location_2D(i, j) for j in range(len(site_numbers))]
             i += 1
+        instrument_count = i
         for site in sites:
             index = sites_array.index(site)
             per_site_to_per_instrument_lut.append(location_2d_array[index])
@@ -946,11 +1016,18 @@ SIGNAL_ID = SignalId(
 def tsm_ssc_clock_generator_abort(tsm: TSMDigital):
     tsm.ssc.clock_generator_abort()
 
-def tsm_ssc_clock_generator_generate_clock(tsm: TSMDigital, frequency: float, select_digital_function: bool = True):
-    tsm.ssc.clock_generator_generate_clock( frequency, select_digital_function)
 
-def tsm_ssc_modify_time_set_for_clock_generation(tsm: TSMDigital, frequency: float, duty_cycle: float, time_set: str):
+def tsm_ssc_clock_generator_generate_clock(
+    tsm: TSMDigital, frequency: float, select_digital_function: bool = True
+):
+    tsm.ssc.clock_generator_generate_clock(frequency, select_digital_function)
+
+
+def tsm_ssc_modify_time_set_for_clock_generation(
+    tsm: TSMDigital, frequency: float, duty_cycle: float, time_set: str
+):
     tsm.ssc.modify_time_set_for_clock_generation(frequency, duty_cycle, time_set)
+
 
 # Configuration #
 def tsm_ssc_clear_start_trigger_signal(tsm: TSMDigital):
@@ -974,6 +1051,8 @@ def tsm_ssc_export_opcode_trigger_signal(
 ):
     tsm.ssc.export_opcode_trigger_signal(signal_id, output_terminal)
     return tsm
+
+
 # End of Configuration #
 
 # Frequency Measurement #
@@ -983,8 +1062,8 @@ def tsm_ssc_frequency_counter_configure_measurement_time(tsm: TSMDigital, measur
 
 def tsm_ssc_frequency_counter_measure_frequency(tsm: TSMDigital):
     initialized_array = [[0.0 for _ in tsm.pins] for _ in tsm.site_numbers]
-    per_instrument_to_per_site_per_pin_lut = tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
-        tsm.site_numbers, tsm.pins
+    per_instrument_to_per_site_per_pin_lut = (
+        tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(tsm.site_numbers, tsm.pins)
     )
     per_instrument_frequencies = tsm.ssc.frequency_counter_measure_frequency()
     per_site_per_pin_frequency_measurements = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -992,7 +1071,7 @@ def tsm_ssc_frequency_counter_measure_frequency(tsm: TSMDigital):
         per_instrument_to_per_site_per_pin_lut,
         per_instrument_frequencies,
     )
-    return tsm, per_site_per_pin_frequency_measurements
+    return per_site_per_pin_frequency_measurements
 
 
 # End of Frequency Measurement #
@@ -1019,7 +1098,9 @@ def tsm_ssc_configure_hram(
         number_of_samples_is_finite,
         buffer_size_per_site,
     )
-    tsm.ssc.configure_hram_trigger(triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset)
+    tsm.ssc.configure_hram_trigger(
+        triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset
+    )
     return tsm
 
 
@@ -1148,6 +1229,8 @@ def tsm_ssc_stream_hram_results(tsm: TSMDigital):
         for index in lut.location_1d_array:
             per_site_cycle_information[index] = cycle_information
     return tsm, per_site_cycle_information
+
+
 # End of HRAM #
 
 
@@ -1166,7 +1249,9 @@ def tsm_ssc_burst_pattern_pass_fail(
     per_instrument_to_per_site_lut = tsm.ssc.calculate_per_instrument_to_per_site_lut(
         tsm.site_numbers
     )
-    per_instrument_pass = tsm.ssc.burst_pattern_pass_fail(start_label, select_digital_function, timeout)
+    per_instrument_pass = tsm.ssc.burst_pattern_pass_fail(
+        start_label, select_digital_function, timeout
+    )
     per_site_pass = _apply_lut_per_instrument_to_per_site(
         initialized_array, per_instrument_to_per_site_lut, per_instrument_pass
     )
@@ -1186,8 +1271,8 @@ def tsm_ssc_burst_pattern(
 
 def tsm_ssc_get_fail_count(tsm: TSMDigital):
     initialized_array = [[0 for _ in tsm.pins] for _ in tsm.site_numbers]
-    per_instrument_to_per_site_per_pin_lut = tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
-        tsm.site_numbers, tsm.pins
+    per_instrument_to_per_site_per_pin_lut = (
+        tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(tsm.site_numbers, tsm.pins)
     )
     per_instrument_failure_counts = tsm.ssc.get_fail_count()
     per_site_per_pin_fail_counts = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -1212,6 +1297,7 @@ def tsm_ssc_get_site_pass_fail(tsm: TSMDigital):
 
 def tsm_ssc_wait_until_done(tsm: TSMDigital, timeout: float = 10):
     tsm.ssc.wait_until_done(timeout)
+
 
 # End of Pattern Actions #
 
@@ -1244,7 +1330,7 @@ def tsm_ssc_apply_tdr_offsets(
     tsm: TSMDigital, per_instrument_offsets: typing.List[typing.List[float]]
 ):
     tsm.ssc.apply_tdr_offsets(per_instrument_offsets)
-    
+
 
 def tsm_ssc_configure_active_load(tsm: TSMDigital, vcom: float, iol: float, ioh: float):
     tsm.ssc.configure_active_load(vcom, iol, ioh)
@@ -1269,7 +1355,9 @@ def tsm_ssc_configure_single_level_per_site(
     tsm.ssc.configure_single_level_per_site(level_type_to_set, per_instrument_value)
 
 
-def tsm_ssc_configure_single_level(tsm: TSMDigital, level_type_to_set: LevelTypeToSet, setting: float):
+def tsm_ssc_configure_single_level(
+    tsm: TSMDigital, level_type_to_set: LevelTypeToSet, setting: float
+):
     tsm.ssc.configure_single_level(level_type_to_set, setting)
 
 
@@ -1295,7 +1383,9 @@ def tsm_ssc_configure_time_set_compare_edge_per_site_per_pin(
         per_site_per_pin_to_per_instrument_lut,
         per_site_per_pin_compare_strobe,
     )
-    tsm.ssc.configure_time_set_compare_edge_per_site_per_pin(time_set, per_instrument_compare_strobe)
+    tsm.ssc.configure_time_set_compare_edge_per_site_per_pin(
+        time_set, per_instrument_compare_strobe
+    )
 
 
 def tsm_ssc_configure_time_set_compare_edge_per_site(
@@ -1323,10 +1413,13 @@ def tsm_ssc_configure_time_set_period(tsm: TSMDigital, time_set: str, period: fl
     configured_period = tsm.ssc.configure_time_set_period(time_set, period)
     return configured_period
 
+
 def tsm_ssc_configure_voltage_levels(
     tsm: TSMDigital, vil: float, vih: float, vol: float, voh: float, vterm: float
 ):
     tsm.ssc.configure_voltage_levels(vil, vih, vol, voh, vterm)
+
+
 # End of Pin Levels and Timing #
 
 
@@ -1347,8 +1440,8 @@ def tsm_ssc_ppmu_configure_voltage_limits(
 
 def tsm_ssc_ppmu_measure_current(tsm: TSMDigital):
     initialized_array = [[0.0 for _ in tsm.pins] for _ in tsm.site_numbers]
-    per_instrument_to_per_site_per_pin_lut = tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
-        tsm.site_numbers, tsm.pins
+    per_instrument_to_per_site_per_pin_lut = (
+        tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(tsm.site_numbers, tsm.pins)
     )
     per_instrument_measurements = tsm.ssc.ppmu_measure(enums.PPMUMeasurementType.CURRENT)
     per_site_per_pin_measurements = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -1361,8 +1454,8 @@ def tsm_ssc_ppmu_measure_current(tsm: TSMDigital):
 
 def tsm_ssc_ppmu_measure_voltage(tsm: TSMDigital):
     initialized_array = [[0.0 for _ in tsm.pins] for _ in tsm.site_numbers]
-    per_instrument_to_per_site_per_pin_lut = tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
-        tsm.site_numbers, tsm.pins
+    per_instrument_to_per_site_per_pin_lut = (
+        tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(tsm.site_numbers, tsm.pins)
     )
     per_instrument_measurements = tsm.ssc.ppmu_measure(enums.PPMUMeasurementType.VOLTAGE)
     per_site_per_pin_measurements = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -1397,7 +1490,9 @@ def tsm_ssc_ppmu_source_voltage_per_site_per_pin(
         per_site_per_pin_to_per_instrument_lut,
         per_site_per_pin_source_voltages,
     )
-    tsm.ssc.ppmu_source_voltage_per_site_per_pin(current_limit_range, per_instrument_source_voltages)
+    tsm.ssc.ppmu_source_voltage_per_site_per_pin(
+        current_limit_range, per_instrument_source_voltages
+    )
 
 
 def tsm_ssc_ppmu_source_voltage_per_site(
@@ -1427,6 +1522,8 @@ def tsm_ssc_ppmu_source_voltage(tsm: TSMDigital, voltage_level: float, current_l
 
 def tsm_ssc_ppmu_source(tsm: TSMDigital):
     tsm.ssc.ppmu_source()
+
+
 # End of PPMU #
 
 
@@ -1435,19 +1532,24 @@ def tsm_ssc_read_sequencer_flag(tsm: TSMDigital, sequencer_flag: enums.Sequencer
     per_instrument_state = tsm.ssc.read_sequencer_flag(sequencer_flag)
     return per_instrument_state
 
+
 def tsm_ssc_read_sequencer_register(tsm: TSMDigital, sequencer_register: enums.SequencerRegister):
     per_instrument_register_values = tsm.ssc.read_sequencer_register(sequencer_register)
     return per_instrument_register_values
+
 
 def tsm_ssc_write_sequencer_flag(
     tsm: TSMDigital, sequencer_flag: enums.SequencerFlag, state: bool = True
 ):
     tsm.ssc.write_sequencer_flag(sequencer_flag, state)
 
+
 def tsm_ssc_write_sequencer_register(
     tsm: TSMDigital, sequencer_register: enums.SequencerRegister, value: int = 0
 ):
     tsm.ssc.write_sequencer_register(sequencer_register, value)
+
+
 # End of Sequencer Flags and Registers #
 
 
@@ -1484,9 +1586,7 @@ def tsm_ssc_fetch_capture_waveform(
     per_instrument_to_per_site_lut = tsm.ssc.calculate_per_instrument_to_per_site_lut(
         tsm.site_numbers
     )
-    per_instrument_capture = tsm.ssc.fetch_capture_waveform(
-    waveform_name, samples_to_read, timeout
-    )
+    per_instrument_capture = tsm.ssc.fetch_capture_waveform(waveform_name, samples_to_read, timeout)
     per_site_waveforms = _apply_lut_per_instrument_to_per_site(
         initialized_array, per_instrument_to_per_site_lut, per_instrument_capture
     )
@@ -1501,7 +1601,7 @@ def tsm_ssc_write_source_waveform_broadcast(
     minimum_size: int = 128,
 ):
     tsm.ssc.write_source_waveform_broadcast(
-    waveform_name, waveform_data, expand_to_minimum_size, minimum_size
+        waveform_name, waveform_data, expand_to_minimum_size, minimum_size
     )
     return tsm
 
@@ -1548,8 +1648,8 @@ def tsm_ssc_read_static(tsm: TSMDigital, auto_select=True):
     if auto_select:
         tsm_ssc_select_function(tsm, enums.SelectedFunction.DIGITAL)
     initialized_array = [[enums.PinState.ZERO for _ in tsm.pins] for _ in tsm.site_numbers]
-    per_instrument_to_per_site_per_pin_lut = tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
-        tsm.site_numbers, tsm.pins
+    per_instrument_to_per_site_per_pin_lut = (
+        tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(tsm.site_numbers, tsm.pins)
     )
     per_instrument_data = tsm.ssc.read_static()
     per_site_per_pin_data = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -1622,6 +1722,8 @@ def tsm_ssc_write_static(tsm: TSMDigital, state: enums.WriteStaticPinState, auto
     if auto_select:
         tsm_ssc_select_function(tsm, enums.SelectedFunction.DIGITAL)
     tsm.ssc.write_static(state)
+
+
 # End of Static #
 
 
@@ -1705,6 +1807,7 @@ def _channel_list_to_pins(channel_list: str):
             sites[i] = int(re.match(r"site(\d+)", site).group(1))
     return channels, pins, sites
 
+
 # End of Subroutines #
 
 
@@ -1717,7 +1820,9 @@ def tsm_ssc_initiate(tsm: TSMDigital):
     tsm.ssc.initiate()
 
 
-def tsm_ssc_publish(tsm: TSMDigital, data_to_publish: typing.List[typing.Any], published_data_id: str = ""):
+def tsm_ssc_publish(
+    tsm: TSMDigital, data_to_publish: typing.List[typing.Any], published_data_id: str = ""
+):
     if len(numpy.shape(data_to_publish)) == 1:
         (
             per_site_to_per_instrument_lut,
@@ -1737,9 +1842,7 @@ def tsm_ssc_publish(tsm: TSMDigital, data_to_publish: typing.List[typing.Any], p
             per_site_per_pin_to_per_instrument_lut,
             instrument_count,
             max_sites_on_instrument,
-        ) = tsm.ssc.calculate_per_site_per_pin_to_per_instrument_lut(
-            tsm.site_numbers, tsm.pins
-        )
+        ) = tsm.ssc.calculate_per_site_per_pin_to_per_instrument_lut(tsm.site_numbers, tsm.pins)
         default = {bool: False, float: 0.0}[type(data_to_publish[0][0])]
         initialized_array = [
             [default for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
@@ -1788,9 +1891,11 @@ def initialize_sessions(tsm_context: TSMContext, options: dict = {}):
                     waveform_name, source_waveform_file, False
                 )
 
+
 @nitsm.codemoduleapi.code_module
 def pin_to_n_sessions(tsm_context: TSMContext, pin: str):
     return n_pins_to_m_sessions(tsm_context, [pin])
+
 
 @nitsm.codemoduleapi.code_module
 def n_pins_to_m_sessions(
@@ -1813,7 +1918,8 @@ def n_pins_to_m_sessions(
     for session, pin_set_string, site_list in zip(sessions, pin_set_strings, site_lists):
         sscs.append(_NIDigitalSSC(session, pin_set_string, site_list))
     nidigital_tsm = _NIDigitalTSM(sscs)
-    return TSMDigital(pin_query_context, nidigital_tsm, sites, pins)    
+    return TSMDigital(pin_query_context, nidigital_tsm, sites, pins)
+
 
 @nitsm.codemoduleapi.code_module
 def close_sessions(tsm_context: TSMContext):
@@ -1822,4 +1928,6 @@ def close_sessions(tsm_context: TSMContext):
     for session in sessions:
         session.reset()
         session.close()
+
+
 # End of TSMContext #

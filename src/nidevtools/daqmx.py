@@ -522,7 +522,7 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
         try:
             task.ao_channels.add_ao_voltage_chan(
                 physical_channel=physical_channel,
-                )
+            )
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         except Exception:
             task = reset_devices(task)
@@ -608,7 +608,9 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
 
 # Pin Map
 @nitsm.codemoduleapi.code_module
-def get_all_instrument_names(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, task_type: str = ""):
+def get_all_instrument_names(
+    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, task_type: str = ""
+):
     """
     Returns the channel group ID and associated instrument names and channel lists of all instruments
     of type Instrument Type ID defined in the Semiconductor Module context. You can use instrument names,
@@ -627,7 +629,9 @@ def get_all_instrument_names(tsm_context: nitsm.codemoduleapi.SemiconductorModul
 
 
 @nitsm.codemoduleapi.code_module
-def get_all_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, task_type: str = ""):
+def get_all_sessions(
+    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, task_type: str = ""
+):
     """
     Returns all sessions in the Semiconductor Module Context that belong to multiple instruments of the type DAQmx.
     Args:
@@ -642,7 +646,9 @@ def get_all_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_session_sessions_info(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pins: PinsArg):
+def pins_to_session_sessions_info(
+    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pins: PinsArg
+):
     """
     Returns a properly filled object of the type MultipleSessions with a session per each
     site defined in the pin map
@@ -655,9 +661,9 @@ def pins_to_session_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconductor
     """
     if type(pins) == str:
         pins = [pins]
-    pin_list = tsm_context.filter_pins_by_instrument_type(pins,
-                                                          nitsm.enums.InstrumentTypeIdConstants.NI_DAQMX,
-                                                          nitsm.enums.Capability.ALL)
+    pin_list = tsm_context.filter_pins_by_instrument_type(
+        pins, nitsm.enums.InstrumentTypeIdConstants.NI_DAQMX, nitsm.enums.Capability.ALL
+    )
     print(pin_list)
     (pin_query_contex, task, channel_list) = tsm_context.pins_to_nidaqmx_task(pin_list)
     sites = tsm_context.site_numbers
@@ -670,7 +676,9 @@ def pins_to_session_sessions_info(tsm_context: nitsm.codemoduleapi.Semiconductor
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions_sessions(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pins: PinsArg):
+def pins_to_sessions_sessions(
+    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pins: PinsArg
+):
     """
     Returns a pin query contex and a list of properties defined in the pin map.
     The list of properties returned can be used to fill a new object type MultipleSessions

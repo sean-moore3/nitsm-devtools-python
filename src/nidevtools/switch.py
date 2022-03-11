@@ -13,9 +13,9 @@ class Action(Enum):
 
 
 class Topology(typing.NamedTuple):  # TODO Add rest of the topologies for the a more general case
-    matrix_2738 = '2738/2-Wire 8x32 Matrix'
-    mux_2525 = '2525/2-Wire Octal 8x1 Mux'
-    matrix_2503 = '2503/2-Wire 4x6 Matrix'
+    matrix_2738 = "2738/2-Wire 8x32 Matrix"
+    mux_2525 = "2525/2-Wire Octal 8x1 Mux"
+    matrix_2503 = "2503/2-Wire 4x6 Matrix"
 
 
 class Session(typing.NamedTuple):
@@ -46,7 +46,9 @@ class MultipleSessions:
     def __init__(self, sessions: typing.List[Session]):
         self.Sessions = sessions
 
-    def action_session_info(self, route_value: str = '', action: Action = Action.Disconnect, timeout: int = 40):
+    def action_session_info(
+        self, route_value: str = "", action: Action = Action.Disconnect, timeout: int = 40
+    ):
         read_path_capability = []
         for session in self.Sessions:
             data = session.info(route_value, action, timeout)
@@ -54,26 +56,34 @@ class MultipleSessions:
         return read_path_capability
 
 
-instrument_type_id = '_niSwitch'
+instrument_type_id = "_niSwitch"
 
 
 def get_all_instruments_names(tsm_context: TSMContext):
-    instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(instrument_type_id)
+    instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(
+        instrument_type_id
+    )
     return instrument_names, channel_group_ids
 
 
 def get_all_sessions(tsm_context: TSMContext):
-    session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(instrument_type_id)
+    session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(
+        instrument_type_id
+    )
     list_of_sessions = []
     for session in session_data:
         list_of_sessions.append(session)
     return list_of_sessions
 
 
-def pin_to_sessions_session_info(tsm_context: TSMContext, pin: str = ''):
+def pin_to_sessions_session_info(tsm_context: TSMContext, pin: str = ""):
     try:
-        pin_query_context, session_data, channel_group_id, channel_list =\
-            tsm_context.pins_to_custom_session(instrument_type_id, pin)
+        (
+            pin_query_context,
+            session_data,
+            channel_group_id,
+            channel_list,
+        ) = tsm_context.pins_to_custom_session(instrument_type_id, pin)
         relay_name = channel_group_id
         # TODO CHECK for better equivalent
         data = MultipleSessions([Session(session_data, pin, relay_name)])
@@ -84,7 +94,9 @@ def pin_to_sessions_session_info(tsm_context: TSMContext, pin: str = ''):
     # tsm_context.pins_to_custom_sessions(instrument_type_id, pin)
 
 
-def set_sessions(tsm_context: TSMContext, switch_name: str, session: niswitch.Session, channel_group_id: str):
+def set_sessions(
+    tsm_context: TSMContext, switch_name: str, session: niswitch.Session, channel_group_id: str
+):
     tsm_context.set_custom_session(instrument_type_id, switch_name, channel_group_id, session)
 
 
@@ -102,19 +114,19 @@ def close_sessions(tsm_context: TSMContext):
         session.close()
 
 
-def name_to_topology(name: str = ''):
-    if name.lower().find('matrix_2738') == 0:
+def name_to_topology(name: str = ""):
+    if name.lower().find("matrix_2738") == 0:
         return Topology.matrix_2738
-    elif name.lower().find('mux_2525') == 0:
+    elif name.lower().find("mux_2525") == 0:
         return Topology.mux_2525
-    elif name.lower().find('matrix_2503') == 0:
+    elif name.lower().find("matrix_2503") == 0:
         return Topology.matrix_2503
     else:
-        return 'Configured Topology'
+        return "Configured Topology"
 
 
 def initialize_sessions(tsm_context: TSMContext):
-    switch_name = ''
+    switch_name = ""
     instrument_names, channel_group_ids = get_all_instruments_names(tsm_context)
     for name, channel_id in zip(instrument_names, channel_group_ids):
         if name != switch_name:

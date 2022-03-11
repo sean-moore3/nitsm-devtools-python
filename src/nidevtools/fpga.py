@@ -20,13 +20,12 @@ import nidevtools.common as ni_dt_common
 # from nitsm.enums import InstrumentTypeIdConstants
 
 
-
 # Types Definition
 
 PinsArg = typing.Union[str, typing.Sequence[str]]
 Any = typing.Any
 StringTuple = typing.Tuple[str]
-InstrumentTypeId = '782xFPGA'
+InstrumentTypeId = "782xFPGA"
 CurrentPath = os.getcwd()
 PinQuery = nitsm.pinquerycontexts.PinQueryContext
 
@@ -181,7 +180,7 @@ class _SSCFPGA(typing.NamedTuple):
         for bit in data:
             line_states.append(bit.state)
         return data, line_states
-            
+
     def ss_read_c_states(self):  # TODO CHECK
         commanded_states = []
         ch_list = self.Channels.split(",")
@@ -207,21 +206,22 @@ class _SSCFPGA(typing.NamedTuple):
     def w_master_lc(self, control_label: str, cluster: I2CMasterLineConfiguration):
         control = self.Session.registers[control_label]
         sda = collections.OrderedDict()
-        sda['Channel'] = cluster.SDA.channel.value
-        sda['Connector'] = cluster.SDA.connector.value
+        sda["Channel"] = cluster.SDA.channel.value
+        sda["Connector"] = cluster.SDA.connector.value
         scl = collections.OrderedDict()
-        scl['Channel'] = cluster.SCL.channel.value
-        scl['Connector'] = cluster.SCL.connector.value
+        scl["Channel"] = cluster.SCL.channel.value
+        scl["Connector"] = cluster.SCL.connector.value
         data = collections.OrderedDict()
-        data['SDA'] = sda
-        data['SCL'] = scl
+        data["SDA"] = sda
+        data["SCL"] = scl
         control.write(data)
 
-    def configure_master_sda_scl_lines(self,
-                                       i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
-                                       sda_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0),
-                                       scl_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0)
-                                       ):
+    def configure_master_sda_scl_lines(
+        self,
+        i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+        sda_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0),
+        scl_channel: LineLocation = LineLocation(DIOLines.DIO0, Connectors.Connector0),
+    ):
         """
         Configures the provided SDA and SCL channels with the indicated I2C master configuration.
         Args:
@@ -234,40 +234,44 @@ class _SSCFPGA(typing.NamedTuple):
         """
         cluster = I2CMasterLineConfiguration(sda_channel, scl_channel)
         if 0 <= i2c_master_in.value <= 3:
-            control = 'I2C Master%d Line Configuration' % i2c_master_in.value
+            control = "I2C Master%d Line Configuration" % i2c_master_in.value
             self.w_master_lc(control, cluster)
         else:
             print("Requested I2C_master is not defined")
             raise Exception
 
-    def configure_i2c_master_settings(self,
-                                      i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
-                                      divide: int = 8,
-                                      ten_bit_addressing: bool = False,
-                                      clock_stretching: bool = True
-                                      ):
+    def configure_i2c_master_settings(
+        self,
+        i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+        divide: int = 8,
+        ten_bit_addressing: bool = False,
+        clock_stretching: bool = True,
+    ):
         """
         Allows configure host setting in the master device. Data provided should be supported by the FPGA and match
         HW configuration
         """
         # cluster = WorldControllerSetting(divide=divide, ten_bit_addressing=ten_bit_addressing)
         if 0 <= i2c_master_in.value <= 3:
-            master = self.Session.registers['I2C Master%d Configuration' % i2c_master_in.value]
-            clock = self.Session.registers['I2C Master%d Enable Clock Stretching?' % i2c_master_in.value]
+            master = self.Session.registers["I2C Master%d Configuration" % i2c_master_in.value]
+            clock = self.Session.registers[
+                "I2C Master%d Enable Clock Stretching?" % i2c_master_in.value
+            ]
             cluster = master.read()
-            cluster['10-bit Addressing'] = ten_bit_addressing
-            cluster['Divide'] = divide
+            cluster["10-bit Addressing"] = ten_bit_addressing
+            cluster["Divide"] = divide
             clock.write(clock_stretching)
             master.write(cluster)  # without all info?
         else:
             print("Requested I2C_master is not defined")
             raise Exception
 
-    def i2c_master_poll_until_ready(self,
-                                    i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
-                                    start_time: float = 0.0,
-                                    timeout: float = 0.0
-                                    ):
+    def i2c_master_poll_until_ready(
+        self,
+        i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+        start_time: float = 0.0,
+        timeout: float = 0.0,
+    ):
         """
         Waits slave ready signal until configured timeout has passed. After the signal has been received it releases the
         resources to allow write or read. If the time out expires it will rise an error 5000
@@ -275,7 +279,9 @@ class _SSCFPGA(typing.NamedTuple):
         if timeout == 0:
             timeout = start_time
         if 0 <= i2c_master_in.value <= 3:
-            master_ready = self.Session.registers['I2C Master%d ready for input' % i2c_master_in.value]
+            master_ready = self.Session.registers[
+                "I2C Master%d ready for input" % i2c_master_in.value
+            ]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
@@ -288,18 +294,21 @@ class _SSCFPGA(typing.NamedTuple):
         if data:
             pass
         else:
-            raise nifpga.ErrorStatus(5000,
-                                     ("I2C %s not ready for input" % i2c_master_in.name),
-                                     "i2c_master_poll_until_ready()",
-                                     ["i2c_master", "timeout"],
-                                     (i2c_master_in, timeout))
+            raise nifpga.ErrorStatus(
+                5000,
+                ("I2C %s not ready for input" % i2c_master_in.name),
+                "i2c_master_poll_until_ready()",
+                ["i2c_master", "timeout"],
+                (i2c_master_in, timeout),
+            )
 
-    def i2c_master_read(self,
-                        i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
-                        device_address: int = 0,
-                        timeout: float = 1,
-                        number_of_bytes: int = 1
-                        ):
+    def i2c_master_read(
+        self,
+        i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+        device_address: int = 0,
+        timeout: float = 1,
+        number_of_bytes: int = 1,
+    ):
         """
         Reads from the FPGA a deterministic number of bytes.
         Args:
@@ -316,30 +325,34 @@ class _SSCFPGA(typing.NamedTuple):
         else:
             pass
         if 0 <= i2c_master_in.value <= 3:
-            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master_in.value]
-            master_go = self.Session.registers['I2C Master%d Go' % i2c_master_in.value]
-            master_data = self.Session.registers['I2C Master%d Read Data' % i2c_master_in.value]
+            master_config = self.Session.registers[
+                "I2C Master%d Configuration" % i2c_master_in.value
+            ]
+            master_go = self.Session.registers["I2C Master%d Go" % i2c_master_in.value]
+            master_data = self.Session.registers["I2C Master%d Read Data" % i2c_master_in.value]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
         # config: WorldControllerSetting
         config = master_config.read()
-        config['Device Address'] = device_address
-        config['Number of Bytes'] = number_of_bytes
-        config['Read'] = True
+        config["Device Address"] = device_address
+        config["Number of Bytes"] = number_of_bytes
+        config["Read"] = True
         self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         master_config.write(config)
         master_go.write(True)
         self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         data = master_data.read()
-        data = data[0:number_of_bytes+1]
+        data = data[0 : number_of_bytes + 1]
         return data
 
-    def i2c_master_write(self,
-                         i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
-                         timeout: float = 1,
-                         device_address: int = 0,
-                         data_to_write: typing.List[int] = []):
+    def i2c_master_write(
+        self,
+        i2c_master_in: I2CMaster = I2CMaster.I2C_3V3_7822_SINK,
+        timeout: float = 1,
+        device_address: int = 0,
+        data_to_write: typing.List[int] = [],
+    ):
         """
         Writes to the FPGA an array of int.
         Args:
@@ -350,9 +363,11 @@ class _SSCFPGA(typing.NamedTuple):
         """
         start_time = time()
         if 0 <= i2c_master_in.value <= 3:
-            master_config = self.Session.registers['I2C Master%d Configuration' % i2c_master_in.value]
-            master_go = self.Session.registers['I2C Master%d Go' % i2c_master_in.value]
-            master_data = self.Session.registers['I2C Master%d Write Data' % i2c_master_in.value]
+            master_config = self.Session.registers[
+                "I2C Master%d Configuration" % i2c_master_in.value
+            ]
+            master_go = self.Session.registers["I2C Master%d Go" % i2c_master_in.value]
+            master_data = self.Session.registers["I2C Master%d Write Data" % i2c_master_in.value]
         else:
             print("Requested I2C_master is not defined")
             raise Exception
@@ -371,7 +386,7 @@ class _SSCFPGA(typing.NamedTuple):
         """
         data_rd = []
         for i in range(4):
-            con = self.Session.registers['Connector%d Read Data' % i]
+            con = self.Session.registers["Connector%d Read Data" % i]
             data_rd.append(con.read())
         data = ReadData(data_rd[0], data_rd[1], data_rd[2], data_rd[3])
         return data
@@ -390,10 +405,10 @@ class _SSCFPGA(typing.NamedTuple):
             out_list.append(merge)
             master = self.Session.registers["I2C Master%d Line Configuration" % i]
             master_data = master.read()
-            sda = master_data['SDA']
-            scl = master_data['SCL']
-            line_sda = LineLocation(sda['Channel'], sda['Connector'])
-            line_scl = LineLocation(scl['Channel'], scl['Connector'])
+            sda = master_data["SDA"]
+            scl = master_data["SCL"]
+            line_sda = LineLocation(sda["Channel"], sda["Connector"])
+            line_scl = LineLocation(scl["Channel"], scl["Connector"])
             config_list.append(line_sda)
             config_list.append(line_scl)
         states_list = []
@@ -428,7 +443,7 @@ class _SSCFPGA(typing.NamedTuple):
         """
         ch_data_list = []
         for ch in range(4):
-            con_rd = self.Session.registers['Connector%d Read Data' % ch]
+            con_rd = self.Session.registers["Connector%d Read Data" % ch]
             ch_data_list.append(con_rd.read())
         readings = []
         for lines in lines_to_read:
@@ -451,7 +466,9 @@ class _SSCFPGA(typing.NamedTuple):
             data = read_control.read()
         return data
 
-    def read_single_dio_line(self, connector: Connectors = Connectors.Connector0, line: DIOLines = DIOLines.DIO0):
+    def read_single_dio_line(
+        self, connector: Connectors = Connectors.Connector0, line: DIOLines = DIOLines.DIO0
+    ):
         """
         Reads the specific DIO line and return its value
         """
@@ -468,8 +485,8 @@ class _SSCFPGA(typing.NamedTuple):
         con_list = []
         data_list = []
         for i in range(4):
-            con_enable = self.Session.registers['Connector%d Output Enable' % i]
-            con_data = self.Session.registers['Connector%d Output Enable' % i]
+            con_enable = self.Session.registers["Connector%d Output Enable" % i]
+            con_data = self.Session.registers["Connector%d Output Enable" % i]
             merge_con = (con_enable, con_data)
             merge_data = [con_enable.read(), con_data.read()]
             con_list.append(merge_con)
@@ -478,16 +495,18 @@ class _SSCFPGA(typing.NamedTuple):
             if 0 <= lines.connector.value <= 3:
                 self.write_single_dio_line(lines.connector, lines.channel, lines.state)
 
-    def write_single_dio_line(self,
-                              connector: Connectors = Connectors.Connector0,
-                              line: DIOLines = DIOLines.DIO0,
-                              state: StaticStates = StaticStates.Zero):
+    def write_single_dio_line(
+        self,
+        connector: Connectors = Connectors.Connector0,
+        line: DIOLines = DIOLines.DIO0,
+        state: StaticStates = StaticStates.Zero,
+    ):
         """
         Writes the provided DiO Line with the given state into the FPGA
         """
         if 0 <= connector.value <= 3:
-            con_enable = self.Session.registers['Connector%d Output Enable' % connector.value]
-            con_data = self.Session.registers['Connector%d Output Data' % connector.value]
+            con_enable = self.Session.registers["Connector%d Output Enable" % connector.value]
+            con_data = self.Session.registers["Connector%d Output Data" % connector.value]
             enable, data = update_line_on_connector(con_enable.read(), con_data.read(), line, state)
             con_enable.write(enable)
             con_data.write(data)
@@ -498,10 +517,9 @@ class TSMFPGA(typing.NamedTuple):
     SSC: typing.List[_SSCFPGA]
     site_numbers: typing.List[int]
 
-    def configure_i2c_bus(self,
-                          tenb_addresing: bool = False,
-                          divide: int = 8,
-                          clock_stretching: bool = True):
+    def configure_i2c_bus(
+        self, tenb_addresing: bool = False, divide: int = 8, clock_stretching: bool = True
+    ):
         """
         Allows configure host setting for the TSMFPGA session. Data provided should be supported by the FPGA and match
         HW configuration for that specific session.
@@ -510,10 +528,7 @@ class TSMFPGA(typing.NamedTuple):
         session, i2c = self.extract_i2c_master_from_sessions()
         session.configure_i2c_master_settings(i2c, divide, tenb_addresing, clock_stretching)
 
-    def read_i2c_data(self,
-                      timeout: float = 1,
-                      slave_address: int = 0,
-                      number_of_bytes: int = 1):
+    def read_i2c_data(self, timeout: float = 1, slave_address: int = 0, number_of_bytes: int = 1):
         """
         Reads from the FPGA session a given number of bytes.
         Args:
@@ -526,10 +541,9 @@ class TSMFPGA(typing.NamedTuple):
         i2c_read_data = session.i2c_master_read(i2c, slave_address, timeout, number_of_bytes)
         return i2c_read_data
 
-    def write_i2c_data(self,
-                       data_to_write: typing.List[int],
-                       timeout: float = 1,
-                       slave_address: int = 0):
+    def write_i2c_data(
+        self, data_to_write: typing.List[int], timeout: float = 1, slave_address: int = 0
+    ):
         """
         Writes to the FPGA session the provided list of integrers.
         Args:
@@ -550,16 +564,18 @@ class TSMFPGA(typing.NamedTuple):
         sites_and_pins, sites, pins = channel_list_to_pins(ch_list)
         sites_and_pins.clear()
         sites.clear()
-        scan = ''
+        scan = ""
         for i2c in I2CMaster:
             if i2c.name in pins[0]:
                 scan = i2c
         if type(scan) != I2CMaster:
-            raise nifpga.ErrorStatus(5000,
-                                     "Invalid I2C Master Session Provided",
-                                     "extract_i2c_master_from_sessions",
-                                     ["self"],
-                                     self)
+            raise nifpga.ErrorStatus(
+                5000,
+                "Invalid I2C Master Session Provided",
+                "extract_i2c_master_from_sessions",
+                ["self"],
+                self,
+            )
         return session, scan
 
     def read_commanded_line_states(self):
@@ -617,10 +633,12 @@ def search_line(line: LineLocation, ch_list: typing.List[LineLocation]):
     return -1
 
 
-def update_line_on_connector(enable_in: int = 0,
-                             data_in: int = 0,
-                             dio_line: DIOLines = DIOLines.DIO0,
-                             line_state: StaticStates = StaticStates.Zero):
+def update_line_on_connector(
+    enable_in: int = 0,
+    data_in: int = 0,
+    dio_line: DIOLines = DIOLines.DIO0,
+    line_state: StaticStates = StaticStates.Zero,
+):
     """
     Calculates the next value to write on FPGA given its previous values and location
     """
@@ -661,8 +679,8 @@ def channel_list_to_pins(channel_list: str = ""):
     for ch in ch_list:
         ch = ch.lstrip()
         sites_and_pins.append(ch)
-        ch_l = ch.replace('/', '\\').split('\\')
-        if '\\' in ch or '/' in ch:
+        ch_l = ch.replace("/", "\\").split("\\")
+        if "\\" in ch or "/" in ch:
             site_out = ch_l[0]
             pin = ch_l[1]
         else:
@@ -700,14 +718,16 @@ def close_sessions(tsm_context: TSMContext):
 debug = []
 
 
-def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
+def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ""):
     """
     Initialize the sessions from TSM context pinmap.
     """
     global debug
-    instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(InstrumentTypeId)
+    instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(
+        InstrumentTypeId
+    )
     # when the output from a function is unused use _ instead of variables like below
-    # instrument_names, channel_group_ids, _ = tsm_context.get_custom_instrument_names(InstrumentTypeId) 
+    # instrument_names, channel_group_ids, _ = tsm_context.get_custom_instrument_names(InstrumentTypeId)
     for instrument, group_id in zip(instrument_names, channel_group_ids):
         # target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
         ref_out = ""
@@ -720,19 +740,29 @@ def initialize_sessions(tsm_context: TSMContext, ldb_type: str = ''):
                 break
         tsm_context.set_custom_session(InstrumentTypeId, instrument, group_id, ref_out)
     dut_pins, system_pins = tsm_context.get_pin_names(InstrumentTypeId)
-    debug = list(tsm_context.pins_to_custom_sessions(InstrumentTypeId, dut_pins+system_pins))
+    debug = list(tsm_context.pins_to_custom_sessions(InstrumentTypeId, dut_pins + system_pins))
 
 
-def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], site_numbers: typing.List[int] = []):
+def pins_to_sessions(
+    tsm_context: TSMContext, pins: typing.List[str], site_numbers: typing.List[int] = []
+):
     """
     Returns an object that contains a list of sessions generated for the provided pins.
     """
-    pin_query_context, session_data, channel_group_ids, channels_lists =\
-        tsm_context.pins_to_custom_sessions(InstrumentTypeId, pins)
+    (
+        pin_query_context,
+        session_data,
+        channel_group_ids,
+        channels_lists,
+    ) = tsm_context.pins_to_custom_sessions(InstrumentTypeId, pins)
     session_data: typing.Tuple[nifpga.Session]
-    channel_list, sites = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], site_numbers)
+    channel_list, sites = ni_dt_common.pin_query_context_to_channel_list(
+        pin_query_context, [], site_numbers
+    )
     new_sessions = []
-    for session, channel_id, channel, site in zip(session_data, channel_group_ids, channels_lists, sites):
+    for session, channel_id, channel, site in zip(
+        session_data, channel_group_ids, channels_lists, sites
+    ):
         new_sessions.append(_SSCFPGA(session, channel_id, channel, site))
     return TSMFPGA(pin_query_context, new_sessions, channel_list)
 
@@ -746,24 +776,28 @@ def open_reference(rio_resource: str, target: BoardType, ldb_type: str):
         ldb_type:String indicating LDB type
     """
     if target == BoardType.PXIe_7820R:
-        name_of_relative_path = '7820R Static IO and I2C FPGA Main 3.3V.lvbitx'
+        name_of_relative_path = "7820R Static IO and I2C FPGA Main 3.3V.lvbitx"
     elif target == BoardType.PXIe_7821R:
-        name_of_relative_path = '7821R Static IO and I2C FPGA Main 3.3V.lvbitx'
+        name_of_relative_path = "7821R Static IO and I2C FPGA Main 3.3V.lvbitx"
     elif target == BoardType.PXIe_7822R:
-        if 'seq' in ldb_type.lower():
-            name_of_relative_path = '7822R Static IO and I2C FPGA Main 3.3V.lvbitx'
+        if "seq" in ldb_type.lower():
+            name_of_relative_path = "7822R Static IO and I2C FPGA Main 3.3V.lvbitx"
         else:
-            name_of_relative_path = '7822R Static IO and I2C FPGA Main Conn01 3.3V Conn 23 1.2V.lvbitx'
+            name_of_relative_path = (
+                "7822R Static IO and I2C FPGA Main Conn01 3.3V Conn 23 1.2V.lvbitx"
+            )
     else:
-        name_of_relative_path = ''
-    path = os.path.join(CurrentPath, '..\\..\\FPGA Bitfiles\\', name_of_relative_path)
+        name_of_relative_path = ""
+    path = os.path.join(CurrentPath, "..\\..\\FPGA Bitfiles\\", name_of_relative_path)
     reference = nifpga.Session(path, rio_resource)
     return reference
 
 
-def get_i2c_master_session(tsm_context: TSMContext,
-                           i2c_master_in: I2CMaster.I2C_3V3_7822_SINK,
-                           apply_i2c_settings: bool = True):
+def get_i2c_master_session(
+    tsm_context: TSMContext,
+    i2c_master_in: I2CMaster.I2C_3V3_7822_SINK,
+    apply_i2c_settings: bool = True,
+):
     sda = "%s_SDA" % i2c_master_in.name
     scl = "%s_SCL" % i2c_master_in.name
     session_data = pins_to_sessions(tsm_context, [sda, scl], [])
@@ -783,23 +817,27 @@ def get_i2c_master_session(tsm_context: TSMContext,
 
 
 def check_ui_tool(
-        path_in: str,
-        path_teststand: str = 'C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)'
+    path_in: str,
+    path_teststand: str = "C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)",
 ):
-    path_icons = os.path.join(path_teststand, 'Components\\Icons')
-    path_in = os.path.join(path_in, '..\\Code Modules\\Common\\Instrument Control\\782x FPGA\\CustomInstrument')
-    path_debug = os.path.join(path_icons, '782x FPGA Debug UI.ico')
+    path_icons = os.path.join(path_teststand, "Components\\Icons")
+    path_in = os.path.join(
+        path_in, "..\\Code Modules\\Common\\Instrument Control\\782x FPGA\\CustomInstrument"
+    )
+    path_debug = os.path.join(path_icons, "782x FPGA Debug UI.ico")
     if not os.path.exists(path_debug):
-        source = os.path.join(path_in, '782x FPGA Debug UI.ico')
+        source = os.path.join(path_in, "782x FPGA Debug UI.ico")
         target = path_icons
         shutil.copy2(source, target)
-    path_panels = os.path.join(path_teststand, 'Components\\Modules\\NI_SemiconductorModule\\CustomInstrumentPanels')
-    path_debug = os.path.join(path_panels, '782x FPGA Debug UI.seq')
-    path_debug2 = os.path.join(path_panels, '782x FPGA Debug UI')
+    path_panels = os.path.join(
+        path_teststand, "Components\\Modules\\NI_SemiconductorModule\\CustomInstrumentPanels"
+    )
+    path_debug = os.path.join(path_panels, "782x FPGA Debug UI.seq")
+    path_debug2 = os.path.join(path_panels, "782x FPGA Debug UI")
     condition = os.path.exists(path_debug) and os.path.exists(path_debug2)
     if not False:
-        source = os.path.join(path_in, '.\\782x FPGA Debug UI\\')
+        source = os.path.join(path_in, ".\\782x FPGA Debug UI\\")
         target = path_panels
         shutil.copy2(source, target)
-        source = os.path.join(path_in, '.\\782x FPGA Debug UI.seq')
+        source = os.path.join(path_in, ".\\782x FPGA Debug UI.seq")
         shutil.copy2(source, target)

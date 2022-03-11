@@ -81,8 +81,8 @@ class MeasurementMode(enums.Enum):
 
 
 class CustomTransientResponse:
-    """class to store and access the custom transient response settings
-    """
+    """class to store and access the custom transient response settings"""
+
     def __init__(
         self, gain_bandwidth: float, compensation_frequency: float, pole_zero_ratio: float
     ):
@@ -119,21 +119,21 @@ class CustomTransientResponse:
 
 
 class ChannelProperties(typing.NamedTuple):
-    instrument_name : str
-    model : str
-    channel : str
-    pin : str
-    output_function : str
-    level : float
-    limit : float
-    voltage_range : float
-    current_range : float
-    sense : str
-    aperture_time : float
-    transient_response : str
-    output_enabled : str
-    output_connected : str
-    
+    instrument_name: str
+    model: str
+    channel: str
+    pin: str
+    output_function: str
+    level: float
+    limit: float
+    voltage_range: float
+    current_range: float
+    sense: str
+    aperture_time: float
+    transient_response: str
+    output_enabled: str
+    output_connected: str
+
 
 def model_to_ranges(model: int, channel: int):
     """Returns current, voltage and resistance (for voltage and current) ranges"""
@@ -219,18 +219,18 @@ class _NIDCPowerSSC:
     _Site specific _Session and _Channel.
     Each object of this class is used to store info for a specified pin under specific Site.
     To store a _Session and _Channel(s) for different _Site(s) you need an array of this class object.
-    Prefix cs is used in all methods that operates on a given channels in a session. 
-    These are for internal use only and can be changed any time. 
-    External module should not use these methods with prefix 'cs_' directly.  
+    Prefix cs is used in all methods that operates on a given channels in a session.
+    These are for internal use only and can be changed any time.
+    External module should not use these methods with prefix 'cs_' directly.
     """
 
     def __init__(self, session: nidcpower.Session, channels: str, pins: str):
         """NI DC power SSC class initialisation for session related operations.
 
         Args:
-            session (nidcpower.Session): This is a shared session. Need to use this with channel 
+            session (nidcpower.Session): This is a shared session. Need to use this with channel
                 subset notation.
-            channels (str): List of channels that are part of this session. 
+            channels (str): List of channels that are part of this session.
             pins (str): List of pins that are part of this session.
         """
         self._session = session  # mostly shared session depends on pinmap file.
@@ -249,14 +249,14 @@ class _NIDCPowerSSC:
         Returns:
             session: This session contains the selected pin's channels and may contain other pin's channels
         """
-        return self._session  # 
+        return self._session  #
 
     @property
     def cs_channels(self):
         """get the stored channel list
 
         Returns:
-            str: channels 
+            str: channels
         """
         return self._channels
 
@@ -265,7 +265,7 @@ class _NIDCPowerSSC:
     #     return self._channels_session  # This session will operate only on subset of channels
 
     def cs_abort(self):
-        """ 
+        """
         Transitions the specified channel(s) from the Running state to the
         Uncommitted state. If a sequence is running, it is stopped. Any
         configuration methods called after this method are not applied until
@@ -322,13 +322,13 @@ class _NIDCPowerSSC:
         self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS
     ):
         """
-        Aborts current operation and configures the measurement aperture time for the 
+        Aborts current operation and configures the measurement aperture time for the
         current channel configuration. Later initiates the session.
         Aperture time is specified in the units set by the aperture_time_units property.
-        for information about supported devices.Refer to the Aperture Time topic in the 
-        NI DC Power Supplies and SMUs Help for more information about how to configure your 
+        for information about supported devices.Refer to the Aperture Time topic in the
+        NI DC Power Supplies and SMUs Help for more information about how to configure your
         measurements and for information about valid values.
-    
+
 
         Args:
             aperture_time (_type_, optional): _description_. Defaults to 16.667e-03.
@@ -343,12 +343,12 @@ class _NIDCPowerSSC:
         self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS
     ):
         """
-        Configures the measurement aperture time for the channel configuration. 
+        Configures the measurement aperture time for the channel configuration.
         Aperture time is specified in the units set by the aperture_time_units property.
         for information about supported devices.
-        Refer to the Aperture Time topic in the NI DC Power Supplies and SMUs Help for 
+        Refer to the Aperture Time topic in the NI DC Power Supplies and SMUs Help for
         more information about how to configure your measurements and for information about valid values.
-    
+
 
         Args:
             aperture_time (float, optional): in seconds by default. Defaults to 16.667e-03.
@@ -361,7 +361,7 @@ class _NIDCPowerSSC:
 
     def cs_configure_power_line_frequency(self, power_line_frequency=60.0):
         """
-        Stores the session object variable power line frequency for other operations 
+        Stores the session object variable power line frequency for other operations
         that uses power line frequency.
 
         Args:
@@ -387,17 +387,17 @@ class _NIDCPowerSSC:
         transient_response=enums.TransientResponse.NORMAL,
     ):
         """
-        Configures the measurement settings for the current session 
+        Configures the measurement settings for the current session
 
         Args:
-            aperture_time (float or int, optional): depends on the unit specified in the 4th argument. 
+            aperture_time (float or int, optional): depends on the unit specified in the 4th argument.
                 Defaults to 16.667e-03.
             source_delay (float, optional): in seconds. Defaults to 0.0.
-            sense (enum, optional): measurement to use Hi and Lo sense lines or not. 
+            sense (enum, optional): measurement to use Hi and Lo sense lines or not.
                 Defaults to enums.Sense.REMOTE.
-            aperture_time_unit (enum, optional): based on model this value needs to be set. 
+            aperture_time_unit (enum, optional): based on model this value needs to be set.
                 Defaults to enums.ApertureTimeUnits.SECONDS.
-            transient_response (enum, optional): Controls how to control the response based on load. 
+            transient_response (enum, optional): Controls how to control the response based on load.
                 Defaults to enums.TransientResponse.NORMAL.
         """
         self._channels_session.abort()
@@ -441,8 +441,8 @@ class _NIDCPowerSSC:
 
     def cs_get_aperture_time_in_seconds(self):
         """
-        get the aperture time in seconds for all channels in the session. if the model has diffent units convert 
-        them into seconds. 
+        get the aperture time in seconds for all channels in the session. if the model has diffent units convert
+        them into seconds.
 
         Returns:
             float: aperture time in seconds
@@ -514,7 +514,7 @@ class _NIDCPowerSSC:
             output_state (nidcpower.OutputStates): desired output state
 
         Returns:
-            bool list: indicates output state is same as desired state or not. 
+            bool list: indicates output state is same as desired state or not.
         """
         output_states = []
         for ch in self._ch_list:
@@ -525,7 +525,7 @@ class _NIDCPowerSSC:
         return output_states
 
     def cs_configure_current_level_range(self, current_level_range=0.0):
-        """upates the property 
+        """upates the property
 
         Args:
             current_level_range (float, optional): updates the range property. Defaults to 0.0.
@@ -718,7 +718,7 @@ class _NIDCPowerSSC:
         """get the transient response settings for one session
 
         Returns:
-            tuple: transient response type, Voltage T.R settings, Current T.R. settings 
+            tuple: transient response type, Voltage T.R settings, Current T.R. settings
         """
         transient_response = self._channels_session.transient_response
         v_gain_bw = self._channels_session.voltage_gain_bandwidth
@@ -867,9 +867,9 @@ class _NIDCPowerSSC:
         return voltages, currents
 
     def cs_get_properties(self):
-        channel_properties=[]
+        channel_properties = []
         # ap_times = list(self.cs_get_aperture_time_in_seconds())
-        chnls= self.cs_channels.split(",")
+        chnls = self.cs_channels.split(",")
         pns = self._pins.split(",")
         for pin, channel in zip(pns, chnls):
             ss = self.session.channels[channel]
@@ -905,10 +905,10 @@ class _NIDCPowerSSC:
                 i_range = nan
                 output_function = "un defined"
             max_instr_name = channel.split("/")[0]
-            print (max_instr_name, max_instr_name)
+            print(max_instr_name, max_instr_name)
             model = self.session.instruments[max_instr_name].instrument_model
             match = re.search("\d\d\d\d", model, re.RegexFlag.ASCII)[0]
-            if match in [4110,4112,4113,4130,4132]:
+            if match in [4110, 4112, 4113, 4130, 4132]:
                 tr_response = "N/A"
             elif match == 4154 and channel == "1":
                 tr_response = "N/A"
@@ -922,9 +922,23 @@ class _NIDCPowerSSC:
             ap_time = ss.aperture_time
             output_en = ss.output_enabled
             instr_name = self.session.instruments[max_instr_name].instrument_manufacturer
-            ch_prop = ChannelProperties(instr_name, model, channel, pin, output_function, level, limit, v_range, i_range, 
-                                   sense, ap_time, tr_response, output_en, output_connected)
-            channel_properties.append(ch_prop)        
+            ch_prop = ChannelProperties(
+                instr_name,
+                model,
+                channel,
+                pin,
+                output_function,
+                level,
+                limit,
+                v_range,
+                i_range,
+                sense,
+                ap_time,
+                tr_response,
+                output_en,
+                output_connected,
+            )
+            channel_properties.append(ch_prop)
         return channel_properties
 
 
@@ -971,17 +985,17 @@ class _NIDCPowerTSM:
         self, aperture_times, source_delays, senses, aperture_time_units, transient_responses
     ):
         """
-        Configures the measurement settings for all the sessions 
+        Configures the measurement settings for all the sessions
 
         Args:
-            aperture_times (list of float or int): depends on the unit specified in the 4th argument. 
+            aperture_times (list of float or int): depends on the unit specified in the 4th argument.
                 Defaults to 16.667e-03.
             source_delays (list of float): in seconds. Defaults to 0.0.
-            senses (list of enum): measurement to use Hi and Lo sense lines or not. 
+            senses (list of enum): measurement to use Hi and Lo sense lines or not.
                 Defaults to enums.Sense.REMOTE.
-            aperture_time_units (list of enum): based on model this value needs to be set. 
+            aperture_time_units (list of enum): based on model this value needs to be set.
                 Defaults to enums.ApertureTimeUnits.SECONDS.
-            transient_responses (list of enum): Controls how to control the response based on load. 
+            transient_responses (list of enum): Controls how to control the response based on load.
                 Defaults to enums.TransientResponse.NORMAL.
         """
         for (
@@ -1363,17 +1377,17 @@ class _NIDCPowerTSM:
         transient_response=enums.TransientResponse.NORMAL,
     ):
         """
-        Configures the measurement settings for all the sessions 
+        Configures the measurement settings for all the sessions
 
         Args:
-            aperture_time (float or int, optional): depends on the unit specified in the 4th argument. 
+            aperture_time (float or int, optional): depends on the unit specified in the 4th argument.
                 Defaults to 16.667e-03.
             source_delay (float, optional): in seconds. Defaults to 0.0.
-            sense (enum, optional): measurement to use Hi and Lo sense lines or not. 
+            sense (enum, optional): measurement to use Hi and Lo sense lines or not.
                 Defaults to enums.Sense.REMOTE.
-            aperture_time_unit (enum, optional): based on model this value needs to be set. 
+            aperture_time_unit (enum, optional): based on model this value needs to be set.
                 Defaults to enums.ApertureTimeUnits.SECONDS.
-            transient_response (enum, optional): Controls how to control the response based on load. 
+            transient_response (enum, optional): Controls how to control the response based on load.
                 Defaults to enums.TransientResponse.NORMAL.
         """
         transient_responses = self._expand_array_to_sessions(transient_response)
@@ -1420,7 +1434,7 @@ class _NIDCPowerTSM:
 
     def configure_voltage_limit_array(self, voltage_limits_array):
         """
-        configure different the voltage limit for all channels in each session. 
+        configure different the voltage limit for all channels in each session.
 
         Args:
             voltage_limits_array (List of float): one voltage limit for each channel
@@ -1513,7 +1527,7 @@ class _NIDCPowerTSM:
             current_level_range (float): for the desired current level.
             voltage_limit_high (float): maximum allowed positive side voltage.
             voltage_limit_low (float): maximum allowed negative side voltage.
-            voltage_limit_range (float): range selection for voltage limit. 
+            voltage_limit_range (float): range selection for voltage limit.
         """
         current_levels = self._expand_array_to_sessions(current_level)
         current_level_ranges = self._expand_array_to_sessions(current_level_range)
@@ -1564,7 +1578,7 @@ class _NIDCPowerTSM:
             voltage_level_range (float): for the desired voltage level.
             current_limit_high (float): maximum allowed positive side current.
             current_limit_low (float): maximum allowed negative side current.
-            current_limit_range (float): range selection for current limit. 
+            current_limit_range (float): range selection for current limit.
         """
         voltage_levels = self._expand_array_to_sessions(voltage_level)
         voltage_level_ranges = self._expand_array_to_sessions(voltage_level_range)
@@ -1601,7 +1615,7 @@ class _NIDCPowerTSM:
 
     def measure(self, measurement_mode=MeasurementMode.AUTO):
         """
-        measure the data by seting uo the measurement mode 
+        measure the data by seting uo the measurement mode
         reads all data from all the sessions.
 
         Args:
@@ -1626,20 +1640,20 @@ class _NIDCPowerTSM:
     def configure_source_adapt(
         self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse
     ):
-        """configures the transient responses for both voltage and current 
+        """configures the transient responses for both voltage and current
 
         Args:
             voltage_ctr (CustomTransientResponse): for voltage control
-            current_ctr (CustomTransientResponse): for current control 
+            current_ctr (CustomTransientResponse): for current control
         """
         for ssc in self._sscs:
             ssc.cs_configure_source_adapt(voltage_ctr, current_ctr)
 
     def get_source_adapt_settings(self):
-        """source adapt settings from all sessions 
+        """source adapt settings from all sessions
 
         Returns:
-            list of tuple: transient response type, Voltage T.R settings, Current T.R. settings  
+            list of tuple: transient response type, Voltage T.R settings, Current T.R. settings
         """
         return [ssc.cs_get_source_adapt_settings() for ssc in self._sscs]
 
@@ -1666,7 +1680,7 @@ class _NIDCPowerTSM:
         """filter the pins specified in the current TSMObject
 
         Args:
-            requested_pins (str): pin names 
+            requested_pins (str): pin names
 
         Returns:
             SSC: list of sessions sites and channels
@@ -1695,8 +1709,9 @@ class TSMDCPower(typing.NamedTuple):
     """data type of the DCPower_Tsm objects
 
     Args:
-        typing (tuple): 5 entites for storing them togather. 
+        typing (tuple): 5 entites for storing them togather.
     """
+
     pin_query_context: typing.Any
     ssc: _NIDCPowerTSM
     sites: typing.List[int]
@@ -1705,7 +1720,7 @@ class TSMDCPower(typing.NamedTuple):
 
 
 def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
-    """From the tsm context select only desired pins 
+    """From the tsm context select only desired pins
 
     Args:
         dc_power_tsm (TSMDCPower): tsm context for nidcpower
@@ -1741,7 +1756,7 @@ def filter_sites(dc_power_tsm: TSMDCPower, sites):
     """from tsm context select only desired sites
 
     Args:
-        dc_power_tsm (TSMDCPower): pin query context 
+        dc_power_tsm (TSMDCPower): pin query context
         sites (int list): desired site numbers
 
     Returns:
@@ -1820,8 +1835,10 @@ def pins_to_sessions(
     _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(
         pin_query_context, pins_expanded, sites
     )
-    sscs = [_NIDCPowerSSC(session, channel, pin_list)
-            for session, channel, pin_list in zip(sessions, channels, pin_lists)]
+    sscs = [
+        _NIDCPowerSSC(session, channel, pin_list)
+        for session, channel, pin_list in zip(sessions, channels, pin_lists)
+    ]
     dc_power_tsm = _NIDCPowerTSM(sscs)
     return TSMDCPower(pin_query_context, dc_power_tsm, sites, pins_info, pins_expanded)
 
