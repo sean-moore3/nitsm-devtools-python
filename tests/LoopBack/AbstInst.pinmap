@@ -29,6 +29,10 @@
 		<DUTPin name="BuckSGL_6_DUT" />
 		<DUTPin name="BuckSGL_7_DUT" />
 		<DUTPin name="BuckSGL_8_DUT" />
+		<DUTPin name="DPI_DO_SCL" />
+		<DUTPin name="DPI_DI_SCL" />
+		<DUTPin name="DPI_DO_SDA" />
+		<DUTPin name="DPI_DI_SDA" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="BuckSGL_1">
@@ -68,6 +72,10 @@
 		<Site siteNumber="0" />
 	</Sites>
 	<Connections>
+		<Connection pin="DPI_DI_SCL" siteNumber="0" instrument="DPI1" channel="2" />
+		<Connection pin="DPI_DI_SDA" siteNumber="0" instrument="DPI1" channel="4" />
+		<Connection pin="DPI_DO_SCL" siteNumber="0" instrument="DPI1" channel="1" />
+		<Connection pin="DPI_DO_SDA" siteNumber="0" instrument="DPI1" channel="3" />
 		<Connection pin="EN_FPGA" siteNumber="0" instrument="RIO1" channel="0" />
 		<Connection pin="En_Daq" siteNumber="0" instrument="DAQ2" channel="DAQ2/port0/line2" />
 		<Connection pin="eN_Digital" siteNumber="0" instrument="DPI1" channel="0" />

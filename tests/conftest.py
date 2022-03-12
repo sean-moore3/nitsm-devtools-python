@@ -145,11 +145,20 @@ digital_project_files = {
     "source_waveforms": [src_wfm1, src_wfm2, src_wfm3],
 }
 
+digital_project_files_as = {
+    "specifications": [specification1, specification2],
+    "levels": ['C:\\G\\nitsm-devtools-python\\tests\\LoopBack\\Levels\\I2C_Levels_as.digilevels'],
+    "timing": ["C:\\G\\nitsm-devtools-python\\tests\\LoopBack\\Timing\\I2C_Timing_as.digitiming"],
+    "pattern": [pattern1, pattern2, pattern3, pattern4],
+    "capture_waveforms": [cap_wfm],
+    "source_waveforms": [src_wfm1, src_wfm2, src_wfm3],
+}
+
 
 @pytest.fixture
 def standalone_tsm(_published_data_reader_factory):
     # tsm_context = nitsm.codemoduleapi.SemiconductorModuleContext(_published_data_reader_factory[0])
-    tsm_context = StandaloneSMC(_published_data_reader_factory[0], file_paths=digital_project_files)
+    tsm_context = StandaloneSMC(_published_data_reader_factory[0], file_paths=digital_project_files_as)
     return tsm_context
 
 

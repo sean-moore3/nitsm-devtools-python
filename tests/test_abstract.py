@@ -5,7 +5,7 @@ import nidevtools.abstract_switch as ni_abstract
 import nidevtools.daqmx as ni_daqmx
 import nidevtools.fpga as ni_fpga
 
-# import nidevtools.digital as ni_dt_digital
+import nidevtools.digital as ni_dt_digital
 import nidevtools.switch as ni_switch
 
 
@@ -32,10 +32,10 @@ def tsm_context(standalone_tsm):
     ni_daqmx.set_task(standalone_tsm)
     ni_fpga.initialize_sessions(standalone_tsm)
     ni_switch.initialize_sessions(standalone_tsm)
-    # ni_dt_digital.tsm_initialize_sessions(standalone_tsm)
+    ni_dt_digital.initialize_sessions(standalone_tsm)
     print("INIT DONE")
     yield standalone_tsm
-    # ni_dt_digital.tsm_close_sessions(standalone_tsm)
+    ni_dt_digital.close_sessions(standalone_tsm)
     ni_switch.close_sessions(standalone_tsm)
     ni_fpga.close_sessions(standalone_tsm)
     ni_daqmx.clear_task(standalone_tsm)

@@ -12,8 +12,7 @@ import nitsm.codemoduleapi
 import nitsm.enums
 import nitsm.pinquerycontexts
 import nidevtools.daqmx
-
-# import nidevtools.digital
+import nidevtools.digital
 import nidevtools.fpga
 import nidevtools.switch
 
@@ -61,9 +60,8 @@ class Session:
             multiple_session.sessions[0].Task.stop()
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
             multiple_session.sessions[0].Task.write(bool(self.route_value), True)
-            """
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
+            multiple_session = nidevtools.digital.pin_to_n_sessions(tsm_context, self.enable_pin)
             multiple_session = nidevtools.digital.tsm_ssc_select_function(multiple_session,
                                                                           nidigital.enums.SelectedFunction.DIGITAL)
             if self.route_value == "0":
@@ -73,7 +71,6 @@ class Session:
             else:
                 data = nidigital.enums.WriteStaticPinState.X
             nidevtools.digital.tsm_ssc_write_static(multiple_session, data)
-            """
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
             if self.route_value == "0":
@@ -102,12 +99,10 @@ class Session:
             multiple_session: nidevtools.daqmx.MultipleSessions
             multiple_session.sessions[0].Task.stop()
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
-            """
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session_info = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
+            multiple_session_info = nidevtools.digital.pin_to_n_sessions(tsm_context, self.enable_pin)
             data = nidigital.enums.WriteStaticPinState.X
             nidevtools.digital.tsm_ssc_write_static(multiple_session_info, data)
-            """
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session_info = nidevtools.fpga.pins_to_sessions(
                 tsm_context, [self.enable_pin], []
@@ -134,15 +129,13 @@ class Session:
             for bit in multiple_session.sessions[0].Task.read(1):
                 data += str(bit)
             self.status = data
-            """
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session_info = nidevtools.digital.tsm_ssc_1_pin_to_n_sessions(tsm_context, self.enable_pin)
+            multiple_session_info = nidevtools.digital.pin_to_n_sessions(tsm_context, self.enable_pin)
             multiple_session_info = nidevtools.digital.tsm_ssc_select_function(multiple_session_info,
                                                                                nidigital.enums.SelectedFunction.DIGITAL)
             data = nidevtools.digital.tsm_ssc_read_static(multiple_session_info)
             status = ['0', '1', '', 'L', 'H', 'X', 'M', 'V', 'D', 'E']
             self.status = status[data[0][0]]
-            """
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session_info = nidevtools.fpga.pins_to_sessions(
                 tsm_context, [self.enable_pin], []
