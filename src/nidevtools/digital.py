@@ -855,9 +855,16 @@ class _NIDigitalTSM:
             per_instrument_data.append(_ssc._session.channels[_ssc._channels].read_static())
         return per_instrument_data
 
-    def write_static(self, state: enums.WriteStaticPinState):
-        for _ssc in self.sscs:
-            _ssc._session.channels[_ssc._channels].write_static(state)
+    def write_static(self, state: enums.WriteStaticPinState, auto_select = True):
+        """
+        auto_select=True, specifies this function to configure the output function as digital automatically.
+        auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
+        Without configuring as digital and auto_select as false, this function will not work as expected.
+        """
+        if auto_select:
+            self.select_function(enums.SelectedFunction.DIGITAL)
+        for ssc in self.sscs:
+            ssc._session.channels[ssc._channels].write_static(state)
 
     def write_static_per_site_per_pin(
         self,
@@ -1033,49 +1040,7 @@ class TSMDigital(typing.NamedTuple):
     pins: typing.List[str]
 
 
-
-def tsm_ssc_clock_generator_abort(tsm: TSMDigital):
-    tsm.ssc.clock_generator_abort()
-
-
-def tsm_ssc_clock_generator_generate_clock(
-    tsm: TSMDigital, frequency: float, select_digital_function: bool = True
-):
-    tsm.ssc.clock_generator_generate_clock(frequency, select_digital_function)
-
-
-def tsm_ssc_modify_time_set_for_clock_generation(
-    tsm: TSMDigital, frequency: float, duty_cycle: float, time_set: str
-):
-    tsm.ssc.modify_time_set_for_clock_generation(frequency, duty_cycle, time_set)
-
-
-# Configuration #
-def tsm_ssc_clear_start_trigger_signal(tsm: TSMDigital):
-    tsm.ssc.clear_start_trigger_signal()
-
-
-def tsm_ssc_configure_trigger_signal(
-    tsm: TSMDigital, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING
-):
-    tsm.ssc.configure_trigger_signal(source, edge)
-
-
-def tsm_ssc_select_function(tsm: TSMDigital, function: enums.SelectedFunction):
-    tsm.ssc.select_function(function)
-
-
-def tsm_ssc_export_opcode_trigger_signal(tsm: TSMDigital, signal_id: str, output_terminal: str = ""):
-    tsm.ssc.export_opcode_trigger_signal(signal_id, output_terminal)
-
-
-# End of Configuration #
-
 # Frequency Measurement #
-def tsm_ssc_frequency_counter_configure_measurement_time(tsm: TSMDigital, measurement_time: float):
-    tsm.ssc.frequency_counter_configure_measurement_time(measurement_time)
-
-
 def tsm_ssc_frequency_counter_measure_frequency(tsm: TSMDigital):
     initialized_array = [[0.0 for _ in tsm.pins] for _ in tsm.site_numbers]
     per_instrument_to_per_site_per_pin_lut = (
@@ -1088,8 +1053,6 @@ def tsm_ssc_frequency_counter_measure_frequency(tsm: TSMDigital):
         per_instrument_frequencies,
     )
     return per_site_per_pin_frequency_measurements
-
-
 # End of Frequency Measurement #
 
 
@@ -1244,15 +1207,10 @@ def tsm_ssc_stream_hram_results(tsm: TSMDigital):
         for index in lut.location_1d_array:
             per_site_cycle_information[index] = cycle_information
     return per_site_cycle_information
-
-
 # End of HRAM #
 
 
 # Pattern Actions #
-def tsm_ssc_abort(tsm: TSMDigital):
-    tsm.ssc.abort()
-
 
 def tsm_ssc_burst_pattern_pass_fail(
     tsm: TSMDigital,
@@ -1271,16 +1229,6 @@ def tsm_ssc_burst_pattern_pass_fail(
         initialized_array, per_instrument_to_per_site_lut, per_instrument_pass
     )
     return per_site_pass
-
-
-def tsm_ssc_burst_pattern(
-    tsm: TSMDigital,
-    start_label: str,
-    select_digital_function: bool = True,
-    timeout: float = 10,
-    wait_until_done: bool = True,
-):
-    tsm.ssc.burst_pattern(start_label, select_digital_function, timeout, wait_until_done)
 
 
 def tsm_ssc_get_fail_count(tsm: TSMDigital):
@@ -1307,19 +1255,10 @@ def tsm_ssc_get_site_pass_fail(tsm: TSMDigital):
         initialized_array, per_instrument_to_per_site_lut, per_instrument_pass
     )
     return per_site_pass
-
-
-def tsm_ssc_wait_until_done(tsm: TSMDigital, timeout: float = 10):
-    tsm.ssc.wait_until_done(timeout)
-
-
 # End of Pattern Actions #
 
 
 # Pin Levels and Timing #
-def tsm_ssc_apply_levels_and_timing(tsm: TSMDigital, levels_sheet: str, timing_sheet: str):
-    tsm.ssc.apply_levels_and_timing(levels_sheet, timing_sheet)
-
 
 def tsm_ssc_apply_tdr_offsets_per_site_per_pin(
     tsm: TSMDigital, per_site_per_pin_tdr_values: typing.List[typing.List[float]]
@@ -1340,16 +1279,6 @@ def tsm_ssc_apply_tdr_offsets_per_site_per_pin(
     tsm.ssc.apply_tdr_offsets(per_instrument_tdr_values)
 
 
-def tsm_ssc_apply_tdr_offsets(
-    tsm: TSMDigital, per_instrument_offsets: typing.List[typing.List[float]]
-):
-    tsm.ssc.apply_tdr_offsets(per_instrument_offsets)
-
-
-def tsm_ssc_configure_active_load(tsm: TSMDigital, vcom: float, iol: float, ioh: float):
-    tsm.ssc.configure_active_load(vcom, iol, ioh)
-
-
 def tsm_ssc_configure_single_level_per_site(
     tsm: TSMDigital,
     level_type_to_set: LevelTypeToSet,
@@ -1367,16 +1296,6 @@ def tsm_ssc_configure_single_level_per_site(
         initialized_array, per_site_to_per_instrument_lut, per_site_value
     )
     tsm.ssc.configure_single_level_per_site(level_type_to_set, per_instrument_value)
-
-
-def tsm_ssc_configure_single_level(
-    tsm: TSMDigital, level_type_to_set: LevelTypeToSet, setting: float
-):
-    tsm.ssc.configure_single_level(level_type_to_set, setting)
-
-
-def tsm_ssc_configure_termination_mode(tsm: TSMDigital, termination_mode: enums.TerminationMode):
-    tsm.ssc.configure_termination_mode(termination_mode)
 
 
 def tsm_ssc_configure_time_set_compare_edge_per_site_per_pin(
@@ -1417,41 +1336,10 @@ def tsm_ssc_configure_time_set_compare_edge_per_site(
         initialized_array, per_site_to_per_instrument_lut, per_site_compare_strobe
     )
     tsm.ssc.configure_time_set_compare_edge_per_site(time_set, per_instrument_compare_strobe)
-
-
-def tsm_ssc_configure_time_set_compare_edge(tsm: TSMDigital, time_set: str, compare_strobe: float):
-    tsm.ssc.configure_time_set_compare_edge(time_set, compare_strobe)
-
-
-def tsm_ssc_configure_time_set_period(tsm: TSMDigital, time_set: str, period: float):
-    configured_period = tsm.ssc.configure_time_set_period(time_set, period)
-    return configured_period
-
-
-def tsm_ssc_configure_voltage_levels(
-    tsm: TSMDigital, vil: float, vih: float, vol: float, voh: float, vterm: float
-):
-    tsm.ssc.configure_voltage_levels(vil, vih, vol, voh, vterm)
-
-
 # End of Pin Levels and Timing #
 
 
 # PPMU #
-def tsm_ssc_ppmu_configure_aperture_time(tsm: TSMDigital, aperture_time: float):
-    tsm.ssc.ppmu_configure_aperture_time(aperture_time)
-
-
-def tsm_ssc_ppmu_configure_current_limit_range(tsm: TSMDigital, current_limit_range: float):
-    tsm.ssc.ppmu_configure_current_limit_range(current_limit_range)
-
-
-def tsm_ssc_ppmu_configure_voltage_limits(
-    tsm: TSMDigital, voltage_limit_high: float, voltage_limit_low: float
-):
-    tsm.ssc.ppmu_configure_voltage_limits(voltage_limit_high, voltage_limit_low)
-
-
 def tsm_ssc_ppmu_measure_current(tsm: TSMDigital):
     initialized_array = [[0.0 for _ in tsm.pins] for _ in tsm.site_numbers]
     per_instrument_to_per_site_per_pin_lut = (
@@ -1478,12 +1366,6 @@ def tsm_ssc_ppmu_measure_voltage(tsm: TSMDigital):
         per_instrument_measurements,
     )
     return per_site_per_pin_measurements
-
-
-def tsm_ssc_ppmu_source_current(
-    tsm: TSMDigital, current_level: float, current_level_range: float = 0
-):
-    tsm.ssc.ppmu_source_current(current_level, current_level_range)
 
 
 def tsm_ssc_ppmu_source_voltage_per_site_per_pin(
@@ -1527,15 +1409,6 @@ def tsm_ssc_ppmu_source_voltage_per_site(
     )
     tsm.ssc.ppmu_source_voltage_per_site(current_limit_range, per_instrument_source_voltages)
 
-
-def tsm_ssc_ppmu_source_voltage(tsm: TSMDigital, voltage_level: float, current_limit_range: float):
-    tsm.ssc.ppmu_source_voltage(voltage_level, current_limit_range)
-
-
-def tsm_ssc_ppmu_source(tsm: TSMDigital):
-    tsm.ssc.ppmu_source()
-
-
 # End of PPMU #
 
 
@@ -1560,12 +1433,7 @@ def tsm_ssc_write_sequencer_register(
     tsm: TSMDigital, sequencer_register: enums.SequencerRegister, value: int = 0
 ):
     tsm.ssc.write_sequencer_register(sequencer_register, value)
-
-
 # End of Sequencer Flags and Registers #
-
-
-
 
 
 # Source and Capture Waveforms #
@@ -1634,7 +1502,7 @@ def tsm_ssc_read_static(tsm: TSMDigital, auto_select=True):
     Without configuring as digital and auto_select as false, this function will not work as expected.
     """
     if auto_select:
-        tsm_ssc_select_function(tsm, enums.SelectedFunction.DIGITAL)
+        tsm.ssc.select_function(enums.SelectedFunction.DIGITAL)
     initialized_array = [[enums.PinState.ZERO for _ in tsm.pins] for _ in tsm.site_numbers]
     per_instrument_to_per_site_per_pin_lut = (
         tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(tsm.site_numbers, tsm.pins)
@@ -1657,7 +1525,7 @@ def tsm_ssc_write_static_per_site_per_pin(
     Without configuring as digital and auto_select as false, this function will not work as expected.
     """
     if auto_select:
-        tsm_ssc_select_function(tsm, enums.SelectedFunction.DIGITAL)
+        tsm.ssc.select_function(enums.SelectedFunction.DIGITAL)
     (
         per_site_per_pin_to_per_instrument_lut,
         instrument_count,
@@ -1684,7 +1552,7 @@ def tsm_ssc_write_static_per_site(
     Without configuring as digital and auto_select as false, this function will not work as expected.
     """
     if auto_select:
-        tsm_ssc_select_function(tsm, enums.SelectedFunction.DIGITAL)
+        tsm.ssc.select_function(enums.SelectedFunction.DIGITAL)
     (
         per_site_to_per_instrument_lut,
         instrument_count,
@@ -1698,18 +1566,6 @@ def tsm_ssc_write_static_per_site(
         initialized_array, per_site_to_per_instrument_lut, per_site_state
     )
     tsm.ssc.write_static_per_site(per_instrument_state)
-
-
-def tsm_ssc_write_static(tsm: TSMDigital, state: enums.WriteStaticPinState, auto_select=True):
-    """
-    auto_select=True, specifies this function to configure the output function as digital automatically.
-    auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
-    Without configuring as digital and auto_select as false, this function will not work as expected.
-    """
-    if auto_select:
-        tsm_ssc_select_function(tsm, enums.SelectedFunction.DIGITAL)
-    tsm.ssc.write_static(state)
-
 
 # End of Static #
 
@@ -1801,10 +1657,6 @@ def _channel_list_to_pins(channel_list: str):
 def tsm_ssc_filter_sites(tsm: TSMDigital, desired_sites: typing.List[int]):
     ssc = tsm.ssc.filter_sites(desired_sites)
     return TSMDigital(tsm.pin_query_context, ssc, tsm.site_numbers, tsm.pins)
-
-
-def tsm_ssc_initiate(tsm: TSMDigital):
-    tsm.ssc.initiate()
 
 
 def tsm_ssc_publish(
