@@ -1,3 +1,7 @@
+"""
+This is nidigital wrapper for use with STS test codes
+"""
+
 import copy
 import os
 import re
@@ -14,6 +18,11 @@ from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
 
 
 class LevelTypeToSet(Enum):
+    """Levels for various band boundries
+
+    Args:
+        Enum (Level): voltage level defines teh voltage for High or Low and for Input or Output
+    """
     VIL = 0
     VIH = 1
     VOL = 2
@@ -104,7 +113,7 @@ class _NIDigitalSSC:
     """
     _Site specific _Session and _Channel.
     Each object of this class is used to store info for a specified pin under specific Site.
-    To store a _Session and _Channel(s) for different _Site(s) you need an array of this class object.
+    To store a _Session and _Channel(s) for many _Site(s) you need an array of this class object.
     Prefix cs is used in all methods that operates on a given channels in a session.
     These are for internal use only and can be changed any time.
     External module should not use these methods with prefix 'cs_' directly.
@@ -131,13 +140,14 @@ class _NIDigitalSSC:
         self, frequency: float, select_digital_function: bool = True
     ):
         """
-        Configures clock generator frequency and initiates clock generation on the specified channel(s)
+        Configures clock generator frequency and initiates clock generation on specified channel(s)
         or pin(s) and pin group(s).
 
         Args:
             frequency (float): The frequency of the clock generation, in Hz.
             select_digital_function (bool, optional): A Boolean that specifies whether to select the
-            digital method for the pins specified prior to starting clock generation. Defaults to True.
+            digital method for the pins specified prior to starting clock generation. 
+            Defaults to True.
 
         Returns:
             none: when successful otherwise exception will be thrown.
@@ -238,6 +248,38 @@ class _NIDigitalSSC:
         return self._channels_session.frequency_counter_measure_frequency()
 
     # HRAM #
+    def cs_configure_hram_settings(
+        self,
+        cycles_to_acquire: enums.HistoryRAMCyclesToAcquire = enums.HistoryRAMCyclesToAcquire.FAILED,
+        pretrigger_samples: int = 0,
+        max_samples_to_acquire_per_site: int = 8191,
+        number_of_samples_is_finite: bool = True,
+        buffer_size_per_site: int = 32000,
+    ):
+        self._session.history_ram_cycles_to_acquire = cycles_to_acquire
+        self._session.history_ram_pretrigger_samples = pretrigger_samples
+        self._session.history_ram_max_samples_to_acquire_per_site = max_samples_to_acquire_per_site
+        self._session.history_ram_number_of_samples_is_finite = number_of_samples_is_finite
+        self._session.history_ram_buffer_size_per_site = buffer_size_per_site
+
+    def cs_configure_hram_trigger(
+        self,
+        triggers_type: enums.HistoryRAMTriggerType,
+        cycle_number: int = 0,
+        pattern_label: str = "",
+        cycle_offset: int = 0,
+        vector_offset: int = 0,
+    ):
+        if triggers_type == enums.HistoryRAMTriggerType.FIRST_FAILURE:
+            self._session.history_ram_trigger_type = triggers_type
+        elif triggers_type == enums.HistoryRAMTriggerType.CYCLE_NUMBER:
+            self._session.history_ram_trigger_type = triggers_type
+            self._session.cycle_number_history_ram_trigger_cycle_number = cycle_number
+        elif triggers_type == enums.HistoryRAMTriggerType.PATTERN_LABEL:
+            self._session.history_ram_trigger_type = triggers_type
+            self._session.pattern_label_history_ram_trigger_label = pattern_label
+            self._session.pattern_label_history_ram_trigger_cycle_offset = cycle_offset
+            self._session.pattern_label_history_ram_trigger_vector_offset = vector_offset
 
 
 class _NIDigitalTSM:
@@ -291,7 +333,6 @@ class _NIDigitalTSM:
         """
         for ssc in self.sscs:
             ssc.cs_modify_time_set_for_clock_generation(frequency, duty_cycle, time_set)
-
     # End of Clock Generation #
 
     # Configuration #
@@ -314,7 +355,7 @@ class _NIDigitalTSM:
                                         Set the **selectDigitalFunction** parameter of the burst_pattern method to
                                         True to automatically switch the selected_function of the pins in the
                                         pattern burst to SelectedFunction.DIGITAL. |
-        +-----------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+        +-----------------------------+-------------------------------------------------------------------------------+
         | SelectedFunction.PPMU       | The pin is connected to the PPMU. The driver, comparator, and active
                                         load are off while this method is selected. Call the ppmu_source
                                         method to source a voltage or current. The ppmu_source method automatically
@@ -338,7 +379,6 @@ class _NIDigitalTSM:
         """
         for ssc in self.sscs:
             ssc.cs_select_function(function)
-
     # End of Configuration #
 
     # Frequency Measurement #
@@ -364,7 +404,6 @@ class _NIDigitalTSM:
         for ssc in self.sscs:
             per_instrument_frequencies.append(ssc.cs_frequency_counter_measure_frequency())
         return per_instrument_frequencies
-
     # End of Frequency Measurement #
 
     # HRAM #
@@ -377,13 +416,8 @@ class _NIDigitalTSM:
         buffer_size_per_site: int = 32000,
     ):
         for ssc in self.sscs:
-            ssc._session.history_ram_cycles_to_acquire = cycles_to_acquire
-            ssc._session.history_ram_pretrigger_samples = pretrigger_samples
-            ssc._session.history_ram_max_samples_to_acquire_per_site = (
-                max_samples_to_acquire_per_site
-            )
-            ssc._session.history_ram_number_of_samples_is_finite = number_of_samples_is_finite
-            ssc._session.history_ram_buffer_size_per_site = buffer_size_per_site
+            ssc.cs_configure_hram_settings(cycles_to_acquire, pretrigger_samples, max_samples_to_acquire_per_site, 
+                                           number_of_samples_is_finite, buffer_size_per_site)
 
     def configure_hram_trigger(
         self,
@@ -394,16 +428,7 @@ class _NIDigitalTSM:
         vector_offset: int = 0,
     ):
         for ssc in self.sscs:
-            if triggers_type == enums.HistoryRAMTriggerType.FIRST_FAILURE:
-                ssc._session.history_ram_trigger_type = triggers_type
-            elif triggers_type == enums.HistoryRAMTriggerType.CYCLE_NUMBER:
-                ssc._session.history_ram_trigger_type = triggers_type
-                ssc._session.cycle_number_history_ram_trigger_cycle_number = cycle_number
-            elif triggers_type == enums.HistoryRAMTriggerType.PATTERN_LABEL:
-                ssc._session.history_ram_trigger_type = triggers_type
-                ssc._session.pattern_label_history_ram_trigger_label = pattern_label
-                ssc._session.pattern_label_history_ram_trigger_cycle_offset = cycle_offset
-                ssc._session.pattern_label_history_ram_trigger_vector_offset = vector_offset
+            ssc.cs_configure_hram_trigger(triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset)
 
     def get_hram_settings(self):
         per_instrument_cycles_to_acquire: typing.List[enums.HistoryRAMCyclesToAcquire] = []
@@ -493,7 +518,6 @@ class _NIDigitalTSM:
             per_instrument_per_site_cycle_information.append(cycle_information)
             number_of_samples = max(number_of_samples, sum_of_samples_to_read)
         return per_instrument_per_site_cycle_information, number_of_samples
-
     # End of HRAM #
 
     # Pattern Actions #
@@ -1697,7 +1721,10 @@ def tsm_ssc_publish(
 # TSMContext #
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm_context: SMClass, options: dict = {}):
-    """Creates the sessions for all the nidigital resource string available in the tsm_context for instruments"""
+    """
+    Creates the sessions for all the nidigital resource string available in the
+    tsm_context for instruments
+    """
     pin_map_file_path = tsm_context.pin_map_file_path
     instrument_names = tsm_context.get_all_nidigital_instrument_names()
     if instrument_names:
