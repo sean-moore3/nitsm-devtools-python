@@ -373,7 +373,7 @@ def get_first_matched_node(tree: Et.ElementTree, key: str):
 
 def get_all_matched_nodes(element: Et.Element, key: str):
     key = "{http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd}" + key
-    children = element.getchildren()
+    children = list(element)
     output = []
     for i in children:
         if i.tag == key:

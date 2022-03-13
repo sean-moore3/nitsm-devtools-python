@@ -75,7 +75,7 @@ class TestDaqmx:
             assert isinstance(daqmx_tsm, ni_daqmx.MultipleSessions)
             assert isinstance(daqmx_tsm.pin_query_context, ni_daqmx.PinQuery)
             assert isinstance(daqmx_tsm.sessions, typing.List)
-            assert len(daqmx_tsm.sessions) == len(tsm_context.site_numbers)
+            assert len(daqmx_tsm.sessions) == len(tsm_context.sites)
 
     def test_get_all_instrument_names(self, tsm_context):
         data = ni_daqmx.get_all_instrument_names(tsm_context)

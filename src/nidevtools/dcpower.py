@@ -1712,7 +1712,6 @@ class TSMDCPower(typing.NamedTuple):
     Args:
         TSM objects (tuple): 5 entities for storing them togather.
     """
-
     pin_query_context: typing.Any
     ssc: _NIDCPowerTSM
     sites: typing.List[int]
@@ -1753,19 +1752,19 @@ def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
     return dc_power_tsm
 
 
-def filter_sites(dc_power_tsm: TSMDCPower, sites):
+def filter_sites(tsm: TSMDCPower, sites):
     """from tsm context select only desired sites
 
     Args:
-        dc_power_tsm (TSMDCPower): pin query context
+        tsm (TSMDCPower): pin query context
         sites (int list): desired site numbers
 
     Returns:
         dc power tsm: same as input but with desired sites only
     """
-    dc_power_tsm.ssc = dc_power_tsm.ssc.filter_sites(sites)
-    dc_power_tsm.site_numbers = sites
-    return dc_power_tsm
+    tsm.ssc = tsm.ssc.filter_sites(sites)
+    tsm.site_numbers = sites
+    return tsm
 
 
 @nitsm.codemoduleapi.code_module
@@ -1808,7 +1807,8 @@ def pins_to_sessions(
     sites: typing.List[int] = [],
     fill_pin_site_info=True,
 ):
-    """get the sessions for the selected pins
+    """
+    get the sessions for the selected pins
 
     Args:
         tsm_context (TSMContext): tsm context for nidcpower

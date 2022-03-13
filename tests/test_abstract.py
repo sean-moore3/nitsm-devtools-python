@@ -1,6 +1,6 @@
 import pytest
 import os
-import nitsm
+import nitsm.codemoduleapi
 import nidevtools.abstract_switch as ni_abstract
 import nidevtools.daqmx as ni_daqmx
 import nidevtools.fpga as ni_fpga
