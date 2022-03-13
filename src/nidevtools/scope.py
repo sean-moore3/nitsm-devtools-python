@@ -221,10 +221,10 @@ def _configure_vertical_per_channel_arrays(
 
 # Digital Sub routines
 def _channel_list_to_pins(channel_list: str):
-    """private function which maps channel list to pins as per the pinmap file.
+    """private function which maps channel list to all pins as per the pinmap file.
 
     Args:
-        channel_list (str): comma seperated list of channels that belongs to the session
+        channel_list (str): comma separated list of channels that belongs to the session
 
     Returns:
         tuple: channels list, pin list and sites
@@ -255,12 +255,11 @@ def _expand_to_requested_array_size(
 
     Raises:
         ValueError: when the requested size is zero
-        ValueError: incoming data cann't be distributed to the list of session stored
+        ValueError: incoming data can't be distributed to the list of session stored
 
     Returns:
         list: list of the incoming objects
     """
-    i = 0
     data: typing.Any
     data_out: typing.Any = []
     if isinstance(data_in, tuple):
@@ -390,7 +389,7 @@ class _NIScopeTSM:
         num_records: int = 1,
         enforce_realtime: bool = True,
     ):
-        """Configures the vertical scale and time scale for the channels in the current TSMScope object
+        """Configures the vertical scale and timescale for the channels in the current TSMScope object
 
         Args:
             vertical_range (float, optional): _description_. Defaults to 5.0.
@@ -431,7 +430,7 @@ class _NIScopeTSM:
             coupling (niscope.VerticalCoupling): vertical coupling
             channel_enabled (bool): channel enabled
         """
-        ssc_per_channel = _expand_ssc_to_ssc_per_channel(self._sscs)
+        ssc_per_channel = _expand_ssc_to_ssc_per_channel(list(self._sscs))
         size = len(ssc_per_channel)
         probe_drops = _expand_to_requested_array_size(probe_attenuation, size)
         couplings = _expand_to_requested_array_size(coupling, size)
@@ -452,7 +451,7 @@ class _NIScopeTSM:
         num_records: int = 1,
         enforce_realtime: bool = True,
     ):
-        """Configures the time scale settings for the channels in the current TSMScope object
+        """Configures the timescale settings for the channels in the current TSMScope object
 
         Args:
             min_sample_rate (float, optional): minimum samples per second. Defaults to 20e6.
@@ -570,8 +569,8 @@ class _NIScopeTSM:
         Args:
             level (float): The voltage threshold for the trigger. Refer to
                 trigger_level for more information.
-            trigger_coupling (niscope.TriggerCoupling): Applies coupling and filtering options to the trigger signal. Refer to
-                trigger_coupling for more information.
+            trigger_coupling (niscope.TriggerCoupling): Applies coupling and filtering options to the trigger signal.
+                Refer to trigger_coupling for more information.
             slope (niscope.TriggerSlope):  Specifies whether you want a rising edge or a falling edge to trigger
                 the digitizer. Refer to trigger_slope for more
                 information.
@@ -599,7 +598,7 @@ class _NIScopeTSM:
         triggering means the digitizer triggers itself.
 
         When you initiate an acquisition, the digitizer waits for a trigger. You
-        specify the type of trigger that the digitizer waits for with a
+        specify the type of trigger that the digitizer waits for with
         Configure Trigger method, such as configure_trigger_immediate.
         """
         for ssc in self._sscs:
@@ -727,7 +726,7 @@ class _NIScopeTSM:
         return measurements
 
     def fetch_waveform(self, meas_num_samples: int):
-        """fetchs waveforms from all channels in the current TSMScope object
+        """fetch waveforms from all channels in the current TSMScope object
 
         Args:
             meas_num_samples (int): number of samples to fetch
@@ -750,13 +749,13 @@ class _NIScopeTSM:
         return waveform_info, waveforms
 
     def fetch_multirecord_waveform(self, num_records=-1):
-        """fetchs multirecord waveform from all channels in the current TSMScope object
+        """fetch multirecord waveform from all channels in the current TSMScope object
 
         Args:
             num_records (int, optional): number of records to fetch. fetch everything by default. Defaults to -1.
 
         Returns:
-            list records: multirecord waveform from all chennels in list
+            list records: multirecord waveform from all channels in list
         """
         waveforms: typing.Any = []
         waveform_info: typing.List[niscope.WaveformInfo] = []
@@ -811,7 +810,7 @@ class _NIScopeTSM:
         Returns:
             _type_: _description_
         """
-        ssc_per_channel = _expand_ssc_to_ssc_per_channel(self._sscs)
+        ssc_per_channel = _expand_ssc_to_ssc_per_channel(list(self._sscs))
         scalar_measurements = _expand_to_requested_array_size(
             scalar_measurement, len(ssc_per_channel)
         )
@@ -933,17 +932,17 @@ def _pin_query_context_to_channel_list(
 # Pinmap
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int] = []):
-    """Retruns the pinquery context object for the given pins at given sites.
+    """Returns the pin-query context object for the given pins at given sites.
 
     Args:
-        tsm_context (TSMContext): Semiconductore module Reference from the teststand.
+        tsm_context (TSMContext): Semiconductor module Reference from the TestStand.
         pins (typing.List[str]): Pins names defined in the current the pinmap.
         sites (typing.List[int], optional): if you need to control only on specific sites,
         then provide site numbers. Defaults to [].
 
     Returns:
         TSMScope object :  for the selected pins. All instrument specific operations
-        are be available as properties and methods of this object.
+        are available as properties and methods of this object.
     """
     if len(sites) == 0:
         sites = list(tsm_context.site_numbers)  # This is tested and works

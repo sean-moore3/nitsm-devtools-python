@@ -133,4 +133,4 @@ def initialize_sessions(tsm_context: TSMContext):
             switch_name = name
             topology = name_to_topology(name)
             handle = niswitch.Session(name, topology)
-        set_sessions(tsm_context, name, handle, channel_id)
+            set_sessions(tsm_context, name, handle, channel_id)

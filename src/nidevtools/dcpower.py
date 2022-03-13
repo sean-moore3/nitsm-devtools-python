@@ -274,7 +274,7 @@ class _NIDCPowerSSC:
         in their current state and continue providing power.
 
         Use the ConfigureOutputEnabled method to disable power
-        output on a per channel basis. Use the reset method to
+        output on a per-channel basis. Use the reset method to
         disable output on all channels.
 
         Returns:
@@ -303,7 +303,8 @@ class _NIDCPowerSSC:
         method.
 
         Returns:
-            context manager: This method will return a Python context manager that will initiate on entering and abort on exit.
+            context manager: This method will return a Python context manager that will
+            initiate on entering and abort on exit.
         """
         return self._channels_session.initiate()
 
@@ -371,7 +372,7 @@ class _NIDCPowerSSC:
         self._channels_session.power_line_frequency = power_line_frequency
 
     def cs_configure_sense(self, sense=enums.Sense.REMOTE):
-        """cofigures the sense for all channels in the session that are part to pinquery context
+        """configures the sense for all channels in the session that are part to pin-query context
 
         Args:
             sense (enum, optional): _description_. Defaults to enums.Sense.REMOTE.
@@ -441,7 +442,7 @@ class _NIDCPowerSSC:
 
     def cs_get_aperture_time_in_seconds(self):
         """
-        get the aperture time in seconds for all channels in the session. if the model has diffent units convert
+        get the aperture time in seconds for all channels in the session. if the model has different units convert
         them into seconds.
 
         Returns:
@@ -525,7 +526,7 @@ class _NIDCPowerSSC:
         return output_states
 
     def cs_configure_current_level_range(self, current_level_range=0.0):
-        """upates the property
+        """updates the property
 
         Args:
             current_level_range (float, optional): updates the range property. Defaults to 0.0.
@@ -869,9 +870,9 @@ class _NIDCPowerSSC:
     def cs_get_properties(self):
         channel_properties = []
         # ap_times = list(self.cs_get_aperture_time_in_seconds())
-        chnls = self.cs_channels.split(",")
+        channels = self.cs_channels.split(",")
         pns = self._pins.split(",")
-        for pin, channel in zip(pns, chnls):
+        for pin, channel in zip(pns, channels):
             ss = self.session.channels[channel]
             output_fn = ss.output_function
             if output_fn == enums.OutputFunction.DC_VOLTAGE:
@@ -1615,7 +1616,7 @@ class _NIDCPowerTSM:
 
     def measure(self, measurement_mode=MeasurementMode.AUTO):
         """
-        measure the data by seting uo the measurement mode
+        measure the data by setting uo the measurement mode
         reads all data from all the sessions.
 
         Args:
@@ -1709,7 +1710,7 @@ class TSMDCPower(typing.NamedTuple):
     """data type of the DCPower_Tsm objects
 
     Args:
-        typing (tuple): 5 entites for storing them togather.
+        TSM objects (tuple): 5 entities for storing them togather.
     """
 
     pin_query_context: typing.Any
@@ -1816,7 +1817,7 @@ def pins_to_sessions(
         fill_pin_site_info (bool, optional): if true updates the sites. Defaults to True.
 
     Returns:
-        dcpower_tsm: pinquery context variable
+        dcpower_tsm: pin-query context variable
     """
     if len(sites) == 0:
         sites = list(tsm_context.site_numbers)  # This is tested and works

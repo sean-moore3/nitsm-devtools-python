@@ -3,26 +3,27 @@ This is nidigital wrapper for use with STS test codes
 """
 
 import copy
+from datetime import datetime
+from enum import Enum
 import os
 import re
 import typing
-from datetime import datetime
-from enum import Enum
 
-import nidigital
-import nitsm.codemoduleapi
-import numpy
 from nidigital import enums
+import nidigital
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
+import nitsm.codemoduleapi
+import numpy
 
 
 class LevelTypeToSet(Enum):
-    """Levels for various band boundries
+    """Levels for various band boundaries
 
     Args:
-        Enum (Level): voltage level defines teh voltage for High or Low and for Input or Output
+        Enum (Level): voltage level defines the voltage for High or Low and for Input or Output
     """
+
     VIL = 0
     VIH = 1
     VOL = 2
@@ -145,8 +146,8 @@ class _NIDigitalSSC:
 
         Args:
             frequency (float): The frequency of the clock generation, in Hz.
-            select_digital_function (bool, optional): A Boolean that specifies whether to select the
-            digital method for the pins specified prior to starting clock generation. 
+            select_digital_function (Bool, optional): A Boolean that specifies whether to select the
+            digital method for the pins specified prior to starting clock generation.
             Defaults to True.
 
         Returns:
@@ -160,15 +161,17 @@ class _NIDigitalSSC:
         self, frequency: float, duty_cycle: float, time_set: str
     ):
         """
-        Configures the period of a time set, drive format and drive edge placement for the specified pins.
-        Use this method to modify time set values after applying a timing sheet with the
-        apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets.
-        This method does not modify the timing sheet file or the timing sheet contents that will be
-        used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the period of a time set, drive format and drive edge placement for the
+        specified pins. Use this method to modify time set values after applying a timing
+        sheet with the apply_levels_and_timing method, or to create time sets programmatically
+        without the use of timing sheets. This method does not modify the timing sheet file or
+        the timing sheet contents that will be used in future calls to apply_levels_and_timing;
+        it only affects the values of the current timing context.
 
         Args:
             frequency (float): Is the inverse of Period for this time set, in Hz.
-            duty_cycle (float): is the percentage at which the positive or negative edge is placed, 0 to 1.
+            duty_cycle (float): is the percentage at which the positive or negative edge
+            is placed, 0 to 1.
             time_set (str): The specified time set name
         """
         period = 1 / frequency
@@ -184,12 +187,12 @@ class _NIDigitalSSC:
 
     def cs_select_function(self, function: enums.SelectedFunction):
         """
-        Specifies whether digital pattern instrument channels are controlled by the pattern sequencer
-        or PPMU, disconnected, or off.
+        Specifies whether digital pattern instrument channels are controlled by the
+        pattern sequencer or PPMU, disconnected, or off.
 
-        +-----------------------------+---------------------------------------------------------------------+
+        +-----------------------------+----------------------------------------------------------------+
         | Defined Values:             |
-        +=============================+=====================================================================+
+        +=============================+================================================================+
         | SelectedFunction.DIGITAL    | The pin is connected to the driver, comparator, and active
                                         load methods. The PPMU is not sourcing, but can make voltage
                                         measurements. The state of the digital pin driver when you change
@@ -283,6 +286,7 @@ class _NIDigitalSSC:
 
 
 class _NIDigitalTSM:
+
     # SSC Digital array or list #
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDigitalSSC]):
         self.sscs = sessions_sites_channels
@@ -333,6 +337,7 @@ class _NIDigitalTSM:
         """
         for ssc in self.sscs:
             ssc.cs_modify_time_set_for_clock_generation(frequency, duty_cycle, time_set)
+
     # End of Clock Generation #
 
     # Configuration #
@@ -379,6 +384,7 @@ class _NIDigitalTSM:
         """
         for ssc in self.sscs:
             ssc.cs_select_function(function)
+
     # End of Configuration #
 
     # Frequency Measurement #
@@ -404,6 +410,7 @@ class _NIDigitalTSM:
         for ssc in self.sscs:
             per_instrument_frequencies.append(ssc.cs_frequency_counter_measure_frequency())
         return per_instrument_frequencies
+
     # End of Frequency Measurement #
 
     # HRAM #
@@ -416,8 +423,13 @@ class _NIDigitalTSM:
         buffer_size_per_site: int = 32000,
     ):
         for ssc in self.sscs:
-            ssc.cs_configure_hram_settings(cycles_to_acquire, pretrigger_samples, max_samples_to_acquire_per_site, 
-                                           number_of_samples_is_finite, buffer_size_per_site)
+            ssc.cs_configure_hram_settings(
+                cycles_to_acquire,
+                pretrigger_samples,
+                max_samples_to_acquire_per_site,
+                number_of_samples_is_finite,
+                buffer_size_per_site,
+            )
 
     def configure_hram_trigger(
         self,
@@ -428,7 +440,9 @@ class _NIDigitalTSM:
         vector_offset: int = 0,
     ):
         for ssc in self.sscs:
-            ssc.cs_configure_hram_trigger(triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset)
+            ssc.cs_configure_hram_trigger(
+                triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset
+            )
 
     def get_hram_settings(self):
         per_instrument_cycles_to_acquire: typing.List[enums.HistoryRAMCyclesToAcquire] = []
@@ -518,6 +532,7 @@ class _NIDigitalTSM:
             per_instrument_per_site_cycle_information.append(cycle_information)
             number_of_samples = max(number_of_samples, sum_of_samples_to_read)
         return per_instrument_per_site_cycle_information, number_of_samples
+
     # End of HRAM #
 
     # Pattern Actions #
@@ -879,7 +894,7 @@ class _NIDigitalTSM:
             per_instrument_data.append(_ssc._session.channels[_ssc._channels].read_static())
         return per_instrument_data
 
-    def write_static(self, state: enums.WriteStaticPinState, auto_select = True):
+    def write_static(self, state: enums.WriteStaticPinState, auto_select=True):
         """
         auto_select=True, specifies this function to configure the output function as digital automatically.
         auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
@@ -1053,7 +1068,10 @@ class _NIDigitalTSM:
                 )
             )
         return session_properties
+
     # End of Session Properties #
+
+
 # End of SSC Digital #
 
 
@@ -1077,6 +1095,8 @@ def tsm_ssc_frequency_counter_measure_frequency(tsm: TSMDigital):
         per_instrument_frequencies,
     )
     return per_site_per_pin_frequency_measurements
+
+
 # End of Frequency Measurement #
 
 
@@ -1231,11 +1251,12 @@ def tsm_ssc_stream_hram_results(tsm: TSMDigital):
         for index in lut.location_1d_array:
             per_site_cycle_information[index] = cycle_information
     return per_site_cycle_information
+
+
 # End of HRAM #
 
 
 # Pattern Actions #
-
 def tsm_ssc_burst_pattern_pass_fail(
     tsm: TSMDigital,
     start_label: str,
@@ -1279,11 +1300,12 @@ def tsm_ssc_get_site_pass_fail(tsm: TSMDigital):
         initialized_array, per_instrument_to_per_site_lut, per_instrument_pass
     )
     return per_site_pass
+
+
 # End of Pattern Actions #
 
 
 # Pin Levels and Timing #
-
 def tsm_ssc_apply_tdr_offsets_per_site_per_pin(
     tsm: TSMDigital, per_site_per_pin_tdr_values: typing.List[typing.List[float]]
 ):
@@ -1360,6 +1382,8 @@ def tsm_ssc_configure_time_set_compare_edge_per_site(
         initialized_array, per_site_to_per_instrument_lut, per_site_compare_strobe
     )
     tsm.ssc.configure_time_set_compare_edge_per_site(time_set, per_instrument_compare_strobe)
+
+
 # End of Pin Levels and Timing #
 
 
@@ -1433,6 +1457,7 @@ def tsm_ssc_ppmu_source_voltage_per_site(
     )
     tsm.ssc.ppmu_source_voltage_per_site(current_limit_range, per_instrument_source_voltages)
 
+
 # End of PPMU #
 
 
@@ -1457,6 +1482,8 @@ def tsm_ssc_write_sequencer_register(
     tsm: TSMDigital, sequencer_register: enums.SequencerRegister, value: int = 0
 ):
     tsm.ssc.write_sequencer_register(sequencer_register, value)
+
+
 # End of Sequencer Flags and Registers #
 
 
@@ -1590,6 +1617,7 @@ def tsm_ssc_write_static_per_site(
         initialized_array, per_site_to_per_instrument_lut, per_site_state
     )
     tsm.ssc.write_static_per_site(per_instrument_state)
+
 
 # End of Static #
 

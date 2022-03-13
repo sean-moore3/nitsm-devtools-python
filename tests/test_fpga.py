@@ -79,7 +79,7 @@ class TestFPGA:
             dioline = ni_fpga.DIOLines(i)
             state = ni_fpga.StaticStates(1)
             result = ni_fpga.update_line_on_connector(0, 0, dioline, state)
-            assert result[1] == 2 ** i
+            assert result[1] == 2**i
 
     def test_wr(self, fpga_tsm_s):
         fpga_session7821 = fpga_tsm_s[1][0].SSC[1]

@@ -28,8 +28,8 @@ class _NIFGenSSC:
 
         Args:
             session (nifgen.Session): stores the session of the fgen card
-            channels (str): comma seperated list of channels in the session
-            pin_list (str): pinnames from the pinmap corresponding to the channels
+            channels (str): comma separated list of channels in the session
+            pin_list (str): pin names from the pinmap corresponding to the channels
         """
         self._session = (
             session  # mostly shared session  (very rarely unique session) depends on pinmap file.
@@ -56,7 +56,7 @@ class _NIFGenSSC:
             sample_rate (float, optional): number of samples per second. Defaults to 1.0.
             gain (float, optional): gain to be applied on the signal during generation. Defaults to 1.0.
             offset (float, optional): any dc offset to add on the generated signal. Defaults to 0.0.
-            enable_filter (bool, optional): enable filter for smooth signal generation so the higher order singals are
+            enable_filter (bool, optional): enable filter for smooth signal generation so the higher order signals are
                 removed in the output. Defaults to True.
         """
         self.session.abort()
@@ -82,7 +82,7 @@ class _NIFGenTSM:
         Args:
             samples (int, optional): number of points to generate. Defaults to 128.
             frequency (_type_, optional): frequency of the sine signal generated. Defaults to 7.8125e-3.
-            phase_degree (int, optional): phase of the sinewave. Defaults to 0.
+            phase_degree (int, optional): phase of the sine wave. Defaults to 0.
 
         Returns:
             waveform list: list of samples in the waveform
@@ -158,17 +158,17 @@ class TSMFGen(typing.NamedTuple):
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int]):
     """
-    Retruns the pinquery context object for the given pins at given sites.
+    Returns the pin-query context object for the given pins at given sites.
 
     Args:
-        tsm_context (TSMContext): Semiconductore module Reference from the teststand.
+        tsm_context (TSMContext): Semiconductor module Reference from the TestStand.
         pins (typing.List[str]): Pins names defined in the current the pinmap.
         sites (typing.List[int]): if you need to control only on specific sites,
         then provide site numbers. Defaults to [].
 
     Returns:
         TSMScope object :  for the selected pins. All instrument specific operations
-        are be available as properties and methods of this object.
+        are available as properties and methods of this object.
     """
     pin_query_context, sessions, channels = tsm_context.pins_to_nifgen_sessions(pins)
     sites_out, pin_list_per_session = ni_dt_common.pin_query_context_to_channel_list(

@@ -62,15 +62,14 @@ class Session:
             multiple_session.sessions[0].Task.write(bool(self.route_value), True)
         elif self.instrument_type == InstrumentTypes.digitalpattern:
             multiple_session = nidevtools.digital.pin_to_n_sessions(tsm_context, self.enable_pin)
-            multiple_session = nidevtools.digital.tsm_ssc_select_function(multiple_session,
-                                                                          nidigital.enums.SelectedFunction.DIGITAL)
+            multiple_session.ssc.select_function(nidigital.enums.SelectedFunction.DIGITAL)
             if self.route_value == "0":
                 data = nidigital.enums.WriteStaticPinState.ZERO
             elif self.route_value == "1":
                 data = nidigital.enums.WriteStaticPinState.ONE
             else:
                 data = nidigital.enums.WriteStaticPinState.X
-            nidevtools.digital.tsm_ssc_write_static(multiple_session, data)
+            multiple_session.ssc.write_static(data)
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session = nidevtools.fpga.pins_to_sessions(tsm_context, [self.enable_pin], [])
             if self.route_value == "0":
@@ -100,9 +99,11 @@ class Session:
             multiple_session.sessions[0].Task.stop()
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session_info = nidevtools.digital.pin_to_n_sessions(tsm_context, self.enable_pin)
+            multiple_session_info = nidevtools.digital.pin_to_n_sessions(
+                tsm_context, self.enable_pin
+            )
             data = nidigital.enums.WriteStaticPinState.X
-            nidevtools.digital.tsm_ssc_write_static(multiple_session_info, data)
+            multiple_session_info.ssc.write_static(data)
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session_info = nidevtools.fpga.pins_to_sessions(
                 tsm_context, [self.enable_pin], []
@@ -130,11 +131,12 @@ class Session:
                 data += str(bit)
             self.status = data
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session_info = nidevtools.digital.pin_to_n_sessions(tsm_context, self.enable_pin)
-            multiple_session_info = nidevtools.digital.tsm_ssc_select_function(multiple_session_info,
-                                                                               nidigital.enums.SelectedFunction.DIGITAL)
+            multiple_session_info = nidevtools.digital.pin_to_n_sessions(
+                tsm_context, self.enable_pin
+            )
+            multiple_session_info.ssc.select_function(nidigital.enums.SelectedFunction.DIGITAL)
             data = nidevtools.digital.tsm_ssc_read_static(multiple_session_info)
-            status = ['0', '1', '', 'L', 'H', 'X', 'M', 'V', 'D', 'E']
+            status = ["0", "1", "", "L", "H", "X", "M", "V", "D", "E"]
             self.status = status[data[0][0]]
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session_info = nidevtools.fpga.pins_to_sessions(
@@ -191,7 +193,7 @@ class AbstractSession(typing.NamedTuple):
         self, tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext
     ):  # CHECK
         """
-        Disconnects the provided session from the TSM contect it works for DAQmx, Digital Pattern, FPGA and Switch
+        Disconnects the provided session from the TSM context it works for DAQmx, Digital Pattern, FPGA and Switch
         sessions only
         """
         for session in self.enable_pins:
@@ -445,7 +447,7 @@ def enable_pins_to_sessions(
     tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, enable_pins: typing.List[str]
 ):
     """
-    Receives enable pins list and return a Multisession object with the sessions corresponding to those pins
+    Receives enable pins list and return a Multi-session object with the sessions corresponding to those pins
     Args:
         tsm_context: Pin context
         enable_pins: List of pins for session creation

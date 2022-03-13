@@ -86,7 +86,7 @@ class _Session(typing.NamedTuple):
         return data
 
     # Write Analog
-    def st_write_anlg(self, data):
+    def st_write_analog(self, data):
         self.Task.write(data)
 
     # Read Configuration
@@ -315,7 +315,7 @@ class _Sessions:
 
     def write_data(self, data: typing.List[float]):
         for session in self.sessions:
-            session.st_write_anlg(data)
+            session.st_write_analog(data)
 
     # Read Configuration
     def configure_channels(self):
