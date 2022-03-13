@@ -140,23 +140,6 @@ class TestDCPower:
             dcpower_tsm.ssc.commit()
             dcpower_tsm.ssc.abort()
 
-    def test_configure_settings(self, dcpower_tsm_s):
-        """
-        TSM SSC DCPower Configure Settings vim
-        dcpower_tsm.query_in_compliance()
-        """
-        # custom_settings = {"aperture_time": 20e-03, "source_delay": 1.0, "sense": Sense.LOCAL}
-        for dcpower_tsm in dcpower_tsm_s:
-
-            dcpower_tsm.ssc.configure_settings(aperture_time=40e-03)
-            dcpower_tsm.ssc.force_voltage_symmetric_limits(1.0, 1.0, 0.1, 0.1)
-            voltages, currents = dcpower_tsm.ssc.measure()
-            print(voltages, currents)
-            dcpower_tsm.ssc.abort()
-        # dcpower_tsm_s.configure_settings(custom_settings)
-        # default_settings = dcpower_tsm_s.get_measurement_settings()
-        # assert custom_settings == default_settings
-
     def test_tsm_source_voltage(self, dcpower_tsm_s):
         """
         # TSM SSC DCPower Source Voltage vim
@@ -242,6 +225,22 @@ class TestDCPower:
             all_props = dcpower_tsm.ssc.get_properties()
             print(all_props)
             i += 1
+
+    def test_configure_settings(self, dcpower_tsm_s):
+        """
+        TSM SSC DCPower Configure Settings vim
+        dcpower_tsm.query_in_compliance()
+        """
+        # custom_settings = {"aperture_time": 20e-03, "source_delay": 1.0, "sense": Sense.LOCAL}
+        for dcpower_tsm in dcpower_tsm_s:
+            dcpower_tsm.ssc.configure_settings(aperture_time=40e-03)
+            dcpower_tsm.ssc.force_voltage_symmetric_limits(1.0, 1.0, 0.1, 0.1)
+            voltages, currents = dcpower_tsm.ssc.measure()
+            print(voltages, currents)
+            dcpower_tsm.ssc.abort()
+        # dcpower_tsm_s.configure_settings(custom_settings)
+        # default_settings = dcpower_tsm_s.get_measurement_settings()
+        # assert custom_settings == default_settings
 
 
 @nitsm.codemoduleapi.code_module
