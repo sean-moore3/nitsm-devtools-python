@@ -242,7 +242,6 @@ class _Sessions:
     """
     Class that contains a list of DAQmx sessions with methods to control all sessions inside the object
     """
-
     sessions: typing.List[_Session]
 
     # Read
@@ -465,7 +464,7 @@ class MultipleSessions(_Sessions):
 @nitsm.codemoduleapi.code_module
 def clear_task(tsm: SMContext):
     """
-    Clears all the tasks in the TSMContext. Before clearing, this method will abort all tasks, if necessary,
+    Clears all the tasks in the SMContext. Before clearing, this method will abort all tasks, if necessary,
     and will release any resources the tasks reserved. You cannot use a task after you clear it unless you
     set it again.
     """
