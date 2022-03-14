@@ -24,7 +24,7 @@ StringTuple = typing.Tuple[str]
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm):
+def tsm(standalone_tsm):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
