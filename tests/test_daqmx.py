@@ -49,7 +49,8 @@ def daqmx_tsm_s(tsm_context, tests_pins):
         daqmx_tsms.append(data)
         sessions += data.sessions
     print(sessions)
-    yield tsm_context, daqmx_tsms
+    test = (tsm_context, daqmx_tsms)
+    yield test
 
 
 @pytest.mark.pin_map(pin_file_name)
@@ -75,7 +76,7 @@ class TestDaqmx:
             assert isinstance(daqmx_tsm, ni_daqmx.MultipleSessions)
             assert isinstance(daqmx_tsm.pin_query_context, ni_daqmx.PinQuery)
             assert isinstance(daqmx_tsm.sessions, typing.List)
-            assert len(daqmx_tsm.sessions) == len(tsm_context.sites)
+            assert len(daqmx_tsm.sessions) == len(tsm_context.site_numbers)
 
     def test_get_all_instrument_names(self, tsm_context):
         data = ni_daqmx.get_all_instrument_names(tsm_context)
@@ -112,7 +113,7 @@ class TestDaqmx:
         # for daqmx_tsm in list_daqmx_tsm:
         #     daqmx_tsm.reference_analog_edge(source, constant.Slope.FALLING, 0.0, 500)
         #     for session in daqmx_tsm.sessions:
-        #         assert source in session.Task.triggers.reference_trigger.anlg_edge_src
+        #         assert source in session.Task.triggers.reference_trigger.analog_edge_src
         # source = "PXI_Trig0"
         # for daqmx_tsm in list_daqmx_tsm:
         #     daqmx_tsm.reference_digital_edge(source, constant.Slope.FALLING, 10)
@@ -158,7 +159,7 @@ class TestDaqmx:
         daq_sessions_all.timing()
         daq_sessions_out.timing()
         # for s in daq_sessions_2.sessions:
-        #    print(s.Task.triggers.reference_trigger.anlg_edge_src)
+        #    print(s.Task.triggers.reference_trigger.analog_edge_src)
         # daq_sessions_2.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
         output = 2.0  # configure output in NI-MAX
         error = 0.00123  # 16 bits with range 20 for both input and output
