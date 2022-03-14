@@ -345,13 +345,13 @@ def frequency_measurement_func(tsm_context: SMClass, pins: typing.List[str]):
 @nitsm.codemoduleapi.code_module
 def hram(tsm_context: SMClass, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
-    hram_configuration = ni_dt_digital.HRAM_Configuration()
+    hram_configuration = ni_dt_digital.HRAMConfiguration()
     hram_configuration.trigger_type = enums.HistoryRAMTriggerType.PATTERN_LABEL
     hram_configuration.pattern_label = "start_burst"
     hram_configuration.cycles_to_acquire = enums.HistoryRAMCyclesToAcquire.ALL
     tsm.ssc.configure_hram(hram_configuration)
     hram_configuration = ni_dt_digital.tsm_ssc_get_hram_configuration(tsm)
-    assert isinstance(hram_configuration, ni_dt_digital.HRAM_Configuration)
+    assert isinstance(hram_configuration, ni_dt_digital.HRAMConfiguration)
     assert isinstance(hram_configuration.finite_samples, bool)
     assert isinstance(hram_configuration.cycles_to_acquire, enums.HistoryRAMCyclesToAcquire)
     assert isinstance(hram_configuration.max_samples_to_acquire_per_site, int)

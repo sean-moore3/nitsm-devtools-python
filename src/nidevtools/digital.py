@@ -18,12 +18,12 @@ import numpy
 
 
 class LevelTypeToSet(Enum):
-    """Levels for various band boundaries
+    """
+    Levels for various band boundaries
 
     Args:
-        Enum (Level): voltage level defines the voltage for High or Low and for Input or Output
+        typing.enum : voltage level defines the voltage for High or Low and for Input or Output
     """
-
     VIL = 0
     VIH = 1
     VOL = 2
@@ -34,20 +34,20 @@ class LevelTypeToSet(Enum):
     VCOM = 7
 
 
-class Location_1D_Array(typing.NamedTuple):
+class Location1DArray(typing.NamedTuple):
     location_1d_array: typing.List[int]
 
 
-class Location_2D(typing.NamedTuple):
+class Location2D(typing.NamedTuple):
     row: int
     col: int
 
 
-class Location_2D_Array(typing.NamedTuple):
-    location_2d_array: typing.List[Location_2D]
+class Location2DArray(typing.NamedTuple):
+    location_2d_array: typing.List[Location2D]
 
 
-class Session_Properties(typing.NamedTuple):
+class SessionProperties(typing.NamedTuple):
     instrument_name: str
     voh: float
     vol: float
@@ -57,7 +57,7 @@ class Session_Properties(typing.NamedTuple):
     measurement_time: float
 
 
-class HRAM_Configuration:
+class HRAMConfiguration:
     finite_samples: bool = True
     cycles_to_acquire: enums.HistoryRAMCyclesToAcquire = enums.HistoryRAMCyclesToAcquire.FAILED
     max_samples_to_acquire_per_site: int = 8191
@@ -124,9 +124,13 @@ class _NIDigitalSSC:
         self._session = session  # mostly shared session depends on pinmap file.
         self._channels = channels  # specific channel(s) of that session
         self._pins = pins  # pin names mapped to the channels
-        self._channels_session = session.channels[
-            channels
-        ]  # To operate on session on very specific channel(s)
+        self._channels_session = session.channels[channels]  # session with specific channel(s)
+
+    def cs_abort(self):
+        """
+        Aborts the current session
+        """
+        self._session.abort()
 
     def cs_clock_generator_abort(self):
         """
@@ -283,6 +287,66 @@ class _NIDigitalSSC:
             self._session.pattern_label_history_ram_trigger_label = pattern_label
             self._session.pattern_label_history_ram_trigger_cycle_offset = cycle_offset
             self._session.pattern_label_history_ram_trigger_vector_offset = vector_offset
+
+    def cs_get_hram_settings(self):
+        return (self._session.history_ram_cycles_to_acquire,
+                self._session.history_ram_pretrigger_samples,
+                self._session.history_ram_max_samples_to_acquire_per_site,
+                self._session.history_ram_number_of_samples_is_finite,
+                self._session.history_ram_buffer_size_per_site)
+
+    def cs_get_hram_trigger_settings(self):
+        return (self._session.history_ram_trigger_type,
+                self._session.cycle_number_history_ram_trigger_cycle_number,
+                self._session.pattern_label_history_ram_trigger_label,
+                self._session.pattern_label_history_ram_trigger_cycle_offset,
+                self._session.pattern_label_history_ram_trigger_vector_offset)
+
+    def cs_get_fail_count(self):
+        return self._channels_session.get_fail_count()
+
+    def cs_wait_until_done(self, timeout: float = 10):
+        self._session.wait_until_done(timeout)
+
+    def cs_apply_tdr_offsets(self, per_instrument_offset: typing.List[float]):
+        self._channels_session.apply_tdr_offsets(per_instrument_offset)
+
+    def cs_configure_active_load(self, vcom: float, iol: float, ioh: float):
+        self._channels_session.configure_active_load_levels(iol, ioh, vcom)
+
+    def cs_configure_single_level(self, level_type_to_set: LevelTypeToSet, setting: float):
+        if level_type_to_set == LevelTypeToSet.VIL:
+            self._channels_session.vil = setting
+        elif level_type_to_set == LevelTypeToSet.VIH:
+            self._channels_session.vih = setting
+        elif level_type_to_set == LevelTypeToSet.VOL:
+            self._channels_session.vol = setting
+        elif level_type_to_set == LevelTypeToSet.VOH:
+            self._channels_session.voh = setting
+        elif level_type_to_set == LevelTypeToSet.VTERM:
+            self._channels_session.vterm = setting
+        elif level_type_to_set == LevelTypeToSet.LOL:
+            self._channels_session.lol = setting
+        elif level_type_to_set == LevelTypeToSet.LOH:
+            self._channels_session.loh = setting
+        elif level_type_to_set == LevelTypeToSet.VCOM:
+            self._channels_session.vcom = setting
+        self._session.commit()
+
+    def cs_configure_termination_mode(self, termination_mode: enums.TerminationMode):
+        self._channels_session.termination_mode = termination_mode
+
+    def cs_configure_time_set_compare_edge_per_pin(
+        self,
+        time_set: str,
+        compare_strobes: typing.List[float],
+    ):
+        channels, _, _ = _channel_list_to_pins(self._channels)
+        for channel, compare_strobe in zip(channels, compare_strobes):
+            self._channels_session.configure_time_set_compare_edges_strobe(time_set, compare_strobe)
+
+    def cs_configure_time_set_compare_edge(self, time_set: str, compare_strobe: float):
+        self._channels_session.configure_time_set_compare_edges_strobe(time_set, compare_strobe)
 
 
 class _NIDigitalTSM:
@@ -444,7 +508,7 @@ class _NIDigitalTSM:
                 triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset
             )
 
-    def configure_hram(self, hram_configuration: HRAM_Configuration = HRAM_Configuration()):
+    def configure_hram(self, hram_configuration: HRAMConfiguration = HRAMConfiguration()):
         number_of_samples_is_finite = hram_configuration.finite_samples
         cycles_to_acquire = hram_configuration.cycles_to_acquire
         pretrigger_samples = hram_configuration.pretrigger_samples
@@ -473,17 +537,12 @@ class _NIDigitalTSM:
         per_instrument_number_of_samples_is_finite: typing.List[bool] = []
         per_instrument_buffer_size_per_site: typing.List[int] = []
         for ssc in self._sscs:
-            per_instrument_cycles_to_acquire.append(ssc._session.history_ram_cycles_to_acquire)
-            per_instrument_pretrigger_samples.append(ssc._session.history_ram_pretrigger_samples)
-            per_instrument_max_samples_to_acquire_per_site.append(
-                ssc._session.history_ram_max_samples_to_acquire_per_site
-            )
-            per_instrument_number_of_samples_is_finite.append(
-                ssc._session.history_ram_number_of_samples_is_finite
-            )
-            per_instrument_buffer_size_per_site.append(
-                ssc._session.history_ram_buffer_size_per_site
-            )
+            cycles, pretrigger_samples, max_samples, is_finite, buffer_size = ssc.cs_get_hram_settings()
+            per_instrument_cycles_to_acquire.append(cycles)
+            per_instrument_pretrigger_samples.append(pretrigger_samples)
+            per_instrument_max_samples_to_acquire_per_site.append(max_samples)
+            per_instrument_number_of_samples_is_finite.append(is_finite)
+            per_instrument_buffer_size_per_site.append(buffer_size)
         return (
             per_instrument_cycles_to_acquire,
             per_instrument_pretrigger_samples,
@@ -499,19 +558,12 @@ class _NIDigitalTSM:
         per_instrument_cycle_offset: typing.List[int] = []
         per_instrument_vector_offset: typing.List[int] = []
         for ssc in self._sscs:
-            per_instrument_triggers_type.append(ssc._session.history_ram_trigger_type)
-            per_instrument_cycle_number.append(
-                ssc._session.cycle_number_history_ram_trigger_cycle_number
-            )
-            per_instrument_pattern_label.append(
-                ssc._session.pattern_label_history_ram_trigger_label
-            )
-            per_instrument_cycle_offset.append(
-                ssc._session.pattern_label_history_ram_trigger_cycle_offset
-            )
-            per_instrument_vector_offset.append(
-                ssc._session.pattern_label_history_ram_trigger_vector_offset
-            )
+            trigger_type, cycle_number, label, cycle_offset, vector_offset = ssc.cs_get_hram_trigger_settings()
+            per_instrument_triggers_type.append(trigger_type)
+            per_instrument_cycle_number.append(cycle_number)
+            per_instrument_pattern_label.append(label)
+            per_instrument_cycle_offset.append(cycle_offset)
+            per_instrument_vector_offset.append(vector_offset)
         return (
             per_instrument_triggers_type,
             per_instrument_cycle_number,
@@ -523,9 +575,7 @@ class _NIDigitalTSM:
     def stream_hram_results(self):
         per_instrument_per_site_array: typing.List[_NIDigitalSSC] = []
         for _ssc in self._sscs:
-            channel_list_array, site_list_array, _ = _arrange_channels_per_site(
-                _ssc._channels, _ssc._pins
-            )
+            channel_list_array, site_list_array, _ = _arrange_channels_per_site(_ssc._channels, _ssc._pins)
             for channel, site in zip(channel_list_array, site_list_array):
                 per_instrument_per_site_array.append(_NIDigitalSSC(_ssc._session, channel, site))
         per_instrument_per_site_cycle_information: typing.List[
@@ -559,8 +609,8 @@ class _NIDigitalTSM:
 
     # Pattern Actions #
     def abort(self):
-        for _ssc in self._sscs:
-            _ssc._session.abort()
+        for ssc in self._sscs:
+            ssc.cs_abort()
 
     def burst_pattern_pass_fail(
         self,
@@ -592,11 +642,7 @@ class _NIDigitalTSM:
             )
 
     def get_fail_count(self):
-        per_instrument_failure_counts: typing.List[typing.List[int]] = []
-        for ssc in self._sscs:
-            per_instrument_failure_counts.append(
-                ssc._session.channels[ssc._channels].get_fail_count()
-            )
+        per_instrument_failure_counts = [ssc.cs_get_fail_count() for ssc in self._sscs]
         return per_instrument_failure_counts
 
     def get_site_pass_fail(self):
@@ -609,8 +655,7 @@ class _NIDigitalTSM:
 
     def wait_until_done(self, timeout: float = 10):
         for ssc in self._sscs:
-            ssc._session.wait_until_done(timeout)
-
+            ssc.cs_wait_until_done(timeout)
     # End of Pattern Actions #
 
     # Pin Levels and Timing #
@@ -620,11 +665,11 @@ class _NIDigitalTSM:
 
     def apply_tdr_offsets(self, per_instrument_offsets: typing.List[typing.List[float]]):
         for ssc, per_instrument_offset in zip(self._sscs, per_instrument_offsets):
-            ssc._session.channels[ssc._channels].apply_tdr_offsets(per_instrument_offset)
+            ssc.cs_apply_tdr_offsets(per_instrument_offset)
 
     def configure_active_load(self, vcom: float, iol: float, ioh: float):
         for ssc in self._sscs:
-            ssc._session.channels[ssc._channels].configure_active_load_levels(iol, ioh, vcom)
+            ssc.cs_configure_active_load(iol, ioh, vcom)
 
     def configure_single_level_per_site(
         self,
@@ -654,27 +699,11 @@ class _NIDigitalTSM:
 
     def configure_single_level(self, level_type_to_set: LevelTypeToSet, setting: float):
         for ssc in self._sscs:
-            if level_type_to_set == LevelTypeToSet.VIL:
-                ssc._session.channels[ssc._channels].vil = setting
-            elif level_type_to_set == LevelTypeToSet.VIH:
-                ssc._session.channels[ssc._channels].vih = setting
-            elif level_type_to_set == LevelTypeToSet.VOL:
-                ssc._session.channels[ssc._channels].vol = setting
-            elif level_type_to_set == LevelTypeToSet.VOH:
-                ssc._session.channels[ssc._channels].voh = setting
-            elif level_type_to_set == LevelTypeToSet.VTERM:
-                ssc._session.channels[ssc._channels].vterm = setting
-            elif level_type_to_set == LevelTypeToSet.LOL:
-                ssc._session.channels[ssc._channels].lol = setting
-            elif level_type_to_set == LevelTypeToSet.LOH:
-                ssc._session.channels[ssc._channels].loh = setting
-            elif level_type_to_set == LevelTypeToSet.VCOM:
-                ssc._session.channels[ssc._channels].vcom = setting
-            ssc._session.commit()
+            ssc.cs_configure_single_level(level_type_to_set, setting)
 
     def configure_termination_mode(self, termination_mode: enums.TerminationMode):
         for ssc in self._sscs:
-            ssc._session.channels[ssc._channels].termination_mode = termination_mode
+            ssc.cs_configure_termination_mode(termination_mode)
 
     def configure_time_set_compare_edge_per_site_per_pin(
         self,
@@ -682,11 +711,7 @@ class _NIDigitalTSM:
         per_site_per_pin_compare_strobe: typing.List[typing.List[float]],
     ):
         for ssc, compare_strobes in zip(self._sscs, per_site_per_pin_compare_strobe):
-            channels, _, _ = _channel_list_to_pins(ssc._channels)
-            for channel, compare_strobe in zip(channels, compare_strobes):
-                ssc._session.channels[channel].configure_time_set_compare_edges_strobe(
-                    time_set, compare_strobe
-                )
+            ssc.cs_configure_time_set_compare_edge_per_pin(time_set, compare_strobes)
 
     def configure_time_set_compare_edge_per_site(
         self,
@@ -702,9 +727,7 @@ class _NIDigitalTSM:
 
     def configure_time_set_compare_edge(self, time_set: str, compare_strobe: float):
         for ssc in self._sscs:
-            ssc._session.channels[ssc._channels].configure_time_set_compare_edges_strobe(
-                time_set, compare_strobe
-            )
+            ssc.cs_configure_time_set_compare_edge(time_set, compare_strobe)
 
     def configure_time_set_period(self, time_set: str, period: float):
         configured_period = period
@@ -1003,35 +1026,35 @@ class _NIDigitalTSM:
             ssc._session.initiate()
 
     def calculate_per_instrument_per_site_to_per_site_lut(self, sites: typing.List[int]):
-        per_instrument_per_site_to_per_site_lut: typing.List[Location_1D_Array] = []
+        per_instrument_per_site_to_per_site_lut: typing.List[Location1DArray] = []
         for ssc in self._sscs:
             site_numbers, _ = _site_list_to_site_numbers(ssc._pins)
-            array: typing.List[Location_1D_Array] = []
+            array: typing.List[Location1DArray] = []
             for site_number in site_numbers:
-                array.append(Location_1D_Array([sites.index(site_number)]))
+                array.append(Location1DArray([sites.index(site_number)]))
             per_instrument_per_site_to_per_site_lut += array
         return per_instrument_per_site_to_per_site_lut
 
     def calculate_per_instrument_to_per_site_lut(self, sites: typing.List[int]):
-        per_instrument_to_per_site_lut: typing.List[Location_1D_Array] = []
+        per_instrument_to_per_site_lut: typing.List[Location1DArray] = []
         for _ssc in self._sscs:
             site_numbers, _ = _site_list_to_site_numbers(_ssc._pins)
             array: typing.List[int] = []
             for site_number in site_numbers:
                 array.append(sites.index(site_number))
-            per_instrument_to_per_site_lut.append(Location_1D_Array(array))
+            per_instrument_to_per_site_lut.append(Location1DArray(array))
         return per_instrument_to_per_site_lut
 
     def calculate_per_instrument_to_per_site_per_pin_lut(
         self, sites: typing.List[int], pins: typing.List[str]
     ):
-        per_instrument_to_per_site_per_pin_lut: typing.List[Location_2D_Array] = []
+        per_instrument_to_per_site_per_pin_lut: typing.List[Location2DArray] = []
         for ssc in self._sscs:
             _, _pins, _sites = _channel_list_to_pins(ssc._channels)
-            array: typing.List[Location_2D] = []
+            array: typing.List[Location2D] = []
             for pin, site in zip(_pins, _sites):
-                array.append(Location_2D(sites.index(site), pins.index(pin)))
-            per_instrument_to_per_site_per_pin_lut.append(Location_2D_Array(array))
+                array.append(Location2D(sites.index(site), pins.index(pin)))
+            per_instrument_to_per_site_per_pin_lut.append(Location2DArray(array))
         return per_instrument_to_per_site_per_pin_lut
 
     def calculate_per_site_per_pin_to_per_instrument_lut(
@@ -1039,18 +1062,18 @@ class _NIDigitalTSM:
     ):
         max_sites_on_instrument = 0
         i = 0
-        location_2d_array: typing.List[Location_2D] = []
+        location_2d_array: typing.List[Location2D] = []
         pins_sites_array: typing.List[typing.Any] = []
-        per_site_per_pin_to_per_instrument_lut: typing.List[typing.List[Location_2D]] = []
+        per_site_per_pin_to_per_instrument_lut: typing.List[typing.List[Location2D]] = []
         for _ssc in self._sscs:
             _, _pins, _sites = _channel_list_to_pins(_ssc._channels)
             pins_sites_array += list(map(list, zip(_pins, _sites)))
             max_sites_on_instrument = max(max_sites_on_instrument, len(_pins))
-            location_2d_array += [Location_2D(i, j) for j in range(len(_pins))]
+            location_2d_array += [Location2D(i, j) for j in range(len(_pins))]
             i += 1
         instrument_count = i
         for site in sites:
-            array: typing.List[Location_2D] = []
+            array: typing.List[Location2D] = []
             for pin in pins:
                 index = pins_sites_array.index([pin, site])
                 array.append(location_2d_array[index])
@@ -1064,14 +1087,14 @@ class _NIDigitalTSM:
     def calculate_per_site_to_per_instrument_lut(self, sites: typing.List[int]):
         max_sites_on_instrument = 0
         i = 0
-        location_2d_array: typing.List[Location_2D] = []
+        location_2d_array: typing.List[Location2D] = []
         sites_array: typing.List[int] = []
-        per_site_to_per_instrument_lut: typing.List[Location_2D] = []
+        per_site_to_per_instrument_lut: typing.List[Location2D] = []
         for ssc in self._sscs:
             site_numbers, _ = _site_list_to_site_numbers(ssc._pins)
             sites_array += site_numbers
             max_sites_on_instrument = max(max_sites_on_instrument, len(site_numbers))
-            location_2d_array += [Location_2D(i, j) for j in range(len(site_numbers))]
+            location_2d_array += [Location2D(i, j) for j in range(len(site_numbers))]
             i += 1
         instrument_count = i
         for site in sites:
@@ -1081,14 +1104,14 @@ class _NIDigitalTSM:
 
     # Session Properties #
     def get_properties(self):  # checked _
-        session_properties: typing.List[Session_Properties] = []
+        session_properties: typing.List[SessionProperties] = []
         for _ssc in self._sscs:
             instrument_name = ""
             match = re.search(r"[A-Za-z]+[1-9]+", str(_ssc._session))
             if match:
                 instrument_name = match.group()
             session_properties.append(
-                Session_Properties(
+                SessionProperties(
                     instrument_name,
                     _ssc._session.channels[_ssc._channels].voh,
                     _ssc._session.channels[_ssc._channels].vol,
@@ -1144,7 +1167,7 @@ def tsm_ssc_get_hram_configuration(tsm: TSMDigital):
         per_instrument_vector_offset,
     ) = tsm.ssc.get_hram_trigger_settings()
     # Assumes all instruments have the same settings
-    hram_configuration: HRAM_Configuration = HRAM_Configuration()
+    hram_configuration: HRAMConfiguration = HRAMConfiguration()
     hram_configuration.finite_samples = per_instrument_number_of_samples_is_finite[-1]
     hram_configuration.trigger_type = per_instrument_triggers_type[-1]
     hram_configuration.cycle_number = per_instrument_cycle_number[-1]
@@ -1585,7 +1608,7 @@ def tsm_ssc_write_static_per_site(
 # Subroutines #
 def _apply_lut_per_instrument_to_per_site_per_pin(
     initialized_array: typing.List[typing.List[typing.Any]],
-    lut: typing.List[Location_2D_Array],
+    lut: typing.List[Location2DArray],
     results_to_apply_lut_to: typing.List[typing.List[typing.Any]],
 ):
     array_out = copy.deepcopy(initialized_array)
@@ -1597,7 +1620,7 @@ def _apply_lut_per_instrument_to_per_site_per_pin(
 
 def _apply_lut_per_instrument_to_per_site(
     initialized_array: typing.List[typing.Any],
-    lut: typing.List[Location_1D_Array],
+    lut: typing.List[Location1DArray],
     results_to_apply_lut_to: typing.List[typing.List[typing.Any]],
 ):
     array_out = copy.deepcopy(initialized_array)
@@ -1609,7 +1632,7 @@ def _apply_lut_per_instrument_to_per_site(
 
 def _apply_lut_per_site_per_pin_to_per_instrument(
     initialized_array: typing.List[typing.List[typing.Any]],
-    lut: typing.List[typing.List[Location_2D]],
+    lut: typing.List[typing.List[Location2D]],
     results_to_apply_lut_to: typing.List[typing.List[typing.Any]],
 ):
     array_out = copy.deepcopy(initialized_array)
@@ -1621,7 +1644,7 @@ def _apply_lut_per_site_per_pin_to_per_instrument(
 
 def _apply_lut_per_site_to_per_instrument(
     initialized_array: typing.List[typing.List[typing.Any]],
-    lut: typing.List[Location_2D],
+    lut: typing.List[Location2D],
     results_to_apply_lut_to: typing.List[typing.Any],
 ):
     array_out = copy.deepcopy(initialized_array)
