@@ -1768,14 +1768,14 @@ def filter_sites(tsm: TSMDCPower, sites):
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: SMContext, power_line_frequency=60.0, **kwargs):
-    """Creates the sessions for all the nidcpower resource string available in the tsm_context for instruments"""
+def initialize_sessions(tsm: SMContext, power_line_frequency=60.0, **kwargs):
+    """Creates the sessions for all the nidcpower resource string available in the tsm context for instruments"""
     # cache kwargs
     reset = kwargs["reset"] if "reset" in kwargs.keys() else False
     options = kwargs["options"] if "options" in kwargs.keys() else {}
 
     # initialize and reset sessions
-    resource_strings = tsm_context.get_all_nidcpower_resource_strings()
+    resource_strings = tsm.get_all_nidcpower_resource_strings()
     for resource_string in resource_strings:
         session = nidcpower.Session(resource_string, reset=reset, options=options)
         try:
@@ -1797,12 +1797,12 @@ def initialize_sessions(tsm_context: SMContext, power_line_frequency=60.0, **kwa
                 session.channels[channel_name].initiate()
 
         # set session in the tsm context
-        tsm_context.set_nidcpower_session(resource_string, session)
+        tsm.set_nidcpower_session(resource_string, session)
 
 
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
-    tsm_context: SMContext,
+    tsm: SMContext,
     pins: typing.List[str],
     sites: typing.List[int] = [],
     fill_pin_site_info=True,
@@ -1811,7 +1811,7 @@ def pins_to_sessions(
     get the sessions for the selected pins
 
     Args:
-        tsm_context (TSMContext): tsm context for nidcpower
+        tsm (SMContext): tsm context for nidcpower
         pins (typing.List[str]): desired pins for which the TSMDCPower object is created
         sites (typing.List[int], optional): list of desired sites. Defaults to [].
         fill_pin_site_info (bool, optional): if true updates the sites. Defaults to True.
@@ -1820,13 +1820,13 @@ def pins_to_sessions(
         dcpower_tsm: pin-query context variable
     """
     if len(sites) == 0:
-        sites = list(tsm_context.site_numbers)  # This is tested and works
+        sites = list(tsm.site_numbers)  # This is tested and works
     pins_expanded = []
     pins_info = []
-    pin_query_context, sessions, channels = tsm_context.pins_to_nidcpower_sessions(pins)
+    pin_query_context, sessions, channels = tsm.pins_to_nidcpower_sessions(pins)
     if fill_pin_site_info:
         pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(
-            tsm_context, pins
+            tsm, pins
         )  # This is tested and working fine.
     else:
         for pin in pins:
@@ -1845,9 +1845,9 @@ def pins_to_sessions(
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: SMContext):
+def close_sessions(tsm: SMContext):
     """Closes the sessions associated with the tsm context"""
-    sessions = tsm_context.get_all_nidcpower_sessions()
+    sessions = tsm.get_all_nidcpower_sessions()
     for session in sessions:
         session.abort()
         try:
