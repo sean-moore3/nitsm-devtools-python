@@ -137,7 +137,7 @@ class TestNIScope:
             scope_tsm.ssc.clear_triggers()
             scope_tsm.ssc.export_analog_edge_start_trigger(test_pins[0], "/OSC1/PXI_Trig2")
             scope_tsm.ssc.start_acquisition()
-            data1, data2 = scope_tsm.ssc.fetch_waveform(1)
+            data1, data2 = scope_tsm.ssc.fetch_waveform(-1)
             print(data1, data2, "\n")
 
     def test_all_scope_apis(self, scope_tsm_s):

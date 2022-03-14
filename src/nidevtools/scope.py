@@ -749,13 +749,13 @@ class _NIScopeTSM:
         return waveform_info, waveforms
 
     def fetch_multirecord_waveform(self, num_records=-1):
-        """fetch multirecord waveform from all channels in the current TSMScope object
+        """fetch multi-record waveform from all channels in the current TSMScope object
 
         Args:
             num_records (int, optional): number of records to fetch. fetch everything by default. Defaults to -1.
 
         Returns:
-            list records: multirecord waveform from all channels in list
+            list records: multi-record waveform from all channels in list
         """
         waveforms: typing.Any = []
         waveform_info: typing.List[niscope.WaveformInfo] = []
@@ -862,7 +862,7 @@ def _pin_query_context_to_channel_list(
 ):
     """Private function for getting the channel list from pin query context"""
     tsm_context = pin_query_context._tsm_context
-    tsm_context1 = nitsm.codemoduleapi.SemiconductorModuleContext(pin_query_context._tsm_context)
+    tsm_context1 = nitsm.codemoduleapi.SemiconductorModuleContext(tsm_context)
     if len(sites) == 0:
         sites = list(tsm_context1.site_numbers)
     if expanded_pins_information:
@@ -881,7 +881,7 @@ def _pin_query_context_to_channel_list(
         expand pin groups
         """
         pin_names = pin_query_context._pins
-        pin_types, pin_names = ni_dt_common._check_for_pin_group(tsm_context, pin_names)
+        pin_types, pin_names = ni_dt_common._check_for_pin_group(tsm_context1, pin_names)
     pins_array_for_session_input: typing.List[PinsCluster] = []
     channel_list_per_session = ()
     (
