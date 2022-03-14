@@ -233,8 +233,9 @@ class TestDCPower:
         """
         # custom_settings = {"aperture_time": 20e-03, "source_delay": 1.0, "sense": Sense.LOCAL}
         for dcpower_tsm in dcpower_tsm_s:
-            dcpower_tsm.ssc.configure_settings(aperture_time=40e-03)
+            # dcpower_tsm.ssc.configure_settings(aperture_time=40e-03)
             dcpower_tsm.ssc.force_voltage_symmetric_limits(1.0, 1.0, 0.1, 0.1)
+            time.sleep(1)
             voltages, currents = dcpower_tsm.ssc.measure()
             print(voltages, currents)
             dcpower_tsm.ssc.abort()
