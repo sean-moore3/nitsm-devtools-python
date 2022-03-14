@@ -5,7 +5,7 @@ from enum import Enum
 import niscope
 import nitsm.codemoduleapi
 import numpy
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
 from nitsm.pinquerycontexts import PinQueryContext
 
 import nidevtools.common as ni_dt_common
@@ -931,7 +931,7 @@ def _pin_query_context_to_channel_list(
 
 # Pinmap
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int] = []):
+def pins_to_sessions(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int] = []):
     """Returns the pin-query context object for the given pins at given sites.
 
     Args:
@@ -958,7 +958,7 @@ def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typ
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: TSMContext, options: dict = {}):
+def initialize_sessions(tsm_context: SMClass, options: dict = {}):
     """Opens sessions for all NI-SCOPE instrument channels that are defined in pinmap associated with the tsm context"""
     instrument_names = tsm_context.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
@@ -973,7 +973,7 @@ def initialize_sessions(tsm_context: TSMContext, options: dict = {}):
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: TSMContext):
+def close_sessions(tsm_context: SMClass):
     """Resets and Closes all the NI-SCOPE instruments sessions from the pinmap file associated
     with the Semiconductor Module Context."""
     sessions = tsm_context.get_all_niscope_sessions()
