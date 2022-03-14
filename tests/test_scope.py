@@ -6,7 +6,7 @@ import nidevtools.scope as scope
 import niscope
 import nitsm.codemoduleapi
 import pytest
-from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
@@ -204,17 +204,17 @@ class TestNIScope:
 
 
 @nitsm.codemoduleapi.code_module
-def open_sessions(tsm_context: SMClass):
+def open_sessions(tsm_context: SMContext):
     scope.initialize_sessions(tsm_context, OPTIONS)
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions_info(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def pins_to_sessions_info(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
     return scope.pins_to_sessions(tsm_context, pins, sites)
 
 
 @nitsm.codemoduleapi.code_module
-def configure(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def configure(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
     scope_tsm.ssc.configure_impedance(0.5)
     scope_tsm.ssc.configure_reference_level()
@@ -227,26 +227,26 @@ def configure(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[i
 
 
 @nitsm.codemoduleapi.code_module
-def acquisition(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def acquisition(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
     scope_tsm.ssc.initiate()
 
 
 @nitsm.codemoduleapi.code_module
-def control(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def control(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
     scope_tsm.ssc.commit()
     scope_tsm.ssc.abort()
 
 
 @nitsm.codemoduleapi.code_module
-def session_properties(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def session_properties(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
     scope_tsm.ssc.get_session_properties()
 
 
 @nitsm.codemoduleapi.code_module
-def trigger(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def trigger(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
     scope_tsm.ssc.configure_digital_edge_trigger(
         scope.TRIGGER_SOURCE.RTSI0, niscope.TriggerSlope.POSITIVE
@@ -259,33 +259,33 @@ def trigger(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int
 
 
 @nitsm.codemoduleapi.code_module
-def measure_results(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def measure_results(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
     scope_tsm.ssc.fetch_measurement(niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
 @nitsm.codemoduleapi.code_module
-def measure_stats(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def measure_stats(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
     scope_tsm.ssc.measure_statistics(niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
 @nitsm.codemoduleapi.code_module
-def clear_stats(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def clear_stats(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
     scope_tsm.ssc.fetch_clear_stats()
 
 
 @nitsm.codemoduleapi.code_module
 def fetch_measurement_stats_per_channel(
-    tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]
+    tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]
 ):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
     scope_tsm.ssc.fetch_meas_stats_per_channel(niscope.ScalarMeasurement.NO_MEASUREMENT)
 
 
 @nitsm.codemoduleapi.code_module
-def fetch_waveform(tsm_context: SMClass, pins: typing.List[str], sites: typing.List[int]):
+def fetch_waveform(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
     scope_tsm = scope.pins_to_sessions(tsm_context, pins, sites)
     print(scope_tsm.ssc.fetch_waveform(1))
     print(scope_tsm.ssc.fetch_multirecord_waveform(1))
@@ -293,13 +293,13 @@ def fetch_waveform(tsm_context: SMClass, pins: typing.List[str], sites: typing.L
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: SMClass):
+def close_sessions(tsm_context: SMContext):
     print(" Closing sessions")
     scope.close_sessions(tsm_context)
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: SMClass):
+def initialize_sessions(tsm_context: SMContext):
     print("opening sessions")
     scope.initialize_sessions(tsm_context, options=OPTIONS)
     scope_tsm = scope.pins_to_sessions(tsm_context, ["OSC_xA_ANA1"], [])
@@ -308,7 +308,7 @@ def initialize_sessions(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def configure_measurements(tsm_context: SMClass):
+def configure_measurements(tsm_context: SMContext):
     scope_tsm = scope.pins_to_sessions(tsm_context, ["OSC_xA_ANA1"], [])
     scope_tsm.ssc.configure(
         4e-3, 1, 0, niscope.VerticalCoupling.AC, 5e6, 20000, 50, -1, 1e6, 1, True
@@ -321,7 +321,7 @@ def configure_measurements(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def fetch_waveform1(tsm_context: SMClass):
+def fetch_waveform1(tsm_context: SMContext):
     scope_tsm = scope.pins_to_sessions(tsm_context, ["OSC_xA_ANA1"], [])
     scope_tsm.ssc.start_acquisition()
     data_capture, wf_info = scope_tsm.ssc.fetch_waveform(20000)

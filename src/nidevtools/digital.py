@@ -12,7 +12,7 @@ import typing
 from nidigital import enums
 import nidigital
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
-from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import nitsm.codemoduleapi
 import numpy
 
@@ -1730,7 +1730,7 @@ def tsm_ssc_publish(
 
 # TSMContext #
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: SMClass, options: dict = {}):
+def initialize_sessions(tsm_context: SMContext, options: dict = {}):
     """
     Creates the sessions for all the nidigital resource string available in the
     tsm_context for instruments
@@ -1769,13 +1769,13 @@ def initialize_sessions(tsm_context: SMClass, options: dict = {}):
 
 
 @nitsm.codemoduleapi.code_module
-def pin_to_n_sessions(tsm_context: SMClass, pin: str):
+def pin_to_n_sessions(tsm_context: SMContext, pin: str):
     return pins_to_sessions(tsm_context, [pin])
 
 
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
-    tsm_context: SMClass,
+    tsm_context: SMContext,
     pins: typing.List[str],
     sites: typing.List[int] = [],
     turn_pin_groups_to_pins: bool = True,
@@ -1798,7 +1798,7 @@ def pins_to_sessions(
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: SMClass):
+def close_sessions(tsm_context: SMContext):
     """Closes the sessions associated with the tsm context"""
     sessions = tsm_context.get_all_nidigital_sessions()
     for session in sessions:

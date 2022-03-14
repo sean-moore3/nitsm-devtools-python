@@ -6,6 +6,7 @@ import nidaqmx.constants
 import nitsm.codemoduleapi
 import nitsm.enums
 import nitsm.pinquerycontexts
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 # Types Definition
 PinsArg = typing.Union[str, typing.Sequence[str]]
@@ -462,17 +463,17 @@ class MultipleSessions(_Sessions):
 
 
 @nitsm.codemoduleapi.code_module
-def clear_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
+def clear_task(tsm: SMContext):
     """
     Clears all the tasks in the TSMContext. Before clearing, this method will abort all tasks, if necessary,
     and will release any resources the tasks reserved. You cannot use a task after you clear it unless you
     set it again.
     """
-    task_ao = tsm_context.get_all_nidaqmx_tasks("AnalogOutput")
-    tasks_ai = tsm_context.get_all_nidaqmx_tasks("AnalogInput")
-    tasks_ai_dsa = tsm_context.get_all_nidaqmx_tasks("AnalogInputDSA")
-    tasks_ao_dsa = tsm_context.get_all_nidaqmx_tasks("AnalogOutputDSA")
-    tasks_do = tsm_context.get_all_nidaqmx_tasks("DigitalOutput")
+    task_ao = tsm.get_all_nidaqmx_tasks("AnalogOutput")
+    tasks_ai = tsm.get_all_nidaqmx_tasks("AnalogInput")
+    tasks_ai_dsa = tsm.get_all_nidaqmx_tasks("AnalogInputDSA")
+    tasks_ao_dsa = tsm.get_all_nidaqmx_tasks("AnalogOutputDSA")
+    tasks_do = tsm.get_all_nidaqmx_tasks("DigitalOutput")
 
     for task in task_ao:
         task.stop()
@@ -508,13 +509,13 @@ def reset_devices(task: nidaqmx.Task):
 
 
 @nitsm.codemoduleapi.code_module
-def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
+def set_task(tsm: SMContext):
     """
     Associates each NI-DAQmx tasks with the NI-DAQmx task name defined in the pin map and
     set all the sessions accordingly
     """
     input_voltage_range = 10.0
-    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names(
+    task_names, channel_lists = tsm.get_all_nidaqmx_task_names(
         "AnalogOutput"
     )  # Replace String if PinMap change
     for task_name, physical_channel in zip(task_names, channel_lists):
@@ -529,9 +530,9 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
             task.ao_channels.add_ao_voltage_chan(physical_channel)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         finally:
-            tsm_context.set_nidaqmx_task(task_name, task)
+            tsm.set_nidaqmx_task(task_name, task)
     # input_voltage_range = 10.0
-    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names(
+    task_names, channel_lists = tsm.get_all_nidaqmx_task_names(
         "AnalogInput"
     )  # Replace String if PinMap change
     for task_name, physical_channel in zip(task_names, channel_lists):
@@ -550,9 +551,9 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
             task.ai_channels.add_ai_voltage_chan(physical_channel)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         finally:
-            tsm_context.set_nidaqmx_task(task_name, task)
+            tsm.set_nidaqmx_task(task_name, task)
 
-    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names(
+    task_names, channel_lists = tsm.get_all_nidaqmx_task_names(
         "AnalogInputDSA"
     )  # Replace String if PM change
     for task_name, physical_channel in zip(task_names, channel_lists):
@@ -566,9 +567,9 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
             task.ai_channels.add_ai_voltage_chan(physical_channel)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         finally:
-            tsm_context.set_nidaqmx_task(task_name, task)
+            tsm.set_nidaqmx_task(task_name, task)
 
-    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names(
+    task_names, channel_lists = tsm.get_all_nidaqmx_task_names(
         "AnalogOutputDSA"
     )  # Replace String if PM change
     for task_name, physical_channel in zip(task_names, channel_lists):
@@ -584,9 +585,9 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
             task.ao_channels.add_ao_voltage_chan(physical_channel)
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         finally:
-            tsm_context.set_nidaqmx_task(task_name, task)
+            tsm.set_nidaqmx_task(task_name, task)
 
-    task_names, channel_lists = tsm_context.get_all_nidaqmx_task_names(
+    task_names, channel_lists = tsm.get_all_nidaqmx_task_names(
         "DigitalOutput"
     )  # Replace String if PM change
     for task_name, physical_channel in zip(task_names, channel_lists):
@@ -603,14 +604,12 @@ def set_task(tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext):
             )
             task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
         finally:
-            tsm_context.set_nidaqmx_task(task_name, task)
+            tsm.set_nidaqmx_task(task_name, task)
 
 
 # Pin Map
 @nitsm.codemoduleapi.code_module
-def get_all_instrument_names(
-    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, task_type: str = ""
-):
+def get_all_instrument_names(tsm: SMContext, task_type: str = ""):
     """
     Returns the channel group ID and associated instrument names and channel lists of all instruments
     of type Instrument Type ID defined in the Semiconductor Module context. You can use instrument names,
@@ -618,42 +617,38 @@ def get_all_instrument_names(
     parameters always return the same number of elements. Instrument names repeat in the Instrument Names
     parameter if the instrument has multiple channel groups.
     Args:
-        tsm_context: Pin context defined by pin map
+        tsm: Pin context defined by pin map
         task_type: Specifies the type of NI-DAQmx task to return. Use an empty string to obtain the names of all
         tasks regardless of task type.
     Return:
         A tuple of the NI-DAQmx task names.
     """
-    instruments = tsm_context.get_all_nidaqmx_task_names(task_type)
+    instruments = tsm.get_all_nidaqmx_task_names(task_type)
     return instruments  # Instrument Names, Channel Lists per Instrument
 
 
 @nitsm.codemoduleapi.code_module
-def get_all_sessions(
-    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, task_type: str = ""
-):
+def get_all_sessions(tsm: SMContext, task_type: str = ""):
     """
     Returns all sessions in the Semiconductor Module Context that belong to multiple instruments of the type DAQmx.
     Args:
-        tsm_context: Pin context defined by pin map
+        tsm: Pin context defined by pin map
         task_type: Specifies the type of NI-DAQmx task to return. Use an empty string to obtain the names of all
         tasks regardless of task type
     Return:
         List of tasks of the specific type
     """
-    tasks = tsm_context.get_all_nidaqmx_tasks(task_type)
+    tasks = tsm.get_all_nidaqmx_tasks(task_type)
     return tasks
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_session_sessions_info(
-    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pins: PinsArg
-):
+def pins_to_session_sessions_info(tsm: SMContext, pins: PinsArg):
     """
     Returns a properly filled object of the type MultipleSessions with a session per each
     site defined in the pin map
     Args:
-        tsm_context: Pin context defined by pin map
+        tsm: Pin context defined by pin map
         pins: The name of the pin(s) or pin group(s) to translate to a task.
     Return:
         Multiple_Sessions: An object that tracks the task associated with this pin query. Use this object
@@ -661,12 +656,12 @@ def pins_to_session_sessions_info(
     """
     if type(pins) == str:
         pins = [pins]
-    pin_list = tsm_context.filter_pins_by_instrument_type(
+    pin_list = tsm.filter_pins_by_instrument_type(
         pins, nitsm.enums.InstrumentTypeIdConstants.NI_DAQMX, nitsm.enums.Capability.ALL
     )
     print(pin_list)
-    (pin_query_contex, task, channel_list) = tsm_context.pins_to_nidaqmx_task(pin_list)
-    sites = tsm_context.site_numbers
+    (pin_query_contex, task, channel_list) = tsm.pins_to_nidaqmx_task(pin_list)
+    sites = tsm.site_numbers
     multiple_session_info = MultipleSessions(pin_query_contex, [])
     for site in sites:
         pin_data = ",".join(pin_list)
@@ -676,18 +671,16 @@ def pins_to_session_sessions_info(
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions_sessions(
-    tsm_context: nitsm.codemoduleapi.SemiconductorModuleContext, pins: PinsArg
-):
+def pins_to_sessions_sessions(tsm: SMContext, pins: PinsArg):
     """
     Returns a pin query contex and a list of properties defined in the pin map.
     The list of properties returned can be used to fill a new object type MultipleSessions
     Args:
-        tsm_context: Pin context defined by pin map
+        tsm: Pin context defined by pin map
         pins: The name of the pin(s) or pin group(s) to translate to a set of tasks.
     Return:
         session: An object that tracks the tasks associated with this pin query. Use this object to publish
         measurements and extract data from a set of measurements.
     """
-    session = tsm_context.pins_to_nidaqmx_tasks(pins)  # pin_query_context, task, channel_lists
+    session = tsm.pins_to_nidaqmx_tasks(pins)  # pin_query_context, task, channel_lists
     return session

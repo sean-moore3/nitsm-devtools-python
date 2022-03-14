@@ -2,7 +2,7 @@ import typing
 from enum import Enum
 
 import niswitch
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 
 class Action(Enum):
@@ -59,14 +59,14 @@ class MultipleSessions:
 instrument_type_id = "_niSwitch"
 
 
-def get_all_instruments_names(tsm_context: TSMContext):
+def get_all_instruments_names(tsm_context: SMContext):
     instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(
         instrument_type_id
     )
     return instrument_names, channel_group_ids
 
 
-def get_all_sessions(tsm_context: TSMContext):
+def get_all_sessions(tsm_context: SMContext):
     session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(
         instrument_type_id
     )
@@ -76,7 +76,7 @@ def get_all_sessions(tsm_context: TSMContext):
     return list_of_sessions
 
 
-def pin_to_sessions_session_info(tsm_context: TSMContext, pin: str = ""):
+def pin_to_sessions_session_info(tsm_context: SMContext, pin: str = ""):
     try:
         (
             pin_query_context,
@@ -95,12 +95,12 @@ def pin_to_sessions_session_info(tsm_context: TSMContext, pin: str = ""):
 
 
 def set_sessions(
-    tsm_context: TSMContext, switch_name: str, session: niswitch.Session, channel_group_id: str
+    tsm_context: SMContext, switch_name: str, session: niswitch.Session, channel_group_id: str
 ):
     tsm_context.set_custom_session(instrument_type_id, switch_name, channel_group_id, session)
 
 
-def close_sessions(tsm_context: TSMContext):
+def close_sessions(tsm_context: SMContext):
     sessions = get_all_sessions(tsm_context)
     sessions_to_close = []
     for session in sessions:
@@ -125,7 +125,7 @@ def name_to_topology(name: str = ""):
         return "Configured Topology"
 
 
-def initialize_sessions(tsm_context: TSMContext):
+def initialize_sessions(tsm_context: SMContext):
     switch_name = ""
     instrument_names, channel_group_ids = get_all_instruments_names(tsm_context)
     for name, channel_id in zip(instrument_names, channel_group_ids):

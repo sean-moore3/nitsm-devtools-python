@@ -2,6 +2,7 @@ import niswitch
 import pytest
 import os
 import nidevtools.switch as ni_switch
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))

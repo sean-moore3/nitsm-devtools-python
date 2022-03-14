@@ -3,7 +3,7 @@ import time
 import pytest
 import os.path
 import nifgen
-from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import nidevtools.fgen as ni_dt_fgen
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
@@ -71,15 +71,15 @@ class TestFGen:
         time.sleep(10.0)
 
 
-def init_fgen(tsm: SMClass):
+def init_fgen(tsm: SMContext):
     ni_dt_fgen.initialize_sessions(tsm, options=OPTIONS)
 
 
-def close_fgen(tsm: SMClass):
+def close_fgen(tsm: SMContext):
     ni_dt_fgen.close_sessions(tsm)
 
 
-def generate_signal_for_test_pins(tsm: SMClass, test_pin):
+def generate_signal_for_test_pins(tsm: SMContext, test_pin):
     fgen_tsm = ni_dt_fgen.pins_to_sessions(tsm, test_pin, sites=[])
     fgen_tsm.ssc.generate_sine_wave(10e6, enable_filter=False)
     time.sleep(10.0)

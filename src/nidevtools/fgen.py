@@ -4,7 +4,7 @@ import typing
 import nifgen
 import nitsm.codemoduleapi
 import nitsm.enums
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 import nidevtools.common as ni_dt_common
 
@@ -156,7 +156,7 @@ class TSMFGen(typing.NamedTuple):
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typing.List[int]):
+def pins_to_sessions(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
     """
     Returns the pin-query context object for the given pins at given sites.
 
@@ -182,7 +182,7 @@ def pins_to_sessions(tsm_context: TSMContext, pins: typing.List[str], sites: typ
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: TSMContext, options: dict = {}):
+def initialize_sessions(tsm_context: SMContext, options: dict = {}):
     """Opens sessions for all instrument channels that are associated with the tsm context"""
     instrument_names = tsm_context.get_all_nifgen_instrument_names()
     for instrument_name in instrument_names:
@@ -200,7 +200,7 @@ def initialize_sessions(tsm_context: TSMContext, options: dict = {}):
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: TSMContext):
+def close_sessions(tsm_context: SMContext):
     """Closes the sessions associated with the tsm context"""
     sessions = tsm_context.get_all_nifgen_sessions()
     for session in sessions:

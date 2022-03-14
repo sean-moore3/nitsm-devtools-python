@@ -2,7 +2,7 @@ import nitsm.codemoduleapi
 import pytest
 import os.path
 import nidcpower
-from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import nidevtools.dcpower as dcpower
 import time
 import os
@@ -244,7 +244,7 @@ class TestDCPower:
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: SMClass):
+def initialize_sessions(tsm_context: SMContext):
     # ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
     dcpower.initialize_sessions(tsm_context, options=OPTIONS)
     dcpower_tsm = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
@@ -253,7 +253,7 @@ def initialize_sessions(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def configure_measurements(tsm_context: SMClass):
+def configure_measurements(tsm_context: SMContext):
     ctypes.windll.user32.MessageBoxW(
         None,
         "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()),
@@ -273,7 +273,7 @@ def configure_measurements(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def configure_measurements_waveform(tsm_context: SMClass):
+def configure_measurements_waveform(tsm_context: SMContext):
     tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
     tsminfo.ssc.abort()
     tsminfo.ssc.configure_settings(20e-3, 0.0, dcpower.enums.Sense.LOCAL)
@@ -284,7 +284,7 @@ def configure_measurements_waveform(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def fetch_waveform(tsm_context: SMClass):
+def fetch_waveform(tsm_context: SMContext):
     tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
     volt_wf, curr_wf = tsminfo.ssc.fetch_waveform(0, waveform_length_s=1e-3)
     print(volt_wf, curr_wf)
@@ -292,7 +292,7 @@ def fetch_waveform(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def source_current(tsm_context: SMClass):
+def source_current(tsm_context: SMContext):
     tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2"])
     tsminfo.ssc.force_current_symmetric_limits(
         current_level=10e-3, current_level_range=10e-3, voltage_limit=6, voltage_limit_range=6
@@ -301,7 +301,7 @@ def source_current(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def source_voltage(tsm_context: SMClass):
+def source_voltage(tsm_context: SMContext):
     tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2"])
     tsminfo.ssc.force_voltage_symmetric_limits(
         voltage_level=3.8, voltage_level_range=6.0, current_limit=10e-3, current_limit_range=100e-3
@@ -310,7 +310,7 @@ def source_voltage(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def measure(tsm_context: SMClass):
+def measure(tsm_context: SMContext):
     tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2"])
     volt_meas, curr_meas = tsminfo.ssc.measure()
     compliance = tsminfo.ssc.query_in_compliance()
@@ -320,7 +320,7 @@ def measure(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: SMClass, settings):
+def close_sessions(tsm_context: SMContext, settings):
     tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
     tsminfo.ssc.abort()
     tsminfo.ssc.configure_output_connected(output_connected=True)

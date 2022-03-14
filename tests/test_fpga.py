@@ -3,7 +3,7 @@ import nitsm
 import typing
 import pytest
 import os
-from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import nidevtools.fpga as ni_fpga
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
@@ -169,12 +169,12 @@ class TestFPGA:
 
 
 @nitsm.codemoduleapi.code_module
-def ts_open_sessions(tsm_context: SMClass):
+def ts_open_sessions(tsm_context: SMContext):
     ni_fpga.initialize_sessions(tsm_context)
 
 
 @nitsm.codemoduleapi.code_module
-def ts_close_sessions(tsm_context: SMClass):
+def ts_close_sessions(tsm_context: SMContext):
     ni_fpga.close_sessions(tsm_context)
 
 

@@ -7,7 +7,7 @@ from time import time
 
 import nifpga
 import nitsm.pinquerycontexts
-from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 import nidevtools.common as ni_dt_common
 
@@ -702,7 +702,7 @@ def channel_list_to_pins(channel_list: str = ""):
     return sites_and_pins, sites, pins
 
 
-def close_sessions(tsm_context: SMClass):
+def close_sessions(tsm_context: SMContext):
     """
     Clears the FPGA session.  Before clearing, this method aborts the session, if necessary, and releases any resources
     the session has reserved. You cannot use a session after you clear it unless you recreate the session.
@@ -718,7 +718,7 @@ def close_sessions(tsm_context: SMClass):
 debug = []
 
 
-def initialize_sessions(tsm_context: SMClass, ldb_type: str = ""):
+def initialize_sessions(tsm_context: SMContext, ldb_type: str = ""):
     """
     Initialize the sessions from TSM context pinmap.
     """
@@ -744,7 +744,7 @@ def initialize_sessions(tsm_context: SMClass, ldb_type: str = ""):
 
 
 def pins_to_sessions(
-    tsm_context: SMClass, pins: typing.List[str], site_numbers: typing.List[int] = []
+    tsm_context: SMContext, pins: typing.List[str], site_numbers: typing.List[int] = []
 ):
     """
     Returns an object that contains a list of sessions generated for the provided pins.
@@ -794,7 +794,7 @@ def open_reference(rio_resource: str, target: BoardType, ldb_type: str):
 
 
 def get_i2c_master_session(
-    tsm_context: SMClass,
+    tsm_context: SMContext,
     i2c_master_in: I2CMaster.I2C_3V3_7822_SINK,
     apply_i2c_settings: bool = True,
 ):

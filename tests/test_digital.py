@@ -7,7 +7,7 @@ import typing
 from nidigital import enums
 import nidigital
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
-from nitsm.codemoduleapi import SemiconductorModuleContext as SMClass
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import nitsm.codemoduleapi
 import nitsm.enums
 import numpy
@@ -290,17 +290,17 @@ class TestNIDigital:
 
 
 @nitsm.codemoduleapi.code_module
-def open_sessions(tsm_context: SMClass):
+def open_sessions(tsm_context: SMContext):
     ni_dt_digital.initialize_sessions(tsm_context, options=OPTIONS)
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: SMClass):
+def close_sessions(tsm_context: SMContext):
     ni_dt_digital.close_sessions(tsm_context)
 
 
 @nitsm.codemoduleapi.code_module
-def clock_generation(tsm_context: SMClass, pins: typing.List[str]):
+def clock_generation(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     frequency = 25000
@@ -315,7 +315,7 @@ def clock_generation(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def configuration(tsm_context: SMClass, pins: typing.List[str]):
+def configuration(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     tsm.ssc.clear_start_trigger_signal()
@@ -327,7 +327,7 @@ def configuration(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def frequency_measurement_func(tsm_context: SMClass, pins: typing.List[str]):
+def frequency_measurement_func(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     tsm.ssc.frequency_counter_configure_measurement_time(0.5)
@@ -343,7 +343,7 @@ def frequency_measurement_func(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def hram(tsm_context: SMClass, pins: typing.List[str]):
+def hram(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
     hram_configuration = ni_dt_digital.HRAMConfiguration()
     hram_configuration.trigger_type = enums.HistoryRAMTriggerType.PATTERN_LABEL
@@ -393,7 +393,7 @@ def hram(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def pattern_actions(tsm_context: SMClass, pins: typing.List[str]):
+def pattern_actions(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     tsm.ssc.abort()
@@ -420,7 +420,7 @@ def pattern_actions(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def pin_levels_and_timing(tsm_context: SMClass, pins: typing.List[str]):
+def pin_levels_and_timing(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     tsm.ssc.apply_levels_and_timing("PinLevels", "Timing")
@@ -488,7 +488,7 @@ def pin_levels_and_timing(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def ppmu(tsm_context: SMClass, pins: typing.List[str]):
+def ppmu(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     tsm.ssc.ppmu_configure_aperture_time(0.01)
@@ -514,7 +514,7 @@ def ppmu(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def sequencer_flags_and_registers(tsm_context: SMClass, pins: typing.List[str]):
+def sequencer_flags_and_registers(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     tsm.ssc.write_sequencer_flag(enums.SequencerFlag.FLAG1, True)
@@ -532,7 +532,7 @@ def sequencer_flags_and_registers(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def session_properties_func(tsm_context: SMClass, pins: typing.List[str]):
+def session_properties_func(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     session_properties = tsm.ssc.get_properties()
@@ -546,7 +546,7 @@ def session_properties_func(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def source_and_capture_waveforms(tsm_context: SMClass, pins: typing.List[str]):
+def source_and_capture_waveforms(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     ni_dt_digital.tsm_ssc_write_source_waveform_site_unique(
@@ -566,7 +566,7 @@ def source_and_capture_waveforms(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def static(tsm_context: SMClass, pins: typing.List[str]):
+def static(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     tsm.ssc.write_static(enums.WriteStaticPinState.ONE)
@@ -584,7 +584,7 @@ def static(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def misc(tsm_context: SMClass, pins: typing.List[str]):
+def misc(tsm_context: SMContext, pins: typing.List[str]):
     tsm = ni_dt_digital.pin_to_n_sessions(tsm_context, pins[0])
 
     _tsm = ni_dt_digital.filter_sites(tsm, [0])
@@ -649,7 +649,7 @@ def misc(tsm_context: SMClass, pins: typing.List[str]):
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: SMClass):
+def initialize_sessions(tsm_context: SMContext):
     ctypes.windll.user32.MessageBoxW(
         None,
         "Process: niPythonHost.exe & ID: " + str(os.getpid()),
@@ -668,14 +668,14 @@ def initialize_sessions(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def configure_pins(tsm_context: SMClass):
+def configure_pins(tsm_context: SMContext):
     tsm_o = ni_dt_digital.pins_to_sessions(tsm_context, ["DPI_PG_Outputs"])
     # tsm_o.ssc.select_function(ni_dt_digital.enums.SelectedFunction.DIGITAL)
     tsm_o.ssc.write_static(ni_dt_digital.enums.WriteStaticPinState.ZERO)
 
 
 @nitsm.codemoduleapi.code_module
-def read_pins(tsm_context: SMClass):
+def read_pins(tsm_context: SMContext):
     tsm_i = ni_dt_digital.pins_to_sessions(tsm_context, ["DPI_PG_Inputs"])
     # tsm_i.ssc.select_function(ni_dt_digital.enums.SelectedFunction.DIGITAL)
     data = ni_dt_digital.tsm_ssc_read_static(tsm_i)
@@ -684,7 +684,7 @@ def read_pins(tsm_context: SMClass):
 
 
 @nitsm.codemoduleapi.code_module
-def burst_pattern(tsm_context: SMClass):
+def burst_pattern(tsm_context: SMContext):
     tsm = ni_dt_digital.pins_to_sessions(tsm_context, ["DPI_SR_VDD", "DPI_PM_VDD"])
     tsm.ssc.apply_levels_and_timing("I2C_Levels", "I2C_Timing")
     per_site_pass = ni_dt_digital.tsm_ssc_burst_pattern_pass_fail(tsm, "I2C_Write")

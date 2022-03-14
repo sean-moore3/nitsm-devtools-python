@@ -9,7 +9,7 @@ import nidcpower
 import nidcpower.enums as enums
 import nidcpower.errors
 import nitsm.codemoduleapi
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSMContext
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 import nidevtools.common as ni_dt_common
 
@@ -1768,7 +1768,7 @@ def filter_sites(tsm: TSMDCPower, sites):
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: TSMContext, power_line_frequency=60.0, **kwargs):
+def initialize_sessions(tsm_context: SMContext, power_line_frequency=60.0, **kwargs):
     """Creates the sessions for all the nidcpower resource string available in the tsm_context for instruments"""
     # cache kwargs
     reset = kwargs["reset"] if "reset" in kwargs.keys() else False
@@ -1802,7 +1802,7 @@ def initialize_sessions(tsm_context: TSMContext, power_line_frequency=60.0, **kw
 
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
-    tsm_context: TSMContext,
+    tsm_context: SMContext,
     pins: typing.List[str],
     sites: typing.List[int] = [],
     fill_pin_site_info=True,
@@ -1845,7 +1845,7 @@ def pins_to_sessions(
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: TSMContext):
+def close_sessions(tsm_context: SMContext):
     """Closes the sessions associated with the tsm context"""
     sessions = tsm_context.get_all_nidcpower_sessions()
     for session in sessions:

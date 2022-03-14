@@ -6,7 +6,7 @@ import nidaqmx.constants as constant
 import nidevtools.daqmx as ni_daqmx
 import nitsm
 import pytest
-from nitsm.codemoduleapi import SemiconductorModuleContext as TSM_Context
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
@@ -214,18 +214,18 @@ class TestDaqmx:
 
 
 @nitsm.codemoduleapi.code_module
-def open_sessions(tsm_context: TSM_Context):
+def open_sessions(tsm_context: SMContext):
     ni_daqmx.set_task(tsm_context)
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: TSM_Context):
+def close_sessions(tsm_context: SMContext):
     ni_daqmx.clear_task(tsm_context)
 
 
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
-    tsm_context: TSM_Context,
+    tsm_context: SMContext,
     pins: typing.List[str],
 ):
     return ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
@@ -233,7 +233,7 @@ def pins_to_sessions(
 
 @nitsm.codemoduleapi.code_module
 def configure(
-    tsm_context: TSM_Context,
+    tsm_context: SMContext,
     pins: typing.List[str],
 ):
     tsm_multi_session: ni_daqmx.MultipleSessions
@@ -252,7 +252,7 @@ def configure(
 
 @nitsm.codemoduleapi.code_module
 def acquisition_single_ch(
-    tsm_context: TSM_Context,
+    tsm_context: SMContext,
     pins: typing.List[str],
 ):
     tsm_multi_session: ni_daqmx.MultipleSessions
@@ -264,7 +264,7 @@ def acquisition_single_ch(
 
 @nitsm.codemoduleapi.code_module
 def acquisition_multi_ch(
-    tsm_context: TSM_Context,
+    tsm_context: SMContext,
     pins: typing.List[str],
 ):
     tsm_multi_session: ni_daqmx.MultipleSessions
@@ -275,7 +275,7 @@ def acquisition_multi_ch(
 
 
 @nitsm.codemoduleapi.code_module
-def scenario1(tsm_context: TSM_Context):
+def scenario1(tsm_context: SMContext):
     daq_pins1 = ["DAQ_Pins1"]
     daq_pins2 = ["DAQ_Pins2"]
     daq_pins_out = ["TestAnalogO"]
@@ -300,7 +300,7 @@ def scenario1(tsm_context: TSM_Context):
 
 
 @nitsm.codemoduleapi.code_module
-def scenario2(tsm_context: TSM_Context):
+def scenario2(tsm_context: SMContext):
     daq_pins_in_dsa = ["TestIn"]
     daq_pins_out_dsa = ["TestOut2"]
     daq_sessions_out_dsa = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out_dsa)
