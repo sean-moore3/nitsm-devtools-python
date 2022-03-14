@@ -129,7 +129,7 @@ class TestNIDigital:
                 assert isinstance(per_pin_data, enums.PinState)
                 assert per_pin_data == enums.PinState.H
 
-    def test_tsm_ssc_write_read_static_same_pin_low(self, digital_tsm_s):
+    def test_write_read_static_same_pin_low(self, digital_tsm_s):
         """TSM SSC Digital Write Static
         This test writes data on one pin and reads back on same pin.
         digital_tsm_s[0] is output pin and digital_tsm_s[0] is input pin
