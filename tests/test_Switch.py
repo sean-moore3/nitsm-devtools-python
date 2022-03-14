@@ -30,30 +30,30 @@ def tsm_context(standalone_tsm):
 
 
 @pytest.fixture
-def switch_tsm_s(tsm_context, tests_pins):
+def switch_tsm_s(tsm, tests_pins):
     """Returns LabVIEW Cluster equivalent data"""
     switch_tsm = []
     sessions = []
     for test_pin in tests_pins:
-        data = ni_switch.pin_to_sessions_session_info(tsm_context, test_pin)
+        data = ni_switch.pin_to_sessions_session_info(tsm, test_pin)
         switch_tsm.append(data)
         sessions.append(data)
-    yield tsm_context, switch_tsm
+    yield tsm, switch_tsm
 
 
 @pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestSwitch:
-    def test_initialize_and_close(self, tsm_context):
-        session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(
+    def test_initialize_and_close(self, tsm):
+        session_data, channel_group_ids, channel_lists = tsm.get_all_custom_sessions(
             ni_switch.instrument_type_id
         )
         assert len(session_data) == len(channel_group_ids) == len(channel_lists)
-        instrument_names = ni_switch.get_all_instruments_names(tsm_context)[0]
+        instrument_names = ni_switch.get_all_instruments_names(tsm)[0]
         # assert len(session_data) == len(instrument_names) # disabled by anish
         for name in instrument_names:
             assert isinstance(name, str)
-        sessions = ni_switch.get_all_sessions(tsm_context)
+        sessions = ni_switch.get_all_sessions(tsm)
         assert len(session_data) == len(sessions)
         for session in sessions:
             assert isinstance(session, niswitch.session.Session)

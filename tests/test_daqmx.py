@@ -38,27 +38,27 @@ def tsm_context(standalone_tsm):
 
 
 @pytest.fixture
-def daqmx_tsm_s(tsm_context, tests_pins):
+def daqmx_tsm_s(tsm, tests_pins):
     """Returns LabVIEW Cluster equivalent data"""
     print(tests_pins)
     daqmx_tsms = []
     sessions = []
     for test_pin_group in tests_pins:
         print(test_pin_group)
-        data = ni_daqmx.pins_to_session_sessions_info(tsm_context, test_pin_group)
+        data = ni_daqmx.pins_to_session_sessions_info(tsm, test_pin_group)
         daqmx_tsms.append(data)
         sessions += data.sessions
     print(sessions)
-    test = (tsm_context, daqmx_tsms)
+    test = (tsm, daqmx_tsms)
     yield test
 
 
 @pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestDaqmx:
-    def test_set_task(self, tsm_context):
-        print(tsm_context.pin_map_file_path)
-        queried_tasks = tsm_context.get_all_nidaqmx_tasks("AnalogInput")
+    def test_set_task(self, tsm):
+        print(tsm.pin_map_file_path)
+        queried_tasks = tsm.get_all_nidaqmx_tasks("AnalogInput")
         assert isinstance(queried_tasks, tuple)  # Type verification
         for task in queried_tasks:
             print("\nTest_set/clear_task\n", task)
@@ -78,16 +78,16 @@ class TestDaqmx:
             assert isinstance(daqmx_tsm.sessions, typing.List)
             assert len(daqmx_tsm.sessions) == len(tsm_context.site_numbers)
 
-    def test_get_all_instrument_names(self, tsm_context):
-        data = ni_daqmx.get_all_instrument_names(tsm_context)
+    def test_get_all_instrument_names(self, tsm):
+        data = ni_daqmx.get_all_instrument_names(tsm)
         print("\nTest Instrument Names: \n", data)
         assert type(data) == tuple
         for element in data:
             assert type(element) == tuple
             assert len(element) != 0
 
-    def test_get_all_sessions(self, tsm_context):
-        data = ni_daqmx.get_all_sessions(tsm_context)
+    def test_get_all_sessions(self, tsm):
+        data = ni_daqmx.get_all_sessions(tsm)
         print("\nTest Sessions: \n", data)
         assert type(data) == tuple
         assert len(data) != 0
@@ -144,13 +144,13 @@ class TestDaqmx:
                 assert isinstance(task_property, ni_daqmx.TaskProperties)
                 assert task_property.SamplingRate == samp_rate
 
-    def test_baku_power_sequence(self, tsm_context):
+    def test_baku_power_sequence(self, tsm):
         daq_pins1 = ["DAQ_Pins1"]
         daq_pins2 = ["DAQ_Pins2"]
         daq_pins_out = ["TestAnalogO"]
-        daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
-        daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
-        daq_sessions_out = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out)
+        daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins1)
+        daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins2)
+        daq_sessions_out = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins_out)
         sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
         daq_sessions_all = ni_daqmx.MultipleSessions(
             pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all
@@ -175,11 +175,11 @@ class TestDaqmx:
         daq_sessions_out.stop_task()
         daq_sessions_all.stop_task()
 
-    def test_baku_dsa_write_read(self, tsm_context):
+    def test_baku_dsa_write_read(self, tsm):
         daq_pins_in_dsa = ["TestIn"]
         daq_pins_out_dsa = ["TestOut2"]
-        daq_sessions_out_dsa = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out_dsa)
-        daq_sessions_in_dsa = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_in_dsa)
+        daq_sessions_out_dsa = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins_out_dsa)
+        daq_sessions_in_dsa = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins_in_dsa)
         daq_sessions_out_dsa.timing(sampling_rate_hz=1250)  # DSA Channel
         daq_sessions_in_dsa.timing(sampling_rate_hz=10000)  # DSA Channel
         output = 2.0  # configure output in NI-MAX
@@ -214,30 +214,27 @@ class TestDaqmx:
 
 
 @nitsm.codemoduleapi.code_module
-def open_sessions(tsm_context: SMContext):
-    ni_daqmx.set_task(tsm_context)
+def open_sessions(tsm: SMContext):
+    ni_daqmx.set_task(tsm)
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: SMContext):
-    ni_daqmx.clear_task(tsm_context)
+def close_sessions(tsm: SMContext):
+    ni_daqmx.clear_task(tsm)
 
 
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
-    tsm_context: SMContext,
+    tsm: SMContext,
     pins: typing.List[str],
 ):
-    return ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
+    return ni_daqmx.pins_to_session_sessions_info(tsm, pins)
 
 
 @nitsm.codemoduleapi.code_module
-def configure(
-    tsm_context: SMContext,
-    pins: typing.List[str],
-):
+def configure(tsm: SMContext, pins: typing.List[str]):
     tsm_multi_session: ni_daqmx.MultipleSessions
-    tsm_multi_session = ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
+    tsm_multi_session = ni_daqmx.pins_to_session_sessions_info(tsm, pins)
     # Timing Configuration
     tsm_multi_session.timing(1000, 500)
     # Trigger Configuration
@@ -251,37 +248,31 @@ def configure(
 
 
 @nitsm.codemoduleapi.code_module
-def acquisition_single_ch(
-    tsm_context: SMContext,
-    pins: typing.List[str],
-):
+def acquisition_single_ch(tsm: SMContext, pins: typing.List[str]):
     tsm_multi_session: ni_daqmx.MultipleSessions
-    tsm_multi_session = ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
+    tsm_multi_session = ni_daqmx.pins_to_session_sessions_info(tsm, pins)
     tsm_multi_session.start_task()
     yield tsm_multi_session.read_waveform()
     tsm_multi_session.stop_task()
 
 
 @nitsm.codemoduleapi.code_module
-def acquisition_multi_ch(
-    tsm_context: SMContext,
-    pins: typing.List[str],
-):
+def acquisition_multi_ch(tsm: SMContext, pins: typing.List[str]):
     tsm_multi_session: ni_daqmx.MultipleSessions
-    tsm_multi_session = ni_daqmx.pins_to_session_sessions_info(tsm_context, pins)
+    tsm_multi_session = ni_daqmx.pins_to_session_sessions_info(tsm, pins)
     tsm_multi_session.start_task()
     yield tsm_multi_session.read_waveform_multichannel()
     tsm_multi_session.stop_task()
 
 
 @nitsm.codemoduleapi.code_module
-def scenario1(tsm_context: SMContext):
+def scenario1(tsm: SMContext):
     daq_pins1 = ["DAQ_Pins1"]
     daq_pins2 = ["DAQ_Pins2"]
     daq_pins_out = ["TestAnalogO"]
-    daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins1)
-    daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins2)
-    daq_sessions_out = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out)
+    daq_sessions_1 = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins1)
+    daq_sessions_2 = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins2)
+    daq_sessions_out = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins_out)
     sessions_all = daq_sessions_1.sessions + daq_sessions_2.sessions
     daq_sessions_all = ni_daqmx.MultipleSessions(
         pin_query_context=daq_sessions_1.pin_query_context, sessions=sessions_all
@@ -300,11 +291,11 @@ def scenario1(tsm_context: SMContext):
 
 
 @nitsm.codemoduleapi.code_module
-def scenario2(tsm_context: SMContext):
+def scenario2(tsm: SMContext):
     daq_pins_in_dsa = ["TestIn"]
     daq_pins_out_dsa = ["TestOut2"]
-    daq_sessions_out_dsa = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_out_dsa)
-    daq_sessions_in_dsa = ni_daqmx.pins_to_session_sessions_info(tsm_context, daq_pins_in_dsa)
+    daq_sessions_out_dsa = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins_out_dsa)
+    daq_sessions_in_dsa = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins_in_dsa)
     daq_sessions_out_dsa.timing(sampling_rate_hz=1250)  # DSA Channel
     daq_sessions_in_dsa.timing(sampling_rate_hz=10000)  # DSA Channel
     expected = 2.0  # configure expected in NI-MAX

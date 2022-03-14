@@ -36,24 +36,24 @@ def tsm_context(standalone_tsm):
 
 
 @pytest.fixture
-def fpga_tsm_s(tsm_context, tests_pins):
+def fpga_tsm_s(tsm, tests_pins):
     """Returns LabVIEW Cluster equivalent data"""
     fpga_tsms = []
     sessions = []
     for test_pin_group in tests_pins:
-        data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
+        data = ni_fpga.pins_to_sessions(tsm, test_pin_group)
         fpga_tsms.append(data)
         sessions += data.SSC
         print(len(sessions))
-    yield tsm_context, fpga_tsms
+    yield tsm, fpga_tsms
 
 
 @pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestFPGA:
-    def test_initialize_sessions(self, tsm_context):
-        print(tsm_context.pin_map_file_path)
-        queried_sessions = tsm_context.get_all_custom_sessions("782xFPGA")
+    def test_initialize_sessions(self, tsm):
+        print(tsm.pin_map_file_path)
+        queried_sessions = tsm.get_all_custom_sessions("782xFPGA")
         assert isinstance(queried_sessions[0], tuple)  # Type verification
         for session in queried_sessions[0]:
             print("\nTest_Init/Clear_Sessions\n", session)
@@ -69,9 +69,9 @@ class TestFPGA:
             assert isinstance(fpga_tsm.pin_query_context, ni_fpga.PinQuery)
             assert isinstance(fpga_tsm.SSC, typing.List)
 
-    def test_get_i2c_master_session(self, tsm_context):
+    def test_get_i2c_master_session(self, tsm):
         print(
-            ni_fpga.get_i2c_master_session(tsm_context, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True)
+            ni_fpga.get_i2c_master_session(tsm, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True)
         )
 
     def test_update_line_on_connectors(self):

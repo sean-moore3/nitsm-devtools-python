@@ -33,12 +33,12 @@ def tsm_context(standalone_tsm):
 
 
 @pytest.fixture
-def dcpower_tsm_s(tsm_context, tests_pins):
+def dcpower_tsm_s(tsm, tests_pins):
     """Returns LabVIEW Cluster equivalent data"""
     dcpower_tsms = []
     for test_pin in tests_pins:
         dcpower_tsms.append(
-            dcpower.pins_to_sessions(tsm_context, test_pin, fill_pin_site_info=True)
+            dcpower.pins_to_sessions(tsm, test_pin, fill_pin_site_info=True)
         )
     return dcpower_tsms
 
@@ -61,14 +61,14 @@ class TestDCPower:
     So these functions needs to be test first.
     """
 
-    def test_initialize_session(self, tsm_context):
+    def test_initialize_session(self, tsm):
         """This Api is used in the Init routine"""
-        queried_sessions = tsm_context.get_all_nidcpower_sessions()
+        queried_sessions = tsm.get_all_nidcpower_sessions()
         assert isinstance(queried_sessions, tuple)
         for session in queried_sessions:
             # print("\nTest_session\n", session)
             assert isinstance(session, nidcpower.Session)
-        assert len(queried_sessions) == len(tsm_context.get_all_nidcpower_resource_strings())
+        assert len(queried_sessions) == len(tsm.get_all_nidcpower_resource_strings())
 
     def test_pin_to_sessions(self, dcpower_tsm_s, tests_pins):
         """TSM SSC DCPower Pins to Sessions vi"""

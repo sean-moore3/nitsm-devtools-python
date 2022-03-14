@@ -20,7 +20,7 @@ if SIMULATE:
 
 
 @pytest.fixture
-def tsm_context(standalone_tsm):
+def tsm(standalone_tsm):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
@@ -34,13 +34,13 @@ def tsm_context(standalone_tsm):
 
 
 @pytest.fixture
-def scope_tsm_s(tsm_context, tests_pins):
+def scope_tsm_s(tsm, tests_pins):
     """Returns LabVIEW Cluster equivalent data
     This fixture accepts single pin in string format or
     multiple pins in list of string format"""
     scope_tsms = []
     for test_pin in tests_pins:
-        scope_tsms.append(scope.pins_to_sessions(tsm_context, test_pin, []))
+        scope_tsms.append(scope.pins_to_sessions(tsm, test_pin, []))
     return scope_tsms
 
 
@@ -51,13 +51,13 @@ class TestNIScope:
     So these functions needs to be test first.
     """
 
-    def test_tsm_initialize_sessions(self, tsm_context):
+    def test_tsm_initialize_sessions(self, tsm):
         """This Api is used in the Init routine"""
-        print("tsm_context", tsm_context)
-        queried_sessions = list(tsm_context.get_all_niscope_sessions())
+        print("tsm_context", tsm)
+        queried_sessions = list(tsm.get_all_niscope_sessions())
         for session in queried_sessions:
             assert isinstance(session, niscope.Session)
-        assert len(queried_sessions) == len(tsm_context.get_all_niscope_instrument_names())
+        assert len(queried_sessions) == len(tsm.get_all_niscope_instrument_names())
 
     def test_tsm_pins_to_sessions(self, scope_tsm_s, tests_pins):
         """"""

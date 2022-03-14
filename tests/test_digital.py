@@ -40,16 +40,16 @@ def tsm_context(standalone_tsm):
 
 
 @pytest.fixture
-def digital_tsm_s(tsm_context, tests_pins):
+def digital_tsm_s(tsm, tests_pins):
     """Returns LabVIEW Cluster equivalent data
     This fixture accepts single pin in string format or
     multiple pins in list of string format"""
     digital_tsms = []
     for test_pin in tests_pins:
         if isinstance(test_pin, str):
-            digital_tsms.append(ni_dt_digital.pin_to_n_sessions(tsm_context, test_pin))
+            digital_tsms.append(ni_dt_digital.pin_to_n_sessions(tsm, test_pin))
         elif isinstance(test_pin, list):
-            digital_tsms.append(ni_dt_digital.pins_to_sessions(tsm_context, test_pin))
+            digital_tsms.append(ni_dt_digital.pins_to_sessions(tsm, test_pin))
         else:
             assert False  # unexpected datatype
     return digital_tsms
@@ -72,12 +72,12 @@ class TestNIDigital:
     So these functions needs to be test first.
     """
 
-    def test_tsm_initialize_sessions(self, tsm_context):
+    def test_tsm_initialize_sessions(self, tsm):
         """This Api is used in the Init routine"""
-        queried_sessions = list(tsm_context.get_all_nidigital_sessions())
+        queried_sessions = list(tsm.get_all_nidigital_sessions())
         for session in queried_sessions:
             assert isinstance(session, nidigital.Session)
-        assert len(queried_sessions) == len(tsm_context.get_all_nidigital_instrument_names())
+        assert len(queried_sessions) == len(tsm.get_all_nidigital_instrument_names())
 
     def test_tsm_ssc_n_pins_to_m_sessions(self, digital_tsm_s, tests_pins):
         """TSM SSC Digital N Pins To M Sessions"""
@@ -187,13 +187,13 @@ class TestNIDigital:
                     assert isinstance(per_pin_measurement, float)
                     assert test_voltage - 0.1 <= per_pin_measurement <= test_voltage + 0.1
 
-    def test_tsm_ssc_burst_pattern_pass_fail(self, tsm_context, digital_tsm_s):
+    def test_tsm_ssc_burst_pattern_pass_fail(self, tsm, digital_tsm_s):
         """
         TSM SSC Digital Burst Pattern [Pass Fail]
         TSM SSC Digital Apply Levels and Timing
         """
-        level = tsm_context.nidigital_project_levels_file_paths[0]
-        timing = tsm_context.nidigital_project_timing_file_paths[0]
+        level = tsm.nidigital_project_levels_file_paths[0]
+        timing = tsm.nidigital_project_timing_file_paths[0]
         print(level)
         print(timing)
         print(str(level))
@@ -207,13 +207,13 @@ class TestNIDigital:
             assert isinstance(per_pass, bool)
             assert per_pass
 
-    def test_tsm_ssc_burst_pattern(self, tsm_context, digital_tsm_s):
+    def test_tsm_ssc_burst_pattern(self, tsm, digital_tsm_s):
         """
         TSM SSC Digital Apply Levels and Timing
         TSM SSC Digital Configure Time Set Period
         """
-        level = tsm_context.nidigital_project_levels_file_paths[0]
-        timing = tsm_context.nidigital_project_timing_file_paths[0]
+        level = tsm.nidigital_project_levels_file_paths[0]
+        timing = tsm.nidigital_project_timing_file_paths[0]
         print(level)
         print(timing)
         print(str(level))

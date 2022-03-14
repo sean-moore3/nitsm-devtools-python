@@ -44,43 +44,43 @@ def tsm_context(standalone_tsm):
 @pytest.mark.pin_map(pin_file_name)
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestAbstract:
-    def test_initialize_and_close(self, tsm_context):
-        ni_abstract.initialize_tsm_context(tsm_context)
-        assert 4 == len(ni_abstract.get_all_sessions(tsm_context).enable_pins)
-        assert ni_abstract.get_all_instruments_names(tsm_context)[0] == "Masterconnect"
-        ni_abstract.close_sessions(tsm_context)
+    def test_initialize_and_close(self, tsm):
+        ni_abstract.initialize_tsm_context(tsm)
+        assert 4 == len(ni_abstract.get_all_sessions(tsm).enable_pins)
+        assert ni_abstract.get_all_instruments_names(tsm)[0] == "Masterconnect"
+        ni_abstract.close_sessions(tsm)
 
     def test_check_debug(self):
         ni_abstract.check_debug_ui_tool("")  # TODO add path
 
-    def test_pins_to_session_sessions_info(self, tsm_context):
-        ni_abstract.initialize_tsm_context(tsm_context)
+    def test_pins_to_session_sessions_info(self, tsm):
+        ni_abstract.initialize_tsm_context(tsm)
         pins = ["En_Daq"]
-        enabled = ni_abstract.enable_pins_to_sessions(tsm_context, pins)
+        enabled = ni_abstract.enable_pins_to_sessions(tsm, pins)
         assert enabled.enable_pins[0].enable_pin == pins[0]
-        enabled.connect_sessions_info(tsm_context)
-        t = ni_daqmx.get_all_sessions(tsm_context)[0]
+        enabled.connect_sessions_info(tsm)
+        t = ni_daqmx.get_all_sessions(tsm)[0]
         t.stop()
-        enabled.disconnect_sessions_info(tsm_context)
+        enabled.disconnect_sessions_info(tsm)
         # ni_abstract.disconnect_all(tsm_context)
-        abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm_context, "BuckSGL_1_DUT")
+        abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm, "BuckSGL_1_DUT")
         print(abst_session)
-        enabled.read_state(tsm_context)
+        enabled.read_state(tsm)
         ni_abstract.pins_to_task_and_connect(
-            tsm_context, ["En_Daq"], ["BuckSGL_3_DUT", "BuckSGL_4_DUT"]
+            tsm, ["En_Daq"], ["BuckSGL_3_DUT", "BuckSGL_4_DUT"]
         )
         # ni_abstract.disconnect_all(tsm_context)
-        ni_abstract.disconnect_pin(tsm_context, "BuckSGL_1_DUT")
+        ni_abstract.disconnect_pin(tsm, "BuckSGL_1_DUT")
 
-    def test_pin_name_to_instrument(self, tsm_context):
+    def test_pin_name_to_instrument(self, tsm):
         # ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')
-        print(tsm_context.pin_map_file_path)
+        print(tsm.pin_map_file_path)
         print("INIT")
-        ni_abstract.pin_fgv(tsm_context, "", ni_abstract.Control.init)
+        ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.init)
         print("GET CONNECTIONS")
-        ni_abstract.pin_fgv(tsm_context, "", ni_abstract.Control.get_connections)
+        ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.get_connections)
         print("DISCONNECT ALL")
-        ni_abstract.pin_fgv(tsm_context, "", ni_abstract.Control.disconnect_all)
+        ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.disconnect_all)
 
 
 @nitsm.codemoduleapi.code_module
