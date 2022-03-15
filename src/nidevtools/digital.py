@@ -471,6 +471,11 @@ class _NIDigitalTSM:
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDigitalSSC]):
         self._sscs = sessions_sites_channels
 
+    @property
+    def sessions_sites_channels(self):
+        return self._sscs
+
+
     # Clock Generation #
     def clock_generator_abort(self):
         """
