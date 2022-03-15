@@ -306,6 +306,23 @@ class _NIDigitalSSC:
         self._channels_session.apply_tdr_offsets(per_instrument_offset)
 
     def cs_configure_active_load(self, vcom: float, iol: float, ioh: float):
+        """
+        Configures I\ :sub:`OL`, I\ :sub:`OH`, and V\ :sub:`COM` levels for the active load on the
+        selected pins/channels in the session. The DUT sources or sinks current based on the level
+        values. To enable active load, set the termination mode to TerminationMode.ACTIVE_LOAD. 
+        To disable active load, set the termination mode of the instrument to
+        TerminationMode.HIGH_Z or TerminationMode.VTERM.
+
+        Args:
+            vcom (float): Commutating voltage level at which the active load circuit 
+            switches between sourcing current and sinking current.
+
+            iol (float): Maximum current that the DUT sinks while outputting a voltage 
+            below V\ :sub:`COM`.
+
+            ioh (float): Maximum current that the DUT sources while outputting a voltage 
+            above V\ :sub:`COM`.
+        """
         self._channels_session.configure_active_load_levels(iol, ioh, vcom)
 
     def cs_configure_single_level(self, level_type_to_set: LevelTypeToSet, setting: float):
@@ -742,8 +759,25 @@ class _NIDigitalTSM:
             ssc.cs_apply_tdr_offsets(per_instrument_offset)
 
     def configure_active_load(self, vcom: float, iol: float, ioh: float):
+        """
+        Configures I\ :sub:`OL`, I\ :sub:`OH`, and V\ :sub:`COM` levels for the active load 
+        on the pins in the context. The DUT sources or sinks current based on the level values. 
+        To enable active load, set the termination mode to TerminationMode.ACTIVE_LOAD. 
+        To disable active load, set the termination mode of the instrument to 
+        TerminationMode.HIGH_Z or TerminationMode.VTERM.
+
+        Args:
+            vcom (float): Commutating voltage level at which the active load circuit 
+            switches between sourcing current and sinking current.
+
+            iol (float): Maximum current that the DUT sinks while outputting a voltage 
+            below V\ :sub:`COM`.
+
+            ioh (float): Maximum current that the DUT sources while outputting a voltage 
+            above V\ :sub:`COM`.
+        """
         for ssc in self._sscs:
-            ssc.cs_configure_active_load(iol, ioh, vcom)
+            ssc.cs_configure_active_load(vcom, iol, ioh)
 
     def configure_single_level_per_site(
         self,
