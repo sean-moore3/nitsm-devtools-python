@@ -29,7 +29,7 @@ if SIMULATE_HARDWARE:
 def tsm(standalone_tsm):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
-    This TSM context uses standalone_tsm_context fixture created by the conftest.py
+    This TSM context uses standalone_tsm context fixture created by the conftest.py
     The fixture provides the digital project files necessary for initialization of sessions
     in a dictionary format.
     """
