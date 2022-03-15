@@ -30,7 +30,7 @@ def tsm(standalone_tsm):
     This TSM context uses standalone_tsm_context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
-    ni_fpga.initialize_sessions(standalone_tsm)
+    print("LLL", ni_fpga.initialize_sessions(standalone_tsm))
     yield standalone_tsm
     ni_fpga.close_sessions(standalone_tsm)
 
