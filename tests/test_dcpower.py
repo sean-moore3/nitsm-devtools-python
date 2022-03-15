@@ -246,7 +246,7 @@ class TestDCPower:
 
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm: SMContext):
-    # ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
+    # ctypes.windll.user32.MessageBoxW(None, "niPythonHost Process ID:" + str(os.getpid()), "Attach debugger", 0)
     dcpower.initialize_sessions(tsm, options=OPTIONS)
     dcpower_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
     dcpower_tsm[1].reset()
@@ -255,12 +255,7 @@ def initialize_sessions(tsm: SMContext):
 
 @nitsm.codemoduleapi.code_module
 def configure_measurements(tsm: SMContext):
-    ctypes.windll.user32.MessageBoxW(
-        None,
-        "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()),
-        "Attach debugger",
-        0,
-    )
+    # ctypes.windll.user32.MessageBoxW(None, "niPythonHost Process ID:" + str(os.getpid()),"Attach debugger", 0)
     dc_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2"])
     dc_tsm.ssc.abort()
     dc_tsm.ssc.configure_aperture_time_with_abort_and_initiate()

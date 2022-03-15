@@ -654,7 +654,7 @@ def read_pins(tsm: SMContext):
 
 @nitsm.codemoduleapi.code_module
 def burst_pattern(tsm: SMContext):
-    dpi_tsm = ni_dt_digital.pins_to_sessions(tsm, ["DPI_SR_VDD", "DPI_PM_VDD"])
+    dpi_tsm = ni_dt_digital.pins_to_sessions(tsm, ["DPI_DO_SCL", "DPI_DO_SDA"])
     dpi_tsm.ssc.apply_levels_and_timing("I2C_Levels", "I2C_Timing")
-    per_site_pass = dpi_tsm.burst_pattern_pass_fail("I2C_Write")
+    per_site_pass = dpi_tsm.burst_pattern_pass_fail("I2C_Read_Loop")
     print(per_site_pass)
