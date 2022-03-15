@@ -29,7 +29,7 @@ StringTuple = typing.Tuple[str]
 def tsm(standalone_tsm):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
-    This TSM context uses standalone_tsm_context fixture created by the conftest.py
+    This TSM context uses standalone_tsm context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
     ni_daqmx.set_task(standalone_tsm)
@@ -67,7 +67,7 @@ class TestDaqmx:
             assert len(queried_tasks) == 2  # Matching quantity
 
     def test_pin_to_sessions_info(self, daqmx_tsm_s):
-        tsm_context = daqmx_tsm_s[0]
+        tsm = daqmx_tsm_s[0]
         list_daqmx_tsm = daqmx_tsm_s[1]
         print(list_daqmx_tsm)
         for daqmx_tsm in list_daqmx_tsm:
@@ -76,7 +76,7 @@ class TestDaqmx:
             assert isinstance(daqmx_tsm, ni_daqmx.MultipleSessions)
             assert isinstance(daqmx_tsm.pin_query_context, ni_daqmx.PinQuery)
             assert isinstance(daqmx_tsm.sessions, typing.List)
-            assert len(daqmx_tsm.sessions) == len(tsm_context.site_numbers)
+            assert len(daqmx_tsm.sessions) == len(tsm.site_numbers)
 
     def test_get_all_instrument_names(self, tsm):
         data = ni_daqmx.get_all_instrument_names(tsm)
