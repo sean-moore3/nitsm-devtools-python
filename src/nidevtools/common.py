@@ -189,11 +189,11 @@ def pin_query_context_to_channel_list(
     """
     provides the p.
     """
-    tsm_context = pin_query_context._tsm_context
-    tsm_context1 = SMContext(tsm_context)
+    tsm = pin_query_context._tsm_context
+    tsm1 = SMContext(tsm)
     if not sites:
         """Get site numbers if not provided"""
-        sites = list(tsm_context1.site_numbers)
+        sites = list(tsm1.site_numbers)
     if expanded_pin_info:
         pins = [pin_info.pin for pin_info in expanded_pin_info]
         pin_types = [pin_info.type for pin_info in expanded_pin_info]
@@ -207,12 +207,12 @@ def pin_query_context_to_channel_list(
         expand pin groups
         """
         pins = pin_query_context._pins
-        pin_types, pins = _check_for_pin_group(tsm_context, pins)
+        pin_types, pins = _check_for_pin_group(tsm, pins)
     (
         num_pins_per_channel_group,
         channel_group_indices,
         channel_indices,
-    ) = tsm_context.GetChannelGroupAndChannelIndex(pins=pins)
+    ) = tsm.GetChannelGroupAndChannelIndex(pins=pins)
     channel_group_indices = tuple(zip(*channel_group_indices))  # transpose(channel_group_indices)
     channel_indices = tuple(zip(*channel_indices))  # transpose(channel_indices)
     data = []
