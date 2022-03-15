@@ -110,10 +110,10 @@ class TestFPGA:
             ni_fpga.Connectors.Connector0, ni_fpga.DIOLines.DIO7, ni_fpga.StaticStates.Zero
         )
         assert fpga_session7821.read_all_lines().Connector0 == 0
-        wr1 = ni_fpga.DIOLineLocationandStaticState(
+        wr1 = ni_fpga.DIOLineLocationAndStaticState(
             ni_fpga.DIOLines(7), ni_fpga.Connectors(0), ni_fpga.StaticStates(0)
         )
-        wr2 = ni_fpga.DIOLineLocationandStaticState(
+        wr2 = ni_fpga.DIOLineLocationAndStaticState(
             ni_fpga.DIOLines(6), ni_fpga.Connectors(0), ni_fpga.StaticStates(1)
         )
         fpga_session7820.write_multiple_dio_lines([wr2, wr1])
@@ -241,10 +241,10 @@ def ts_wr_and_rd(tsm_context):
         ni_fpga.Connectors.Connector0, ni_fpga.DIOLines.DIO7, ni_fpga.StaticStates.Zero
     )
     # assert (fpga_session7821.read_all_lines().Connector0 == 0)
-    wr1 = ni_fpga.DIOLineLocationandStaticState(
+    wr1 = ni_fpga.DIOLineLocationAndStaticState(
         ni_fpga.DIOLines(7), ni_fpga.Connectors(0), ni_fpga.StaticStates(0)
     )
-    wr2 = ni_fpga.DIOLineLocationandStaticState(
+    wr2 = ni_fpga.DIOLineLocationAndStaticState(
         ni_fpga.DIOLines(6), ni_fpga.Connectors(0), ni_fpga.StaticStates(1)
     )
     fpga_session7820.write_multiple_dio_lines([wr2, wr1])

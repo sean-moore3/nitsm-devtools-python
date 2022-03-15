@@ -112,19 +112,19 @@ class LineLocation(typing.NamedTuple):  # Channel
     connector: Connectors
 
 
-class DIOLineLocationandStaticState(typing.NamedTuple):  # Channel
+class DIOLineLocationAndStaticState(typing.NamedTuple):  # Channel
     channel: DIOLines
     connector: Connectors
     state: StaticStates
 
 
-class LineLocationandStates(typing.NamedTuple):  # Channel
+class LineLocationAndStates(typing.NamedTuple):  # Channel
     channel: DIOLines
     connector: Connectors
     state: States
 
 
-class DIOLineLocationandReadState(typing.NamedTuple):  # Channel
+class DIOLineLocationAndReadState(typing.NamedTuple):  # Channel
     channel: DIOLines
     connector: Connectors
     state: bool
@@ -150,7 +150,7 @@ class _SSCFPGA(typing.NamedTuple):
             r_list.append(int(ch) % 32)
         lines_to_write = []
         for s_s, iq, r in zip(static_states, iq_list, r_list):
-            element = DIOLineLocationandStaticState(DIOLines(r), Connectors(iq), s_s)
+            element = DIOLineLocationAndStaticState(DIOLines(r), Connectors(iq), s_s)
             lines_to_write.append(element)
         self.write_multiple_dio_lines(lines_to_write)
 
@@ -163,7 +163,7 @@ class _SSCFPGA(typing.NamedTuple):
             r_list.append(int(ch) % 32)
         lines_to_write = []
         for s_s, iq, r in zip(static_states, iq_list, r_list):
-            element = DIOLineLocationandStaticState(DIOLines(r), Connectors(iq), s_s)
+            element = DIOLineLocationAndStaticState(DIOLines(r), Connectors(iq), s_s)
             lines_to_write.append(element)
         self.write_multiple_dio_lines(lines_to_write)
         # TODO Check difference with ss_wr_static_array
@@ -248,8 +248,8 @@ class _SSCFPGA(typing.NamedTuple):
         clock_stretching: bool = True,
     ):
         """
-        Allows configure host setting in the master device. Data provided should be supported by the FPGA and match
-        HW configuration
+        Allows to configure the host setting in the master device. Data provided should be
+        supported by the FPGA and match HW configuration
         """
         # cluster = WorldControllerSetting(divide=divide, ten_bit_addressing=ten_bit_addressing)
         if 0 <= i2c_master_in.value <= 3:
@@ -274,7 +274,7 @@ class _SSCFPGA(typing.NamedTuple):
     ):
         """
         Waits slave ready signal until configured timeout has passed. After the signal has been received it releases the
-        resources to allow write or read. If the time out expires it will rise an error 5000
+        resources to write or read. If the timeout expires it will rise an error 5000
         """
         if timeout == 0:
             timeout = start_time
@@ -315,7 +315,7 @@ class _SSCFPGA(typing.NamedTuple):
             i2c_master_in: This indicates the bitfile to be used. It should match HW being utilized
             device_address: Address of the device to read from
             timeout: After it passes the function will raise an exception
-            number_of_bytes: expected number of bytes to be readed
+            number_of_bytes: expected number of bytes to be read
         """
         start_time = time()
         if timeout > 30:
@@ -343,7 +343,7 @@ class _SSCFPGA(typing.NamedTuple):
         master_go.write(True)
         self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         data = master_data.read()
-        data = data[0 : number_of_bytes + 1]
+        data = data[0: number_of_bytes + 1]
         return data
 
     def i2c_master_write(
@@ -431,7 +431,7 @@ class _SSCFPGA(typing.NamedTuple):
                 pass
             else:
                 line_state = States.I2C
-            state = LineLocationandStates(line, connector, line_state)
+            state = LineLocationAndStates(line, connector, line_state)
             states_list.append(state)
         return states_list
 
@@ -452,7 +452,7 @@ class _SSCFPGA(typing.NamedTuple):
             data = ch_data_list[connector.value]
             state_list = list("{:032b}".format(data, "b"))[::-1]
             line_state = state_list[line.value]
-            state = DIOLineLocationandReadState(line, connector, line_state)
+            state = DIOLineLocationAndReadState(line, connector, line_state)
             readings.append(state)
         return readings
 
@@ -477,9 +477,9 @@ class _SSCFPGA(typing.NamedTuple):
         line_state = state_list[line.value]
         return line_state
 
-    def write_multiple_dio_lines(self, lines_to_write: typing.List[DIOLineLocationandStaticState]):
+    def write_multiple_dio_lines(self, lines_to_write: typing.List[DIOLineLocationAndStaticState]):
         """
-        Writes the provided list of DIOLineLocationandStaticState objects into the FPGA uning the addres provided in
+        Writes the provided list of DIOLineLocationAndStaticState objects into the FPGA using the address provided in
         each element
         """
         con_list = []
@@ -518,15 +518,15 @@ class TSMFPGA(typing.NamedTuple):
     site_numbers: typing.List[int]
 
     def configure_i2c_bus(
-        self, tenb_addresing: bool = False, divide: int = 8, clock_stretching: bool = True
+        self, ten_bit_addressing: bool = False, divide: int = 8, clock_stretching: bool = True
     ):
         """
-        Allows configure host setting for the TSMFPGA session. Data provided should be supported by the FPGA and match
-        HW configuration for that specific session.
+        Allows to configure the host setting for the TSMFPGA session. Data provided should be supported
+        by the FPGA and match HW configuration for that specific session.
         """
         session: _SSCFPGA
         session, i2c = self.extract_i2c_master_from_sessions()
-        session.configure_i2c_master_settings(i2c, divide, tenb_addresing, clock_stretching)
+        session.configure_i2c_master_settings(i2c, divide, ten_bit_addressing, clock_stretching)
 
     def read_i2c_data(self, timeout: float = 1, slave_address: int = 0, number_of_bytes: int = 1):
         """
@@ -534,7 +534,7 @@ class TSMFPGA(typing.NamedTuple):
         Args:
             slave_address: Address of the device to read from
             timeout: After it passes the function will raise an exception
-            number_of_bytes: expected number of bytes to be readed
+            number_of_bytes: expected number of bytes to be read
         """
         session: _SSCFPGA
         session, i2c = self.extract_i2c_master_from_sessions()
@@ -545,11 +545,11 @@ class TSMFPGA(typing.NamedTuple):
         self, data_to_write: typing.List[int], timeout: float = 1, slave_address: int = 0
     ):
         """
-        Writes to the FPGA session the provided list of integrers.
+        Writes to the FPGA session the provided list of integers.
         Args:
             slave_address: Address of the device to write the provided data
             timeout: If it passes the function will raise an exception
-            data_to_write: list of integrers to write on the FPGA session
+            data_to_write: list of integers to write on the FPGA session
         """
         session: _SSCFPGA
         session, i2c = self.extract_i2c_master_from_sessions()
@@ -557,7 +557,7 @@ class TSMFPGA(typing.NamedTuple):
 
     def extract_i2c_master_from_sessions(self):
         """
-        From session it determines the right configuration to be used that Matches de FPGA HW
+        From session, it determines the right configuration to be used that Matches de FPGA HW
         """
         session = self.SSC[0]  # .Session
         ch_list = self.SSC[0].ChannelList
@@ -706,7 +706,7 @@ def close_sessions(tsm_context: SMContext):
     """
     Clears the FPGA session.  Before clearing, this method aborts the session, if necessary, and releases any resources
     the session has reserved. You cannot use a session after you clear it unless you recreate the session.
-    If you create a FPGA session object within a loop, use this method within the loop after you are finished with the
+    If you create the FPGA session object within a loop, use this method within the loop after you are finished with the
     session to avoid allocating unnecessary memory.
     """
     # session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(InstrumentTypeId)
@@ -771,7 +771,7 @@ def open_reference(rio_resource: str, target: BoardType, ldb_type: str):
     """
     Creates an FPGA session for the specific RIO resource.
     Args:
-        rio_resource: FPGA board name shoul match with NI-MAX
+        rio_resource: FPGA board name should match with NI-MAX
         target: HW type should match with the real hardware
         ldb_type:String indicating LDB type
     """
