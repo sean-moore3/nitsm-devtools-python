@@ -861,10 +861,10 @@ def _pin_query_context_to_channel_list(
     sites: typing.List[int],
 ):
     """Private function for getting the channel list from pin query context"""
-    tsm_context = pin_query_context._tsm_context
-    tsm_context1 = nitsm.codemoduleapi.SemiconductorModuleContext(tsm_context)
+    tsm = pin_query_context._tsm_context
+    tsm1 = nitsm.codemoduleapi.SemiconductorModuleContext(tsm)
     if len(sites) == 0:
-        sites = list(tsm_context1.site_numbers)
+        sites = list(tsm1.site_numbers)
     if expanded_pins_information:
         pin_names = []
         pin_types = []
@@ -881,14 +881,14 @@ def _pin_query_context_to_channel_list(
         expand pin groups
         """
         pin_names = pin_query_context._pins
-        pin_types, pin_names = ni_dt_common._check_for_pin_group(tsm_context1, pin_names)
+        pin_types, pin_names = ni_dt_common._check_for_pin_group(tsm1, pin_names)
     pins_array_for_session_input: typing.List[PinsCluster] = []
     channel_list_per_session = ()
     (
         number_of_pins_per_channel,
         channel_group_indices,
         channel_indices,
-    ) = tsm_context.GetChannelGroupAndChannelIndex(pin_names)
+    ) = tsm.GetChannelGroupAndChannelIndex(pin_names)
     for number_of_pins in number_of_pins_per_channel:
         """
         Create a pins list for each session of the correct size
@@ -931,11 +931,11 @@ def _pin_query_context_to_channel_list(
 
 # Pinmap
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int] = []):
+def pins_to_sessions(tsm: SMContext, pins: typing.List[str], sites: typing.List[int] = []):
     """Returns the pin-query context object for the given pins at given sites.
 
     Args:
-        tsm_context (TSMContext): Semiconductor module Reference from the TestStand.
+        tsm (TSMContext): Semiconductor module Reference from the TestStand.
         pins (typing.List[str]): Pins names defined in the current the pinmap.
         sites (typing.List[int], optional): if you need to control only on specific sites,
         then provide site numbers. Defaults to [].
@@ -945,8 +945,8 @@ def pins_to_sessions(tsm_context: SMContext, pins: typing.List[str], sites: typi
         are available as properties and methods of this object.
     """
     if len(sites) == 0:
-        sites = list(tsm_context.site_numbers)  # This is tested and works
-    pin_query_context, sessions, channels = tsm_context.pins_to_niscope_sessions(pins)
+        sites = list(tsm.site_numbers)  # This is tested and works
+    pin_query_context, sessions, channels = tsm.pins_to_niscope_sessions(pins)
     sites, pin_lists = _pin_query_context_to_channel_list(pin_query_context, [], sites)
     # sites, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
     sscs = [
@@ -958,9 +958,9 @@ def pins_to_sessions(tsm_context: SMContext, pins: typing.List[str], sites: typi
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: SMContext, options: dict = {}):
+def initialize_sessions(tsm: SMContext, options: dict = {}):
     """Opens sessions for all NI-SCOPE instrument channels that are defined in pinmap associated with the tsm context"""
-    instrument_names = tsm_context.get_all_niscope_instrument_names()
+    instrument_names = tsm.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
         session = niscope.Session(instrument_name, reset_device=True, options=options)
         try:
@@ -969,14 +969,14 @@ def initialize_sessions(tsm_context: SMContext, options: dict = {}):
             session.reset_device()
         session.configure_chan_characteristics(1e6, -1)
         session.commit()
-        tsm_context.set_niscope_session(instrument_name, session)
+        tsm.set_niscope_session(instrument_name, session)
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: SMContext):
+def close_sessions(tsm: SMContext):
     """Resets and Closes all the NI-SCOPE instruments sessions from the pinmap file associated
     with the Semiconductor Module Context."""
-    sessions = tsm_context.get_all_niscope_sessions()
+    sessions = tsm.get_all_niscope_sessions()
     for session in sessions:
         session.reset()
         session.close()
