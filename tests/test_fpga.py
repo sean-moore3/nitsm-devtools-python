@@ -27,7 +27,7 @@ StringTuple = typing.Tuple[str]
 def tsm(standalone_tsm):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
-    This TSM context uses standalone_tsm_context fixture created by the conftest.py
+    This TSM context uses standalone_tsm context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
     print("LLL", ni_fpga.initialize_sessions(standalone_tsm))
@@ -169,19 +169,19 @@ class TestFPGA:
 
 
 @nitsm.codemoduleapi.code_module
-def ts_open_sessions(tsm_context: SMContext):
-    ni_fpga.initialize_sessions(tsm_context)
+def ts_open_sessions(tsm: SMContext):
+    ni_fpga.initialize_sessions(tsm)
 
 
 @nitsm.codemoduleapi.code_module
-def ts_close_sessions(tsm_context: SMContext):
-    ni_fpga.close_sessions(tsm_context)
+def ts_close_sessions(tsm: SMContext):
+    ni_fpga.close_sessions(tsm)
 
 
 @nitsm.codemoduleapi.code_module
-def ts_initialize_sessions(tsm_context):
-    print(tsm_context.pin_map_file_path)
-    queried_sessions = tsm_context.get_all_custom_sessions("782xFPGA")
+def ts_initialize_sessions(tsm):
+    print(tsm.pin_map_file_path)
+    queried_sessions = tsm.get_all_custom_sessions("782xFPGA")
     assert isinstance(queried_sessions[0], tuple)  # Type verification
     for session in queried_sessions[0]:
         print("\nTest_Init/Clear_Sessions\n", session)
@@ -191,17 +191,17 @@ def ts_initialize_sessions(tsm_context):
 
 
 @nitsm.codemoduleapi.code_module
-def ts_get_i2c_master_session(tsm_context):
-    print(ni_fpga.get_i2c_master_session(tsm_context, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True))
+def ts_get_i2c_master_session(tsm):
+    print(ni_fpga.get_i2c_master_session(tsm, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True))
 
 
 @nitsm.codemoduleapi.code_module
-def ts_wr(tsm_context):
+def ts_wr(tsm):
     fpga_tsms = []
     sessions = []
     tests_pins = [["RIO_Pins"]]
     for test_pin_group in tests_pins:
-        data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
+        data = ni_fpga.pins_to_sessions(tsm, test_pin_group)
         fpga_tsms.append(data)
         sessions += data.SSC
     fpga_session7821 = fpga_tsms[0].SSC[1]
@@ -216,12 +216,12 @@ def ts_wr(tsm_context):
 
 
 @nitsm.codemoduleapi.code_module
-def ts_wr_and_rd(tsm_context):
+def ts_wr_and_rd(tsm):
     fpga_tsms = []
     sessions = []
     tests_pins = [["RIO_Pins"]]
     for test_pin_group in tests_pins:
-        data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
+        data = ni_fpga.pins_to_sessions(tsm, test_pin_group)
         fpga_tsms.append(data)
         sessions += data.SSC
     fpga_session7821 = fpga_tsms[0].SSC[1]
@@ -277,12 +277,12 @@ def ts_wr_and_rd(tsm_context):
 
 
 @nitsm.codemoduleapi.code_module
-def ts_rd_wr_static(tsm_context):
+def ts_rd_wr_static(tsm):
     fpga_tsms = []
     sessions = []
     tests_pins = [["RIO_Pins"]]
     for test_pin_group in tests_pins:
-        data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
+        data = ni_fpga.pins_to_sessions(tsm, test_pin_group)
         fpga_tsms.append(data)
         sessions += data.SSC
     fpga_tsms[0].write_static([ni_fpga.StaticStates.Zero] * 128)
@@ -300,12 +300,12 @@ def ts_rd_wr_static(tsm_context):
 
 
 @nitsm.codemoduleapi.code_module
-def ts_rd_commanded(tsm_context):
+def ts_rd_commanded(tsm):
     fpga_tsms = []
     sessions = []
     tests_pins = [["RIO_Pins"]]
     for test_pin_group in tests_pins:
-        data = ni_fpga.pins_to_sessions(tsm_context, test_pin_group)
+        data = ni_fpga.pins_to_sessions(tsm, test_pin_group)
         fpga_tsms.append(data)
         sessions += data.SSC
     print(fpga_tsms[0].read_commanded_line_states())
