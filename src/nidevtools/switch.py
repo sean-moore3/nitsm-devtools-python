@@ -59,15 +59,15 @@ class MultipleSessions:
 instrument_type_id = "_niSwitch"
 
 
-def get_all_instruments_names(tsm_context: SMContext):
-    instrument_names, channel_group_ids, channel_lists = tsm_context.get_custom_instrument_names(
+def get_all_instruments_names(tsm: SMContext):
+    instrument_names, channel_group_ids, channel_lists = tsm.get_custom_instrument_names(
         instrument_type_id
     )
     return instrument_names, channel_group_ids
 
 
-def get_all_sessions(tsm_context: SMContext):
-    session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(
+def get_all_sessions(tsm: SMContext):
+    session_data, channel_group_ids, channel_lists = tsm.get_all_custom_sessions(
         instrument_type_id
     )
     list_of_sessions = []
@@ -76,14 +76,14 @@ def get_all_sessions(tsm_context: SMContext):
     return list_of_sessions
 
 
-def pin_to_sessions_session_info(tsm_context: SMContext, pin: str = ""):
+def pin_to_sessions_session_info(tsm: SMContext, pin: str = ""):
     try:
         (
             pin_query_context,
             session_data,
             channel_group_id,
             channel_list,
-        ) = tsm_context.pins_to_custom_session(instrument_type_id, pin)
+        ) = tsm.pins_to_custom_session(instrument_type_id, pin)
         relay_name = channel_group_id
         # TODO CHECK for better equivalent
         data = MultipleSessions([Session(session_data, pin, relay_name)])
@@ -91,17 +91,17 @@ def pin_to_sessions_session_info(tsm_context: SMContext, pin: str = ""):
     except Exception:
         return None
     # pin_query_context,session_data,channel_group_ids,channel_lists =
-    # tsm_context.pins_to_custom_sessions(instrument_type_id, pin)
+    # tsm.pins_to_custom_sessions(instrument_type_id, pin)
 
 
 def set_sessions(
-    tsm_context: SMContext, switch_name: str, session: niswitch.Session, channel_group_id: str
+    tsm: SMContext, switch_name: str, session: niswitch.Session, channel_group_id: str
 ):
-    tsm_context.set_custom_session(instrument_type_id, switch_name, channel_group_id, session)
+    tsm.set_custom_session(instrument_type_id, switch_name, channel_group_id, session)
 
 
-def close_sessions(tsm_context: SMContext):
-    sessions = get_all_sessions(tsm_context)
+def close_sessions(tsm: SMContext):
+    sessions = get_all_sessions(tsm)
     sessions_to_close = []
     for session in sessions:
         try:
@@ -125,12 +125,12 @@ def name_to_topology(name: str = ""):
         return "Configured Topology"
 
 
-def initialize_sessions(tsm_context: SMContext):
+def initialize_sessions(tsm: SMContext):
     switch_name = ""
-    instrument_names, channel_group_ids = get_all_instruments_names(tsm_context)
+    instrument_names, channel_group_ids = get_all_instruments_names(tsm)
     for name, channel_id in zip(instrument_names, channel_group_ids):
         if name != switch_name:
             switch_name = name
             topology = name_to_topology(name)
             handle = niswitch.Session(name, topology)
-            set_sessions(tsm_context, name, handle, channel_id)
+            set_sessions(tsm, name, handle, channel_id)
