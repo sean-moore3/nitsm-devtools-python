@@ -224,7 +224,7 @@ def close_sessions(tsm: SMContext):  # Comment: Nothing to do
 
 # Not used
 """
-def debug_ui(tsm_context: TSMContext):
+def debug_ui(tsm: SMContext):
     pass
 """
 
