@@ -253,7 +253,7 @@ def disconnect_pin(tsm: SMContext, pin: str):
     sessions.disconnect_sessions_info(tsm)
 
 
-def initialize_tsm_context(tsm: SMContext):  # CHECK
+def initialize(tsm: SMContext):  # CHECK
     """
     Initialize the TSM context with all the Abstract switch sessions
     Args:
@@ -283,7 +283,7 @@ def initialize_tsm_context(tsm: SMContext):  # CHECK
                 "Unsupported Pin Map for the Abstract Switch."
                 "Ensure you only have one abstract switch in the pinmap"
             ),
-            "initialize_tsm_context()",
+            "initialize()",
             ["tsm_context"],
             (tsm,),
         )
