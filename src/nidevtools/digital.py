@@ -141,23 +141,21 @@ class _NIDigitalSSC:
         """
         return self._channels_session.clock_generator_abort()
 
-    def cs_clock_generator_generate_clock(self, frequency: float, select_digital_function: bool = True):
+    def cs_clock_generator_generate_clock(self, frequency: float, select_digital: bool = True):
         """
         Configures clock generator frequency and initiates clock generation on specified channel(s)
         or pin(s) and pin group(s).
 
         Args:
             frequency (float): The frequency of the clock generation, in Hz.
-            select_digital_function (Bool, optional): A Boolean that specifies whether to select the
+            select_digital (Bool, optional): A Boolean that specifies whether to select the
             digital method for the pins specified prior to starting clock generation.
             Defaults to True.
 
         Returns:
             none: when successful otherwise exception will be thrown.
         """
-        return self._channels_session.clock_generator_generate_clock(
-            frequency, select_digital_function
-        )
+        return self._channels_session.clock_generator_generate_clock(frequency, select_digital)
 
     def cs_modify_time_set_for_clock_generation(self, frequency: float, duty_cycle: float, time_set: str):
         """
@@ -1731,23 +1729,23 @@ def _channel_list_to_pins(channel_list: str):
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: SMContext, options: dict = {}):
+def initialize_sessions(tsm: SMContext, options: dict = {}):
     """
     Creates the sessions for all the nidigital resource string available in the
-    tsm_context for instruments
+    tsm context for instruments
     """
-    pin_map_file_path = tsm_context.pin_map_file_path
-    instrument_names = tsm_context.get_all_nidigital_instrument_names()
+    pin_map_file_path = tsm.pin_map_file_path
+    instrument_names = tsm.get_all_nidigital_instrument_names()
     if instrument_names:
-        specifications_files = tsm_context.nidigital_project_specifications_file_paths
-        levels_files = tsm_context.nidigital_project_levels_file_paths
-        timing_files = tsm_context.nidigital_project_timing_file_paths
-        pattern_files = tsm_context.nidigital_project_pattern_file_paths
-        source_waveform_files = tsm_context.nidigital_project_source_waveform_file_paths
-        capture_waveform_files = tsm_context.nidigital_project_capture_waveform_file_paths
+        specifications_files = tsm.nidigital_project_specifications_file_paths
+        levels_files = tsm.nidigital_project_levels_file_paths
+        timing_files = tsm.nidigital_project_timing_file_paths
+        pattern_files = tsm.nidigital_project_pattern_file_paths
+        source_waveform_files = tsm.nidigital_project_source_waveform_file_paths
+        capture_waveform_files = tsm.nidigital_project_capture_waveform_file_paths
         for instrument_name in instrument_names:
             session = nidigital.Session(instrument_name, options=options)
-            tsm_context.set_nidigital_session(instrument_name, session)
+            tsm.set_nidigital_session(instrument_name, session)
             session.load_pin_map(pin_map_file_path)
             session.load_specifications_levels_and_timing(
                 specifications_files, levels_files, timing_files
@@ -1770,28 +1768,28 @@ def initialize_sessions(tsm_context: SMContext, options: dict = {}):
 
 
 @nitsm.codemoduleapi.code_module
-def pin_to_n_sessions(tsm_context: SMContext, pin: str):
-    return pins_to_sessions(tsm_context, [pin])
+def pin_to_n_sessions(tsm: SMContext, pin: str):
+    return pins_to_sessions(tsm, [pin])
 
 
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
-    tsm_context: SMContext,
+    tsm: SMContext,
     pins: typing.List[str],
     sites: typing.List[int] = [],
     turn_pin_groups_to_pins: bool = True,
 ):
     if len(sites) == 0:
-        sites = list(tsm_context.site_numbers)
+        sites = list(tsm.site_numbers)
     if turn_pin_groups_to_pins:
-        pins = list(tsm_context.get_pins_in_pin_groups(pins))
+        pins = list(tsm.get_pins_in_pin_groups(pins))
     sscs: typing.List[_NIDigitalSSC] = []
     (
         pin_query_context,
         sessions,
         pin_set_strings,
-    ) = tsm_context.pins_to_nidigital_sessions_for_ppmu(pins)
-    _, _, site_lists = tsm_context.pins_to_nidigital_sessions_for_pattern(pins)
+    ) = tsm.pins_to_nidigital_sessions_for_ppmu(pins)
+    _, _, site_lists = tsm.pins_to_nidigital_sessions_for_pattern(pins)
     for session, pin_set_string, site_list in zip(sessions, pin_set_strings, site_lists):
         sscs.append(_NIDigitalSSC(session, pin_set_string, site_list))
     nidigital_tsm = _NIDigitalTSM(sscs)
@@ -1799,9 +1797,9 @@ def pins_to_sessions(
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: SMContext):
+def close_sessions(tsm: SMContext):
     """Closes the sessions associated with the tsm context"""
-    sessions = tsm_context.get_all_nidigital_sessions()
+    sessions = tsm.get_all_nidigital_sessions()
     for session in sessions:
         session.reset()
         session.close()
