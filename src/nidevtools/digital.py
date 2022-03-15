@@ -1768,7 +1768,7 @@ def initialize_sessions(tsm: SMContext, options: dict = {}):
 
 
 @nitsm.codemoduleapi.code_module
-def pin_to_n_sessions(tsm: SMContext, pin: str):
+def pin_to_sessions(tsm: SMContext, pin: str):
     return pins_to_sessions(tsm, [pin])
 
 
