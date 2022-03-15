@@ -156,12 +156,12 @@ class TSMFGen(typing.NamedTuple):
 
 
 @nitsm.codemoduleapi.code_module
-def pins_to_sessions(tsm_context: SMContext, pins: typing.List[str], sites: typing.List[int]):
+def pins_to_sessions(tsm: SMContext, pins: typing.List[str], sites: typing.List[int]):
     """
     Returns the pin-query context object for the given pins at given sites.
 
     Args:
-        tsm_context (TSMContext): Semiconductor module Reference from the TestStand.
+        tsm (TSMContext): Semiconductor module Reference from the TestStand.
         pins (typing.List[str]): Pins names defined in the current the pinmap.
         sites (typing.List[int]): if you need to control only on specific sites,
         then provide site numbers. Defaults to [].
@@ -170,7 +170,7 @@ def pins_to_sessions(tsm_context: SMContext, pins: typing.List[str], sites: typi
         TSMScope object :  for the selected pins. All instrument specific operations
         are available as properties and methods of this object.
     """
-    pin_query_context, sessions, channels = tsm_context.pins_to_nifgen_sessions(pins)
+    pin_query_context, sessions, channels = tsm.pins_to_nifgen_sessions(pins)
     sites_out, pin_list_per_session = ni_dt_common.pin_query_context_to_channel_list(
         pin_query_context, [], sites
     )
@@ -182,17 +182,17 @@ def pins_to_sessions(tsm_context: SMContext, pins: typing.List[str], sites: typi
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: SMContext, options: dict = {}):
+def initialize_sessions(tsm: SMContext, options: dict = {}):
     """Opens sessions for all instrument channels that are associated with the tsm context"""
-    instrument_names = tsm_context.get_all_nifgen_instrument_names()
+    instrument_names = tsm.get_all_nifgen_instrument_names()
     for instrument_name in instrument_names:
         session = nifgen.Session(instrument_name, reset_device=True, options=options)
-        tsm_context.set_nifgen_session(instrument_name, session)
-    dut_pins, system_pins = tsm_context.get_pin_names()
+        tsm.set_nifgen_session(instrument_name, session)
+    dut_pins, system_pins = tsm.get_pin_names()
     all_pins = dut_pins + system_pins
     instrument_type = nitsm.enums.InstrumentTypeIdConstants.NI_FGEN
-    fgen_pins = tsm_context.filter_pins_by_instrument_type(all_pins, instrument_type, "")
-    pin_query_context, sessions, channels = tsm_context.pins_to_nifgen_sessions(fgen_pins)
+    fgen_pins = tsm.filter_pins_by_instrument_type(all_pins, instrument_type, "")
+    pin_query_context, sessions, channels = tsm.pins_to_nifgen_sessions(fgen_pins)
     for fgen_session, channel_list in zip(sessions, channels):
         temp = set(channel_list)
         channels = list(temp)
@@ -200,9 +200,9 @@ def initialize_sessions(tsm_context: SMContext, options: dict = {}):
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: SMContext):
+def close_sessions(tsm: SMContext):
     """Closes the sessions associated with the tsm context"""
-    sessions = tsm_context.get_all_nifgen_sessions()
+    sessions = tsm.get_all_nifgen_sessions()
     for session in sessions:
         session.reset()
         session.close()
