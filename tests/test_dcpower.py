@@ -24,7 +24,7 @@ if SIMULATE:
 def tsm(standalone_tsm):
     """
     This TSM context is on simulated hardware or on real hardware based on OPTIONS defined below.
-    This TSM context uses standalone_tsm_context fixture created by the conftest.py
+    This TSM context uses standalone_tsm context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
     dcpower.initialize_sessions(standalone_tsm, options=OPTIONS)
@@ -245,85 +245,85 @@ class TestDCPower:
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm_context: SMContext):
+def initialize_sessions(tsm: SMContext):
     # ctypes.windll.user32.MessageBoxW(None, "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()), "Attach debugger", 0)
-    dcpower.initialize_sessions(tsm_context, options=OPTIONS)
-    dcpower_tsm = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
+    dcpower.initialize_sessions(tsm, options=OPTIONS)
+    dcpower_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
     dcpower_tsm[1].reset()
     time.sleep(0.5)
 
 
 @nitsm.codemoduleapi.code_module
-def configure_measurements(tsm_context: SMContext):
+def configure_measurements(tsm: SMContext):
     ctypes.windll.user32.MessageBoxW(
         None,
         "Process name: niPythonHost.exe and Process ID: " + str(os.getpid()),
         "Attach debugger",
         0,
     )
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2"])
-    tsminfo.ssc.abort()
-    tsminfo.ssc.configure_aperture_time_with_abort_and_initiate()
-    # tsminfo.ssc.configure_settings(20e-3, 0.0, ni_dt_dcpower.enums.Sense.LOCAL)
-    # ap_time = tsminfo.ssc.get_aperture_times_in_seconds()
-    # output_state = tsminfo.ssc.query_output_state
-    # max_curr = tsminfo.ssc.get_max_current
+    dc_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2"])
+    dc_tsm.ssc.abort()
+    dc_tsm.ssc.configure_aperture_time_with_abort_and_initiate()
+    # dc_tsm.ssc.configure_settings(20e-3, 0.0, ni_dt_dcpower.enums.Sense.LOCAL)
+    # ap_time = dc_tsm.ssc.get_aperture_times_in_seconds()
+    # output_state = dc_tsm.ssc.query_output_state
+    # max_curr = dc_tsm.ssc.get_max_current
     # print(ap_time)
     # print(output_state)
     # print(max_curr)
 
 
 @nitsm.codemoduleapi.code_module
-def configure_measurements_waveform(tsm_context: SMContext):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
-    tsminfo.ssc.abort()
-    tsminfo.ssc.configure_settings(20e-3, 0.0, dcpower.enums.Sense.LOCAL)
-    tsminfo.ssc.configure_and_start_waveform_acquisition(sample_rate=10e3, buffer_length=1.0)
-    wf_settings = tsminfo.ssc.get_measurement_settings()
-    tsminfo.ssc.configure_output_connected(output_connected=True)
+def configure_measurements_waveform(tsm: SMContext):
+    dc_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
+    dc_tsm.ssc.abort()
+    dc_tsm.ssc.configure_settings(20e-3, 0.0, dcpower.enums.Sense.LOCAL)
+    dc_tsm.ssc.configure_and_start_waveform_acquisition(sample_rate=10e3, buffer_length=1.0)
+    wf_settings = dc_tsm.ssc.get_measurement_settings()
+    dc_tsm.ssc.configure_output_connected(output_connected=True)
     return wf_settings
 
 
 @nitsm.codemoduleapi.code_module
-def fetch_waveform(tsm_context: SMContext):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
-    volt_wf, curr_wf = tsminfo.ssc.fetch_waveform(0, waveform_length_s=1e-3)
+def fetch_waveform(tsm: SMContext):
+    dc_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
+    volt_wf, curr_wf = dc_tsm.ssc.fetch_waveform(0, waveform_length_s=1e-3)
     print(volt_wf, curr_wf)
     return volt_wf
 
 
 @nitsm.codemoduleapi.code_module
-def source_current(tsm_context: SMContext):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2"])
-    tsminfo.ssc.force_current_symmetric_limits(
+def source_current(tsm: SMContext):
+    dc_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2"])
+    dc_tsm.ssc.force_current_symmetric_limits(
         current_level=10e-3, current_level_range=10e-3, voltage_limit=6, voltage_limit_range=6
     )
     time.sleep(0.5)
 
 
 @nitsm.codemoduleapi.code_module
-def source_voltage(tsm_context: SMContext):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2"])
-    tsminfo.ssc.force_voltage_symmetric_limits(
+def source_voltage(tsm: SMContext):
+    dc_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2"])
+    dc_tsm.ssc.force_voltage_symmetric_limits(
         voltage_level=3.8, voltage_level_range=6.0, current_limit=10e-3, current_limit_range=100e-3
     )
     time.sleep(0.5)
 
 
 @nitsm.codemoduleapi.code_module
-def measure(tsm_context: SMContext):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2"])
-    volt_meas, curr_meas = tsminfo.ssc.measure()
-    compliance = tsminfo.ssc.query_in_compliance()
+def measure(tsm: SMContext):
+    dc_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2"])
+    volt_meas, curr_meas = dc_tsm.ssc.measure()
+    compliance = dc_tsm.ssc.query_in_compliance()
     print(compliance)
     time.sleep(0.5)
     return volt_meas, curr_meas
 
 
 @nitsm.codemoduleapi.code_module
-def close_sessions(tsm_context: SMContext, settings):
-    tsminfo = dcpower.pins_to_sessions(tsm_context, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
-    tsminfo.ssc.abort()
-    tsminfo.ssc.configure_output_connected(output_connected=True)
-    # tsminfo.ssc.set_measurement_settings(settings)
-    dcpower.close_sessions(tsm_context)
+def close_sessions(tsm: SMContext, settings):
+    dc_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
+    dc_tsm.ssc.abort()
+    dc_tsm.ssc.configure_output_connected(output_connected=True)
+    # dc_tsm.ssc.set_measurement_settings(settings)
+    dcpower.close_sessions(tsm)
