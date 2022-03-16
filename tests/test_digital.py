@@ -356,22 +356,11 @@ def hram(tsm: SMContext, pins: typing.List[str]):
     per_site_cycle_information = dpi_tsm.stream_hram_results()
     for cycle_information in per_site_cycle_information:
         assert not cycle_information
-    files_generated = dpi_tsm.log_hram_results([
-                                               [
-                                                   HistoryRAMCycleInformation(
-                                                       "start_burst",
-                                                       "time_set",
-                                                       0,
-                                                       0,
-                                                       0,
-                                                       [enums.PinState.X] * 3,
-                                                       [enums.PinState.X] * 3,
-                                                       [False] * 3,
-                                                   )
-                                               ]
-                                               * 2
-                                           ]
-                                           * 3, "Pattern Name", os.path.dirname(os.path.realpath(__file__)) + r"\log")
+    files_generated = dpi_tsm.log_hram_results([[HistoryRAMCycleInformation("start_burst", "time_set", 0, 0, 0,
+                                                                            [enums.PinState.X] * 3,
+                                                                            [enums.PinState.X] * 3, [False] * 3,)] * 2
+                                                ] * 3, "Pattern Name", os.path.dirname(os.path.realpath(__file__)) +
+                                               r"\log")
     for file in files_generated:
         assert isinstance(file, str)
 
@@ -408,13 +397,13 @@ def pin_levels_and_timing(tsm: SMContext, pins: typing.List[str]):
     # ctypes.windll.user32.MessageBoxW(None, "niPythonHost Process ID:" + str(os.getpid()), "Attach debugger", 0)
     dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
     dpi_tsm.ssc.apply_levels_and_timing("PinLevels", "Timing")
-    dpi_tsm.apply_tdr_offsets_per_site_per_pin([[1e-9,]] * 3)
-    dpi_tsm.ssc.apply_tdr_offsets([[1e-9, 1e-9,]] * 1,)
+    dpi_tsm.apply_tdr_offsets_per_site_per_pin([[1e-9, ]] * 3)
+    dpi_tsm.ssc.apply_tdr_offsets([[1e-9, 1e-9, ]] * 1, )
     dpi_tsm.ssc.configure_active_load(0.0015, 0.0015, -0.0015)
     dpi_tsm.configure_single_level_per_site(dt_dpi.LevelTypeToSet.VIL, [0.0015, 0.0015, 0.0015])
     dpi_tsm.ssc.configure_single_level(dt_dpi.LevelTypeToSet.VIL, 0.0015)
     dpi_tsm.ssc.configure_termination_mode(enums.TerminationMode.HIGH_Z)
-    dpi_tsm.configure_time_set_compare_edge_per_site_per_pin("time_set", [[ 40e-6,]] * 3)
+    dpi_tsm.configure_time_set_compare_edge_per_site_per_pin("time_set", [[40e-6, ]] * 3)
     dpi_tsm.configure_time_set_compare_edge_per_site("time_set", [40e-6, 40e-6, 40e-6])
     dpi_tsm.ssc.configure_time_set_compare_edge("time_set", 40e-6)
     dpi_tsm.ssc.configure_voltage_levels(0.0015, 0.0015, 0.0015, 0.0015, 0.0015)
@@ -495,7 +484,7 @@ def source_and_capture_waveforms(tsm: SMContext, pins: typing.List[str]):
     dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
 
     dpi_tsm.write_source_waveform_site_unique("SourceWaveform_SiteUnique",
-                                          [[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]], True)
+                                              [[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]], True)
     dpi_tsm.ssc.write_source_waveform_broadcast("SourceWaveform", [1, 2, 3, 4, 5], True)
     dpi_tsm.ssc.burst_pattern("start_capture")
     per_site_waveforms = dpi_tsm.fetch_capture_waveform("CaptureWaveform", 2)
@@ -552,6 +541,7 @@ def misc(tsm: SMContext, pins: typing.List[str]):
         per_instrument_to_per_site_lut,
         [[False, False, False], [True, True, True]],
     )
+    assert len(per_site_data) == len([True, True, True])
     # assert per_site_data == [True, True, True]
     print(per_site_data)
     per_site_data = dt_dpi._apply_lut_per_instrument_to_per_site(
