@@ -564,7 +564,7 @@ def misc(tsm: SMContext, pins: typing.List[str]):
         per_site_per_pin_to_per_instrument_lut,
         _,
         _,
-    ) = dpi_tsm.ssc.calculate_per_site_per_pin_to_per_instrument_lut(dpi_tsm.sites, dpi_tsm.pins_info)
+    ) = dpi_tsm.ssc.calculate_per_site_per_pin_to_per_instrument_lut(dpi_tsm.sites, dpi_tsm.pins)
     per_instrument_data = dt_dpi._apply_lut_per_site_per_pin_to_per_instrument(
         [[0, 0, 0], [0, 0, 0]],
         per_site_per_pin_to_per_instrument_lut,
@@ -572,9 +572,11 @@ def misc(tsm: SMContext, pins: typing.List[str]):
     )
     # assert per_instrument_data == [[1, 2, 3], [4, 5, 6]]
     print(per_instrument_data)
-    dpi_tsm.publish([1.0, 1.0, 1.0], "Publish_1")
+    # dpi_tsm.publish([1.0, 1.0, 1.0], "Publish_1")
+    dpi_tsm.publish([[1.0, 1.0, 1.0]], "Publish_1")
     dpi_tsm.publish([[1.0, 1.0], [1.0, 1.0], [1.0, 1.0]], "Publish_2")
-    dpi_tsm.publish([True, True, True], "Publish_3")
+    # dpi_tsm.publish([True, True, True], "Publish_3")
+    dpi_tsm.publish([[True, True, True]], "Publish_3")
     dpi_tsm.publish([[True, True], [True, True], [True, True]], "Publish_4")
 
 
