@@ -1819,7 +1819,7 @@ def initialize_sessions(tsm: SMContext, options: dict = {}):
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
     tsm: SMContext,
-    pins: typing.Union(str | [str]),
+    pins: typing.Union[str, typing.List[str]],
     sites: typing.List[int] = [],
     turn_pin_groups_to_pins: bool = True,
 ):
