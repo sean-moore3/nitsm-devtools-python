@@ -309,12 +309,12 @@ class _NIDigitalSSC:
         """
         Configures I\ :sub:`OL`, I\ :sub:`OH`, and V\ :sub:`COM` levels for the active load on the
         selected pins/channels in the session. The DUT sources or sinks current based on the level
-        values. To enable active load, set the termination mode to TerminationMode.ACTIVE_LOAD. 
+        values. To enable active load, set the termination mode to TerminationMode.ACTIVE_LOAD.
         To disable active load, set the termination mode of the instrument to
         TerminationMode.HIGH_Z or TerminationMode.VTERM.
 
         Args:
-            vcom (float): Commutating voltage level at which the active load circuit 
+            vcom (float): Commutating voltage level at which the active load circuit
             switches between sourcing current and sinking current.
 
             iol (float): Maximum current that the DUT sinks while outputting a voltage 
@@ -1106,7 +1106,7 @@ class _NIDigitalTSM:
         Returns:
             SSC: list of sessions sites and channels
         """
-        ssc_with_requested_sites: typing.List[_NIDigitalSSC] = []
+        sscs_new: typing.List[_NIDigitalSSC] = []
         for ssc in self._sscs:
             channel_list_array, site_list_array, site_numbers = _arrange_channels_per_site(ssc._channels, ssc._pins)
             channel_list: typing.List[str] = []
@@ -1118,10 +1118,11 @@ class _NIDigitalTSM:
                     channel_list.append(_channel_list)
                     site_list.append(_site_list)
             if site_list:
-                ssc_with_requested_sites.append(
+                sscs_new.append(
                     _NIDigitalSSC(ssc._session, ",".join(channel_list), ",".join(site_list))
                 )
-        return ssc_with_requested_sites
+        nidigital_tsm = _NIDigitalTSM(sscs_new)
+        return nidigital_tsm
 
     def initiate(self):
         for ssc in self._sscs:
@@ -1682,9 +1683,18 @@ class TSMDigital:
 
 
 def filter_sites(tsm: TSMDigital, desired_sites: typing.List[int]):
-    tsm.ssc = tsm.ssc.filter_sites(desired_sites)
-    tsm.sites = desired_sites
-    return tsm
+    """
+    filter  the sites specified in the current TSMObject
+
+    Args:
+        tsm (TSMDigital): tsm object from which sites to filter
+        desired_sites (typing.List[int]): sites
+
+    Returns:
+        tsm (TSMDigital): tsm object with filtered sites
+    """
+    ssc = tsm.ssc.filter_sites(desired_sites)
+    return TSMDigital(tsm.pin_query_context,ssc,desired_sites,tsm.pins)
 
 
 def _apply_lut_per_instrument_to_per_site_per_pin(
@@ -1807,27 +1817,34 @@ def initialize_sessions(tsm: SMContext, options: dict = {}):
 
 
 @nitsm.codemoduleapi.code_module
-def pin_to_sessions(tsm: SMContext, pin: str):
-    return pins_to_sessions(tsm, [pin])
-
-
-@nitsm.codemoduleapi.code_module
 def pins_to_sessions(
     tsm: SMContext,
-    pins: typing.List[str],
+    pins: typing.Union(str | [str]),
     sites: typing.List[int] = [],
     turn_pin_groups_to_pins: bool = True,
 ):
+    """
+    Get the sessions for the given Pins and return the pinquery object for operating on the Pins.
+
+    Args:
+        tsm (SMContext): tsm context for nidigital
+        pins typing.Union(str | [str]): desired pins for which the TSMDigital object is created.
+            single pin name can be given in string data type.List of strings for multiple pins.
+        sites (typing.List[int], optional): list of desired sites.. Defaults to [].
+        turn_pin_groups_to_pins (bool, optional): converts all the Pin groups to pins. 
+            Defaults to True.
+
+    Returns:
+        digital_tsm: pin-query context variable
+    """
+    if isinstance(pins, str):
+        pins = [pins]
     if len(sites) == 0:
         sites = list(tsm.site_numbers)
     if turn_pin_groups_to_pins:
         pins = list(tsm.get_pins_in_pin_groups(pins))
     sscs: typing.List[_NIDigitalSSC] = []
-    (
-        pin_query_context,
-        sessions,
-        pin_set_strings,
-    ) = tsm.pins_to_nidigital_sessions_for_ppmu(pins)
+    (pin_query_context, sessions, pin_set_strings) = tsm.pins_to_nidigital_sessions_for_ppmu(pins)
     _, _, site_lists = tsm.pins_to_nidigital_sessions_for_pattern(pins)
     for session, pin_set_string, site_list in zip(sessions, pin_set_strings, site_lists):
         sscs.append(_NIDigitalSSC(session, pin_set_string, site_list))

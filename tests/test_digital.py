@@ -47,7 +47,7 @@ def digital_tsm_s(tsm, tests_pins):
     digital_tsms = []
     for test_pin in tests_pins:
         if isinstance(test_pin, str):
-            digital_tsms.append(dt_dpi.pin_to_sessions(tsm, test_pin))
+            digital_tsms.append(dt_dpi.pins_to_sessions(tsm, test_pin))
         elif isinstance(test_pin, list):
             digital_tsms.append(dt_dpi.pins_to_sessions(tsm, test_pin))
         else:
@@ -290,7 +290,7 @@ def close_sessions(tsm: SMContext):
 
 @nitsm.codemoduleapi.code_module
 def clock_generation(tsm: SMContext, pins: typing.List[str]):
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
 
     frequency = 25000
     dpi_tsm.ssc.modify_time_set_for_clock_generation(frequency, 0.5, "time_set")
@@ -305,8 +305,7 @@ def clock_generation(tsm: SMContext, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def configuration(tsm: SMContext, pins: typing.List[str]):
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
-
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     dpi_tsm.ssc.clear_start_trigger_signal()
     dpi_tsm.ssc.configure_trigger_signal(dt_dpi.PXI_TRIGGER_LINE.PXI_TRIG0)
     dpi_tsm.ssc.select_function(enums.SelectedFunction.DIGITAL)
@@ -317,8 +316,7 @@ def configuration(tsm: SMContext, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def frequency_measurement_func(tsm: SMContext, pins: typing.List[str]):
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
-
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     dpi_tsm.ssc.frequency_counter_configure_measurement_time(0.5)
     per_site_per_pin_frequency_measurements = (
         dpi_tsm.frequency_counter_measure_frequency()
@@ -333,7 +331,7 @@ def frequency_measurement_func(tsm: SMContext, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def hram(tsm: SMContext, pins: typing.List[str]):
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     hram_configuration = dt_dpi.HRAMConfiguration()
     hram_configuration.trigger_type = enums.HistoryRAMTriggerType.PATTERN_LABEL
     hram_configuration.pattern_label = "start_burst"
@@ -367,7 +365,7 @@ def hram(tsm: SMContext, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def pattern_actions(tsm: SMContext, pins: typing.List[str]):
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
 
     dpi_tsm.ssc.abort()
     dpi_tsm.ssc.burst_pattern("start_burst")
@@ -395,7 +393,7 @@ def pattern_actions(tsm: SMContext, pins: typing.List[str]):
 @nitsm.codemoduleapi.code_module
 def pin_levels_and_timing(tsm: SMContext, pins: typing.List[str]):
     # ctypes.windll.user32.MessageBoxW(None, "niPythonHost Process ID:" + str(os.getpid()), "Attach debugger", 0)
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     dpi_tsm.ssc.apply_levels_and_timing("PinLevels", "Timing")
     dpi_tsm.apply_tdr_offsets_per_site_per_pin([[1e-9, ]] * 3)
     dpi_tsm.ssc.apply_tdr_offsets([[1e-9, 1e-9, ]] * 1, )
@@ -423,8 +421,7 @@ def pin_levels_and_timing(tsm: SMContext, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def ppmu(tsm: SMContext, pins: typing.List[str]):
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
-
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     dpi_tsm.ssc.ppmu_configure_aperture_time(0.01)
     dpi_tsm.ssc.ppmu_configure_current_limit_range(0.01)
     dpi_tsm.ssc.ppmu_configure_voltage_limits(0.01, 0.01)
@@ -449,8 +446,7 @@ def ppmu(tsm: SMContext, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def sequencer_flags_and_registers(tsm: SMContext, pins: typing.List[str]):
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
-
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     dpi_tsm.ssc.write_sequencer_flag(enums.SequencerFlag.FLAG1, True)
     dpi_tsm.ssc.write_sequencer_register(enums.SequencerRegister.REGISTER1, 1)
     per_instrument_state = dpi_tsm.ssc.read_sequencer_flag(enums.SequencerFlag.FLAG1)
@@ -467,8 +463,7 @@ def sequencer_flags_and_registers(tsm: SMContext, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def session_properties_func(tsm: SMContext, pins: typing.List[str]):
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
-
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     session_properties = dpi_tsm.ssc.get_properties()
     for session_property in session_properties:
         assert session_property[0].startswith("DPI")
@@ -481,8 +476,7 @@ def session_properties_func(tsm: SMContext, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def source_and_capture_waveforms(tsm: SMContext, pins: typing.List[str]):
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
-
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     dpi_tsm.write_source_waveform_site_unique("SourceWaveform_SiteUnique",
                                               [[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]], True)
     dpi_tsm.ssc.write_source_waveform_broadcast("SourceWaveform", [1, 2, 3, 4, 5], True)
@@ -497,8 +491,7 @@ def source_and_capture_waveforms(tsm: SMContext, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def static(tsm: SMContext, pins: typing.List[str]):
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
-
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     dpi_tsm.ssc.write_static(enums.WriteStaticPinState.ONE)
     dpi_tsm.write_static_per_site([enums.WriteStaticPinState.ONE] * 3)
     dpi_tsm.write_static_per_site_per_pin(
@@ -515,22 +508,18 @@ def static(tsm: SMContext, pins: typing.List[str]):
 
 @nitsm.codemoduleapi.code_module
 def misc(tsm: SMContext, pins: typing.List[str]):
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     dpi_tsm1 = dt_dpi.filter_sites(dpi_tsm, [0])
-    for ssc in dpi_tsm1.ssc:
+    for ssc in dpi_tsm1.ssc.sessions_sites_channels:
         assert ssc._pins == "site0"
-
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
     dpi_tsm1 = dt_dpi.filter_sites(dpi_tsm, [1])
-    for ssc in dpi_tsm1.ssc:
+    for ssc in dpi_tsm1.ssc.sessions_sites_channels:
         assert ssc.site_list == "site1"
-
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
     dpi_tsm1 = dt_dpi.filter_sites(dpi_tsm, [2])
-    for ssc in dpi_tsm1.ssc:
+    for ssc in dpi_tsm1.ssc.sessions_sites_channels:
         assert ssc.site_list == "site2"
 
-    dpi_tsm = dt_dpi.pin_to_sessions(tsm, pins[0])
+    dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     dpi_tsm.ssc.initiate()
     dpi_tsm.ssc.abort()
     per_instrument_to_per_site_lut = dpi_tsm.ssc.calculate_per_instrument_to_per_site_lut(
