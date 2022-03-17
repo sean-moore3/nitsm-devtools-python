@@ -541,7 +541,7 @@ def misc(tsm: SMContext, pins: typing.List[str]):
     # assert per_site_data == [[True, True]] * 3
     print(per_site_data)
     per_instrument_to_per_site_per_pin_lut = (
-        dpi_tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(dpi_tsm.sites, dpi_tsm.pins_info)
+        dpi_tsm.ssc.calculate_per_instrument_to_per_site_per_pin_lut(dpi_tsm.sites, dpi_tsm.pins)
     )
     per_site_per_pin_data = dt_dpi._apply_lut_per_instrument_to_per_site_per_pin(
         [[0, 0], [0, 0], [0, 0]],
