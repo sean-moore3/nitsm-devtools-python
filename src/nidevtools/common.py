@@ -209,16 +209,10 @@ def pin_query_context_to_channel_list(
         pins = pin_query_context._pins
         pin_types, pins = _check_for_pin_group(tsm, pins)
     num_pins_per_channel_group=(0,)
-    channel_group_indices=((0, ))
-    channel_indices=((0, ))
-    (
-        num_pins_per_channel_group,
-        channel_group_indices,
-        channel_indices,
+    channel_group_indices=((0, ), )
+    channel_indices=((0, ), )
+    (num_pins_per_channel_group, channel_group_indices, channel_indices,
     ) = tsm.GetChannelGroupAndChannelIndex(pins, num_pins_per_channel_group, channel_group_indices, channel_indices)
-    print("num_pins_per_channel_group, ", num_pins_per_channel_group)
-    print("channel_group_indices", channel_group_indices)
-    print("channel_indices",  channel_indices)
     channel_group_indices = tuple(zip(*channel_group_indices))  # transpose(channel_group_indices)
     channel_indices = tuple(zip(*channel_indices))  # transpose(channel_indices)
     data = []
