@@ -884,12 +884,11 @@ def _pin_query_context_to_channel_list(
         pin_types, pin_names = ni_dt_common._check_for_pin_group(tsm1, pin_names)
     pins_array_for_session_input: typing.List[PinsCluster] = []
     channel_list_per_session = ()
-    (
-        number_of_pins_per_channel,
-        channel_group_indices,
-        channel_indices,
-    ) = tsm.GetChannelGroupAndChannelIndex(pin_names)
-    for number_of_pins in number_of_pins_per_channel:
+    num_pins_per_ch_gp = (0,)
+    ch_gp_indices = ((0, ), )
+    ch_indices = ((0, ), )
+    (num_pins_per_ch_gp, ch_gp_indices, ch_indices) = tsm.GetChannelGroupAndChannelIndex(pin_names, num_pins_per_ch_gp, ch_gp_indices, ch_indices)
+    for number_of_pins in num_pins_per_ch_gp:
         """
         Create a pins list for each session of the correct size
         """
@@ -900,8 +899,8 @@ def _pin_query_context_to_channel_list(
         per_site_transposed_channel_indices,
         site_number,
     ) in zip(
-        numpy.transpose(channel_group_indices),
-        numpy.transpose(channel_indices),
+        numpy.transpose(ch_gp_indices),
+        numpy.transpose(ch_indices),
         sites,
     ):
         for (

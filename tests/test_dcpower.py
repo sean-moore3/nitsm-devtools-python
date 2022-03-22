@@ -246,7 +246,7 @@ class TestDCPower:
 
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm: SMContext):
-    # ctypes.windll.user32.MessageBoxW(None, "niPythonHost Process ID:" + str(os.getpid()), "Attach debugger", 0)
+    # ctypes.windll.user32.MessageBoxW(None, "Process ID:" + str(os.getpid()), "Attach debugger", 0)
     dcpower.initialize_sessions(tsm, options=OPTIONS)
     dcpower_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2", "SMU_VI_ANA1"])
     dcpower_tsm[1].reset()

@@ -208,21 +208,21 @@ def pin_query_context_to_channel_list(
         """
         pins = pin_query_context._pins
         pin_types, pins = _check_for_pin_group(tsm, pins)
-    num_pins_per_channel_group=(0,)
-    channel_group_indices=((0, ), )
-    channel_indices=((0, ), )
-    (num_pins_per_channel_group, channel_group_indices, channel_indices,
-    ) = tsm.GetChannelGroupAndChannelIndex(pins, num_pins_per_channel_group, channel_group_indices, channel_indices)
-    channel_group_indices = tuple(zip(*channel_group_indices))  # transpose(channel_group_indices)
-    channel_indices = tuple(zip(*channel_indices))  # transpose(channel_indices)
+    num_pins_per_ch_gp = (0,)
+    ch_gp_indices = ((0, ), )
+    ch_indices = ((0, ), )
+    (num_pins_per_ch_gp, ch_gp_indices, ch_indices) = tsm.GetChannelGroupAndChannelIndex(pins, num_pins_per_ch_gp,
+                                                                                         ch_gp_indices, ch_indices)
+    ch_gp_indices = tuple(zip(*ch_gp_indices))  # transpose(channel_group_indices)
+    ch_indices = tuple(zip(*ch_indices))  # transpose(channel_indices)
     data = []
-    for pin_count in num_pins_per_channel_group:
+    for pin_count in num_pins_per_ch_gp:
         pin_str = [""]
         pins_array = pin_str * pin_count
         data.append(pins_array)
 
     for site_number, channel_group_index_s, channel_index_s in zip(
-        sites, channel_group_indices, channel_indices
+        sites, ch_gp_indices, ch_indices
     ):
         for channel_group_index, channel_index, pin, pin_type in zip(
             channel_group_index_s, channel_index_s, pins, pin_types
