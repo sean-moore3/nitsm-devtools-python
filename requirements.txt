@@ -11,3 +11,4 @@ nitclk>=1.4.1
 numpy>=1.19.5
 pytest>=6.2.5
 setuptools==59.6.0
+matplotlib>=3.3.4

@@ -1,3 +1,4 @@
+import ctypes
 import os
 import time
 import typing
@@ -7,6 +8,77 @@ import niscope
 import nitsm.codemoduleapi
 import pytest
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
+
+# modules added for matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+import math
+
+
+#  code added to support Matplotlib
+def on_close(event):
+    global closed
+    closed = True
+  
+
+def plot_data(measurements, record_length):
+
+    # record_length = 10
+    buffer_multiplier = 10
+    voltage_level = 1.0
+
+    # Setup a plot to draw the captured waveform.
+    fig = plt.figure("Waveform Graph")
+    fig.show()
+    fig.canvas.draw()
+
+    # Handle closing of plot window.
+    global closed
+    closed = False
+
+    fig.canvas.mpl_connect('close_event', on_close)
+
+    # print("\nReading values in loop. CTRL+C or Close window to stop.\n")
+
+    # Create a buffer for fetching the values.
+    y_axis = [0] * (record_length * buffer_multiplier)
+    x_start = 0
+
+    try:
+        # Clear the plot and setup the axis.
+        plt.clf()
+        plt.axis()
+        plt.xlabel("Samples")
+        plt.ylabel("Amplitude")
+
+        voltages = []
+        # measurements = session.channels[0].fetch_multiple(count=record_length)
+        print(len(measurements))
+        for i in range(len(measurements)):
+            voltages.append(measurements[i])
+        # Append the fetched values in the buffer.
+        y_axis.extend(voltages)
+        y_axis = y_axis[record_length:]
+        
+        # Updating the precision of the fetched values.
+        y_axis_new = []
+        for value in y_axis:
+            if (value < voltage_level):
+                y_axis_new.append(math.floor(value * 100) / 100)
+            else:
+                y_axis_new.append(math.ceil(value * 100) / 100)
+
+        # Plotting
+        y_axis = y_axis_new
+        x_axis = np.arange(start=x_start, stop=x_start + record_length * buffer_multiplier, step=1)
+        x_start = x_start + record_length
+        plt.plot(x_axis, y_axis)
+        while not closed:
+            plt.pause(0.001)
+            time.sleep(0.1)
+    except KeyboardInterrupt:
+        pass
+
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
@@ -204,16 +276,19 @@ class TestNIScope:
 
 @nitsm.codemoduleapi.code_module
 def open_sessions(tsm: SMContext):
+    ctypes.windll.user32.MessageBoxW(None, "Py ID:" + str(os.getpid()), "Attach debugger", 0)
     scope.initialize_sessions(tsm, OPTIONS)
 
 
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions_info(tsm: SMContext, pins: typing.List[str], sites: typing.List[int]):
+    ctypes.windll.user32.MessageBoxW(None, "Py ID:" + str(os.getpid()), "Attach debugger", 0)
     return scope.pins_to_sessions(tsm, pins, sites)
 
 
 @nitsm.codemoduleapi.code_module
 def configure(tsm: SMContext, pins: typing.List[str], sites: typing.List[int]):
+    ctypes.windll.user32.MessageBoxW(None, "Py ID:" + str(os.getpid()), "Attach debugger", 0)
     scope_tsm = scope.pins_to_sessions(tsm, pins, sites)
     scope_tsm.ssc.configure_impedance(0.5)
     scope_tsm.ssc.configure_reference_level()
@@ -227,6 +302,7 @@ def configure(tsm: SMContext, pins: typing.List[str], sites: typing.List[int]):
 
 @nitsm.codemoduleapi.code_module
 def acquisition(tsm: SMContext, pins: typing.List[str], sites: typing.List[int]):
+    ctypes.windll.user32.MessageBoxW(None, "Py ID:" + str(os.getpid()), "Attach debugger", 0)
     scope_tsm = scope.pins_to_sessions(tsm, pins, sites)
     scope_tsm.ssc.initiate()
 
@@ -299,7 +375,7 @@ def close_sessions(tsm: SMContext):
 
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm: SMContext):
-    print("opening sessions")
+    # ctypes.windll.user32.MessageBoxW(None, "Py ID:" + str(os.getpid()), "Attach debugger", 0)
     scope.initialize_sessions(tsm, options=OPTIONS)
     scope_tsm = scope.pins_to_sessions(tsm, ["OSC_xA_ANA1"], [])
     scope_tsm.ssc.abort()
@@ -312,7 +388,8 @@ def configure_measurements(tsm: SMContext):
     scope_tsm.ssc.configure(
         4e-3, 1, 0, niscope.VerticalCoupling.AC, 5e6, 20000, 50, -1, 1e6, 1, True
     )
-    scope_tsm.ssc.configure_digital_edge_trigger("", slope=niscope.TriggerSlope.POSITIVE)
+    # scope_tsm.ssc.configure_digital_edge_trigger("", slope=niscope.TriggerSlope.POSITIVE)
+    scope_tsm.ssc.configure_trigger_immediate()
     props = scope_tsm.ssc.get_session_properties()
     print("\n", props)
     print("Configuring fetch wf")
@@ -330,7 +407,8 @@ def fetch_waveform1(tsm: SMContext):
     v_max = scope_tsm.ssc.fetch_measurement(
         scalar_meas_function=niscope.ScalarMeasurement.VOLTAGE_MAX
     )
-    print(wf_info)
-    print(v_peak)
-    print(v_max)
+    # print(wf_info)
+    # print(v_peak)
+    # print(v_max)
+    plot_data(data_capture[0][0].samples, 20000)
     return data_capture, wf_info, v_peak, v_max
