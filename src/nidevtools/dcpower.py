@@ -1711,6 +1711,7 @@ class TSMDCPower(typing.NamedTuple):
     Args:
         TSM objects (tuple): 5 entities for storing them togather.
     """
+
     pin_query_context: typing.Any
     ssc: _NIDCPowerTSM
     sites: typing.List[int]

@@ -70,9 +70,7 @@ class TestFPGA:
             assert isinstance(fpga_tsm.SSC, typing.List)
 
     def test_get_i2c_master_session(self, tsm):
-        print(
-            ni_fpga.get_i2c_master_session(tsm, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True)
-        )
+        print(ni_fpga.get_i2c_master_session(tsm, ni_fpga.I2CMaster.I2C_3V3_7822_LINT, True))
 
     def test_update_line_on_connectors(self):
         for i in range(8):

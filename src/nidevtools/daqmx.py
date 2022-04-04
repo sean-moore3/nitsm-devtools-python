@@ -242,6 +242,7 @@ class _Sessions:
     """
     Class that contains a list of DAQmx sessions with methods to control all sessions inside the object
     """
+
     sessions: typing.List[_Session]
 
     # Read

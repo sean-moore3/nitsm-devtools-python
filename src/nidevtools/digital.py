@@ -24,6 +24,7 @@ class LevelTypeToSet(Enum):
     Args:
         typing.enum : voltage level defines the voltage for High or Low and for Input or Output
     """
+
     VIL = 0
     VIH = 1
     VOL = 2
@@ -157,7 +158,9 @@ class _NIDigitalSSC:
         """
         return self._channels_session.clock_generator_generate_clock(frequency, select_digital)
 
-    def cs_modify_time_set_for_clock_generation(self, frequency: float, duty_cycle: float, time_set: str):
+    def cs_modify_time_set_for_clock_generation(
+        self, frequency: float, duty_cycle: float, time_set: str
+    ):
         """
         Configures the period of a time set, drive format and drive edge placement for the
         specified pins. Use this method to modify time set values after applying a timing
@@ -283,18 +286,22 @@ class _NIDigitalSSC:
             self._session.pattern_label_history_ram_trigger_vector_offset = vector_offset
 
     def cs_get_hram_settings(self):
-        return (self._session.history_ram_cycles_to_acquire,
-                self._session.history_ram_pretrigger_samples,
-                self._session.history_ram_max_samples_to_acquire_per_site,
-                self._session.history_ram_number_of_samples_is_finite,
-                self._session.history_ram_buffer_size_per_site)
+        return (
+            self._session.history_ram_cycles_to_acquire,
+            self._session.history_ram_pretrigger_samples,
+            self._session.history_ram_max_samples_to_acquire_per_site,
+            self._session.history_ram_number_of_samples_is_finite,
+            self._session.history_ram_buffer_size_per_site,
+        )
 
     def cs_get_hram_trigger_settings(self):
-        return (self._session.history_ram_trigger_type,
-                self._session.cycle_number_history_ram_trigger_cycle_number,
-                self._session.pattern_label_history_ram_trigger_label,
-                self._session.pattern_label_history_ram_trigger_cycle_offset,
-                self._session.pattern_label_history_ram_trigger_vector_offset)
+        return (
+            self._session.history_ram_trigger_type,
+            self._session.cycle_number_history_ram_trigger_cycle_number,
+            self._session.pattern_label_history_ram_trigger_label,
+            self._session.pattern_label_history_ram_trigger_cycle_offset,
+            self._session.pattern_label_history_ram_trigger_vector_offset,
+        )
 
     def cs_get_fail_count(self):
         return self._channels_session.get_fail_count()
@@ -317,10 +324,10 @@ class _NIDigitalSSC:
             vcom (float): Commutating voltage level at which the active load circuit
             switches between sourcing current and sinking current.
 
-            iol (float): Maximum current that the DUT sinks while outputting a voltage 
+            iol (float): Maximum current that the DUT sinks while outputting a voltage
             below V\ :sub:`COM`.
 
-            ioh (float): Maximum current that the DUT sources while outputting a voltage 
+            ioh (float): Maximum current that the DUT sources while outputting a voltage
             above V\ :sub:`COM`.
         """
         self._channels_session.configure_active_load_levels(iol, ioh, vcom)
@@ -361,6 +368,7 @@ class _NIDigitalSSC:
         # End of Source and Capture Waveforms #
 
         # Static #
+
     def cs_read_static(self):
         """
         Reads the current state of comparators for pins you specify in the repeated capabilities.
@@ -398,26 +406,31 @@ class _NIDigitalSSC:
         match = re.search(r"[A-Za-z]+[1-9]+", str(self._session))
         if match:
             instrument_name = match.group()
-        session_property = SessionProperties(instrument_name,
-                                             self._channels_session.voh,
-                                             self._channels_session.vol,
-                                             self._channels_session.vih,
-                                             self._channels_session.vil,
-                                             self._channels_session.vterm,
-                                             self._channels_session.frequency_counter_measurement_time)
+        session_property = SessionProperties(
+            instrument_name,
+            self._channels_session.voh,
+            self._channels_session.vol,
+            self._channels_session.vih,
+            self._channels_session.vil,
+            self._channels_session.vterm,
+            self._channels_session.frequency_counter_measurement_time,
+        )
         return session_property
 
     # Trigger #
     def cs_clear_start_trigger_signal(self):
         self._session.start_trigger_type = enums.TriggerType.NONE
 
-    def cs_configure_trigger_signal(self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING):
+    def cs_configure_trigger_signal(
+        self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING
+    ):
         self._session.digital_edge_start_trigger_source = source
         self._session.digital_edge_start_trigger_edge = edge
 
     def cs_export_opcode_trigger_signal(self, signal_id: str, terminal: str = ""):
         self._session.pattern_opcode_events[
-            signal_id].exported_pattern_opcode_event_output_terminal = terminal
+            signal_id
+        ].exported_pattern_opcode_event_output_terminal = terminal
 
     def cs_ppmu_source(self):
         self._channels_session.ppmu_source()
@@ -451,15 +464,25 @@ class _NIDigitalSSC:
         self._channels_session.ppmu_voltage_level = voltage_level
         self.cs_ppmu_source()
 
-    def ps_burst_pattern_pass_fail(self, start_label: str, select_digital_function: bool = True,
-                                   timeout: float = 10):
-        return list(self._session.sites[self._pins].
-                    burst_pattern(start_label, select_digital_function, True, timeout).values())
+    def ps_burst_pattern_pass_fail(
+        self, start_label: str, select_digital_function: bool = True, timeout: float = 10
+    ):
+        return list(
+            self._session.sites[self._pins]
+            .burst_pattern(start_label, select_digital_function, True, timeout)
+            .values()
+        )
 
-    def ps_burst_pattern(self, start_label: str, select_digital_function: bool = True,
-                         timeout: float = 10, wait_until_done: bool = True):
-        self._session.sites[self._pins].burst_pattern(start_label, select_digital_function,
-                                                      wait_until_done, timeout)
+    def ps_burst_pattern(
+        self,
+        start_label: str,
+        select_digital_function: bool = True,
+        timeout: float = 10,
+        wait_until_done: bool = True,
+    ):
+        self._session.sites[self._pins].burst_pattern(
+            start_label, select_digital_function, wait_until_done, timeout
+        )
 
     def ps_get_site_pass_fail(self):
         return list(self._session.sites[self._pins].get_site_pass_fail().values())
@@ -474,7 +497,6 @@ class _NIDigitalTSM:
     @property
     def sessions_sites_channels(self):
         return self._sscs
-
 
     # Clock Generation #
     def clock_generator_abort(self):
@@ -658,7 +680,13 @@ class _NIDigitalTSM:
         per_instrument_number_of_samples_is_finite: typing.List[bool] = []
         per_instrument_buffer_size_per_site: typing.List[int] = []
         for ssc in self._sscs:
-            cycles, pretrigger_samples, max_samples, is_finite, buffer_size = ssc.cs_get_hram_settings()
+            (
+                cycles,
+                pretrigger_samples,
+                max_samples,
+                is_finite,
+                buffer_size,
+            ) = ssc.cs_get_hram_settings()
             per_instrument_cycles_to_acquire.append(cycles)
             per_instrument_pretrigger_samples.append(pretrigger_samples)
             per_instrument_max_samples_to_acquire_per_site.append(max_samples)
@@ -679,7 +707,13 @@ class _NIDigitalTSM:
         per_instrument_cycle_offset: typing.List[int] = []
         per_instrument_vector_offset: typing.List[int] = []
         for ssc in self._sscs:
-            trigger_type, cycle_number, label, cycle_offset, vector_offset = ssc.cs_get_hram_trigger_settings()
+            (
+                trigger_type,
+                cycle_number,
+                label,
+                cycle_offset,
+                vector_offset,
+            ) = ssc.cs_get_hram_trigger_settings()
             per_instrument_triggers_type.append(trigger_type)
             per_instrument_cycle_number.append(cycle_number)
             per_instrument_pattern_label.append(label)
@@ -696,10 +730,14 @@ class _NIDigitalTSM:
     def stream_hram_results(self):
         per_instrument_per_site_array: typing.List[_NIDigitalSSC] = []
         for ssc in self._sscs:
-            channel_list_array, site_list_array, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
+            channel_list_array, site_list_array, _ = _arrange_channels_per_site(
+                ssc._channels, ssc._pins
+            )
             for channel, site in zip(channel_list_array, site_list_array):
                 per_instrument_per_site_array.append(_NIDigitalSSC(ssc._session, channel, site))
-        per_instrument_per_site_cycle_information: typing.List[typing.List[HistoryRAMCycleInformation]] = []
+        per_instrument_per_site_cycle_information: typing.List[
+            typing.List[HistoryRAMCycleInformation]
+        ] = []
         number_of_samples = 0
         for ssc in per_instrument_per_site_array:
             cycle_information: typing.List[HistoryRAMCycleInformation] = []
@@ -734,8 +772,13 @@ class _NIDigitalTSM:
     def burst_pattern_pass_fail(self, start_label: str, digital: bool = True, timeout: float = 10):
         return [s.ps_burst_pattern_pass_fail(start_label, digital, timeout) for s in self._sscs]
 
-    def burst_pattern(self, start_label: str, select_digital_function: bool = True,
-                      timeout: float = 10, wait_until_done: bool = True):
+    def burst_pattern(
+        self,
+        start_label: str,
+        select_digital_function: bool = True,
+        timeout: float = 10,
+        wait_until_done: bool = True,
+    ):
         for ssc in self._sscs:
             ssc.ps_burst_pattern(start_label, select_digital_function, timeout, wait_until_done)
 
@@ -752,6 +795,7 @@ class _NIDigitalTSM:
     def wait_until_done(self, timeout: float = 10):
         for ssc in self._sscs:
             ssc.cs_wait_until_done(timeout)
+
     # End of Pattern Actions #
 
     # Pin Levels and Timing #
@@ -765,20 +809,20 @@ class _NIDigitalTSM:
 
     def configure_active_load(self, vcom: float, iol: float, ioh: float):
         """
-        Configures I\ :sub:`OL`, I\ :sub:`OH`, and V\ :sub:`COM` levels for the active load 
-        on the pins in the context. The DUT sources or sinks current based on the level values. 
-        To enable active load, set the termination mode to TerminationMode.ACTIVE_LOAD. 
-        To disable active load, set the termination mode of the instrument to 
+        Configures I\ :sub:`OL`, I\ :sub:`OH`, and V\ :sub:`COM` levels for the active load
+        on the pins in the context. The DUT sources or sinks current based on the level values.
+        To enable active load, set the termination mode to TerminationMode.ACTIVE_LOAD.
+        To disable active load, set the termination mode of the instrument to
         TerminationMode.HIGH_Z or TerminationMode.VTERM.
 
         Args:
-            vcom (float): Commutating voltage level at which the active load circuit 
+            vcom (float): Commutating voltage level at which the active load circuit
             switches between sourcing current and sinking current.
 
-            iol (float): Maximum current that the DUT sinks while outputting a voltage 
+            iol (float): Maximum current that the DUT sinks while outputting a voltage
             below V\ :sub:`COM`.
 
-            ioh (float): Maximum current that the DUT sources while outputting a voltage 
+            ioh (float): Maximum current that the DUT sources while outputting a voltage
             above V\ :sub:`COM`.
         """
         for ssc in self._sscs:
@@ -1083,17 +1127,21 @@ class _NIDigitalTSM:
         # End of Static #
 
         # Trigger #
+
     def clear_start_trigger_signal(self):
         for ssc in self._sscs:
             ssc.cs_clear_start_trigger_signal()
 
-    def configure_trigger_signal(self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING):
+    def configure_trigger_signal(
+        self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING
+    ):
         for ssc in self._sscs:
             ssc.cs_configure_trigger_signal(source, edge)
 
     def export_opcode_trigger_signal(self, signal_id: str, output_terminal: str = ""):
         for ssc in self._sscs:
             ssc.cs_export_opcode_trigger_signal(signal_id, output_terminal)
+
     # End of Trigger #
 
     def filter_sites(self, desired_sites: typing.List[int]):
@@ -1108,7 +1156,9 @@ class _NIDigitalTSM:
         """
         sscs_new: typing.List[_NIDigitalSSC] = []
         for ssc in self._sscs:
-            channel_list_array, site_list_array, site_numbers = _arrange_channels_per_site(ssc._channels, ssc._pins)
+            channel_list_array, site_list_array, site_numbers = _arrange_channels_per_site(
+                ssc._channels, ssc._pins
+            )
             channel_list: typing.List[str] = []
             site_list: typing.List[str] = []
             for _channel_list, _site_list, site_number in zip(
@@ -1210,9 +1260,13 @@ class _NIDigitalTSM:
 
 
 class TSMDigital:
-
-    def __init__(self, pin_query_context: typing.Any, ssc: _NIDigitalTSM, sites: typing.List[int],
-                 pins: typing.List[str]):
+    def __init__(
+        self,
+        pin_query_context: typing.Any,
+        ssc: _NIDigitalTSM,
+        sites: typing.List[int],
+        pins: typing.List[str],
+    ):
         self.pin_query_context = pin_query_context
         self.ssc = ssc
         self.sites = sites
@@ -1275,7 +1329,10 @@ class TSMDigital:
         for cycle_informations, site_number in zip(per_site_cycle_information, self.sites):
             results: typing.List[typing.List[typing.Any]] = []
             if not cycle_informations or all(
-                [not cycle_information.per_pin_pass_fail for cycle_information in cycle_informations]
+                [
+                    not cycle_information.per_pin_pass_fail
+                    for cycle_information in cycle_informations
+                ]
             ):
                 results.append(["PATTERN PASSED - NO FAILURES"])
             else:
@@ -1287,7 +1344,9 @@ class TSMDigital:
                             str(cycle_information.cycle_number),
                             str(cycle_information.scan_cycle_number),
                             str(
-                                (lambda x: "P" if x else "F")(all(cycle_information.per_pin_pass_fail))
+                                (lambda x: "P" if x else "F")(
+                                    all(cycle_information.per_pin_pass_fail)
+                                )
                             ),
                             "{" + ",".join(self.pins) + "}",
                             "{"
@@ -1299,10 +1358,14 @@ class TSMDigital:
                             )
                             + "}",
                             "{"
-                            + ",".join([str(value) for value in cycle_information.expected_pin_states])
+                            + ",".join(
+                                [str(value) for value in cycle_information.expected_pin_states]
+                            )
                             + "}",
                             "{"
-                            + ",".join([str(value) for value in cycle_information.actual_pin_states])
+                            + ",".join(
+                                [str(value) for value in cycle_information.actual_pin_states]
+                            )
                             + "}",
                         ]
                     )
@@ -1345,7 +1408,8 @@ class TSMDigital:
             self.ssc.calculate_per_instrument_per_site_to_per_site_lut(self.sites)
         )
         per_site_cycle_information = [
-            [HistoryRAMCycleInformation(0, 0, 0, 0, 0, 0, 0, 0)] * number_of_samples for _ in self.sites
+            [HistoryRAMCycleInformation(0, 0, 0, 0, 0, 0, 0, 0)] * number_of_samples
+            for _ in self.sites
         ]
         for lut, cycle_information in zip(
             per_instrument_per_site_to_per_site_lut,
@@ -1537,14 +1601,14 @@ class TSMDigital:
         )
         self.ssc.ppmu_source_voltage_per_site(current_limit_range, per_instrument_source_voltages)
 
-    def fetch_capture_waveform(
-        self, waveform_name: str, samples_to_read: int, timeout: float = 10
-    ):
+    def fetch_capture_waveform(self, waveform_name: str, samples_to_read: int, timeout: float = 10):
         initialized_array = [[0 for _ in range(samples_to_read)] for _ in range(len(self.sites))]
         per_instrument_to_per_site_lut = self.ssc.calculate_per_instrument_to_per_site_lut(
             self.sites
         )
-        per_instrument_capture = self.ssc.fetch_capture_waveform(waveform_name, samples_to_read, timeout)
+        per_instrument_capture = self.ssc.fetch_capture_waveform(
+            waveform_name, samples_to_read, timeout
+        )
         per_site_waveforms = _apply_lut_per_instrument_to_per_site(
             initialized_array, per_instrument_to_per_site_lut, per_instrument_capture
         )
@@ -1647,9 +1711,7 @@ class TSMDigital:
         )
         self.ssc.write_static_per_site(per_instrument_state)
 
-    def publish(
-        self, data_to_publish: typing.List[typing.Any], published_data_id: str = ""
-    ):
+    def publish(self, data_to_publish: typing.List[typing.Any], published_data_id: str = ""):
         if len(numpy.shape(data_to_publish)) == 1:
             (
                 per_site_to_per_instrument_lut,
@@ -1694,7 +1756,7 @@ def filter_sites(tsm: TSMDigital, desired_sites: typing.List[int]):
         tsm (TSMDigital): tsm object with filtered sites
     """
     ssc = tsm.ssc.filter_sites(desired_sites)
-    return TSMDigital(tsm.pin_query_context,ssc,desired_sites,tsm.pins)
+    return TSMDigital(tsm.pin_query_context, ssc, desired_sites, tsm.pins)
 
 
 def _apply_lut_per_instrument_to_per_site_per_pin(
@@ -1831,7 +1893,7 @@ def pins_to_sessions(
         pins typing.Union(str | [str]): desired pins for which the TSMDigital object is created.
             single pin name can be given in string data type.List of strings for multiple pins.
         sites (typing.List[int], optional): list of desired sites.. Defaults to [].
-        turn_pin_groups_to_pins (bool, optional): converts all the Pin groups to pins. 
+        turn_pin_groups_to_pins (bool, optional): converts all the Pin groups to pins.
             Defaults to True.
 
     Returns:

@@ -251,15 +251,19 @@ class TestNIDigital:
 
     def test_write_source_waveform_broadcast(self, digital_tsm_s):
         """TSM SSC Digital Write Source Waveform [Broadcast].vi"""
-        digital_tsm_s[0].write_source_waveform_site_unique("I2C_SiteUnique", [
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-        ], True)
+        digital_tsm_s[0].write_source_waveform_site_unique(
+            "I2C_SiteUnique",
+            [
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+                [1, 2, 3, 4, 5],
+            ],
+            True,
+        )
         digital_tsm_s[0].ssc.write_source_waveform_broadcast("I2C_Broadcast", [1, 2, 3, 4, 5], True)
 
     def test_write_sequencer_register(self, digital_tsm_s):
@@ -271,7 +275,9 @@ class TestNIDigital:
         assert numpy.shape(per_instrument_state) == (1,)
         for state in per_instrument_state:
             assert isinstance(state, bool)
-        register_values = digital_tsm_s[0].ssc.read_sequencer_register(enums.SequencerRegister.REGISTER1)
+        register_values = digital_tsm_s[0].ssc.read_sequencer_register(
+            enums.SequencerRegister.REGISTER1
+        )
         assert isinstance(register_values, list)
         assert numpy.shape(register_values) == (1,)
         for register_value in register_values:
@@ -318,9 +324,7 @@ def configuration(tsm: SMContext, pins: typing.List[str]):
 def frequency_measurement_func(tsm: SMContext, pins: typing.List[str]):
     dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     dpi_tsm.ssc.frequency_counter_configure_measurement_time(0.5)
-    per_site_per_pin_frequency_measurements = (
-        dpi_tsm.frequency_counter_measure_frequency()
-    )
+    per_site_per_pin_frequency_measurements = dpi_tsm.frequency_counter_measure_frequency()
     assert isinstance(per_site_per_pin_frequency_measurements, list)
     print(numpy.shape(per_site_per_pin_frequency_measurements))
     assert numpy.shape(per_site_per_pin_frequency_measurements) == (1, 2)
@@ -354,11 +358,26 @@ def hram(tsm: SMContext, pins: typing.List[str]):
     per_site_cycle_information = dpi_tsm.stream_hram_results()
     for cycle_information in per_site_cycle_information:
         assert not cycle_information
-    files_generated = dpi_tsm.log_hram_results([[HistoryRAMCycleInformation("start_burst", "time_set", 0, 0, 0,
-                                                                            [enums.PinState.X] * 3,
-                                                                            [enums.PinState.X] * 3, [False] * 3,)] * 2
-                                                ] * 3, "Pattern Name", os.path.dirname(os.path.realpath(__file__)) +
-                                               r"\log")
+    files_generated = dpi_tsm.log_hram_results(
+        [
+            [
+                HistoryRAMCycleInformation(
+                    "start_burst",
+                    "time_set",
+                    0,
+                    0,
+                    0,
+                    [enums.PinState.X] * 3,
+                    [enums.PinState.X] * 3,
+                    [False] * 3,
+                )
+            ]
+            * 2
+        ]
+        * 3,
+        "Pattern Name",
+        os.path.dirname(os.path.realpath(__file__)) + r"\log",
+    )
     for file in files_generated:
         assert isinstance(file, str)
 
@@ -395,13 +414,36 @@ def pin_levels_and_timing(tsm: SMContext, pins: typing.List[str]):
     # ctypes.windll.user32.MessageBoxW(None, "niPythonHost Process ID:" + str(os.getpid()), "Attach debugger", 0)
     dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
     dpi_tsm.ssc.apply_levels_and_timing("PinLevels", "Timing")
-    dpi_tsm.apply_tdr_offsets_per_site_per_pin([[1e-9, ]] * 3)
-    dpi_tsm.ssc.apply_tdr_offsets([[1e-9, 1e-9, ]] * 1, )
+    dpi_tsm.apply_tdr_offsets_per_site_per_pin(
+        [
+            [
+                1e-9,
+            ]
+        ]
+        * 3
+    )
+    dpi_tsm.ssc.apply_tdr_offsets(
+        [
+            [
+                1e-9,
+                1e-9,
+            ]
+        ]
+        * 1,
+    )
     dpi_tsm.ssc.configure_active_load(0.0015, 0.0015, -0.0015)
     dpi_tsm.configure_single_level_per_site(dt_dpi.LevelTypeToSet.VIL, [0.0015, 0.0015, 0.0015])
     dpi_tsm.ssc.configure_single_level(dt_dpi.LevelTypeToSet.VIL, 0.0015)
     dpi_tsm.ssc.configure_termination_mode(enums.TerminationMode.HIGH_Z)
-    dpi_tsm.configure_time_set_compare_edge_per_site_per_pin("time_set", [[40e-6, ]] * 3)
+    dpi_tsm.configure_time_set_compare_edge_per_site_per_pin(
+        "time_set",
+        [
+            [
+                40e-6,
+            ]
+        ]
+        * 3,
+    )
     dpi_tsm.configure_time_set_compare_edge_per_site("time_set", [40e-6, 40e-6, 40e-6])
     dpi_tsm.ssc.configure_time_set_compare_edge("time_set", 40e-6)
     dpi_tsm.ssc.configure_voltage_levels(0.0015, 0.0015, 0.0015, 0.0015, 0.0015)
@@ -454,7 +496,9 @@ def sequencer_flags_and_registers(tsm: SMContext, pins: typing.List[str]):
     assert numpy.shape(per_instrument_state) == (1,)
     for state in per_instrument_state:
         assert isinstance(state, bool)
-    per_instrument_register_values = dpi_tsm.ssc.read_sequencer_register(enums.SequencerRegister.REGISTER1)
+    per_instrument_register_values = dpi_tsm.ssc.read_sequencer_register(
+        enums.SequencerRegister.REGISTER1
+    )
     assert isinstance(per_instrument_register_values, list)
     assert numpy.shape(per_instrument_register_values) == (1,)
     for register_value in per_instrument_register_values:
@@ -477,8 +521,9 @@ def session_properties_func(tsm: SMContext, pins: typing.List[str]):
 @nitsm.codemoduleapi.code_module
 def source_and_capture_waveforms(tsm: SMContext, pins: typing.List[str]):
     dpi_tsm = dt_dpi.pins_to_sessions(tsm, pins[0])
-    dpi_tsm.write_source_waveform_site_unique("SourceWaveform_SiteUnique",
-                                              [[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]], True)
+    dpi_tsm.write_source_waveform_site_unique(
+        "SourceWaveform_SiteUnique", [[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]], True
+    )
     dpi_tsm.ssc.write_source_waveform_broadcast("SourceWaveform", [1, 2, 3, 4, 5], True)
     dpi_tsm.ssc.burst_pattern("start_capture")
     per_site_waveforms = dpi_tsm.fetch_capture_waveform("CaptureWaveform", 2)

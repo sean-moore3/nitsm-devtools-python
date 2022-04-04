@@ -89,7 +89,9 @@ class Session:
 
     def ss_disconnect(self, tsm: SMContext):
         if self.instrument_type == InstrumentTypes.daqmx:
-            multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(tsm, [self.enable_pin])
+            multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(
+                tsm, [self.enable_pin]
+            )
             for channel in multiple_session.sessions[0].Task.do_channels:
                 channel.do_tristate = True
             multiple_session: nidevtools.daqmx.MultipleSessions
@@ -505,9 +507,7 @@ def pins_to_task_and_connect(tsm: SMContext, task_name: PinsArg, pins: PinsArg):
         session: An object that tracks the tasks associated with this pin query. Use this object to publish
         measurements and extract data from a set of measurements.
     """
-    pin_list = tsm.filter_pins_by_instrument_type(
-        pins, "abstinst", nitsm.enums.Capability.ALL
-    )
+    pin_list = tsm.filter_pins_by_instrument_type(pins, "abstinst", nitsm.enums.Capability.ALL)
     multiple_session_info = nidevtools.daqmx.pins_to_session_sessions_info(tsm, task_name)
     sessions = []
     for pin in pin_list:

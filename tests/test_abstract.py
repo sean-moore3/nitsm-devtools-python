@@ -66,9 +66,7 @@ class TestAbstract:
         abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm, "BuckSGL_1_DUT")
         print(abst_session)
         enabled.read_state(tsm)
-        ni_abstract.pins_to_task_and_connect(
-            tsm, ["En_Daq"], ["BuckSGL_3_DUT", "BuckSGL_4_DUT"]
-        )
+        ni_abstract.pins_to_task_and_connect(tsm, ["En_Daq"], ["BuckSGL_3_DUT", "BuckSGL_4_DUT"])
         # ni_abstract.disconnect_all(tsm)
         ni_abstract.disconnect_pin(tsm, "BuckSGL_1_DUT")
 

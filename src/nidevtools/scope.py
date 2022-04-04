@@ -132,15 +132,20 @@ class _NIScopeSSC:
     _Site specific _Session and _Channel.
     Each object of this class is used to store info for a specified pin under specific Site.
     To store a _Session and _Channel(s) for different _Site(s) you need an array of this class object.
-    """
-
-    """
     Prefix cs is used in all methods that operates on a given channels in a session. 
     These are for internal use only and can be changed any time. 
     External module should not use these methods with prefix 'cs_' directly.  
     """
 
     def __init__(self, session: niscope.Session, channels: str, pins: str):
+        """
+        Constructor for creating Sessions specific to pins at specific sites
+
+        Args:
+            session (niscope.Session): Session that contains the pin(s) parameter
+            channels (str): mapped channels of the pin(s) parameter
+            pins (str): pins of the hardware for which the session object is created.
+        """
         self._session = session  # mostly shared session depends on pinmap file.
         self._channels = channels  # specific channel(s) of that session
         self._pins = pins  # pin names mapped to the channels
@@ -309,9 +314,25 @@ class _NIScopeTSM:
     """
 
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIScopeSSC]):
+        """
+        constructor for the arrays of sessions for selected pins under selected site
+
+        Args:
+            sessions_sites_channels (typing.Iterable[_NIScopeSSC]): list of sessions 
+        """
         self._sscs = sessions_sites_channels
 
     def _obtain_trigger_path(self, trigger_source: str, setup_type: str):
+        """
+        gets the trigger path in string variable
+
+        Args:
+            trigger_source (str): triggering signal source location
+            setup_type (str): indicates if this STSM1 or PXI or specific type
+
+        Returns:
+            trigger_paths [str]: returns list of trigger paths strings
+        """
         trigger_paths: typing.List[str] = []
         if setup_type == "STSM1":
             for ssc in self._sscs:

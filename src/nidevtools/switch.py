@@ -67,9 +67,7 @@ def get_all_instruments_names(tsm: SMContext):
 
 
 def get_all_sessions(tsm: SMContext):
-    session_data, channel_group_ids, channel_lists = tsm.get_all_custom_sessions(
-        instrument_type_id
-    )
+    session_data, channel_group_ids, channel_lists = tsm.get_all_custom_sessions(instrument_type_id)
     list_of_sessions = []
     for session in session_data:
         list_of_sessions.append(session)

@@ -19,7 +19,7 @@ import math
 def on_close(event):
     global closed
     closed = True
-  
+
 
 def plot_data(measurements, record_length):
 
@@ -36,7 +36,7 @@ def plot_data(measurements, record_length):
     global closed
     closed = False
 
-    fig.canvas.mpl_connect('close_event', on_close)
+    fig.canvas.mpl_connect("close_event", on_close)
 
     # print("\nReading values in loop. CTRL+C or Close window to stop.\n")
 
@@ -59,11 +59,11 @@ def plot_data(measurements, record_length):
         # Append the fetched values in the buffer.
         y_axis.extend(voltages)
         y_axis = y_axis[record_length:]
-        
+
         # Updating the precision of the fetched values.
         y_axis_new = []
         for value in y_axis:
-            if (value < voltage_level):
+            if value < voltage_level:
                 y_axis_new.append(math.floor(value * 100) / 100)
             else:
                 y_axis_new.append(math.ceil(value * 100) / 100)
