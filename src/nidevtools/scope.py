@@ -885,9 +885,11 @@ def _pin_query_context_to_channel_list(
     pins_array_for_session_input: typing.List[PinsCluster] = []
     channel_list_per_session = ()
     num_pins_per_ch_gp = (0,)
-    ch_gp_indices = ((0, ), )
-    ch_indices = ((0, ), )
-    (num_pins_per_ch_gp, ch_gp_indices, ch_indices) = tsm.GetChannelGroupAndChannelIndex(pin_names, num_pins_per_ch_gp, ch_gp_indices, ch_indices)
+    ch_gp_indices = ((0,),)
+    ch_indices = ((0,),)
+    (num_pins_per_ch_gp, ch_gp_indices, ch_indices) = tsm.GetChannelGroupAndChannelIndex(
+        pin_names, num_pins_per_ch_gp, ch_gp_indices, ch_indices
+    )
     for number_of_pins in num_pins_per_ch_gp:
         """
         Create a pins list for each session of the correct size
