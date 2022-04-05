@@ -257,6 +257,7 @@ def configure_measurements(tsm: SMContext):
     dc_tsm = dcpower.pins_to_sessions(tsm, ["SMU_VI_ANA2"])
     dc_tsm.ssc.abort()
     dc_tsm.ssc.configure_aperture_time_with_abort_and_initiate()
+
     # dc_tsm.ssc.configure_settings(20e-3, 0.0, ni_dt_dcpower.enums.Sense.LOCAL)
     # ap_time = dc_tsm.ssc.get_aperture_times_in_seconds()
     # output_state = dc_tsm.ssc.query_output_state

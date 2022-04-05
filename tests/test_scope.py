@@ -407,6 +407,7 @@ def fetch_waveform1(tsm: SMContext):
     v_max = scope_tsm.ssc.fetch_measurement(
         scalar_meas_function=niscope.ScalarMeasurement.VOLTAGE_MAX
     )
+
     # print(wf_info)
     # print(v_peak)
     # print(v_max)

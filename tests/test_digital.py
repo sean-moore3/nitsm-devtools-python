@@ -647,8 +647,9 @@ def initialize_sessions(tsm: SMContext):
 @nitsm.codemoduleapi.code_module
 def configure_pins(tsm: SMContext):
     dpi_tsm_o = dt_dpi.pins_to_sessions(tsm, ["DPI_PG_Outputs"])
-    # dpi_tsm_o.ssc.select_function(ni_dt_digital.enums.SelectedFunction.DIGITAL)
+    dpi_tsm_o.ssc.select_function(dt_dpi.enums.SelectedFunction.DIGITAL)
     dpi_tsm_o.ssc.write_static(dt_dpi.enums.WriteStaticPinState.ZERO)
+
 
 
 @nitsm.codemoduleapi.code_module

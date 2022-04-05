@@ -257,26 +257,27 @@ def disconnect_pin(tsm: SMContext, pin: str):
 
 def initialize(tsm: SMContext):  # CHECK
     """
-    Initialize the TSM context with all the Abstract switch sessions
+    Initialize the TSM context with all the Abstract switch sessions. Based on the instrument type it will create
+    session to individual drivers. so it is essential to
     Args:
         tsm: TSM context where the sessions will be initialized
     """
     switch_names = tsm.get_all_switch_names(instrument_type_id)
     if len(switch_names) == 1:
         dut_pins, sys_pins = tsm.get_pin_names()
-        array = []
+        en_pins = []
         for pin in dut_pins + sys_pins:
             if pin.lower().find("en_") == 0:
-                array.append(pin)
-        data = []
+                en_pins.append(pin)
+        en_sessions = []
         for instrument in ["niDAQmx", "niDigitalPattern", "782xFPGA", "_niSwitch"]:
             filtered_pins = tsm.filter_pins_by_instrument_type(
-                array, instrument, nitsm.enums.Capability.ALL
+                en_pins, instrument, nitsm.enums.Capability.ALL
             )
             for pin in filtered_pins:
                 session = Session(pin, instrument, "", 0, "")
-                data.append(session)
-        multi_session = AbstractSession(data)
+                en_sessions.append(session)
+        multi_session = AbstractSession(en_sessions)
         multi_session.set_sessions(tsm, switch_names[0])
     else:
         raise nifpga.ErrorStatus(
