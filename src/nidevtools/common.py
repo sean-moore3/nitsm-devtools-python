@@ -35,6 +35,9 @@ _pin_types = []  # pin type cache
 
 
 class PinType(enum.Enum):
+    """
+    Pin type classification
+    """
     DUT_PIN = 0
     r"""
     This pin belongs to the device under test
@@ -54,6 +57,14 @@ class PinType(enum.Enum):
 
 
 class PinInformation(typing.NamedTuple):
+    """
+    pin information stores pin name, type, count
+
+    Args:
+        pin: string
+        type : Pintype object
+        count : integer 
+    """
     # pin: _Pin
     pin: str
     type: PinType
@@ -61,6 +72,14 @@ class PinInformation(typing.NamedTuple):
 
 
 class ExpandedPinInformation(typing.NamedTuple):
+    """
+    pin information stores pin name, type, index
+
+    Args:
+        pin: string
+        type : Pintype object
+        index : integer 
+    """
     # pin: _Pin
     pin: str
     type: PinType
@@ -68,6 +87,15 @@ class ExpandedPinInformation(typing.NamedTuple):
 
 
 def channel_list_to_pins(channel_list: str):
+    """
+    Maps the channel list of the hardware to pins from the pinmap file
+
+    Args:
+        channel_list (str): comma seperated list of channels 
+
+    Returns:
+        tuple: sites_and_pins, sites, pins
+    """
     sites_and_pins = []
     sites = []
     pins = []
@@ -86,8 +114,10 @@ def channel_list_to_pins(channel_list: str):
 
 @nitsm.codemoduleapi.code_module
 def get_all_pins(tsm: SMContext, reload_cache=False):
-    """Returns all pins and its types (DUT or system) available in the Semiconductor Module context.
-    Maintains a cache of these pin details and reloads them when requested or required."""
+    """
+    Returns all pins and its types (DUT or system) available in the Semiconductor Module context.
+    Maintains a cache of these pin details and reloads them when requested or required.
+    """
     global _pin_names, _pin_types
     # rebuild cache if empty
     if len(_pin_names) == 0 or reload_cache:
@@ -102,12 +132,31 @@ def get_all_pins(tsm: SMContext, reload_cache=False):
 def get_pin_names_from_expanded_pin_information(
     expanded_pin_info: typing.List[ExpandedPinInformation],
 ):
+    """
+    gets all the pins from the expanded pin object
+
+    Args:
+        expanded_pin_info (typing.List[ExpandedPinInformation]): list of expanded pin information 
+
+    Returns:
+        pins: list of pins in the pins expanded object
+    """
+
     return [pin_info.pin for pin_info in expanded_pin_info]
 
 
 def get_dut_pins_and_system_pins_from_expanded_pin_list(
     expanded_pin_info: typing.List[ExpandedPinInformation],
 ):
+    """
+    from expanded pin information seperates the dut pins and the system pins and returns them
+
+    Args:
+        expanded_pin_info (typing.List[ExpandedPinInformation]): list of expanded pin information
+
+    Returns:
+        dut_pins, system_pins : tuple of dut_pins and system_pins 
+    """
     dut_pins = []
     system_pins = []
     for pin in expanded_pin_info:
@@ -120,6 +169,16 @@ def get_dut_pins_and_system_pins_from_expanded_pin_list(
 
 @nitsm.codemoduleapi.code_module
 def expand_pin_groups_and_identify_pin_types(tsm: SMContext, pins_in):
+    """
+    for the given pins expand all the pin groups and identifies the pin types
+
+    Args:
+        tsm (SMContext): semiconductor module context from teststand
+        pins_in (_type_): list of pins for which information needs to be expanded if it is pin group
+
+    Returns:
+        pins_info, pins_expanded: tuple of pins_info and pins_expanded. 
+    """
     pins_temp, pin_types_temp = get_all_pins(tsm)
     pins_info = []
     pins_expanded = []
@@ -152,6 +211,16 @@ def expand_pin_groups_and_identify_pin_types(tsm: SMContext, pins_in):
 def remove_duplicates_from_tsm_pin_information_array(
     pins_info: typing.List[PinInformation], pins_expanded: typing.List[ExpandedPinInformation]
 ):
+    """
+    removes any duplicate pins in the pins expaned list and the pins info
+
+    Args:
+        pins_info (typing.List[PinInformation]): list of pins_info
+        pins_expanded (typing.List[ExpandedPinInformation]): list of pins_expanded
+
+    Returns:
+        pins expanded: pins expanded list without duplicates
+    """
     temp_pins = []
     temp_pins_expanded = []
     for pin_exp in pins_expanded:
@@ -171,6 +240,17 @@ def select_between_expanded_pin_information_options(
     duplicate: ExpandedPinInformation,
     pin_group_info: typing.List[PinInformation],
 ):
+    """
+    selects the best expanedpinfo from the arguments
+
+    Args:
+        current (ExpandedPinInformation): current pin expanded info
+        duplicate (ExpandedPinInformation): duplicate pin expanded info
+        pin_group_info (typing.List[PinInformation]): pin_group_info
+
+    Returns:
+        pin group info : best expanded pin info
+    """
     a = pin_group_info[current.index].type
     b = pin_group_info[duplicate.index].type
     flag = (a != PinType.PIN_GROUP) and (b == PinType.PIN_GROUP)
@@ -187,7 +267,7 @@ def pin_query_context_to_channel_list(
     sites: typing.List[int],
 ):
     """
-    provides the p.
+    provides the channel list from the pin query context.
     """
     tsm = pin_query_context._tsm_context
     tsm1 = SMContext(tsm)
@@ -253,6 +333,16 @@ def pin_query_context_to_channel_list(
 
 @nitsm.codemoduleapi.code_module
 def identify_pin_types(tsm: SMContext, pins_or_pins_group: typing.Union[str, typing.Sequence[str]]):
+    """
+    identify if there is any pin_group in the input list
+
+    Args:
+        tsm (SMContext): semiconductor module context from teststand
+        pins_or_pins_group (typing.Union[str, typing.Sequence[str]]): list of pins or pingroup names
+
+    Returns:
+        pintypes, pingroupfound: for each of the input pin find its pin type and a flag about pingroupfound
+    """
     all_pin_names, all_pin_types = get_all_pins(tsm)
     pin_group_found = False
     pin_types = []
@@ -269,6 +359,16 @@ def identify_pin_types(tsm: SMContext, pins_or_pins_group: typing.Union[str, typ
 
 @nitsm.codemoduleapi.code_module
 def _check_for_pin_group(tsm: SMContext, pins_or_pins_group):
+    """
+    private function for finding the pingrup in the list of pins
+
+    Args:
+        tsm (SMContext): semiconductor module context from teststand
+        pins_or_pins_group (_type_): list of pins or pingroup names
+
+    Returns:
+        pintypes, pins: for each of the input pin find its pin type and pins
+    """
     pins = pins_or_pins_group
     pins_types, pin_group_found = identify_pin_types(tsm, pins_or_pins_group)
     if pin_group_found:
