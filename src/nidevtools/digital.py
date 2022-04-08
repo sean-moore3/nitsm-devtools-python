@@ -393,7 +393,7 @@ class _NIDigitalSSC:
     def cs_write_static(self, state: enums.WriteStaticPinState, auto_select=True):
         """
         auto_select=True, specifies this function to configure the output function as digital automatically.
-        auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
+        auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
         Without configuring as digital and auto_select as false, this function will not work as expected.
         """
         if auto_select:
@@ -1101,7 +1101,7 @@ class _NIDigitalTSM:
     def write_static(self, state: enums.WriteStaticPinState, auto_select=True):
         """
         auto_select=True, specifies this function to configure the output function as digital automatically.
-        auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
+        auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
         Without configuring as digital and auto_select as false, this function will not work as expected.
         """
         for ssc in self._sscs:
@@ -1644,7 +1644,7 @@ class TSMDigital:
     def read_static(self, auto_select=True):
         """
         auto_select=True, specifies this function to configure the output function as digital automatically.
-        auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
+        auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
         Without configuring as digital and auto_select as false, this function will not work as expected.
         """
         if auto_select:
@@ -1666,7 +1666,7 @@ class TSMDigital:
     ):
         """
         auto_select=True, specifies this function to configure the output function as digital automatically.
-        auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
+        auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
         Without configuring as digital and auto_select as false, this function will not work as expected.
         """
         if auto_select:
@@ -1692,7 +1692,7 @@ class TSMDigital:
     ):
         """
         auto_select=True, specifies this function to configure the output function as digital automatically.
-        auto_select=False, if the pin is explicitly configured as digital already with the tsm_ssc_select_function().
+        auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
         Without configuring as digital and auto_select as false, this function will not work as expected.
         """
         if auto_select:

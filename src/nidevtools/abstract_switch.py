@@ -126,7 +126,7 @@ class Session:
         elif self.instrument_type == InstrumentTypes.digitalpattern:
             multiple_session_info = nidevtools.digital.pin_to_sessions(tsm, self.enable_pin)
             multiple_session_info.ssc.select_function(nidigital.enums.SelectedFunction.DIGITAL)
-            data = nidevtools.digital.tsm_ssc_read_static(multiple_session_info)
+            data = multiple_session_info.ssc.read_static()
             status = ["0", "1", "", "L", "H", "X", "M", "V", "D", "E"]
             self.status = status[data[0][0]]
         elif self.instrument_type == InstrumentTypes.fpga:
