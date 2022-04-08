@@ -581,6 +581,8 @@ class _SSCFPGA(typing.NamedTuple):
         """
         Writes the provided list of DIOLineLocationAndStaticState objects into the FPGA using the address provided in
         each element
+        Args:
+            lines_to_write: List of DIOLineLocationAndStaticState objects to be written
         """
         con_list = []
         data_list = []
@@ -603,6 +605,10 @@ class _SSCFPGA(typing.NamedTuple):
     ):
         """
         Writes the provided DiO Line with the given state into the FPGA
+        Args:
+            connector: Connector to write
+            line: Line to write
+            state: State to be written
         """
         if 0 <= connector.value <= 3:
             con_enable = self.Session.registers["Connector%d Output Enable" % connector.value]
@@ -623,6 +629,10 @@ class TSMFPGA(typing.NamedTuple):
         """
         Allows to configure the host setting for the TSMFPGA session. Data provided should be supported
         by the FPGA and match HW configuration for that specific session.
+        Args:
+            ten_bit_addressing: Configuration variable false by default
+            divide: configuration variable 8 by default
+            clock_stretching: Configuration variable True by default
         """
         session: _SSCFPGA
         session, i2c = self.extract_i2c_master_from_sessions()
@@ -635,6 +645,8 @@ class TSMFPGA(typing.NamedTuple):
             slave_address: Address of the device to read from
             timeout: After it passes the function will raise an exception
             number_of_bytes: expected number of bytes to be read
+        Returns:
+            Data read from FPG
         """
         session: _SSCFPGA
         session, i2c = self.extract_i2c_master_from_sessions()
@@ -658,6 +670,8 @@ class TSMFPGA(typing.NamedTuple):
     def extract_i2c_master_from_sessions(self):
         """
         From session, it determines the right configuration to be used that Matches de FPGA HW
+        Returns:
+            Session handler and scan value in a string
         """
         session = self.SSC[0]  # .Session
         ch_list = self.SSC[0].ChannelList
@@ -681,6 +695,8 @@ class TSMFPGA(typing.NamedTuple):
     def read_commanded_line_states(self):
         """
         Read commanded states for the specific session and returns it as an array of elements
+        Returns:
+            list of current commanded states and commanded states as a tuple
         """
         commanded_states = []
         current_commanded_states = []
@@ -694,6 +710,8 @@ class TSMFPGA(typing.NamedTuple):
     def read_static(self):
         """
         Read static values for each FPGA session in the TSMFPGA list
+        Returns:
+            Readings and line states as a Tuple
         """
         readings = []
         line_states = []
@@ -706,6 +724,8 @@ class TSMFPGA(typing.NamedTuple):
     def write_static_array(self, static_state: typing.List[StaticStates]):
         """
         Write a list of Static States on the FPGA session
+        Args:
+            static_state: List of static states to be written
         """
         for ss in self.SSC:
             ss.ss_wr_static_array(static_state)
@@ -713,6 +733,8 @@ class TSMFPGA(typing.NamedTuple):
     def write_static(self, static_state: typing.List[StaticStates]):
         """
         Write a list of Static States on the FPGA session
+        Args:
+            static_state: List of static states to be written
         """
         for ss in self.SSC:
             ss.ss_wr_static(static_state)
@@ -724,6 +746,12 @@ def debug_ui_launcher(semiconductor_module_manager: nitsm.codemoduleapi.Semicond
 
 
 def search_line(line: LineLocation, ch_list: typing.List[LineLocation]):
+    """
+    Search the a line that corresponds to the inputs provided and returns -1 in case it is not found
+    Args:
+        line: Line location object to be searched in the list of channels
+        ch_list: list of channels to perform the search
+    """
     index = 0
     for element in ch_list:
         if element.channel == line.channel and element.connector == line.connector:
@@ -741,6 +769,13 @@ def update_line_on_connector(
 ):
     """
     Calculates the next value to write on FPGA given its previous values and location
+    Args:
+        enable_in: 0 by default. Carries the last known value of enable
+        data_in: 0 by default. Represents the new value of Data
+        dio_line: Defines the Dio line to be updated
+        line_state: Value to update
+    Returns:
+        Tuple with enable value and data value for the next iteration
     """
     dio_index = dio_line.value
     output_data = ((-dio_index << data_in) & 1) > 0
@@ -756,6 +791,11 @@ def update_line_on_connector(
 def line_state_to_out(line: StaticStates, out_data: bool):
     """
     Calculate the data and enable values given a initial state
+    Args:
+        line: StaticState that represent the line
+        out_data: If line value is 2 it will be returned as the next value of data
+    Returns:
+         Data and Enable values for the next iteration
     """
     data = False
     enable = False
@@ -772,6 +812,13 @@ def line_state_to_out(line: StaticStates, out_data: bool):
 
 
 def channel_list_to_pins(channel_list: str = ""):
+    """
+    Converts from a provided channel list to hardware pins
+    Args:
+        channel_list: List of channels to use in the function
+    Returns:
+        sites_and_pins, sites, pins in a tuple
+    """
     ch_list = channel_list.split(",")
     sites_and_pins = []
     sites = []
