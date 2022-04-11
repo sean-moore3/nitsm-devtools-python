@@ -60,7 +60,7 @@ class Session:
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
             multiple_session.sessions[0].Task.write(bool(self.route_value), True)
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session = nidevtools.digital.pin_to_sessions(tsm, self.enable_pin)
+            multiple_session = nidevtools.digital.pins_to_sessions(tsm, self.enable_pin)
             multiple_session.ssc.select_function(nidigital.enums.SelectedFunction.DIGITAL)
             if self.route_value == "0":
                 data = nidigital.enums.WriteStaticPinState.ZERO
