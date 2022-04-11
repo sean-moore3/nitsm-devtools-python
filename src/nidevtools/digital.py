@@ -308,6 +308,12 @@ class _NIDigitalSSC:
         self._session.wait_until_done(timeout)
 
     def cs_apply_tdr_offsets(self, per_instrument_offset: typing.List[float]):
+        """
+        Applies the correction for propagation delay offsets to a digital pattern instrument. Use this method to apply TDR offsets that are stored from a past measurement or are measured by means other than the tdr method. Also use this method to apply correction for offsets if the **applyOffsets** input of the tdr method was set to False at the time of measurement.
+
+        Args:
+            per_instrument_offset (typing.List[float]): TDR offsets to apply, in seconds. Specify an offset for each pin or channel.
+        """
         self._channels_session.apply_tdr_offsets(per_instrument_offset)
 
     def cs_configure_active_load(self, vcom: float, iol: float, ioh: float):
@@ -534,6 +540,12 @@ class _NIDigitalSSC:
         self._session.sites[self._pins].burst_pattern(start_label, select_digital_function, wait_until_done, timeout)
 
     def ps_get_site_pass_fail(self):
+        """
+        Returns value as list of pass/fail for each pin in the current context
+
+        Returns:
+            pass_fail (List[Bool]): list of pass or fail for each pin
+        """
         return list(self._session.sites[self._pins].get_site_pass_fail().values())
 
 
@@ -824,6 +836,12 @@ class _NIDigitalTSM:
         return per_instrument_failure_counts
 
     def get_site_pass_fail(self):
+        """
+        Returns value as list of pass/fail for each pin in the current context
+
+        Returns:
+            pass_fail (List[Bool]): list of pass or fail for each pin
+        """
         per_instrument_pass: typing.List[typing.List[bool]] = []
         for ssc in self._sscs:
             per_instrument_pass.append(ssc.ps_get_site_pass_fail())
@@ -841,6 +859,12 @@ class _NIDigitalTSM:
             ssc._session.sites[ssc._pins].apply_levels_and_timing(levels_sheet, timing_sheet)
 
     def apply_tdr_offsets(self, per_instrument_offsets: typing.List[typing.List[float]]):
+        """
+        Applies the correction for propagation delay offsets to a digital pattern instrument. Use this method to apply TDR offsets that are stored from a past measurement or are measured by means other than the tdr method. Also use this method to apply correction for offsets if the **applyOffsets** input of the tdr method was set to False at the time of measurement.
+
+        Args:
+            per_instrument_offsets (typing.List[typing.List[float]]): TDR offsets to apply, in seconds. Specify an offset for each pin or channel.
+        """
         for ssc, per_instrument_offset in zip(self._sscs, per_instrument_offsets):
             ssc.cs_apply_tdr_offsets(per_instrument_offset)
 
@@ -1567,6 +1591,12 @@ class TSMDigital:
         return per_site_per_pin_fail_counts
 
     def get_site_pass_fail(self):
+        """
+        Returns value as list of pass/fail for each pin in the current context
+
+        Returns:
+            pass_fail (List[Bool]): list of pass or fail for each pin
+        """
         initialized_array = [False for _ in self.sites]
         per_instrument_to_per_site_lut = self.ssc.calculate_per_instrument_to_per_site_lut(self.sites)
         per_instrument_pass = self.ssc.get_site_pass_fail()
@@ -1576,6 +1606,12 @@ class TSMDigital:
         return per_site_pass
 
     def apply_tdr_offsets_per_site_per_pin(self, per_site_per_pin_tdr_values: typing.List[typing.List[float]]):
+        """
+        Applies the correction for propagation delay offsets to a digital pattern instrument. Use this method to apply TDR offsets that are stored from a past measurement or are measured by means other than the tdr method. Also use this method to apply correction for offsets if the **applyOffsets** input of the tdr method was set to False at the time of measurement.
+
+        Args:
+            per_site_per_pin_tdr_values (typing.List[typing.List[float]]): TDR offsets to apply, in seconds. Specify an offset for each pin or channel.
+        """
         (
             per_site_per_pin_to_per_instrument_lut,
             instrument_count,
@@ -1595,11 +1631,16 @@ class TSMDigital:
         per_site_value: typing.List[float],
     ):
         """
-        
+        LevelTypeToSet
+            VIH or VIL - Specifies the voltage that the digital pattern instrument will apply to the input of the DUT when the test instrument drives a logic high (1) or low (0).
+            VOH or VOL - Specifies the output voltage from the DUT above (or below) which the comparator on the digital pattern test instrument interprets a logic high (H) or low (L).
+            VTERM - Specifies the termination voltage the digital pattern instrument applies during non-drive cycles when the termination mode is set to V :sub:`term`. The instrument applies the termination voltage through a 50 Ω parallel termination resistance.
+            IOL or IOH - Specifies the current that the DUT sources (or sinks) to the active load while outputting a voltage above (or below) VCOM.
+            VCOM - Specifies the voltage level at which the active load circuit switches between sourcing current and sinking current.
 
         Args:
-            level_type_to_set (LevelTypeToSet): _description_
-            per_site_value (typing.List[float]): _description_
+            level_type_to_set (LevelTypeToSet): VIH or VIL or VOH or VOL or IOL or IOH or VCOM or VTERM
+            per_site_value (typing.List[float]): values to set per site
         """
         (
             per_site_to_per_instrument_lut,
