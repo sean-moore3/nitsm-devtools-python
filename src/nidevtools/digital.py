@@ -302,6 +302,12 @@ class _NIDigitalSSC:
         )
 
     def cs_get_fail_count(self):
+        """
+        Returns the comparison fail count for pins in the repeated capabilities.
+
+        Returns:
+            failure_count (list of int): Number of failures in an array. If a site is disabled or not enabled for burst, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
+        """
         return self._channels_session.get_fail_count()
 
     def cs_wait_until_done(self, timeout: float = 10):
@@ -781,6 +787,61 @@ class _NIDigitalTSM:
         )
 
     def stream_hram_results(self):
+        """
+        Returns the pattern information acquired for the specified cycles.
+
+        If the pattern is using the edge multiplier feature, cycle numbers represent tester cycles, each of which may consist of multiple DUT cycles. When using pins with mixed edge multipliers, pins may return PinState.PIN_STATE_NOT_ACQUIRED for DUT cycles where those pins do not have edges defined.
+
+        Site number on which to retrieve pattern information must be specified via sites repeated capability.The method returns an error if more than one site is specified.
+
+        Pins for which to retrieve pattern information must be specified via pins repeated capability.If pins are not specified, pin list from the pattern containing the start label is used. Call get_pattern_pin_names with the start label to retrieve the pins associated with the pattern burst:
+
+        Note:
+        Before bursting a pattern, you must configure the History RAM trigger and specify which cycles to acquire.
+
+        history_ram_trigger_type should be used to specify the trigger condition on which History RAM starts acquiring pattern information.
+
+        If History RAM trigger is configured as HistoryRAMTriggerType.CYCLE_NUMBER,
+        cycle_number_history_ram_trigger_cycle_number should be used to specify the cycle number on which History RAM starts acquiring pattern information.
+
+        If History RAM trigger is configured as HistoryRAMTriggerType.PATTERN_LABEL,
+        pattern_label_history_ram_trigger_label should be used to specify the pattern label from which to start acquiring pattern information.
+        pattern_label_history_ram_trigger_vector_offset should be used to specify the number of vectors following the specified pattern label from which to start acquiring pattern information.
+        pattern_label_history_ram_trigger_cycle_offset should be used to specify the number of cycles following the specified pattern label and vector offset from which to start acquiring pattern information.
+
+        For all History RAM trigger conditions, history_ram_pretrigger_samples should be used to specify the number of samples to acquire before the trigger conditions are met. If you configure History RAM to only
+        acquire failed cycles, you must set history_ram_pretrigger_samples to 0.
+
+        history_ram_cycles_to_acquire should be used to specify which cycles History RAM acquires after the trigger conditions are met.
+
+        Returns:
+            history_ram_cycle_information (list of HistoryRAMCycleInformation): Returns a list of class instances with
+                the following information about each pattern cycle:
+
+                -  **pattern_name** (str)  Name of the pattern for the acquired cycle.
+                -  **time_set_name** (str) Time set for the acquired cycle.
+                -  **vector_number** (int) Vector number within the pattern for the acquired cycle. Vector numbers start
+                   at 0 from the beginning of the pattern.
+                -  **cycle_number** (int) Cycle number acquired by this History RAM sample. Cycle numbers start at 0
+                   from the beginning of the pattern burst.
+                -  **scan_cycle_number** (int) Scan cycle number acquired by this History RAM sample. Scan cycle numbers
+                   start at 0 from the first cycle of the scan vector. Scan cycle numbers are -1 for cycles that do not
+                   have a scan opcode.
+                -  **expected_pin_states** (list of list of enums.PinState) Pin states as expected by the loaded
+                   pattern in the order specified in the pin list. Pins without defined edges in the specified DUT cycle
+                   will have a value of PinState.PIN_STATE_NOT_ACQUIRED.
+                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
+                   Length of the inner list will be equal to the number of pins requested.
+                -  **actual_pin_states** (list of list of enums.PinState) Pin states acquired by History RAM in the
+                   order specified in the pin list. Pins without defined edges in the specified DUT cycle will have a
+                   value of PinState.PIN_STATE_NOT_ACQUIRED.
+                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
+                   Length of the inner list will be equal to the number of pins requested.
+                -  **per_pin_pass_fail** (list of list of bool) Pass fail information for pins in the order specified in
+                   the pin list. Pins without defined edges in the specified DUT cycle will have a value of pass (True).
+                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
+                   Length of the inner list will be equal to the number of pins requested.
+        """
         per_instrument_per_site_array: typing.List[_NIDigitalSSC] = []
         for ssc in self._sscs:
             channel_list_array, site_list_array, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
@@ -795,12 +856,11 @@ class _NIDigitalTSM:
             stop = False
             while not stop:
                 done = ssc._session.is_done()
-                _, pins, _ = _channel_list_to_pins(ssc._channels)
+                _, pins, sites = _channel_list_to_pins(ssc._channels)
                 sample_count = ssc._session.sites[ssc._pins].get_history_ram_sample_count()
                 samples_to_read = sample_count - read_position
                 cycle_information += (
-                    ssc._session.sites[ssc._pins]
-                    .pins_info[pins]
+                    ssc._session.sites[sites].pins[pins]
                     .fetch_history_ram_cycle_information(read_position, samples_to_read)
                 )
                 read_position = sample_count
@@ -819,6 +879,22 @@ class _NIDigitalTSM:
             ssc.cs_abort()
 
     def burst_pattern_pass_fail(self, start_label: str, digital: bool = True, timeout: float = 10):
+        """
+        Uses the start_label you specify to burst the pattern on the sites you specify. Waits for the burst to complete, and returns comparison results for each site.
+
+        Digital pins retain their state at the end of a pattern burst until the first vector of the pattern burst, a call to
+        write_static, or a call to apply_levels_and_timing.
+
+        Args:
+            start_label (str): Pattern name or exported pattern label from which to start bursting the pattern.
+
+            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital method for the pins in the pattern prior to bursting. Defaults to True.
+
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error.Defaults to 10.
+
+        Returns:
+            List of List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site number and value is pass/fail.  
+        """
         return [s.ps_burst_pattern_pass_fail(start_label, digital, timeout) for s in self._sscs]
 
     def burst_pattern(
@@ -832,6 +908,12 @@ class _NIDigitalTSM:
             ssc.ps_burst_pattern(start_label, select_digital_function, timeout, wait_until_done)
 
     def get_fail_count(self):
+        """
+        Returns the comparison fail count for pins in the repeated capabilities.
+
+        Returns:
+            failure_count (list of list of int): Number of failures per instrument. If a site is disabled or not enabled for burst, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
+        """
         per_instrument_failure_counts = [ssc.cs_get_fail_count() for ssc in self._sscs]
         return per_instrument_failure_counts
 
@@ -1547,6 +1629,12 @@ class TSMDigital:
         return files_generated
 
     def stream_hram_results(self):
+        """
+        
+
+        Returns:
+            _type_: _description_
+        """
         (
             per_instrument_per_site_cycle_information,
             number_of_samples,
@@ -1569,6 +1657,22 @@ class TSMDigital:
         select_digital_function: bool = True,
         timeout: float = 10,
     ):
+        """
+        Uses the start_label you specify to burst the pattern on the sites you specify. Waits for the burst to complete, and returns comparison results for each site.
+
+        Digital pins retain their state at the end of a pattern burst until the first vector of the pattern burst, a call to
+        write_static, or a call to apply_levels_and_timing.
+
+        Args:
+            start_label (str): Pattern name or exported pattern label from which to start bursting the pattern.
+
+            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital method for the pins in the pattern prior to bursting. Defaults to True.
+
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error.Defaults to 10.
+
+        Returns:
+            List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site number and value is pass/fail.  
+        """
         initialized_array = [False for _ in self.sites]
         per_instrument_to_per_site_lut = self.ssc.calculate_per_instrument_to_per_site_lut(self.sites)
         per_instrument_pass = self.ssc.burst_pattern_pass_fail(start_label, select_digital_function, timeout)
@@ -1578,6 +1682,12 @@ class TSMDigital:
         return per_site_pass
 
     def get_fail_count(self):
+        """
+        Returns the comparison fail count for pins in the repeated capabilities.
+
+        Returns:
+            failure_count (list of list of int): Number of failures per site per pin. If a site is disabled or not enabled for burst, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
+        """
         initialized_array = [[0 for _ in self.pins] for _ in self.sites]
         per_instrument_to_per_site_per_pin_lut = self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
             self.sites, self.pins
