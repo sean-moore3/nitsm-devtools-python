@@ -9,7 +9,7 @@ import nidevtools.digital as ni_dt_digital
 import nidevtools.switch as ni_switch
 
 
-# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
+# To simulate hardware create a dummy file named "Simulate.driver" in the current folder.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
 pin_file_names = ["AbstInst.pinmap", "C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap"]
@@ -45,6 +45,12 @@ def tsm(standalone_tsm):
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestAbstract:
     def test_initialize_and_close(self, tsm):
+        """
+        tests init and close feature
+
+        Args:
+            tsm (_type_): _description_
+        """
         ni_abstract.initialize(tsm)
         assert 4 == len(ni_abstract.get_all_sessions(tsm).enable_pins)
         assert ni_abstract.get_all_instruments_names(tsm)[0] == "Masterconnect"

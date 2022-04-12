@@ -284,6 +284,12 @@ class _NIDigitalSSC:
             self._session.pattern_label_history_ram_trigger_vector_offset = vector_offset
 
     def cs_get_hram_settings(self):
+        """
+        gets the current HRAM settings in a tuple format
+
+        Returns:
+            HRAM_settings(tuple): contains HRAM Cycles to acquire,pretrigger samples, max samples to acquire per site, is number of samples finite, and buffer size per site 
+        """
         return (
             self._session.history_ram_cycles_to_acquire,
             self._session.history_ram_pretrigger_samples,
@@ -293,6 +299,12 @@ class _NIDigitalSSC:
         )
 
     def cs_get_hram_trigger_settings(self):
+        """
+        returns the tuple containing HRAM trigger type,cycle number, label, cycle offset and vector offset
+
+        Returns:
+            HRAM tuple: HRAM trigger settings
+        """
         return (
             self._session.history_ram_trigger_type,
             self._session.cycle_number_history_ram_trigger_cycle_number,
@@ -324,7 +336,7 @@ class _NIDigitalSSC:
 
     def cs_configure_active_load(self, vcom: float, iol: float, ioh: float):
         """
-        Configures I\ :sub:`OL`, I\ :sub:`OH`, and V\ :sub:`COM` levels for the active load on the
+        Configures Iol, Ioh, and Vcom levels for the active load on the
         selected pins/channels in the session. The DUT sources or sinks current based on the level
         values. To enable active load, set the termination mode to TerminationMode.ACTIVE_LOAD.
         To disable active load, set the termination mode of the instrument to
@@ -432,6 +444,12 @@ class _NIDigitalSSC:
 
     # Session Properties #
     def cs_get_properties(self):  # checked _
+        """
+        Returns the session properties i.e. Voh, Vol, Vih, Vil, Vterm, frequency_counter_measurement_time in a named tuple format
+
+        Returns:
+            session_property: Named tuple of session property
+        """
         instrument_name = ""
         match = re.search(r"[A-Za-z]+[1-9]+", str(self._session))
         if match:
@@ -456,6 +474,32 @@ class _NIDigitalSSC:
         self._session.digital_edge_start_trigger_edge = edge
 
     def cs_export_opcode_trigger_signal(self, signal_id: str, terminal: str = ""):
+        """
+        Specifies the destination terminal for exporting the Pattern Opcode Event. Terminals can be specified in one of two ways. If the digital pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0.
+
+        +-----------------+--------------------+
+        | Defined Values: |                    |
+        +=================+====================+
+        | PXI_Trig0       | PXI trigger line 0 |
+        +-----------------+--------------------+
+        | PXI_Trig1       | PXI trigger line 1 |
+        +-----------------+--------------------+
+        | PXI_Trig2       | PXI trigger line 2 |
+        +-----------------+--------------------+
+        | PXI_Trig3       | PXI trigger line 3 |
+        +-----------------+--------------------+
+        | PXI_Trig4       | PXI trigger line 4 |
+        +-----------------+--------------------+
+        | PXI_Trig5       | PXI trigger line 5 |
+        +-----------------+--------------------+
+        | PXI_Trig6       | PXI trigger line 6 |
+        +-----------------+--------------------+
+        | PXI_Trig7       | PXI trigger line 7 |
+        +-----------------+--------------------+
+        Args:
+                signal_id (str): id of the signal that is used for indexing events.
+                terminal (str, optional): pxi trigger line name. Defaults to "".
+        """
         self._session.pattern_opcode_events[signal_id].exported_pattern_opcode_event_output_terminal = terminal
 
     def cs_ppmu_source(self):
@@ -733,6 +777,12 @@ class _NIDigitalTSM:
         self.configure_hram_trigger(triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset)
 
     def get_hram_settings(self):
+        """
+        gets the current HRAM settings in a tuple of lists format
+
+        Returns:
+            HRAM_settings(tuple of lists): contains HRAM Cycles to acquire,pretrigger samples, max samples to acquire per site, is number of samples finite, and buffer size per site 
+        """
         per_instrument_cycles_to_acquire: typing.List[enums.HistoryRAMCyclesToAcquire] = []
         per_instrument_pretrigger_samples: typing.List[int] = []
         per_instrument_max_samples_to_acquire_per_site: typing.List[int] = []
@@ -760,6 +810,12 @@ class _NIDigitalTSM:
         )
 
     def get_hram_trigger_settings(self):
+        """
+        Returns the tuple containing HRAM trigger type,cycle number, label, cycle offset and vector offset
+
+        Returns:
+            HRAM_trigger_settings (tuple of lists): HRAM trigger settings
+        """
         per_instrument_triggers_type: typing.List[enums.HistoryRAMTriggerType] = []
         per_instrument_cycle_number: typing.List[int] = []
         per_instrument_pattern_label: typing.List[str] = []
@@ -841,6 +897,7 @@ class _NIDigitalTSM:
                    the pin list. Pins without defined edges in the specified DUT cycle will have a value of pass (True).
                    Length of the outer list will be equal to the value of edge multiplier for the given vector.
                    Length of the inner list will be equal to the number of pins requested.
+                number_of_samples (int): total number of samples in the record 
         """
         per_instrument_per_site_array: typing.List[_NIDigitalSSC] = []
         for ssc in self._sscs:
@@ -1393,6 +1450,36 @@ class _NIDigitalTSM:
             ssc.cs_configure_trigger_signal(source, edge)
 
     def export_opcode_trigger_signal(self, signal_id: str, output_terminal: str = ""):
+        """
+        Specifies the destination terminal for exporting the Pattern Opcode Event. Terminals can be specified in one of two ways. If the digital pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0.
+
+        +-----------------+--------------------+
+        | Defined Values: |                    |
+        +=================+====================+
+        | PXI_Trig0       | PXI trigger line 0 |
+        +-----------------+--------------------+
+        | PXI_Trig1       | PXI trigger line 1 |
+        +-----------------+--------------------+
+        | PXI_Trig2       | PXI trigger line 2 |
+        +-----------------+--------------------+
+        | PXI_Trig3       | PXI trigger line 3 |
+        +-----------------+--------------------+
+        | PXI_Trig4       | PXI trigger line 4 |
+        +-----------------+--------------------+
+        | PXI_Trig5       | PXI trigger line 5 |
+        +-----------------+--------------------+
+        | PXI_Trig6       | PXI trigger line 6 |
+        +-----------------+--------------------+
+        | PXI_Trig7       | PXI trigger line 7 |
+        +-----------------+--------------------+
+        Args:
+                signal_id (str): pxi trigger line name
+                terminal (str, optional): _description_. Defaults to "".
+
+        Args:
+            signal_id (str): _description_
+            output_terminal (str, optional): _description_. Defaults to "".
+        """
         for ssc in self._sscs:
             ssc.cs_export_opcode_trigger_signal(signal_id, output_terminal)
 
@@ -1433,6 +1520,15 @@ class _NIDigitalTSM:
             ssc._session.initiate()
 
     def calculate_per_instrument_per_site_to_per_site_lut(self, sites: typing.List[int]):
+        """
+        computes per instrument per site to per site lookup table
+
+        Args:
+            sites (typing.List[int]): list of site numbers
+
+        Returns:
+            list: per_instrument_per_site_to_per_site_lut
+        """
         per_instrument_per_site_to_per_site_lut: typing.List[Location1DArray] = []
         for ssc in self._sscs:
             site_numbers, _ = _site_list_to_site_numbers(ssc._pins)
@@ -1443,6 +1539,15 @@ class _NIDigitalTSM:
         return per_instrument_per_site_to_per_site_lut
 
     def calculate_per_instrument_to_per_site_lut(self, sites: typing.List[int]):
+        """
+        computes the per instrument to per site lookup table
+
+        Args:
+            sites (typing.List[int]): list of site numbers
+
+        Returns:
+            list: per_instrument_to_per_site_lut
+        """
         per_instrument_to_per_site_lut: typing.List[Location1DArray] = []
         for ssc in self._sscs:
             site_numbers, _ = _site_list_to_site_numbers(ssc._pins)
@@ -1453,6 +1558,16 @@ class _NIDigitalTSM:
         return per_instrument_to_per_site_lut
 
     def calculate_per_instrument_to_per_site_per_pin_lut(self, sites: typing.List[int], pins: typing.List[str]):
+        """
+        computes per insturment to per site per pin lookup table
+
+        Args:
+            sites (typing.List[int]): list of site numbers
+            pins (typing.List[str]): list of pin names
+
+        Returns:
+            list: per_instrument_to_per_site_per_pin_lut
+        """
         per_instrument_to_per_site_per_pin_lut: typing.List[Location2DArray] = []
         for ssc in self._sscs:
             _, _pins, _sites = _channel_list_to_pins(ssc._channels)
@@ -1463,6 +1578,18 @@ class _NIDigitalTSM:
         return per_instrument_to_per_site_per_pin_lut
 
     def calculate_per_site_per_pin_to_per_instrument_lut(self, sites: typing.List[int], pins: typing.List[str]):
+        """
+        coomputes the per site per pin to per instrument lookup table
+
+        Args:
+            sites (typing.List[int]): list of site numbers
+            pins (typing.List[str]): list of pin names
+
+        Returns:
+            tuple: per_site_per_pin_to_per_instrument_lut,
+            instrument_count,
+            max_sites_on_instrument,
+        """
         max_sites_on_instrument = 0
         i = 0
         location_2d_array: typing.List[Location2D] = []
@@ -1488,6 +1615,15 @@ class _NIDigitalTSM:
         )
 
     def calculate_per_site_to_per_instrument_lut(self, sites: typing.List[int]):
+        """
+        computes the per site to per instrument lookup table.
+
+        Args:
+            sites (typing.List[int]): list of site numbers
+
+        Returns:
+            tuple: per_site_to_per_instrument_lut, instrument_count, max_sites_on_instrument
+        """
         max_sites_on_instrument = 0
         i = 0
         location_2d_array: typing.List[Location2D] = []
@@ -1506,6 +1642,12 @@ class _NIDigitalTSM:
         return per_site_to_per_instrument_lut, instrument_count, max_sites_on_instrument
 
     def get_properties(self):
+        """
+        Returns list of session properties i.e. Voh, Vol, Vih, Vil, Vterm, frequency_counter_measurement_time in a named tuple format
+
+        Returns:
+            list of session_property: list of Named tuple of session property
+        """
         return [ssc.cs_get_properties() for ssc in self._sscs]
 
 
@@ -1517,12 +1659,30 @@ class TSMDigital:
         sites: typing.List[int],
         pins: typing.List[str],
     ):
+        """
+        constructor for TSMDigital to store sessions, sites and pins for the pin query context
+
+        Args:
+            pin_query_context (typing.Any): _description_
+            ssc (_NIDigitalTSM): _description_
+            sites (typing.List[int]): _description_
+            pins (typing.List[str]): _description_
+        """
         self.pin_query_context = pin_query_context
         self.ssc = ssc
         self.sites = sites
         self.pins = pins
 
     def frequency_counter_measure_frequency(self):
+        """
+        Measures the frequency on all the channel(s) over the specified measurement time.
+        
+        Returns:
+            list [ list[float]]: measurement frequencies per site per pin
+
+        Returns:
+            _type_: _description_
+        """
         initialized_array = [[0.0 for _ in self.pins] for _ in self.sites]
         per_instrument_to_per_site_per_pin_lut = self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
             self.sites, self.pins
@@ -1536,6 +1696,12 @@ class TSMDigital:
         return per_site_per_pin_frequency_measurements
 
     def get_hram_configuration(self):
+        """
+        gets the current HRAM settings and HRAM trigger settings in a tuple of lists format
+
+        Returns:
+            HRAMConfiguration(named tuple): contains HRAM Cycles to acquire,pretrigger samples, max samples to acquire per site, is number of samples finite, buffer size per site, trigger type, cycle number, pattern label, cycle offset, vector offset
+        """
         (
             per_instrument_cycles_to_acquire,
             per_instrument_pretrigger_samples,
@@ -1570,6 +1736,17 @@ class TSMDigital:
         pattern_name: str,
         destination_dir: str,
     ):
+        """
+        stores the HRAM results from every site into multiple log files 
+
+        Args:
+            per_site_cycle_information (typing.List[typing.List[HistoryRAMCycleInformation]]): HRAM results
+            pattern_name (str): pattern name used for bursting 
+            destination_dir (str): destination folder under which the log files are created.
+
+        Returns:
+            files_generated (list of filenames): returns the list of log file names
+        """
         if not os.path.exists(destination_dir):
             os.mkdir(destination_dir)
         os.chdir(destination_dir)
@@ -1630,10 +1807,57 @@ class TSMDigital:
 
     def stream_hram_results(self):
         """
-        
+        Returns the pattern information acquired for the specified cycles.
+
+        If the pattern is using the edge multiplier feature, cycle numbers represent tester cycles, each of which may consist of multiple DUT cycles. When using pins with mixed edge multipliers, pins may return PinState.PIN_STATE_NOT_ACQUIRED for DUT cycles where those pins do not have edges defined.
+
+        Site number on which to retrieve pattern information must be specified via sites repeated capability.The method returns an error if more than one site is specified.
+
+        Pins for which to retrieve pattern information must be specified via pins repeated capability.If pins are not specified, pin list from the pattern containing the start label is used. Call get_pattern_pin_names with the start label to retrieve the pins associated with the pattern burst:
+
+        Note:
+        Before bursting a pattern, you must configure the History RAM trigger and specify which cycles to acquire.
+
+        history_ram_trigger_type should be used to specify the trigger condition on which History RAM starts acquiring pattern information.
+
+        If History RAM trigger is configured as HistoryRAMTriggerType.CYCLE_NUMBER,
+        cycle_number_history_ram_trigger_cycle_number should be used to specify the cycle number on which History RAM starts acquiring pattern information.
+
+        If History RAM trigger is configured as HistoryRAMTriggerType.PATTERN_LABEL,
+        pattern_label_history_ram_trigger_label should be used to specify the pattern label from which to start acquiring pattern information.
+        pattern_label_history_ram_trigger_vector_offset should be used to specify the number of vectors following the specified pattern label from which to start acquiring pattern information.
+        pattern_label_history_ram_trigger_cycle_offset should be used to specify the number of cycles following the specified pattern label and vector offset from which to start acquiring pattern information.
+
+        For all History RAM trigger conditions, history_ram_pretrigger_samples should be used to specify the number of samples to acquire before the trigger conditions are met. If you configure History RAM to only
+        acquire failed cycles, you must set history_ram_pretrigger_samples to 0.
+
+        history_ram_cycles_to_acquire should be used to specify which cycles History RAM acquires after the trigger conditions are met.
 
         Returns:
-            _type_: _description_
+            per_site_cycle_information (list of HistoryRAMCycleInformation): Returns a list of  class instances with the following information about each pattern cycle:
+                -  **pattern_name** (str)  Name of the pattern for the acquired cycle.
+                -  **time_set_name** (str) Time set for the acquired cycle.
+                -  **vector_number** (int) Vector number within the pattern for the acquired cycle. Vector numbers start
+                   at 0 from the beginning of the pattern.
+                -  **cycle_number** (int) Cycle number acquired by this History RAM sample. Cycle numbers start at 0
+                   from the beginning of the pattern burst.
+                -  **scan_cycle_number** (int) Scan cycle number acquired by this History RAM sample. Scan cycle numbers
+                   start at 0 from the first cycle of the scan vector. Scan cycle numbers are -1 for cycles that do not
+                   have a scan opcode.
+                -  **expected_pin_states** (list of list of enums.PinState) Pin states as expected by the loaded
+                   pattern in the order specified in the pin list. Pins without defined edges in the specified DUT cycle
+                   will have a value of PinState.PIN_STATE_NOT_ACQUIRED.
+                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
+                   Length of the inner list will be equal to the number of pins requested.
+                -  **actual_pin_states** (list of list of enums.PinState) Pin states acquired by History RAM in the
+                   order specified in the pin list. Pins without defined edges in the specified DUT cycle will have a
+                   value of PinState.PIN_STATE_NOT_ACQUIRED.
+                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
+                   Length of the inner list will be equal to the number of pins requested.
+                -  **per_pin_pass_fail** (list of list of bool) Pass fail information for pins in the order specified in
+                   the pin list. Pins without defined edges in the specified DUT cycle will have a value of pass (True).
+                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
+                   Length of the inner list will be equal to the number of pins requested.
         """
         (
             per_instrument_per_site_cycle_information,

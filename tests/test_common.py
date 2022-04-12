@@ -1,6 +1,7 @@
-import nidevtools.common as ni_dt_common
-import nidevtools.abstract_switch as ni_dt_abs
 import re
+
+import nidevtools.abstract_switch as ni_dt_abs
+import nidevtools.common as ni_dt_common
 
 # This file is used for testing some common functions
 
