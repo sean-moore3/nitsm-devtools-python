@@ -596,13 +596,13 @@ def set_task(tsm: SMContext):
             task.do_channels.add_do_chan(
                 physical_channel, "", nidaqmx.constants.LineGrouping.CHAN_PER_LINE
             )
-            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.ON_DEMAND
         except Exception:
             task = reset_devices(task)
             task.do_channels.add_do_chan(
                 physical_channel, "", nidaqmx.constants.LineGrouping.CHAN_PER_LINE
             )
-            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.SAMPLE_CLOCK
+            task.timing.samp_timing_type = nidaqmx.constants.SampleTimingType.ON_DEMAND
         finally:
             tsm.set_nidaqmx_task(task_name, task)
 
