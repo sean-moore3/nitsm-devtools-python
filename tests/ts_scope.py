@@ -155,14 +155,6 @@ def fetch_measurement_stats_per_channel(
     osc_pin1 = scope.pins_to_sessions(tsm, pins, sites)
     osc_pin1.ssc.fetch_meas_stats_per_channel(niscope.ScalarMeasurement.NO_MEASUREMENT)
 
-@nitsm.codemoduleapi.code_module
-def configure_measurements(tsm: SMContext, pins: typing.List[str], sites: typing.List[int]):
-    osc_pin1 = scope.pins_to_sessions(tsm, pins, sites)
-    osc_pin1.ssc.configure(
-        4e-3, 1, 0, niscope.VerticalCoupling.AC, 5e6, 2000, 50, -1, 1e6, 1, True
-    )
-    osc_pin1.ssc.configure_trigger_immediate()
-
 
 @nitsm.codemoduleapi.code_module
 def fetch_waveform(tsm: SMContext, pins: typing.List[str], sites: typing.List[int]):
@@ -190,8 +182,4 @@ def fetch_waveform(tsm: SMContext, pins: typing.List[str], sites: typing.List[in
 def close_sessions(tsm: SMContext):
     print(" Closing sessions")
     scope.close_sessions(tsm)
-
-
-
-
 
