@@ -262,7 +262,7 @@ class TestNIScope:
             # scope_tsm.ssc.configure(5.0, 1.0, 0.0, niscope.VerticalCoupling.DC, 10e6, 1000, 0.0, 0.0, 1e6, 1, True)
             scope_tsm.ssc.configure_vertical(5.0, niscope.VerticalCoupling.DC, 0.0, 1.0, True)
             scope_tsm.ssc.configure_timing(20e6, 1000, 50, 1, True)
-            # scope.tsm_ssc_start_acquisition(scope_tsm)
+            # scope_tsm.ssc.start_acquisition()
             scope_tsm.ssc.initiate()
             data1, data2 = scope_tsm.ssc.fetch_multirecord_waveform(1)
             print(data1, data2, "\n")

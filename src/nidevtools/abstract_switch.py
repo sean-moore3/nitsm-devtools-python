@@ -60,7 +60,7 @@ class Session:
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
             multiple_session.sessions[0].Task.write(bool(self.route_value), True)
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session = nidevtools.digital.pin_to_sessions(tsm, self.enable_pin)
+            multiple_session = nidevtools.digital.pins_to_sessions(tsm, self.enable_pin)
             multiple_session.ssc.select_function(nidigital.enums.SelectedFunction.DIGITAL)
             if self.route_value == "0":
                 data = nidigital.enums.WriteStaticPinState.ZERO
@@ -98,7 +98,7 @@ class Session:
             multiple_session.sessions[0].Task.stop()
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session_info = nidevtools.digital.pin_to_sessions(tsm, self.enable_pin)
+            multiple_session_info = nidevtools.digital.pins_to_sessions(tsm, self.enable_pin)
             data = nidigital.enums.WriteStaticPinState.X
             multiple_session_info.ssc.write_static(data)
         elif self.instrument_type == InstrumentTypes.fpga:
@@ -124,9 +124,9 @@ class Session:
                 data += str(bit)
             self.status = data
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session_info = nidevtools.digital.pin_to_sessions(tsm, self.enable_pin)
+            multiple_session_info = nidevtools.digital.pins_to_sessions(tsm, self.enable_pin)
             multiple_session_info.ssc.select_function(nidigital.enums.SelectedFunction.DIGITAL)
-            data = nidevtools.digital.tsm_ssc_read_static(multiple_session_info)
+            data = multiple_session_info.ssc.read_static()
             status = ["0", "1", "", "L", "H", "X", "M", "V", "D", "E"]
             self.status = status[data[0][0]]
         elif self.instrument_type == InstrumentTypes.fpga:
