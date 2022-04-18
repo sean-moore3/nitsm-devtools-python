@@ -180,13 +180,15 @@ class _SSCFPGA(typing.NamedTuple):
     Channels: str
     ChannelList: str
 
-    def ss_wr_static_array(self, static_states: typing.List[StaticStates]):
+    def ss_wr_static_array(self, static_states: typing.Union[StaticStates, typing.List[StaticStates]]):
         """
         This function allows to write a static array of StaticStates for the specific single session
 
         Args:
             static_states: Array of objects class StaticStates to be written on the single session
         """
+        if isinstance(static_states, StaticStates):
+            static_states = [static_states]
         ch_list = self.ChannelList.split(",")
         iq_list = []
         r_list = []
@@ -199,13 +201,15 @@ class _SSCFPGA(typing.NamedTuple):
             lines_to_write.append(element)
         self.write_multiple_dio_lines(lines_to_write)
 
-    def ss_wr_static(self, static_states: typing.List[StaticStates]):
+    def ss_wr_static(self, static_states: typing.Union[StaticStates, typing.List[StaticStates]]):
         """
         This function allows to write a static array of StaticStates for the specific single session
 
         Args:
-            static_states: Array of objects class StaticStates to be written on the single session
+            static_states: Single or array of objects class StaticStates to be written on the single session
         """
+        if isinstance(static_states, StaticStates):
+            static_states = [static_states]
         ch_list = self.Channels.split(",")
         iq_list = []
         r_list = []
@@ -222,9 +226,6 @@ class _SSCFPGA(typing.NamedTuple):
     def ss_read_static(self):
         """
         This function allows to write a static array of StaticStates for the specific single session
-
-        Args:
-            static_states: Array of objects class StaticStates to be written on the single session
         """
         line_states = []
         ch_list = self.Channels.split(",")
@@ -426,7 +427,7 @@ class _SSCFPGA(typing.NamedTuple):
         master_go.write(True)
         self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         data = master_data.read()
-        data = data[0 : number_of_bytes + 1]
+        data = data[0:number_of_bytes + 1]
         return data
 
     def i2c_master_write(
@@ -476,7 +477,7 @@ class _SSCFPGA(typing.NamedTuple):
         data = ReadData(data_rd[0], data_rd[1], data_rd[2], data_rd[3])
         return data
 
-    def read_multiple_dio_commanded_states(self, lines_to_read: typing.List[LineLocation]):
+    def read_multiple_dio_commanded_states(self, lines_to_read: typing.Union[LineLocation, typing.Sequence[LineLocation]]):
         """
         Reads the commanded states (0, 1, X, I2C) from the provided list of FPGA Lines and returns an array with their
         value
@@ -485,6 +486,8 @@ class _SSCFPGA(typing.NamedTuple):
         Returns:
             states_list: Returns a list of states read from the specified lines.
         """
+        if isinstance(lines_to_read, LineLocation):
+            lines_to_read = [lines_to_read]
         out_list = []
         config_list = []
         for i in range(4):
@@ -524,7 +527,7 @@ class _SSCFPGA(typing.NamedTuple):
             states_list.append(state)
         return states_list
 
-    def read_multiple_lines(self, lines_to_read: typing.List[LineLocation]):
+    def read_multiple_lines(self, lines_to_read: typing.Union[LineLocation, typing.Sequence[LineLocation]]):
         """
         Reads a provided list of lines from the FPGA
         Args:
@@ -532,6 +535,8 @@ class _SSCFPGA(typing.NamedTuple):
         Returns:
             Readings: Array of data readed
         """
+        if isinstance(lines_to_read, LineLocation):
+            lines_to_read = [lines_to_read]
         ch_data_list = []
         for ch in range(4):
             con_rd = self.Session.registers["Connector%d Read Data" % ch]
@@ -577,13 +582,15 @@ class _SSCFPGA(typing.NamedTuple):
         line_state = state_list[line.value]
         return line_state
 
-    def write_multiple_dio_lines(self, lines_to_write: typing.List[DIOLineLocationAndStaticState]):
+    def write_multiple_dio_lines(self, lines_to_write: typing.Union[DIOLineLocationAndStaticState, typing.Sequence[DIOLineLocationAndStaticState]]):
         """
         Writes the provided list of DIOLineLocationAndStaticState objects into the FPGA using the address provided in
         each element
         Args:
             lines_to_write: List of DIOLineLocationAndStaticState objects to be written
         """
+        if isinstance(lines_to_write, DIOLineLocationAndStaticState):
+            lines_to_write = [lines_to_write]
         con_list = []
         data_list = []
         for i in range(4):
@@ -721,7 +728,7 @@ class TSMFPGA(typing.NamedTuple):
             line_states.append(data[0])
         return readings, line_states
 
-    def write_static_array(self, static_state: typing.List[StaticStates]):
+    def write_static_array(self, static_state: typing.Union[StaticStates, typing.List[StaticStates]]):
         """
         Write a list of Static States on the FPGA session
         Args:
@@ -730,7 +737,7 @@ class TSMFPGA(typing.NamedTuple):
         for ss in self.SSC:
             ss.ss_wr_static_array(static_state)
 
-    def write_static(self, static_state: typing.List[StaticStates]):
+    def write_static(self, static_state: typing.Union[StaticStates, typing.List[StaticStates]]):
         """
         Write a list of Static States on the FPGA session
         Args:
@@ -891,11 +898,15 @@ def initialize_sessions(tsm_context: SMContext, ldb_type: str = ""):
 
 
 def pins_to_sessions(
-    tsm_context: SMContext, pins: typing.List[str], site_numbers: typing.List[int] = []
+    tsm_context: SMContext, pins: typing.Union[str, typing.Sequence[str]], site_numbers: typing.Union[int, typing.Sequence[int]] = []
 ):
     """
     Returns an object that contains a list of sessions generated for the provided pins.
     """
+    if type(pins) == str:
+        pins = [pins]
+    if type(site_numbers) == int:
+        site_numbers = [site_numbers]
     (
         pin_query_context,
         session_data,
