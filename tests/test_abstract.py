@@ -32,10 +32,10 @@ def tsm(standalone_tsm):
     ni_daqmx.set_task(standalone_tsm)
     ni_fpga.initialize_sessions(standalone_tsm)
     ni_switch.initialize_sessions(standalone_tsm)
-    ni_dt_digital.initialize_sessions(standalone_tsm)
+#    ni_dt_digital.initialize_sessions(standalone_tsm)
     print("INIT DONE")
     yield standalone_tsm
-    ni_dt_digital.close_sessions(standalone_tsm)
+#    ni_dt_digital.close_sessions(standalone_tsm)
     ni_switch.close_sessions(standalone_tsm)
     ni_fpga.close_sessions(standalone_tsm)
     ni_daqmx.clear_task(standalone_tsm)
@@ -61,7 +61,7 @@ class TestAbstract:
 
     def test_pins_to_session_sessions_info(self, tsm):
         ni_abstract.initialize(tsm)
-        pins = ["En_Daq"]
+        pins = ["EN_FPGA"]
         enabled = ni_abstract.enable_pins_to_sessions(tsm, pins)
         assert enabled.enable_pins[0].enable_pin == pins[0]
         enabled.connect_sessions_info(tsm)
