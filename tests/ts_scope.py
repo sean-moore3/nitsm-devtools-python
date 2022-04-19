@@ -133,13 +133,13 @@ def trigger(tsm: SMContext, pins: typing.List[str], sites: typing.List[int]):
 @nitsm.codemoduleapi.code_module
 def measure_results(tsm: SMContext, pins: typing.List[str], sites: typing.List[int]):
     osc_pin1 = scope.pins_to_sessions(tsm, pins, sites)
-    osc_pin1.ssc.fetch_measurement(niscope.ScalarMeasurement.NO_MEASUREMENT)
+    osc_pin1.ssc.fetch_measurement(niscope.ScalarMeasurement.VOLTAGE_PEAK_TO_PEAK)
 
 
 @nitsm.codemoduleapi.code_module
 def measure_stats(tsm: SMContext, pins: typing.List[str], sites: typing.List[int]):
     osc_pin1 = scope.pins_to_sessions(tsm, pins, sites)
-    osc_pin1.ssc.measure_statistics(niscope.ScalarMeasurement.NO_MEASUREMENT)
+    osc_pin1.ssc.measure_statistics(niscope.ScalarMeasurement.VOLTAGE_MAX)
 
 
 @nitsm.codemoduleapi.code_module
