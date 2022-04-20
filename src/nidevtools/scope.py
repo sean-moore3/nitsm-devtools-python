@@ -132,9 +132,9 @@ class _NIScopeSSC:
     _Site specific _Session and _Channel.
     Each object of this class is used to store info for a specified pin under specific Site.
     To store a _Session and _Channel(s) for different _Site(s) you need an array of this class object.
-    Prefix cs is used in all methods that operates on a given channels in a session. 
-    These are for internal use only and can be changed any time. 
-    External module should not use these methods with prefix 'cs_' directly.  
+    Prefix cs is used in all methods that operates on a given channels in a session.
+    These are for internal use only and can be changed any time.
+    External module should not use these methods with prefix 'cs_' directly.
     """
 
     def __init__(self, session: niscope.Session, channels: str, pins: str):
@@ -152,7 +152,8 @@ class _NIScopeSSC:
 
     @property
     def session(self):
-        """This allows to access the session stored in each instance of the class
+        """
+        This allows to access the session stored in each instance of the class
 
         Returns:
             niscope.Session : session of scope
@@ -161,26 +162,29 @@ class _NIScopeSSC:
 
     @property
     def channels(self):
-        """returns the channels of the pin query context
+        """
+        returns the channels of the pin query context
 
         Returns:
-            _type_: string List
+            channels: string List
         """
         return self._channels
 
     @property
     def channel_list(self):
-        """returns the Pin names of the pin query context
+        """
+        returns the Pin names of the pin query context
 
         Returns:
-            _type_: string List
+            pins: string List of ping 
         """
         return self._pins
 
 
 # Scope Sub routines
 def _expand_ssc_to_ssc_per_channel(ssc_s: typing.List[_NIScopeSSC]):
-    """private function
+    """
+    private function
 
     Args:
         ssc_s (typing.List[_NIScopeSSC]): to know the length of the list
@@ -219,9 +223,7 @@ def _configure_vertical_per_channel_arrays(
     for (ssc, v_range, coupling, offset, probe_drop, enabled) in zip(
         ssc_s, ranges, couplings, offsets, probes_drop, enabled_s
     ):
-        ssc.session.channels[ssc.channels].configure_vertical(
-            v_range, coupling, offset, probe_drop, enabled
-        )
+        ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, probe_drop, enabled)
 
 
 # Digital Sub routines
@@ -291,14 +293,51 @@ def _fetch_measurement_stats_arrays(
     ssc_s: typing.List[_NIScopeSSC],
     scalar_measurements: typing.List[niscope.ScalarMeasurement],
 ):
-    """private function for fetching statics for selected functions
+    """
+    private function for fetching statics for selected functions.
+    Obtains a waveform measurement and returns the measurement value. This
+    method may return multiple statistical results depending on the number
+    of channels, the acquisition type, and the number of records you
+    specify.
+
+    You specify a particular measurement type, such as rise time, frequency,
+    or voltage peak-to-peak. The waveform on which the digitizer calculates
+    the waveform measurement is from an acquisition that you previously
+    initiated. The statistics for the specified measurement method are
+    returned, where the statistics are updated once every acquisition when
+    the specified measurement is fetched by any of the Fetch Measurement
+    methods. If a Fetch Measurement method has not been called, this
+    method fetches the data on which to perform the measurement. The
+    statistics are cleared by calling
+    clear_waveform_measurement_stats.
+
+    Many of the measurements use the low, mid, and high reference levels.
+    You configure the low, mid, and high references with
+    meas_chan_low_ref_level,
+    meas_chan_mid_ref_level, and
+    meas_chan_high_ref_level to set each channel
+    differently.
 
     Args:
-        ssc_s (typing.List[_NIScopeSSC]): _description_
-        scalar_measurements (typing.List[niscope.ScalarMeasurement]): _description_
+        ssc_s (typing.List[_NIScopeSSC]): List of sessions for various channels in groups.
+        scalar_measurements (typing.List[niscope.ScalarMeasurement]): The list of scalar measurement to be performed on each fetched waveform.
 
     Returns:
-        _type_: _description_
+        list of measurement_stats (list of MeasurementStats): Returns a list of class instances with the following measurement statistics
+            about the specified measurement:
+
+            -	**result** (float): the resulting measurement
+            -	**mean** (float): the mean scalar value, which is obtained by
+            averaging each fetch_measurement_stats call
+            -	**stdev** (float): the standard deviations of the most recent
+            **numInStats** measurements
+            -	**min_val** (float): the smallest scalar value acquired (the minimum
+            of the **numInStats** measurements)
+            -	**max_val** (float): the largest scalar value acquired (the maximum
+            of the **numInStats** measurements)
+            -	**num_in_stats** (int): the number of times fetch_measurement_stats has been called
+            -	**channel** (str): channel name this result was acquired from
+            -	**record** (int): record number of this result
     """
     stats: typing.List[niscope.MeasurementStats] = []
     for ssc, scalar_meas_function in zip(ssc_s, scalar_measurements):
@@ -309,7 +348,8 @@ def _fetch_measurement_stats_arrays(
 
 
 class _NIScopeTSM:
-    """This is private class exposed via an object with different name. mostly all operations in this
+    """
+    This is private class exposed via an object with different name. mostly all operations in this
     class will be performed on all sessions of selected channels stored in this class.
     """
 
@@ -318,7 +358,7 @@ class _NIScopeTSM:
         constructor for the arrays of sessions for selected pins under selected site
 
         Args:
-            sessions_sites_channels (typing.Iterable[_NIScopeSSC]): list of sessions 
+            sessions_sites_channels (typing.Iterable[_NIScopeSSC]): list of sessions
         """
         self._sscs = sessions_sites_channels
 
@@ -360,7 +400,8 @@ class _NIScopeTSM:
         return
 
     def configure_reference_level(self, channel_based_mid_ref_level=50.0):
-        """Configures the reference level for the channels in the current TSMScope object
+        """
+        Configures the reference level for the channels in the current TSMScope object
 
         Args:
             channel_based_mid_ref_level (float, optional): Valid values from 0 to 100. Defaults to 50.0.
@@ -380,7 +421,8 @@ class _NIScopeTSM:
         probe_attenuation: float = 1.0,
         enabled: bool = True,
     ):
-        """Configures the vertical scale settings for the channels in the current TSMScope object
+        """
+        Configures the vertical scale settings for the channels in the current TSMScope object
 
         Args:
             v_range (float): vertical range
@@ -391,9 +433,7 @@ class _NIScopeTSM:
             enabled (bool, optional): Channels enabled or disabled for data capture. Defaults to True.
         """
         for ssc in self._sscs:
-            ssc.session.channels[ssc.channels].configure_vertical(
-                v_range, coupling, offset, probe_attenuation, enabled
-            )
+            ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, probe_attenuation, enabled)
         return
 
     def configure(
@@ -410,7 +450,8 @@ class _NIScopeTSM:
         num_records: int = 1,
         enforce_realtime: bool = True,
     ):
-        """Configures the vertical scale and timescale for the channels in the current TSMScope object
+        """
+        Configures the vertical scale and timescale for the channels in the current TSMScope object
 
         Args:
             vertical_range (float, optional): _description_. Defaults to 5.0.
@@ -442,7 +483,8 @@ class _NIScopeTSM:
         coupling: niscope.VerticalCoupling,
         channel_enabled: bool,
     ):
-        """Configures the vertical scale settings for the channels in the current TSMScope object
+        """
+        Configures the vertical scale settings for the channels in the current TSMScope object
 
         Args:
             vertical_range (float): Vertical range
@@ -458,9 +500,7 @@ class _NIScopeTSM:
         ranges = _expand_to_requested_array_size(vertical_range, size)
         offsets = _expand_to_requested_array_size(offset, size)
         enabled_out = _expand_to_requested_array_size(channel_enabled, size)
-        _configure_vertical_per_channel_arrays(
-            ssc_per_channel, ranges, couplings, offsets, probe_drops, enabled_out
-        )
+        _configure_vertical_per_channel_arrays(ssc_per_channel, ranges, couplings, offsets, probe_drops, enabled_out)
         return
 
     # Configure Timing
@@ -472,7 +512,8 @@ class _NIScopeTSM:
         num_records: int = 1,
         enforce_realtime: bool = True,
     ):
-        """Configures the timescale settings for the channels in the current TSMScope object
+        """
+        Configures the timescale settings for the channels in the current TSMScope object
 
         Args:
             min_sample_rate (float, optional): minimum samples per second. Defaults to 20e6.
@@ -493,7 +534,8 @@ class _NIScopeTSM:
 
     # Session Properties
     def get_session_properties(self):
-        """returns the list of session properties of all channels in the current TSMScope object
+        """
+        returns the list of session properties of all channels in the current TSMScope object
 
         Returns:
             List[ScopeSessionProperties] : list of Scope Session properties
@@ -552,7 +594,8 @@ class _NIScopeTSM:
         holdoff: float = 0.0,
         delay: float = 0.0,
     ):
-        """configures trigger as digital for all channels in the current TSMScope object
+        """
+        configures trigger as digital for all channels in the current TSMScope object
 
         Args:
             trigger_source (str): Specifies the trigger source. Refer to trigger_source
@@ -585,7 +628,8 @@ class _NIScopeTSM:
         holdoff: float = 0.0,
         delay: float = 0.0,
     ):
-        """configures trigger for all channels in the current TSMScope object
+        """
+        configures trigger for all channels in the current TSMScope object
 
         Args:
             level (float): The voltage threshold for the trigger. Refer to
@@ -614,7 +658,8 @@ class _NIScopeTSM:
         return
 
     def configure_trigger_immediate(self):
-        """Configures common properties for immediate triggering on all channels in the
+        """
+        Configures common properties for immediate triggering on all channels in the
         current TSMScope object. Immediate
         triggering means the digitizer triggers itself.
 
@@ -638,7 +683,8 @@ class _NIScopeTSM:
         return
 
     def export_start_triggers(self, output_terminal: str):
-        """exports the start triggers on the selected output terminal
+        """
+        exports the start triggers on the selected output terminal
 
         Args:
             output_terminal (str): provide a valid resource name system like pxi trigger 0
@@ -670,7 +716,9 @@ class _NIScopeTSM:
         trigger_level: float = 0.0,
         trigger_slope=niscope.TriggerSlope.POSITIVE,
     ):
-        """Configure the selected pin for analog edge trigger and make other channels to wait for trigger"""
+        """
+        Configure the selected pin for analog edge trigger and make other channels to wait for trigger
+        """
         start_trigger: str = ""
         trigger_source: str = "0"
         i = 0
@@ -698,30 +746,52 @@ class _NIScopeTSM:
                 ssc.session.commit()
                 start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
             else:
-                ssc.session.configure_trigger_digital(
-                    start_trigger, trigger_slope, holdoff=0.0, delay=0.0
-                )
+                ssc.session.configure_trigger_digital(start_trigger, trigger_slope, holdoff=0.0, delay=0.0)
                 ssc.session.initiate()
         return start_trigger
 
     # Acquisition
     def initiate(self):
+        """
+        Initiates a waveform acquisition.
+
+        After calling this method, the digitizer leaves the Idle state and
+        waits for a trigger. The digitizer acquires a waveform for each channel
+        you enable with configure_vertical.
+        """
         for ssc in self._sscs:
             ssc.session.initiate()
         return
 
     # Control
     def abort(self):
+        """
+        Aborts an acquisition and returns the digitizer to the Idle state. Call
+        this method if the digitizer times out waiting for a trigger.
+        """
         for ssc in self._sscs:
             ssc.session.abort()
         return
 
     def commit(self):
+        """
+        Commits to hardware all the parameter settings associated with the task.
+        Use this method if you want a parameter change to be immediately
+        reflected in the hardware. This method is not supported for
+        Traditional NI-DAQ (Legacy) devices.
+        """
         for ssc in self._sscs:
             ssc.session.commit()
         return
 
     def start_acquisition(self):
+        """
+        Initiates a waveform acquisition.
+
+        After calling this method, the digitizer leaves the Idle state and
+        waits for a trigger. The digitizer acquires a waveform for each channel
+        you enable with configure_vertical.
+        """
         for ssc in reversed(self._sscs):
             ssc.session.abort()
             ssc.session.initiate()
@@ -729,7 +799,8 @@ class _NIScopeTSM:
 
     # Measure
     def fetch_measurement(self, scalar_meas_function: niscope.ScalarMeasurement):
-        """fetch the selected measurement from all the channels in the current TSMScope object
+        """
+        fetch the selected measurement from all the channels in the current TSMScope object
 
         Args:
             scalar_meas_function (niscope.ScalarMeasurement): select the type of measurement.
@@ -747,7 +818,8 @@ class _NIScopeTSM:
         return measurements
 
     def fetch_waveform(self, meas_num_samples: int):
-        """fetch waveforms from all channels in the current TSMScope object
+        """
+        fetch waveforms from all channels in the current TSMScope object
 
         Args:
             meas_num_samples (int): number of samples to fetch
@@ -758,9 +830,7 @@ class _NIScopeTSM:
         waveforms: typing.Any = []
         waveform_info: typing.List[niscope.WaveformInfo] = []
         for ssc in self._sscs:
-            channels, pins, sites = _channel_list_to_pins(
-                ssc.channel_list
-            )  # Unused no waveform attribute in python
+            channels, pins, sites = _channel_list_to_pins(ssc.channel_list)  # Unused no waveform attribute in python
             waveform = ssc.session.channels[ssc.channels].fetch(
                 meas_num_samples, relative_to=niscope.FetchRelativeTo.PRETRIGGER
             )
@@ -770,7 +840,8 @@ class _NIScopeTSM:
         return waveform_info, waveforms
 
     def fetch_multirecord_waveform(self, num_records=-1):
-        """fetch multi-record waveform from all channels in the current TSMScope object
+        """
+        fetch multi-record waveform from all channels in the current TSMScope object
 
         Args:
             num_records (int, optional): number of records to fetch. fetch everything by default. Defaults to -1.
@@ -781,9 +852,7 @@ class _NIScopeTSM:
         waveforms: typing.Any = []
         waveform_info: typing.List[niscope.WaveformInfo] = []
         for ssc in self._sscs:
-            channels, pins, sites = _channel_list_to_pins(
-                ssc.channel_list
-            )  # Unused no waveform attribute in python
+            channels, pins, sites = _channel_list_to_pins(ssc.channel_list)  # Unused no waveform attribute in python
             ssc.session._fetch_num_records = num_records
             waveform = ssc.session.channels[ssc.channels].fetch(
                 relative_to=niscope.FetchRelativeTo.PRETRIGGER,
@@ -803,7 +872,8 @@ class _NIScopeTSM:
         return
 
     def measure_statistics(self, scalar_meas_function: niscope.ScalarMeasurement):
-        """get measure statistics for all channels in the current TSMScope object
+        """
+        get measure statistics for all channels in the current TSMScope object
 
         Args:
             scalar_meas_function (niscope.ScalarMeasurement): measurement function to use for statistics
@@ -817,24 +887,59 @@ class _NIScopeTSM:
                 clearable_measurement_function=niscope.ClearableMeasurement.ALL_MEASUREMENTS
             )
             ssc.session.initiate()
-            measurement_stats.append(
-                ssc.session.channels[ssc.channels].fetch_measurement_stats(scalar_meas_function)
-            )
+            measurement_stats.append(ssc.session.channels[ssc.channels].fetch_measurement_stats(scalar_meas_function))
         return measurement_stats
 
     def fetch_meas_stats_per_channel(self, scalar_measurement: niscope.ScalarMeasurement):
-        """fetches the measurement statistics per channel in the current TSMScope object
+        """
+        fetches the measurement statistics per channel in the current TSMScope object
+
+        Obtains a waveform measurement and returns the measurement value. This
+        method may return multiple statistical results depending on the number
+        of channels, the acquisition type, and the number of records you
+        specify.
+
+        You specify a particular measurement type, such as rise time, frequency,
+        or voltage peak-to-peak. The waveform on which the digitizer calculates
+        the waveform measurement is from an acquisition that you previously
+        initiated. The statistics for the specified measurement method are
+        returned, where the statistics are updated once every acquisition when
+        the specified measurement is fetched by any of the Fetch Measurement
+        methods. If a Fetch Measurement method has not been called, this
+        method fetches the data on which to perform the measurement. The
+        statistics are cleared by calling
+        clear_waveform_measurement_stats.
+
+        Many of the measurements use the low, mid, and high reference levels.
+        You configure the low, mid, and high references with
+        meas_chan_low_ref_level,
+        meas_chan_mid_ref_level, and
+        meas_chan_high_ref_level to set each channel
+        differently.
 
         Args:
-            scalar_measurement (niscope.ScalarMeasurement): _description_
+            ssc_s (typing.List[_NIScopeSSC]): List of sessions for various channels in groups.
+            scalar_measurement (niscope.ScalarMeasurement): The scalar measurement to be performed on each fetched waveform.
 
         Returns:
-            _type_: _description_
+            list of measurement_stats (list of MeasurementStats): Returns a list of class instances with the following measurement statistics
+                about the specified measurement:
+
+                -	**result** (float): the resulting measurement
+                -	**mean** (float): the mean scalar value, which is obtained by
+                averaging each fetch_measurement_stats call
+                -	**stdev** (float): the standard deviations of the most recent
+                **numInStats** measurements
+                -	**min_val** (float): the smallest scalar value acquired (the minimum
+                of the **numInStats** measurements)
+                -	**max_val** (float): the largest scalar value acquired (the maximum
+                of the **numInStats** measurements)
+                -	**num_in_stats** (int): the number of times fetch_measurement_stats has been called
+                -	**channel** (str): channel name this result was acquired from
+                -	**record** (int): record number of this result
         """
         ssc_per_channel = _expand_ssc_to_ssc_per_channel(list(self._sscs))
-        scalar_measurements = _expand_to_requested_array_size(
-            scalar_measurement, len(ssc_per_channel)
-        )
+        scalar_measurements = _expand_to_requested_array_size(scalar_measurement, len(ssc_per_channel))
         measurement_stats = _fetch_measurement_stats_arrays(ssc_per_channel, scalar_measurements)
         return measurement_stats
 
@@ -917,21 +1022,12 @@ def _pin_query_context_to_channel_list(
         """
         initialized_pins: typing.List[str] = [""] * number_of_pins
         pins_array_for_session_input.append(PinsCluster(Pins=initialized_pins))
-    for (
-        per_site_transposed_channel_group_indices,
-        per_site_transposed_channel_indices,
-        site_number,
-    ) in zip(
+    for (per_site_transposed_channel_group_indices, per_site_transposed_channel_indices, site_number,) in zip(
         numpy.transpose(ch_gp_indices),
         numpy.transpose(ch_indices),
         sites,
     ):
-        for (
-            per_pin_transposed_channel_group_index,
-            per_pin_transposed_channel_index,
-            pin,
-            pin_type,
-        ) in zip(
+        for (per_pin_transposed_channel_group_index, per_pin_transposed_channel_index, pin, pin_type,) in zip(
             per_site_transposed_channel_group_indices,
             per_site_transposed_channel_indices,
             pin_names,
@@ -972,8 +1068,7 @@ def pins_to_sessions(tsm: SMContext, pins: typing.List[str], sites: typing.List[
     sites, pin_lists = _pin_query_context_to_channel_list(pin_query_context, [], sites)
     # sites, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
     sscs = [
-        _NIScopeSSC(session, channel, pin_list)
-        for session, channel, pin_list in zip(sessions, channels, pin_lists)
+        _NIScopeSSC(session, channel, pin_list) for session, channel, pin_list in zip(sessions, channels, pin_lists)
     ]
     scope_tsm = _NIScopeTSM(sscs)
     return TSMScope(pin_query_context, scope_tsm, sites)
