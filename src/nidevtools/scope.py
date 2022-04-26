@@ -176,7 +176,7 @@ class _NIScopeSSC:
         returns the Pin names of the pin query context
 
         Returns:
-            pins: string List of ping 
+            pins: string List of ping
         """
         return self._pins
 
@@ -1050,7 +1050,8 @@ def _pin_query_context_to_channel_list(
 # Pinmap
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(tsm: SMContext, pins: typing.List[str], sites: typing.List[int] = []):
-    """Returns the pin-query context object for the given pins at given sites.
+    """
+    Returns the pin-query context object for the given pins at given sites.
 
     Args:
         tsm (TSMContext): Semiconductor module Reference from the TestStand.
@@ -1076,7 +1077,12 @@ def pins_to_sessions(tsm: SMContext, pins: typing.List[str], sites: typing.List[
 
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm: SMContext, options: dict = {}):
-    """Opens sessions for all NI-SCOPE instrument channels that are defined in pinmap associated with the tsm context"""
+    """
+    Open sessions for all NI-SCOPE instrument channels that are defined in pinmap associated with the tsm context
+
+    Args:
+        tsm (SMContext): TestStand semiconductor module context
+    """
     instrument_names = tsm.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
         session = niscope.Session(instrument_name, reset_device=True, options=options)
@@ -1091,8 +1097,13 @@ def initialize_sessions(tsm: SMContext, options: dict = {}):
 
 @nitsm.codemoduleapi.code_module
 def close_sessions(tsm: SMContext):
-    """Resets and Closes all the NI-SCOPE instruments sessions from the pinmap file associated
-    with the Semiconductor Module Context."""
+    """
+    Resets and Closes all the NI-SCOPE instruments sessions from the pinmap file associated
+    with the Semiconductor Module Context.
+
+    Args:
+        tsm (SMContext): TestStand semiconductor module context
+    """
     sessions = tsm.get_all_niscope_sessions()
     for session in sessions:
         session.reset()

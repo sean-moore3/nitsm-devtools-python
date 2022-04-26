@@ -52,6 +52,12 @@ class Session:
         self.status = status
 
     def ss_connect(self, tsm: SMContext):
+        """
+        connects to make desired electrical path specificed in the route attribute of the pinmap file
+
+        Args:
+            tsm (SMContext): TestStand semiconductor module context
+        """
         if self.instrument_type == InstrumentTypes.daqmx:
             multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(tsm, self.enable_pin)
             for channel in multiple_session.sessions[0].Task.do_channels:
@@ -88,6 +94,12 @@ class Session:
             time.sleep(0.15)
 
     def ss_disconnect(self, tsm: SMContext):
+        """
+        disconnects the desired path specified by the route attribute.
+
+        Args:
+            tsm (SMContext): TestStand semiconductor module context
+        """
         if self.instrument_type == InstrumentTypes.daqmx:
             multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(
                 tsm, [self.enable_pin]
@@ -116,6 +128,15 @@ class Session:
             pass
 
     def ss_read_state(self, tsm: SMContext):
+        """
+        reads the current state of the swtiches of the switch object
+
+        Args:
+            tsm (SMContext): TestStand semiconductor module context
+
+        Returns:
+            self: returns the object itself with updated status
+        """
         if self.instrument_type == InstrumentTypes.daqmx:
             multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(tsm, self.enable_pin)
             multiple_session: nidevtools.daqmx.MultipleSessions

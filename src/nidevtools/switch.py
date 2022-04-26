@@ -2,6 +2,7 @@ import typing
 from enum import Enum
 
 import niswitch
+import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 
@@ -59,13 +60,24 @@ class MultipleSessions:
 instrument_type_id = "_niSwitch"
 
 
+@nitsm.codemoduleapi.code_module
 def get_all_instruments_names(tsm: SMContext):
+    """
+    Returns all the switch based instruments in the tsm context
+
+    Args:
+        tsm (SMContext): Semiconductor module Reference from the TestStand.
+
+    Returns:
+        tulple : instrument_names, channel_group_ids
+    """
     instrument_names, channel_group_ids, channel_lists = tsm.get_custom_instrument_names(
         instrument_type_id
     )
     return instrument_names, channel_group_ids
 
 
+@nitsm.codemoduleapi.code_module
 def get_all_sessions(tsm: SMContext):
     session_data, channel_group_ids, channel_lists = tsm.get_all_custom_sessions(instrument_type_id)
     list_of_sessions = []
@@ -74,6 +86,7 @@ def get_all_sessions(tsm: SMContext):
     return list_of_sessions
 
 
+@nitsm.codemoduleapi.code_module
 def pin_to_sessions_session_info(tsm: SMContext, pin: str = ""):
     try:
         (
@@ -92,13 +105,32 @@ def pin_to_sessions_session_info(tsm: SMContext, pin: str = ""):
     # tsm.pins_to_custom_sessions(instrument_type_id, pin)
 
 
+@nitsm.codemoduleapi.code_module
 def set_sessions(
     tsm: SMContext, switch_name: str, session: niswitch.Session, channel_group_id: str
 ):
+    """
+    Adds the session to the list of switch sessions in tsm context
+
+    Args:
+        tsm (SMContext): Semiconductor module Reference from the TestStand.
+        switch_name (str): name of the switch 
+        session (niswitch.Session): session created fo the switch
+        channel_group_id (str): unique id of the channel group
+    """
     tsm.set_custom_session(instrument_type_id, switch_name, channel_group_id, session)
 
 
+@nitsm.codemoduleapi.code_module
 def close_sessions(tsm: SMContext):
+    """
+    closes all the session associated with the switch drivers
+    in the semiconductor module context. 
+
+
+    Args:
+        tsm (SMContext): TestStand semiconductor module context
+    """
     sessions = get_all_sessions(tsm)
     sessions_to_close = []
     for session in sessions:
@@ -113,6 +145,15 @@ def close_sessions(tsm: SMContext):
 
 
 def name_to_topology(name: str = ""):
+    """
+    converts the name to topology class object
+
+    Args:
+        name (str, optional): name of the topology in string. Defaults to "".
+
+    Returns:
+        Topology: multiplexer topology for the name provided.
+    """
     if name.lower().find("matrix_2738") == 0:
         return Topology.matrix_2738
     elif name.lower().find("mux_2525") == 0:
@@ -123,7 +164,14 @@ def name_to_topology(name: str = ""):
         return "Configured Topology"
 
 
+@nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm: SMContext):
+    """
+    open sessions for all switch instrument channels that are defined in the pinmap associated with the tsm context
+
+    Args:
+        tsm (SMContext): TestStand semiconductor module context
+    """
     switch_name = ""
     instrument_names, channel_group_ids = get_all_instruments_names(tsm)
     for name, channel_id in zip(instrument_names, channel_group_ids):

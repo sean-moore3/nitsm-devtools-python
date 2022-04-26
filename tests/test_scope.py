@@ -237,7 +237,7 @@ class TestNIScope:
                 0.0, niscope.TriggerCoupling.DC, niscope.TriggerSlope.POSITIVE
             )
             scope_tsm.ssc.clear_triggers()
-            scope_tsm.ssc.export_start_triggers("/OSC1/PXI_Trig1")
+            scope_tsm.ssc.export_start_triggers("PXI_Trig0")
             scope_tsm.ssc.start_acquisition()
             props = scope_tsm.ssc.get_session_properties()
             print("\n", props)

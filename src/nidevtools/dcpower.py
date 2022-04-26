@@ -87,6 +87,10 @@ class MeasurementMode(enums.Enum):
     """
 
 
+class SignalTypes(enums.SendSoftwareEdgeTriggerType, enums.Events):
+    pass
+
+
 class CustomTransientResponse:
     """
     class to store and access the custom transient response settings
@@ -1038,7 +1042,7 @@ class _NIDCPowerSSC:
         else:
             self._channels_session.measure_when = nidcpower.MeasureWhen.ON_DEMAND
 
-    def cs_configure_export_signal(self, signal, output_terminal):
+    def cs_configure_export_signal(self, signal: Signal, output_terminal):
 
         if signal == enums.SendSoftwareEdgeTriggerType.START:
             self._channels_session.exported_start_trigger_output_terminal = output_terminal
@@ -1595,9 +1599,9 @@ class _NIDCPowerTSM:
         start_time = datetime.now()
         settings = [previous_settings, start_time]
         return settings
-    
+
     def configure_export_signal(self, signal, output_terminal):
-        #TODO need to have option to select pin name to export the signal instead of first in the session.
+        # TODO need to have option to select pin name to export the signal instead of first in the session.
         for ssc in self._sscs:
             ssc.cs_configure_export_signal(signal, output_terminal)
             break
