@@ -1,3 +1,6 @@
+"""
+This is abstract wrapper for use with STS test codes
+"""
 import enum
 import os.path
 import shutil
@@ -45,6 +48,16 @@ class Session:
         site: int,
         status: str,
     ):
+        """
+        Constructor method for switch session class. This stores the enable pin details.
+
+        Args:
+            enable_pin (str): The Enable pin in the pinmap file which has prefix En_ for which the session is created.
+            instrument_type (typing.Union[InstrumentTypes, str]): digital or daqmx or switch instrument used in the routes.
+            route_value (str): comma seperated list of pins with values to set in order to connect the desired path
+            site (int): site for which this needs to executed
+            status (str): connect or disconnect status
+        """
         self.enable_pin = enable_pin
         self.instrument_type = instrument_type
         self.route_value = route_value
@@ -223,7 +236,10 @@ def check_debug_ui_tool(
     path_in: str,
     path_teststand: str = "C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)",
 ):
-    """ """
+    """
+    checks the debug UI tool connected or not
+    """
+
     path_icons = os.path.join(path_teststand, "Components\\Icons")
     path_in = os.path.join(
         path_in, "..\\Code Modules\\Common\\Instrument Control\\Abstract Switch\\Debug UI"
@@ -320,7 +336,9 @@ def initialize(tsm: SMContext):  # CHECK
 
 
 def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connections):
-    """ """
+    """ 
+    Pin switch status fgv labview equivalent code 
+    """
     connections = []
     while True:
         if action == Control.get_connections:
@@ -365,10 +383,20 @@ def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connect
         elif action == Control.init:
             pinmap_path = tsm.pin_map_file_path
             connections += pin_name_to_instrument(pinmap_path)
-        break
+        break #TODO consider removing the while loop which breaks always
 
 
 def get_first_matched_node(tree: Et.ElementTree, key: str):
+    """
+    find the first key matched node in the element tree
+
+    Args:
+        tree (Et.ElementTree): element tree in which search happens
+        key (str): key to search for in the element tree
+
+    Returns:
+        root: element in which the key is found
+    """
     key = "{http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd}" + key
     root = tree.getroot()
     for i in root:
@@ -377,6 +405,16 @@ def get_first_matched_node(tree: Et.ElementTree, key: str):
 
 
 def get_all_matched_nodes(element: Et.Element, key: str):
+    """
+    finds all the key matched nodes inside the element tag  
+
+    Args:
+        element (Et.Element): xml element in which searching happens
+        key (str): string to search in the element
+
+    Returns:
+        list: list of child elements 
+    """
     key = "{http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd}" + key
     children = list(element)
     output = []

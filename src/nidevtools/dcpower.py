@@ -547,7 +547,8 @@ class _NIDCPowerSSC:
         return output_states
 
     def cs_configure_current_level_range(self, current_level_range=0.0):
-        """updates the property
+        """
+        updates the property
 
         Args:
             current_level_range (float, optional): updates the range property. Defaults to 0.0.
@@ -555,7 +556,8 @@ class _NIDCPowerSSC:
         self._channels_session.current_level_range = current_level_range
 
     def cs_configure_current_level(self, current_level=0.0):
-        """updates the current level property.
+        """
+        updates the current level property.
 
         Args:
             current_level (float, optional): updates the level property. Defaults to 0.0.
@@ -1045,8 +1047,15 @@ class _NIDCPowerSSC:
         else:
             self._channels_session.measure_when = nidcpower.MeasureWhen.ON_DEMAND
 
-    def cs_configure_export_signal(self, signal: Signal, output_terminal):
+    def cs_configure_export_signal(self, signal: SignalTypes, output_terminal):
+        """
+        configures the signal to be exported on the specified output terminal
 
+        Args:
+            signal (Signal): signal to be exported 
+            output_terminal (_type_): output terminal on which the signal is exported.
+        """
+        
         if signal == enums.SendSoftwareEdgeTriggerType.START:
             self._channels_session.exported_start_trigger_output_terminal = output_terminal
         elif signal == enums.SendSoftwareEdgeTriggerType.SOURCE:
@@ -1147,6 +1156,12 @@ class _NIDCPowerSSC:
         return settings
 
     def cs_get_measurement_settings(self):
+        """
+        reads the measurement settings like aperture time, measure trigger and record length
+
+        Returns:
+            settings(dict): measurement settings in the dictionary format
+        """
         settings = {
             "aperture_time_units": self._channels_session.aperture_time_units,
             "aperture_time": self._channels_session.aperture_time,
@@ -1158,6 +1173,12 @@ class _NIDCPowerSSC:
         return settings
 
     def cs_set_measurement_settings(self, settings):
+        """
+        sets several measurement related settings from the dictionary input
+
+        Args:
+            settings (dict): aperture, trigger and record related properties in a dictionary format 
+        """
         self._channels_session.aperture_time = settings["aperture_time"]
         self._channels_session.aperture_time_units = settings["aperture_time_units"]
         self._channels_session.measure_when = settings["measure_when"]
@@ -1192,6 +1213,12 @@ class _NIDCPowerSSC:
         return voltages, currents
 
     def cs_get_properties(self):
+        """
+        for each channel find its properties like level, limit, voltage range, currnt range
+        
+        Returns:
+            list of channel properties: list of channel properties of all channels in the session
+        """
         channel_properties = []
         # ap_times = list(self.cs_get_aperture_time_in_seconds())
         channels = self.cs_channels.split(",")
@@ -1584,14 +1611,69 @@ class _NIDCPowerTSM:
             ssc.cs_configure_source_mode(source_mode)
 
     def get_max_current(self):
+        """
+        gets the maximum current that can be supplied to one of the selected pins
+
+        Returns:
+            current_in_amps (float): maximum current that can be drawn in amps
+        """
         return max([ssc.cs_get_max_current() for ssc in self._sscs])
 
     def wait_for_event(self, event=nidcpower.Event.SOURCE_COMPLETE, timeout=10.0):
+        """
+        Waits until the specified pin(s) have generated the specified event.
+
+        The session monitors whether each type of event has occurred at least
+        once since the last time this method or the initiate
+        method were called. If an event has only been generated once and you
+        call this method successively, the method times out. Individual
+        events must be generated between separate calls of this method.
+
+        Args:
+            event_id (enums.Event): Specifies which event to wait for.Defaults to nidcpower.Event.SOURCE_COMPLETE.
+        **Defined Values:**
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_SOURCE_COMPLETE_EVENT    | Waits for the Source Complete event.  |
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_MEASURE_COMPLETE_EVENT   | Waits for the Measure Complete event. |
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_SEQUENCE_ITERATION_COMPLETE_EVENT | Waits for Specified event.   |
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_SEQUENCE_ENGINE_DONE_EVENT| Waits for the Seq Engine Done event. |
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_PULSE_COMPLETE_EVENT     | Waits for the Pulse Complete event.   |
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_READY_FOR_PULSE_TRIGGER_EVENT| Waits for Specified event.        |
+        +----------------------------------------+---------------------------------------+
+
+        Note:
+        One or more of the referenced values are not in the Python API for this driver. Enums that only define values, or represent True/False, have been removed.
+
+        timeout (hightime.timedelta, datetime.timedelta, or float in seconds): Specifies the maximum time allowed for this method to complete, in
+        seconds. If the method does not complete within this time interval,
+        NI-DCPower returns an error. Defaults to 10.0.
+
+        Note:
+        When setting the timeout interval, ensure you take into account any
+        triggers so that the timeout interval is long enough for your
+        application.
+        
+        """
         for ssc in self._sscs:
             ssc.cs_wait_for_event(event, timeout)
         return
 
     def configure_and_start_waveform_acquisition(self, sample_rate=0.0, buffer_length=0.0):
+        """
+        configures and records previous settings and start the waveform acquisition
+
+        Args:
+            sample_rate (float, optional): sampling rate for acquition. Defaults to 0.0.
+            buffer_length (float, optional): length of measurment to be stored in memory. Defaults to 0.0.
+
+        Returns:
+            settings: list of settings and start time
+        """
         self.abort()
         previous_settings = []
         for ssc in self._sscs:
@@ -1603,17 +1685,59 @@ class _NIDCPowerTSM:
         settings = [previous_settings, start_time]
         return settings
 
-    def configure_export_signal(self, signal, output_terminal):
+    def configure_export_signal(self, signal: SignalTypes, output_terminal):
+        """
+        configures the signal to be exported on the specified output terminal
+
+        Args:
+            signal (SignalTypes): signal to be exported 
+            output_terminal (_type_): output terminal on which the signal is exported.
+
+        """
         # TODO need to have option to select pin name to export the signal instead of first in the session.
         for ssc in self._sscs:
             ssc.cs_configure_export_signal(signal, output_terminal)
             break
 
     def send_software_edge_trigger(self, trigger_to_send=nidcpower.SendSoftwareEdgeTriggerType.MEASURE):
+        """
+        Asserts the specified trigger. This method can override an external
+        edge trigger.
+
+        Args:
+            trigger_to_send (enums.SendSoftwareEdgeTriggerType, optional): Specifies which trigger to assert. Defaults to enums.SendSoftwareEdgeTriggerType.MEASURE.
+        **Defined Values:**
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_START_TRIGGER            | Asserts the Start trigger.            |
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_SOURCE_TRIGGER           | Asserts the Source trigger.           |
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_MEASURE_TRIGGER          | Asserts the Measure trigger.          |
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_SEQUENCE_ADVANCE_TRIGGER | Asserts the Sequence Advance trigger. |
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_PULSE_TRIGGER            | Asserts the Pulse trigger.            |
+        +----------------------------------------+---------------------------------------+
+        | NIDCPOWER_VAL_SHUTDOWN_TRIGGER         | Asserts the Shutdown trigger.         |
+        +----------------------------------------+---------------------------------------+
+
+        Note:
+        One or more of the referenced values are not in the Python API for this driver. Enums that only define values, or represent True/False, have been removed.
+        """
         for ssc in self._sscs:
             ssc.cs_send_software_edge_trigger(trigger_to_send)
 
     def finish_waveform_acquisition(self, settings, fetch_waveform_length_s=0.0):
+        """
+        finish waveform acquisition by aborting and applying previous settings and initiating session
+
+        Args:
+            settings (dict): previous settings to apply on the sessions
+            fetch_waveform_length_s (float, optional): length of waveform to acquire. Defaults to 0.0.
+
+        Returns:
+            voltage and current waveforms: tuple of voltage and current waveforms
+        """
         voltage_waveforms, current_waveforms = self.fetch_waveform(settings["start_time"], fetch_waveform_length_s)
         self.abort()
         self.set_measurement_settings(settings["previous_settings"])
@@ -1621,6 +1745,20 @@ class _NIDCPowerTSM:
         return voltage_waveforms, current_waveforms
 
     def fetch_waveform(self, waveform_t0, waveform_length_s=0.0):
+        """
+        Returns a voltage and current waveform tuples (Measurement) that were
+        previously taken and are stored in the NI-DCPower buffer. This method
+        should not be used when the measure_when property is
+        set to MeasureWhen.ON_DEMAND. You must first call
+        initiate before calling this method.
+        
+        Args:
+            waveform_t0 (_type_): waveform time stamp 
+            waveform_length_s (float, optional): duration of waveform to measure. Defaults to 0.0.
+
+        Returns:
+            voltage and current waveforms: tuple of voltage and current waveforms
+        """
         voltage_waveforms = []
         current_waveforms = []
         for ssc in self._sscs:
@@ -1655,6 +1793,13 @@ class _NIDCPowerTSM:
         return voltage_waveforms, current_waveforms
 
     def get_measurement_settings(self):
+        """
+        reads the measurement settings like aperture time, measure trigger and record length
+
+        Returns:
+            list of settings(dict): measurement settings in list of dictionary format
+        
+        """
         meas_settings = []
         for ssc in self._sscs:
             settings = ssc.cs_get_measurement_settings()
@@ -1662,6 +1807,12 @@ class _NIDCPowerTSM:
         return meas_settings
 
     def get_properties(self):
+        """
+        for each channel find its properties like level, limit, voltage range, currnt range
+        
+        Returns:
+            list of channel properties: list of channel properties of all channels in the session
+        """
         all_ch_prop = []
         for ssc in self._sscs:
             prop = ssc.cs_get_properties()
@@ -1669,12 +1820,24 @@ class _NIDCPowerTSM:
         return all_ch_prop
 
     def set_measurement_settings(self, meas_settings):
+        """
+        sets several measurement related settings from the list of dictionary input
+
+        Args:
+            meas_settings (list of dict): list of dictionary of aperture, trigger and record related properties
+        """
         i = 0
         for ssc in self._sscs:
             ssc.cs_set_measurement_settings(meas_settings[i])
             i += 1
 
     def configure_measurements(self, mode=MeasurementMode.AUTO):
+        """
+        configure the measurement mode to be auto by default, otherwise the value specified by the parameter passed. Then configures additional settings that are required by the measurement mode
+
+        Args:
+            mode (MeasurementMode, optional): measurement mode to configure. Defaults to MeasurementMode.AUTO.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_measurements(mode)
 
@@ -1708,14 +1871,32 @@ class _NIDCPowerTSM:
         self._configure_settings_array(aperture_times, source_delays, senses, aperture_time_units, transient_responses)
 
     def configure_current_level_range(self, current_level_range=0.0):
+        """
+        updates the current level range property for all sessions in the context.
+
+        Args:
+            current_level_range (float, optional): updates the current level range property. Defaults to 0.0.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_current_level_range(current_level_range)
 
     def configure_current_level(self, current_level=0.0):
+        """
+        updates the current level property.
+
+        Args:
+            current_level (float, optional): updates the level property. Defaults to 0.0.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_current_level(current_level)
 
     def configure_current_level_array(self, current_levels_array):
+        """
+        updates the current level property with the expanded array of current levels.
+ 
+        Args:
+            current_levels_array (list of floats): updates the current level property.
+        """
         current_levels = self._expand_array_to_sessions(current_levels_array)
         for ssc, current_level in zip(self._sscs, current_levels):
             ssc.cs_configure_current_level(current_level)
@@ -2010,7 +2191,8 @@ class _NIDCPowerTSM:
 
 
 class TSMDCPower(typing.NamedTuple):
-    """data type of the DCPower_Tsm objects
+    """
+    data type of the DCPower_Tsm objects
 
     Args:
         TSM objects (tuple): 5 entities for storing them togather.

@@ -36,7 +36,6 @@ class TaskProperties(typing.NamedTuple):
             TriggerChannel: str
             Edge: str
     """
-
     InstrumentName: str
     Channel: str
     Pin: str
@@ -58,7 +57,6 @@ class _Session(typing.NamedTuple):
         Pins: Pins assigned to the specific task
         Site: Site in which the task is running
     """
-
     Task: nidaqmx.Task
     ChannelList: str
     Pins: str
@@ -292,7 +290,6 @@ class _Sessions:
     """
     Class that contains a list of DAQmx sessions with methods to control all sessions inside the object
     """
-
     sessions: typing.List[_Session]
 
     # Read
@@ -416,7 +413,6 @@ class _Sessions:
             samples_count = session.st_write_analog(data)
             samples_counts.append(samples_count)
         return samples_counts
-
 
     # Read Configuration
     def configure_channels(self):

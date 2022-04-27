@@ -607,6 +607,8 @@ class _SSCFPGA(typing.NamedTuple):
         for lines in lines_to_write:
             if 0 <= lines.connector.value <= 3:
                 self.write_single_dio_line(lines.connector, lines.channel, lines.state)
+        update_state = self.Session.registers['Update State']
+        update_state.write(True)
 
     def write_single_dio_line(
         self,
@@ -627,6 +629,8 @@ class _SSCFPGA(typing.NamedTuple):
             enable, data = update_line_on_connector(con_enable.read(), con_data.read(), line, state)
             con_enable.write(enable)
             con_data.write(data)
+            update_state = self.Session.registers['Update State']
+            update_state.write(True)
 
 
 class TSMFPGA(typing.NamedTuple):
