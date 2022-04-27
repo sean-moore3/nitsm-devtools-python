@@ -220,7 +220,7 @@ class _SSCFPGA(typing.NamedTuple):
             iq_list.append(int(ch) // 32)
             r_list.append(int(ch) % 32)
         lines_to_write = []
-        print("test", iq_list)
+        # print("test", iq_list)
         for s_s, iq, r in zip(static_states, iq_list, r_list):
             element = DIOLineLocationAndStaticState(DIOLines(r), Connectors(iq), s_s)
             lines_to_write.append(element)
@@ -314,7 +314,7 @@ class _SSCFPGA(typing.NamedTuple):
             control = "I2C Master%d Line Configuration" % i2c_master_in.value
             self.w_master_lc(control, cluster)
         else:
-            print("Requested I2C_master is not defined")
+            # print("Requested I2C_master is not defined")
             raise Exception
 
     def configure_i2c_master_settings(
@@ -346,7 +346,7 @@ class _SSCFPGA(typing.NamedTuple):
             clock.write(clock_stretching)
             master.write(cluster)  # without all info?
         else:
-            print("Requested I2C_master is not defined")
+            # print("Requested I2C_master is not defined")
             raise Exception
 
     def i2c_master_poll_until_ready(
@@ -371,7 +371,7 @@ class _SSCFPGA(typing.NamedTuple):
                 "I2C Master%d ready for input" % i2c_master_in.value
             ]
         else:
-            print("Requested I2C_master is not defined")
+            # print("Requested I2C_master is not defined")
             raise Exception
         stop = False
         data = False
@@ -419,7 +419,7 @@ class _SSCFPGA(typing.NamedTuple):
             master_go = self.Session.registers["I2C Master%d Go" % i2c_master_in.value]
             master_data = self.Session.registers["I2C Master%d Read Data" % i2c_master_in.value]
         else:
-            print("Requested I2C_master is not defined")
+            # print("Requested I2C_master is not defined")
             raise Exception
         # config: WorldControllerSetting
         config = master_config.read()
@@ -457,7 +457,7 @@ class _SSCFPGA(typing.NamedTuple):
             master_go = self.Session.registers["I2C Master%d Go" % i2c_master_in.value]
             master_data = self.Session.registers["I2C Master%d Write Data" % i2c_master_in.value]
         else:
-            print("Requested I2C_master is not defined")
+            # print("Requested I2C_master is not defined")
             raise Exception
         master_read = master_config.read()
         master_read.Device_Address = device_address
@@ -607,8 +607,12 @@ class _SSCFPGA(typing.NamedTuple):
         for lines in lines_to_write:
             if 0 <= lines.connector.value <= 3:
                 self.write_single_dio_line(lines.connector, lines.channel, lines.state)
-        update_state = self.Session.registers['Update State']
-        update_state.write(True)
+        try:
+            update_state = self.Session.registers['Update State']
+            update_state.write(True)
+        except KeyError:
+            pass
+
 
     def write_single_dio_line(
         self,
@@ -629,8 +633,12 @@ class _SSCFPGA(typing.NamedTuple):
             enable, data = update_line_on_connector(con_enable.read(), con_data.read(), line, state)
             con_enable.write(enable)
             con_data.write(data)
-            update_state = self.Session.registers['Update State']
-            update_state.write(True)
+            try:
+                update_state = self.Session.registers['Update State']
+                update_state.write(True)
+            except KeyError:
+                pass
+
 
 
 class TSMFPGA(typing.NamedTuple):
@@ -756,7 +764,7 @@ class TSMFPGA(typing.NamedTuple):
 
 
 def debug_ui_launcher(semiconductor_module_manager: nitsm.codemoduleapi.SemiconductorModuleContext):
-    print(semiconductor_module_manager)
+    # print(semiconductor_module_manager)
     pass
 
 
