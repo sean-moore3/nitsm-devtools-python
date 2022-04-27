@@ -88,12 +88,59 @@ class _Session(typing.NamedTuple):
 
     # Write Analog
     def st_write_analog(self, data):
-        self.Task.write(data)
+        """
+        Writes samples to the task or virtual channels you specify.
+
+        This write method is dynamic, and is capable of accepting the
+        samples to write in the various forms for most operations:
+        
+        - Scalar: Single sample for 1 channel.
+        - List/1D numpy.ndarray: Multiple samples for 1 channel or 1
+          sample for multiple channels.
+        - List of lists/2D numpy.ndarray: Multiple samples for multiple
+          channels.
+
+        The data type of the samples passed in must be appropriate for
+        the channel type of the task.
+
+        For counter output pulse operations, this write method only
+        accepts samples in these forms:
+        
+        - Scalar CtrFreq, CtrTime, CtrTick (from nidaqmx.types): 
+          Single sample for 1 channel.
+        - List of CtrFreq, CtrTime, CtrTick (from nidaqmx.types):
+          Multiple samples for 1 channel or 1 sample for multiple 
+          channels.
+
+        If the task uses on-demand timing, this method returns only
+        after the device generates all samples. On-demand is the default
+        timing type if you do not use the timing property on the task to
+        configure a sample timing type. If the task uses any timing type
+        other than on-demand, this method returns immediately and does
+        not wait for the device to generate all samples. Your
+        application must determine if the task is done to ensure that
+        the device generated all samples.
+
+        Args:
+            data (dynamic): Contains the samples to write to the task.
+
+                The data you write must be in the units of the
+                generation, including any custom scales. Use the DAQmx
+                Create Channel methods to specify these units.
+            
+        Returns:
+            int:
+
+            Specifies the actual number of samples this method
+            successfully wrote.
+        """
+        samples_wrote = self.Task.write(data)
+        return samples_wrote
 
     # Read Configuration
     def st_cnfg_chan_to_read(self):
         """
-        Specifies ChannelList as a subset of channels in the task from which to read.
+        Specifies Channel List as a subset of channels in the task from which to read.
         """
         c_t_r = ChannelsToRead()
         c_t_r.name = self.ChannelList
@@ -315,8 +362,58 @@ class _Sessions:
         return waveform
 
     def write_data(self, data: typing.List[float]):
+        """
+        Writes samples to the task or virtual channels you specify.
+
+        This write method is dynamic, and is capable of accepting the
+        samples to write in the various forms for most operations:
+        
+        - Scalar: Single sample for 1 channel.
+        - List/1D numpy.ndarray: Multiple samples for 1 channel or 1
+          sample for multiple channels.
+        - List of lists/2D numpy.ndarray: Multiple samples for multiple
+          channels.
+
+        The data type of the samples passed in must be appropriate for
+        the channel type of the task.
+
+        For counter output pulse operations, this write method only
+        accepts samples in these forms:
+        
+        - Scalar CtrFreq, CtrTime, CtrTick (from nidaqmx.types): 
+          Single sample for 1 channel.
+        - List of CtrFreq, CtrTime, CtrTick (from nidaqmx.types):
+          Multiple samples for 1 channel or 1 sample for multiple 
+          channels.
+
+        If the task uses on-demand timing, this method returns only
+        after the device generates all samples. On-demand is the default
+        timing type if you do not use the timing property on the task to
+        configure a sample timing type. If the task uses any timing type
+        other than on-demand, this method returns immediately and does
+        not wait for the device to generate all samples. Your
+        application must determine if the task is done to ensure that
+        the device generated all samples.
+
+        Args:
+            data (dynamic): Contains the samples to write to the task.
+
+                The data you write must be in the units of the
+                generation, including any custom scales. Use the DAQmx
+                Create Channel methods to specify these units.
+            
+        Returns:
+            int:
+
+            Specifies the actual number of samples this method
+            successfully wrote.
+        """
+        samples_counts = []
         for session in self.sessions:
-            session.st_write_analog(data)
+            samples_count = session.st_write_analog(data)
+            samples_counts.append(samples_count)
+        return samples_counts
+
 
     # Read Configuration
     def configure_channels(self):
@@ -462,6 +559,22 @@ class MultipleSessions(_Sessions):
         self.sessions = sessions
 
 
+def reset_devices(task: nidaqmx.Task):
+    """
+    Reset all devices, clear the task and returns a new empty task with the same name.
+    Args:
+        task: object to reset
+    Return:
+        Object after reset
+    """
+    devices = task.devices
+    task_name = task.name
+    task.close()
+    for device in devices:
+        device.reset_device()
+    return nidaqmx.Task(task_name)
+
+
 @nitsm.codemoduleapi.code_module
 def clear_task(tsm: SMContext):
     """
@@ -490,22 +603,6 @@ def clear_task(tsm: SMContext):
     for task in tasks_do:
         task.stop()
         task.close()
-
-
-def reset_devices(task: nidaqmx.Task):
-    """
-    Reset all devices, clear the task and returns a new empty task with the same name.
-    Args:
-        task: object to reset
-    Return:
-        Object after reset
-    """
-    devices = task.devices
-    task_name = task.name
-    task.close()
-    for device in devices:
-        device.reset_device()
-    return nidaqmx.Task(task_name)
 
 
 @nitsm.codemoduleapi.code_module
@@ -673,7 +770,7 @@ def pins_to_session_sessions_info(tsm: SMContext, pins: PinsArg):
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions_sessions(tsm: SMContext, pins: PinsArg):
     """
-    Returns a pin query contex and a list of properties defined in the pin map.
+    Returns a pin query context and a list of properties defined in the pin map.
     The list of properties returned can be used to fill a new object type MultipleSessions
     Args:
         tsm: Pin context defined by pin map

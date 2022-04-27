@@ -39,10 +39,22 @@ class _NIFGenSSC:
 
     @property
     def session(self):
+        """
+        This allows to access the session stored in each instance of the class
+
+        Returns:
+            nifgen.Session : session of fgen
+        """
         return self._session  # This session may contain other pin's channels
 
     @property
     def cs_channels(self):
+        """
+        This allows to access the channels stored in each instance of the class
+
+        Returns:
+            str : comma seperated list of channels
+        """
         return self._channels
 
     def cs_generate_sine_wave(
@@ -71,8 +83,18 @@ class _NIFGenSSC:
 
 
 class _NIFGenTSM:
+    """
+    This is private class exposed via an object with different name. mostly all operations in this
+    class will be performed on all sessions of selected channels stored in this class.
+    """
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIFGenSSC]):
-        self._sessions_sites_channels = sessions_sites_channels
+        """
+        constructor for the arrays of sessions for selected pins under selected site
+
+        Args:
+            sessions_sites_channels (typing.Iterable[_NIFGenSSC]): list of sessions
+        """
+        self._sscs = sessions_sites_channels
 
     @staticmethod
     def create_waveform_data(samples=128, frequency=7.8125e-3, phase_degree=0):
@@ -142,7 +164,7 @@ class _NIFGenTSM:
         sample_rate = pts * frequency  # waveform_dt = 1 / (sample_rate)
         gain = max([abs(data) for data in waveform_data])
         normalised_waveform = [data / gain for data in waveform_data]
-        for ssc in self._sessions_sites_channels:
+        for ssc in self._sscs:
             ssc.cs_generate_sine_wave(
                 normalised_waveform, sample_rate, gain, 0, enable_filter=enable_filter
             )
