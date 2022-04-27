@@ -156,7 +156,7 @@ class TestFPGA:
         fpga_tsm_s[1][0].write_static([ni_fpga.StaticStates.One] * 128)
         list_s = fpga_tsm_s[1][0].read_static()
         for data in list_s[0][0]:
-            print(data.state)
+            print(data.state == "1")
         fpga_tsm_s[1][0].write_static([ni_fpga.StaticStates.Zero] * 128)
         list_s = fpga_tsm_s[1][0].read_static()
         for data in list_s[0][0]:

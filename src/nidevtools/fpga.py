@@ -217,6 +217,7 @@ class _SSCFPGA(typing.NamedTuple):
             iq_list.append(int(ch) // 32)
             r_list.append(int(ch) % 32)
         lines_to_write = []
+        print("test", iq_list)
         for s_s, iq, r in zip(static_states, iq_list, r_list):
             element = DIOLineLocationAndStaticState(DIOLines(r), Connectors(iq), s_s)
             lines_to_write.append(element)
