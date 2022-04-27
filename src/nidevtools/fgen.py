@@ -1,3 +1,6 @@
+"""
+This is nifgen wrapper for use with STS test codes
+"""
 import math
 import typing
 

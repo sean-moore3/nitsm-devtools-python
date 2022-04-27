@@ -171,6 +171,12 @@ class Session:
 
 
 class AbstractSession(typing.NamedTuple):
+    """
+    Abstract Session class to store pin specific sessions
+
+    Args:
+        enable_pins: typing.List[Session]
+    """
     enable_pins: typing.List[Session]
 
     def set_sessions(self, tsm: SMContext, switch_name: str = ""):  # CHECK

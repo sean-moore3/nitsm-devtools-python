@@ -1,3 +1,6 @@
+"""
+This is nidcpower wrapper for use with STS test codes
+"""
 import math
 import re
 import typing

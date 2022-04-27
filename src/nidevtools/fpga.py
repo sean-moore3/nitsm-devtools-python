@@ -1,3 +1,6 @@
+"""
+This is nifpga wrapper for use with STS test codes
+"""
 import collections
 import os
 import shutil

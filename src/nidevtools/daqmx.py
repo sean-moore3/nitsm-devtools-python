@@ -1,3 +1,6 @@
+"""
+This is nidaqmx wrapper for use with STS test codes
+"""
 import enum
 import typing
 

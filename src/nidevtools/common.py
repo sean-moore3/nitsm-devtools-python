@@ -52,7 +52,7 @@ class PinType(enum.Enum):
     """
     NOT_DETERMINED = 3
     r"""
-    This pin type is not defined 
+    This pin type is not defined
     """
 
 

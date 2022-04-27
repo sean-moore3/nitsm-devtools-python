@@ -1,3 +1,6 @@
+"""
+This is niswitch wrapper for use with STS test codes
+"""
 import typing
 from enum import Enum
 
