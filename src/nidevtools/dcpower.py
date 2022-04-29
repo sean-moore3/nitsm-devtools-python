@@ -254,7 +254,8 @@ class _NIDCPowerSSC:
     """
 
     def __init__(self, session: nidcpower.Session, channels: str, pins: str):
-        """NI DC power SSC class initialisation for session related operations.
+        """
+        NI DC power SSC class initialisation for session related operations.
 
         Args:
             session (nidcpower.Session): This is a shared session. Need to use this with channel
@@ -273,7 +274,8 @@ class _NIDCPowerSSC:
 
     @property
     def session(self):
-        """get the stored nidcpower session in which the channels are mapped for the selected pins
+        """
+        get the stored nidcpower session in which the channels are mapped for the selected pins
 
         Returns:
             session: This session contains the selected pin's channels and may contain other pin's channels
@@ -282,7 +284,8 @@ class _NIDCPowerSSC:
 
     @property
     def cs_channels(self):
-        """get the stored channel list
+        """
+        get the stored channel list
 
         Returns:
             str: channels
@@ -291,6 +294,12 @@ class _NIDCPowerSSC:
 
     @property
     def cs_session(self):
+        """
+        
+
+        Returns:
+            _type_: _description_
+        """
         return self._channels_session  # This session will operate only on subset of channels
 
     def cs_abort(self):
@@ -1197,6 +1206,15 @@ class _NIDCPowerSSC:
         return fetch_or_measure
 
     def cs_measure_execute(self, fetch_or_measure: bool):
+        """
+        
+
+        Args:
+            fetch_or_measure (bool): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if fetch_or_measure:
             samples = self._channels_session.fetch_multiple(1, 1.0)
         else:
@@ -1293,11 +1311,29 @@ class _NIDCPowerSSC:
 
 
 class _NIDCPowerTSM:
+    """
+    
+    """
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDCPowerSSC]):
+        """
+        
+
+        Args:
+            sessions_sites_channels (typing.Iterable[_NIDCPowerSSC]): _description_
+        """
         self._sscs = sessions_sites_channels
 
     @staticmethod
     def _parse_instrument_names(resource_string: str) -> typing.Set[str]:
+        """
+        
+
+        Args:
+            resource_string (str): _description_
+
+        Returns:
+            typing.Set[str]: _description_
+        """
         channels = resource_string.split(",")
         instrument_names = set()
         for channel in channels:
@@ -1307,6 +1343,16 @@ class _NIDCPowerTSM:
 
     @staticmethod
     def _expand_to_requested_array_size(generic_in, size: int):
+        """
+        
+
+        Args:
+            generic_in (_type_): _description_
+            size (int): _description_
+
+        Returns:
+            _type_: _description_
+        """
         if hasattr(generic_in, "__iter__"):
             generic_array = []
             length = len(generic_in)
@@ -1329,6 +1375,12 @@ class _NIDCPowerTSM:
 
     @property
     def sessions_sites_channels(self):
+        """
+        
+
+        Returns:
+            _type_: _description_
+        """
         return self._sscs
 
     def _configure_settings_array(
