@@ -359,10 +359,9 @@ class _NIDCPowerSSC:
         NI DC Power Supplies and SMUs Help for more information about how to configure your
         measurements and for information about valid values.
 
-
         Args:
-            aperture_time (_type_, optional): _description_. Defaults to 16.667e-03.
-            aperture_time_units (_type_, optional): _description_. Defaults to enums.ApertureTimeUnits.SECONDS.
+            aperture_time (float, optional): in seconds by default. Defaults to 16.667e-03.
+            aperture_time_units (enum, optional): seconds. Defaults to enums.ApertureTimeUnits.SECONDS.
         """
         self._channels_session.abort()
         self._channels_session.aperture_time = aperture_time
@@ -393,16 +392,17 @@ class _NIDCPowerSSC:
         that uses power line frequency.
 
         Args:
-            power_line_frequency (float, optional): _description_. Defaults to 60.0.
+            power_line_frequency (float, optional): in hertz. Defaults to 60.0.
         """
         self.power_line_frequency = power_line_frequency
         self._channels_session.power_line_frequency = power_line_frequency
 
     def cs_configure_sense(self, sense=enums.Sense.REMOTE):
-        """configures the sense for all channels in the session that are part to pin-query context
+        """
+        configures the sense for all channels in the session that are part to pin-query context
 
         Args:
-            sense (enum, optional): _description_. Defaults to enums.Sense.REMOTE.
+            sense (enum, optional): sensing at local or remote. Defaults to enums.Sense.REMOTE.
         """
         self._channels_session.sense = sense
 
@@ -519,7 +519,8 @@ class _NIDCPowerSSC:
         return configured_power_line_frequency
 
     def cs_query_in_compliance(self):
-        """get the in compliance status of each channel under the current session.
+        """
+        get the in compliance status of each channel under the current session.
 
         Returns:
             bool list: list of status one for each channel
@@ -908,12 +909,11 @@ class _NIDCPowerSSC:
         about supported devices.
         Set this property to False to disconnect the output terminal from the output.
         to the output terminal might discharge unless the relay is disconnected. Excessive connecting and disconnecting of the output can cause premature wear on the relay.
-        Default Value: True
 
         Note: Only disconnect the output when disconnecting is necessary for your application. For example, a battery connected
 
         Args:
-            output_connected (bool, optional): _description_. Defaults to False.
+            output_connected (bool, optional): controls the output relay. Defaults to False.
         """
         self._channels_session.output_connected = output_connected
 
@@ -971,19 +971,17 @@ class _NIDCPowerSSC:
         """
         self._channels_session.output_resistance = output_resistance
 
-    def cs_configure_source_delay(self, source_delay=0.0):
+    def cs_configure_source_delay(self, source_delay=0.01667):
         """
         Determines when, in seconds, the device generates the Source Complete event, potentially starting a measurement if the measure_when property is set to MeasureWhen.AUTOMATICALLY_AFTER_SOURCE_COMPLETE.
         Refer to the Single Point Source Mode and Sequence Source Mode topics for more information.
-        Valid Values: 0 to 167 seconds
-        Default Value: 0.01667 seconds
 
         Note:
         Refer to Supported Properties by Device for information about supported devices.
 
 
         Args:
-            source_delay (float, optional): hightime.timedelta, datetime.timedelta, or float in seconds. Defaults to 0.0.
+            source_delay (float, optional): hightime.timedelta, datetime.timedelta, or float in seconds. Defaults to 0.01667.Valid Values: 0 to 167 seconds.
         """
         self._channels_session.source_delay = source_delay
 
@@ -1052,10 +1050,10 @@ class _NIDCPowerSSC:
         configures the signal to be exported on the specified output terminal
 
         Args:
-            signal (Signal): signal to be exported 
+            signal (Signal): signal to be exported
             output_terminal (_type_): output terminal on which the signal is exported.
         """
-        
+
         if signal == enums.SendSoftwareEdgeTriggerType.START:
             self._channels_session.exported_start_trigger_output_terminal = output_terminal
         elif signal == enums.SendSoftwareEdgeTriggerType.SOURCE:
@@ -1177,7 +1175,7 @@ class _NIDCPowerSSC:
         sets several measurement related settings from the dictionary input
 
         Args:
-            settings (dict): aperture, trigger and record related properties in a dictionary format 
+            settings (dict): aperture, trigger and record related properties in a dictionary format
         """
         self._channels_session.aperture_time = settings["aperture_time"]
         self._channels_session.aperture_time_units = settings["aperture_time_units"]
@@ -1215,7 +1213,7 @@ class _NIDCPowerSSC:
     def cs_get_properties(self):
         """
         for each channel find its properties like level, limit, voltage range, currnt range
-        
+
         Returns:
             list of channel properties: list of channel properties of all channels in the session
         """
@@ -1368,6 +1366,15 @@ class _NIDCPowerTSM:
         voltage_limit_lows,
         voltage_limit_ranges,
     ):
+        """in volts
+
+        Args:
+            current_levels (_type_): _description_
+            current_level_ranges (_type_): _description_
+            voltage_limit_highs (_type_): _description_
+            voltage_limit_lows (_type_): _description_
+            voltage_limit_ranges (_type_): _description_
+        """
         i = 0
         for ssc in self._sscs:
             ssc.cs_force_current_asymmetric_limits(
@@ -1383,6 +1390,15 @@ class _NIDCPowerTSM:
     def _force_current_symmetric_limits_array(
         self, current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges
     ):
+        """
+        
+
+        Args:
+            current_levels (_type_): _description_
+            current_level_ranges (_type_): _description_
+            voltage_limits (_type_): _description_
+            voltage_limit_ranges (_type_): _description_
+        """
         i = 0
         for ssc in self._sscs:
             ssc.cs_force_current_symmetric_limits(
@@ -1402,6 +1418,16 @@ class _NIDCPowerTSM:
         current_limit_lows,
         current_limit_ranges,
     ):
+        """
+        
+
+        Args:
+            voltage_levels (_type_): _description_
+            voltage_level_ranges (_type_): _description_
+            current_limit_highs (_type_): _description_
+            current_limit_lows (_type_): _description_
+            current_limit_ranges (_type_): _description_
+        """
         i = 0
         for ssc in self._sscs:
             ssc.cs_force_voltage_asymmetric_limits(
@@ -1417,6 +1443,15 @@ class _NIDCPowerTSM:
     def _force_voltage_symmetric_limits_array(
         self, voltage_levels, voltage_level_ranges, current_limits, current_limit_ranges
     ):
+        """
+        
+
+        Args:
+            voltage_levels (_type_): _description_
+            voltage_level_ranges (_type_): _description_
+            current_limits (_type_): _description_
+            current_limit_ranges (_type_): _description_
+        """
         i = 0
         for ssc in self._sscs:
             ssc.cs_force_voltage_symmetric_limits(
@@ -1429,6 +1464,15 @@ class _NIDCPowerTSM:
         self.initiate()
 
     def _expand_array_to_sessions(self, generic_in):
+        """
+        private function for expanding the given array to the requested array size
+
+        Args:
+            generic_in (any): if the data is a list already it will be passed as such
+
+        Returns:
+            list of any type: creates the list of given generic input argument
+        """
         if hasattr(generic_in, "__iter__"):
             generic_array = generic_in
             # Need to revisit this code for all cases as per reference LabVIEW code
@@ -1446,6 +1490,16 @@ class _NIDCPowerTSM:
         voltage_limit_low,
         voltage_limit_range,
     ):
+        """
+        private function which performs sourcing of current with symmetric voltage limit settings
+
+        Args:
+            current_level (float list): in amps
+            current_level_range (float list): in amps
+            voltage_limit_high (float list): in volts
+            voltage_limit_low (float list): in volts
+            voltage_limit_range (float list): in volts
+        """
         size = 0
         for _ in self._sscs:
             size += 1
@@ -1463,6 +1517,15 @@ class _NIDCPowerTSM:
         )
 
     def _force_current_symmetric_limits(self, current_level, current_level_range, voltage_limit, voltage_limit_range):
+        """
+        private function which performs sourcing of current with symmetric voltage limit settings
+
+        Args:
+            current_level (float list): in amps
+            current_level_range (float list): in amps
+            voltage_limit (float list): in volts
+            voltage_limit_range (float list): in volts
+        """
         size = 0
         for _ in self._sscs:
             size += 1
@@ -1482,6 +1545,16 @@ class _NIDCPowerTSM:
         current_limit_low,
         current_limit_range,
     ):
+        """
+        private function which performs sourcing of voltage with asymmetric current limit settings
+
+        Args:
+            voltage_level (float list): in volts
+            voltage_level_range (float list): in volts
+            current_limit_high (float list): in amps
+            current_limit_low (float list): in amps
+            current_limit_range (float list): in amps
+        """
         size = 0
         for _ in self._sscs:
             size += 1
@@ -1499,6 +1572,15 @@ class _NIDCPowerTSM:
         )
 
     def _force_voltage_symmetric_limits(self, voltage_level, voltage_level_range, current_limit, current_limit_range):
+        """
+        private function which performs sourcing of voltage with symmetric current limit settings
+
+        Args:
+            voltage_level (float list): in volts
+            voltage_level_range (float list): in volts
+            current_limit (float list): in amps
+            current_limit_range (float list): in amps
+        """
         size = 0
         for _ in self._sscs:
             size += 1
@@ -1511,78 +1593,212 @@ class _NIDCPowerTSM:
         )
 
     def abort(self):
+        """
+        Transitions the specified channel(s) from the Running state to the
+        Uncommitted state. If a sequence is running, it is stopped. Any
+        configuration methods called after this method are not applied until
+        the initiate method is called. If power output is enabled
+        when you call the abort method, the output channels remain
+        in their current state and continue providing power.
+
+        Use the ConfigureOutputEnabled method to disable power
+        output on a per-channel basis. Use the reset method to
+        disable output on all channels.
+
+        Returns:
+            none: when aborted otherwise exception
+        """
         for ssc in self._sscs:
             ssc.cs_abort()
 
     def commit(self):
+        """
+        Applies previously configured settings to the specified channel(s) under current session.
+        Calling this method moves the NI-DCPower session from the Uncommitted state into
+        the Committed state. After calling this method, modifying any
+        property reverts the NI-DCPower session to the Uncommitted state. Use
+        the initiate method to transition to the Running state.
+
+        Returns:
+            None: when this operation is completed successfully, i.e. no error.
+        """
         for ssc in self._sscs:
             ssc.cs_commit()
 
     def initiate(self):
+        """
+        Starts generation or acquisition, causing the specified channel(s) to
+        leave the Uncommitted state or Committed state and enter the Running
+        state. To return to the Uncommitted state call the abort
+        method.
+
+        Returns:
+            context manager: This method will return a Python context manager that will
+            initiate on entering and abort on exit.
+        """
         for ssc in self._sscs:
             ssc.cs_initiate()
 
     def reset(self):
+        """
+        Resets the specified pin(s) to a known state. This method disables power
+        generation, resets session properties to their default values, commits
+        the session properties, and leaves the session in the Uncommitted state.
+
+        Returns:
+            None: when this operation is completed successfully, i.e. no error.
+        """
         for ssc in self._sscs:
             ssc.cs_reset()
 
     def configure_aperture_time_with_abort_and_initiate(
         self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS
     ):
+        """
+        Configures the measurement aperture time for the channel configuration.
+        Aperture time is specified in the units set by the aperture_time_units property.
+        for information about supported devices.
+        Refer to the Aperture Time topic in the NI DC Power Supplies and SMUs Help for
+        more information about how to configure your measurements and for information about valid values.
+
+        Args:
+            aperture_time (float, optional): in seconds by default. Defaults to 16.667e-03.
+            aperture_time_units (enum, optional): seconds. Defaults to enums.ApertureTimeUnits.SECONDS.
+
+        Returns:
+            None: when this operation is completed successfully, i.e. no error.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_aperture_time_with_abort_and_initiate(aperture_time, aperture_time_units)
         return
 
     def configure_power_line_frequency(self, power_line_frequency=60.0):
+        """
+        Stores the session object variable power line frequency for other operations
+        that uses power line frequency.
+
+        Args:
+            power_line_frequency (float, optional): in hertz. Defaults to 60.0.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_power_line_frequency(power_line_frequency)
         return
 
     def configure_sense(self, sense=enums.Sense.LOCAL):
+        """
+        configures the sense for all channels in the session that are part to pin-query context
+
+        Args:
+            sense (enum, optional): sensing at local or remote. Defaults to enums.Sense.LOCAL.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_sense(sense)
         return
 
     def get_aperture_times_in_seconds(self):
+        """
+        get the aperture time in seconds for all channels in the session. if the model has different units convert them into seconds.
+
+        Returns:
+            list of float: aperture times in seconds
+        """
         temp_list = []
         for ssc in self._sscs:
             temp_list.append(ssc.cs_get_aperture_time_in_seconds())
         return temp_list
 
     def get_power_line_frequencies(self):
+        """
+        get the power line frequencies stored in the object or from the instrument based on the supported model
+
+        Returns:
+            list of float: power line frequency in hertz
+        """
         temp_list = []
         for ssc in self._sscs:
             temp_list.append(ssc.cs_get_power_line_frequency())
         return temp_list
 
     def query_in_compliance(self):
+        """
+        get the in compliance status of each channel under the current session.
+
+        Returns:
+            bool list: list of status one for each channel
+        """
         temp_list = []
         for ssc in self._sscs:
             temp_list += ssc.cs_query_in_compliance()
         return temp_list
 
     def query_output_state(self, output_state: nidcpower.OutputStates):
+        """
+        compares the states of the output against the desired state
+
+        Args:
+            output_state (nidcpower.OutputStates): desired output state
+
+        Returns:
+            bool list: indicates output state is same as desired state or not.
+        """
         temp_list = []
         for ssc in self._sscs:
             temp_list += ssc.cs_query_output_state(output_state)
         return temp_list
 
     def configure_transient_response(self, transient_response=enums.TransientResponse.NORMAL):
+        """
+        Specifies the transient response.
+        Default Value: TransientResponse.NORMAL
+
+        Note: This property is not supported by all devices.
+
+        Args:
+            transient_response (TransientResponse, optional): specifies custom response settings or normal. Defaults to enums.TransientResponse.NORMAL.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_transient_response(transient_response)
         return
 
     def configure_output_connected(self, output_connected=False):
+        """
+        Specifies whether the output relay is connected (closed) or disconnected (open). The output_enabled property does not change based on this property; they are independent of each other.
+        about supported devices.
+        Set this property to False to disconnect the output terminal from the output.
+        to the output terminal might discharge unless the relay is disconnected. Excessive connecting and disconnecting of the output can cause premature wear on the relay.
+      
+        Note: Only disconnect the output when disconnecting is necessary for your application. For example, a battery connected
+
+        Args:
+            output_connected (bool, optional): controls the output relay. Defaults to False.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_output_connected(output_connected)
         return
 
     def configure_output_enabled(self, output_enabled=False):
+        """
+        Specifies whether the output is enabled (True) or disabled (False).
+        Depending on the value you specify for the output_function property, you also must set the voltage level or current level in addition to enabling the output
+        the initiate method. 
+
+        Note: If the session is in the Committed or Uncommitted states, enabling the output does not take effect until you call
+
+
+        Args:
+            output_enabled (bool, optional): selects the output to be enabled or not. Defaults to False.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_output_enabled(output_enabled)
         return
 
     def configure_output_enabled_and_connected(self, output_enabled_and_connected=False):
+        """
+        Specifies whether the output relay is connected (closed) or disconnected (open). The output_enabled property also changes based on this property; 
+        
+        Args:
+            output_enabled_and_connected (bool, optional):controls the output relay and enables the output. Defaults to False.
+        """
         if output_enabled_and_connected:
             self.configure_output_enabled(output_enabled_and_connected)
             self.configure_output_connected(output_enabled_and_connected)
@@ -1591,22 +1807,59 @@ class _NIDCPowerTSM:
             self.configure_output_enabled(output_enabled_and_connected)
 
     def configure_output_resistance(self, output_resistance=0.0):
+        """
+        Specifies the output resistance that the device attempts to generate for the specified pin(s). This property is available only when you set the output_function property on a support device. Refer to a supported device's topic about output resistance for more information about selecting an output resistance.
+        about supported devices.
+
+        Note: This property is not supported by all devices. Refer to Supported Properties by Device topic for information
+
+        Args:
+            output_resistance (float, optional): resistance value in ohms. Defaults to 0.0.
+        """
+
         for ssc in self._sscs:
             ssc.cs_configure_output_resistance(output_resistance)
         return
 
     def configure_output_resistance_array(self, output_resistance):
+        """
+        Specifies the output resistance that the device attempts to generate for the specified pin(s). This property is available only when you set the output_function property on a support device. Refer to a supported device's topic about output resistance for more information about selecting an output resistance.
+        about supported devices.
+
+        Note: This property is not supported by all devices. Refer to Supported Properties by Device topic for information
+
+        Args:
+            output_resistance (List of float): resistance values in ohms.
+        """
         output_resistances = self._expand_array_to_sessions(output_resistance)
         i = 0
         for ssc in self._sscs:
             ssc.cs_configure_output_resistance(output_resistances[i])
             i += 1
 
-    def configure_source_delay(self, source_delay=0.0):
+    def configure_source_delay(self, source_delay=0.01667):
+        """
+        Determines when, in seconds, the device generates the Source Complete event, potentially starting a measurement if the measure_when property is set to MeasureWhen.AUTOMATICALLY_AFTER_SOURCE_COMPLETE.
+        Refer to the Single Point Source Mode and Sequence Source Mode topics for more information.
+
+        Note:
+        Refer to Supported Properties by Device for information about supported devices.
+
+
+        Args:
+            source_delay (float, optional): hightime.timedelta, datetime.timedelta, or float in seconds. Defaults to 0.01667.Valid Values: 0 to 167 seconds.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_source_delay(source_delay)
 
     def configure_source_mode(self, source_mode=nidcpower.SourceMode.SINGLE_POINT):
+        """
+        Specifies whether to run a single output point or a sequence. Refer to the Single Point Source Mode and Sequence Source Mode topics in the NI DC Power Supplies and SMUs Help for more information about source modes.
+        Default value: SourceMode.SINGLE_POINT
+
+        Args:
+            source_mode (nidcpower.SourceMode, optional): configures the single point or sequence. Defaults to nidcpower.SourceMode.SINGLE_POINT.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_source_mode(source_mode)
 
@@ -1657,7 +1910,7 @@ class _NIDCPowerTSM:
         When setting the timeout interval, ensure you take into account any
         triggers so that the timeout interval is long enough for your
         application.
-        
+
         """
         for ssc in self._sscs:
             ssc.cs_wait_for_event(event, timeout)
@@ -1690,7 +1943,7 @@ class _NIDCPowerTSM:
         configures the signal to be exported on the specified output terminal
 
         Args:
-            signal (SignalTypes): signal to be exported 
+            signal (SignalTypes): signal to be exported
             output_terminal (_type_): output terminal on which the signal is exported.
 
         """
@@ -1751,9 +2004,9 @@ class _NIDCPowerTSM:
         should not be used when the measure_when property is
         set to MeasureWhen.ON_DEMAND. You must first call
         initiate before calling this method.
-        
+
         Args:
-            waveform_t0 (_type_): waveform time stamp 
+            waveform_t0 (time stamp): waveform time stamp
             waveform_length_s (float, optional): duration of waveform to measure. Defaults to 0.0.
 
         Returns:
@@ -1798,7 +2051,7 @@ class _NIDCPowerTSM:
 
         Returns:
             list of settings(dict): measurement settings in list of dictionary format
-        
+
         """
         meas_settings = []
         for ssc in self._sscs:
@@ -1809,7 +2062,7 @@ class _NIDCPowerTSM:
     def get_properties(self):
         """
         for each channel find its properties like level, limit, voltage range, currnt range
-        
+
         Returns:
             list of channel properties: list of channel properties of all channels in the session
         """
@@ -1893,7 +2146,7 @@ class _NIDCPowerTSM:
     def configure_current_level_array(self, current_levels_array):
         """
         updates the current level property with the expanded array of current levels.
- 
+
         Args:
             current_levels_array (list of floats): updates the current level property.
         """
