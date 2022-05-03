@@ -551,7 +551,7 @@ def pins_to_sessions_sessions_info(tsm: SMContext, pin: str):
         for element1, element2 in zip(list1, list2):
             condition = False
             for single_session in session.enable_pins:
-                #Change id 050322 "Moving the lines that set the route_value for each element and the site inside the if statement avoids overwriting correct route_value with following for loops"
+                # Change id 050322 "Moving the lines that set the route_value for each element and the site inside the if statement avoids overwriting correct route_value with following for loops"
                 if single_session.enable_pin.strip().lower() == element1.lower():
                     single_session.route_value = element2
                     single_session.site = i
