@@ -12,7 +12,6 @@ import nidcpower.enums as enums
 import nidcpower.errors
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
-
 import nidevtools.common as ni_dt_common
 
 
@@ -295,10 +294,10 @@ class _NIDCPowerSSC:
     @property
     def cs_session(self):
         """
-        
+        returns the sessions specific to the channels of the pins specified
 
         Returns:
-            _type_: _description_
+            session: subset of session
         """
         return self._channels_session  # This session will operate only on subset of channels
 
@@ -689,7 +688,7 @@ class _NIDCPowerSSC:
         self, current_level=0.0, current_level_range=0.0, voltage_limit=0.0, voltage_limit_range=0.0
     ):
         """
-            configure and commit session for forcing current with symmetric voltage limits
+        configure and commit session for forcing current with symmetric voltage limits
 
         Args:
             current_level (float, optional): current level in amps. Defaults to 0.0.
@@ -852,14 +851,13 @@ class _NIDCPowerSSC:
         self, voltage_level=0.0, voltage_level_range=0.0, current_limit=0.0, current_limit_range=0.0
     ):
         """
-        configures and commits to force single point dc voltage with asymmetric current limits
+        configures and commits to force single point dc voltage with symmetric current limits
 
         Args:
             voltage_level (float, optional): voltage level in volts. Defaults to 0.0.
             voltage_level_range (float, optional): voltage level range in volts. Defaults to 0.0.
-            current_limit (float, optional): current limits in amps. Defaults to 0.0.
+            current_limit (float, optional): current limit in amps. Defaults to 0.0.
             current_limit_range (float, optional): current limit range in amps. Defaults to 0.0.
-
         """
         self._channels_session.abort()
         self.cs_configure_single_point_force_dc_voltage_symmetric_limits(
@@ -896,7 +894,8 @@ class _NIDCPowerSSC:
         self._channels_session.transient_response = transient_response
 
     def cs_get_source_adapt_settings(self):
-        """get the transient response settings for one session
+        """
+        get the transient response settings for one session
 
         Returns:
             tuple: transient response type, Voltage T.R settings, Current T.R. settings
@@ -1145,6 +1144,16 @@ class _NIDCPowerSSC:
         return self._channels_session.wait_for_event(event, timeout)
 
     def cs_configure_and_commit_waveform_acquisition(self, sample_rate, buffer_length=1.0):
+        """
+        configures measurement settings and commits the changes
+
+        Args:
+            sample_rate (hertz in float): samples per second for data acquisitation
+            buffer_length (float, optional): Number of samples to hold in memory. Defaults to 1.0.
+
+        Returns:
+            settings: previous settings before configuration for reverting purpose.
+        """
         settings = self.cs_get_measurement_settings()
         self._channels_session.aperture_time_units = enums.ApertureTimeUnits.SECONDS
         self._channels_session.aperture_time = 1 / sample_rate
@@ -1194,6 +1203,15 @@ class _NIDCPowerSSC:
         self._channels_session.measure_record_length_is_finite = settings["measure_record_length_is_finite"]
 
     def cs_measure_setup(self, measurement_mode: MeasurementMode):
+        """
+        measurement setup mode and get a boolean for fetching or measuring.
+
+        Args:
+            measurement_mode (MeasurementMode): measuremultiple or software triggered or default
+
+        Returns:
+            fetch_measure (bool): This can be used to decide between to use fetch or measure operation to perform.
+        """
         if measurement_mode == MeasurementMode.MEASURE_MULTIPLE:
             fetch_or_measure = False
         elif measurement_mode == MeasurementMode.SOFTWARE_TRIGGER:
@@ -1207,13 +1225,13 @@ class _NIDCPowerSSC:
 
     def cs_measure_execute(self, fetch_or_measure: bool):
         """
-        
+        fetches or measures based on the boolean parameter passed 
 
         Args:
-            fetch_or_measure (bool): _description_
+            fetch_or_measure (bool): decides the operation between fetch and measure
 
         Returns:
-            _type_: _description_
+            tuple of voltages and currents: lists of voltages and current in tuple format
         """
         if fetch_or_measure:
             samples = self._channels_session.fetch_multiple(1, 1.0)
@@ -1312,27 +1330,27 @@ class _NIDCPowerSSC:
 
 class _NIDCPowerTSM:
     """
-    
+    Class to store the sessions for each context of pins.
     """
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDCPowerSSC]):
         """
-        
+        constructor function for NIDCPowerTSM private class
 
         Args:
-            sessions_sites_channels (typing.Iterable[_NIDCPowerSSC]): _description_
+            sessions_sites_channels (typing.Iterable[_NIDCPowerSSC]): list of sessions for the context pins
         """
         self._sscs = sessions_sites_channels
 
     @staticmethod
     def _parse_instrument_names(resource_string: str) -> typing.Set[str]:
         """
-        
+        returns a set of intrument names from the channels of resource string
 
         Args:
-            resource_string (str): _description_
+            resource_string (str): comma seperated list of channels from different cards
 
         Returns:
-            typing.Set[str]: _description_
+            typing.Set[str]: set of instruments names
         """
         channels = resource_string.split(",")
         instrument_names = set()
@@ -1344,11 +1362,11 @@ class _NIDCPowerTSM:
     @staticmethod
     def _expand_to_requested_array_size(generic_in, size: int):
         """
-        
+        private function to compute the size and expand the given list to the size specified
 
         Args:
-            generic_in (_type_): _description_
-            size (int): _description_
+            generic_in (any): any python datatype for expanding
+            size (int):  desired number of elements
 
         Returns:
             _type_: _description_
@@ -1376,10 +1394,10 @@ class _NIDCPowerTSM:
     @property
     def sessions_sites_channels(self):
         """
-        
+        get the sessions stored in for the context pins
 
         Returns:
-            _type_: _description_
+            sessions: list of sessions for various pins in the context
         """
         return self._sscs
 
@@ -1418,14 +1436,15 @@ class _NIDCPowerTSM:
         voltage_limit_lows,
         voltage_limit_ranges,
     ):
-        """in volts
+        """
+        configures and commits to force single point dc current with asymmetric voltage limits
 
         Args:
-            current_levels (_type_): _description_
-            current_level_ranges (_type_): _description_
-            voltage_limit_highs (_type_): _description_
-            voltage_limit_lows (_type_): _description_
-            voltage_limit_ranges (_type_): _description_
+            current_levels (list of float): current levels in amps.
+            current_level_ranges (list of float): current level ranges in amps.
+            voltage_limits_highs (list of float): voltage higher limits in volts.
+            voltage_limits_lows (list of float): voltage lower limits in volts.
+            voltage_limit_ranges (list of float): voltage limit range in volts.
         """
         i = 0
         for ssc in self._sscs:
@@ -1443,13 +1462,13 @@ class _NIDCPowerTSM:
         self, current_levels, current_level_ranges, voltage_limits, voltage_limit_ranges
     ):
         """
-        
+        configures and commits to force single point dc current with symmetric voltage limits
 
         Args:
-            current_levels (_type_): _description_
-            current_level_ranges (_type_): _description_
-            voltage_limits (_type_): _description_
-            voltage_limit_ranges (_type_): _description_
+            current_levels (list of float): current levels in amps.
+            current_level_ranges (list of float): current level ranges in amps.
+            voltage_limits (list of float): voltage limits in volts.
+            voltage_limit_ranges (list of float): voltage limit range in volts.
         """
         i = 0
         for ssc in self._sscs:
@@ -1471,14 +1490,13 @@ class _NIDCPowerTSM:
         current_limit_ranges,
     ):
         """
-        
+        configures and commits to force single point dc voltage with asymmetric current limits
 
         Args:
-            voltage_levels (_type_): _description_
-            voltage_level_ranges (_type_): _description_
-            current_limit_highs (_type_): _description_
-            current_limit_lows (_type_): _description_
-            current_limit_ranges (_type_): _description_
+            voltage_levels (list of float): voltage levels in volts.
+            voltage_level_ranges (list of float): voltage level ranges in volts.
+            current_limits_highs (list of float): current higher limits in amps.
+            current_limits_lows (list of float): current lower limits in amps.            current_limit_ranges (list of float): current limit range in amps.
         """
         i = 0
         for ssc in self._sscs:
@@ -1496,13 +1514,13 @@ class _NIDCPowerTSM:
         self, voltage_levels, voltage_level_ranges, current_limits, current_limit_ranges
     ):
         """
-        
+        configures and commits to force single point dc voltage with symmetric current limits
 
         Args:
-            voltage_levels (_type_): _description_
-            voltage_level_ranges (_type_): _description_
-            current_limits (_type_): _description_
-            current_limit_ranges (_type_): _description_
+            voltage_levels (list of float): voltage levels in volts.
+            voltage_level_ranges (list of float): voltage level ranges in volts.
+            current_limits (list of float): current limits in amps.
+            current_limit_ranges (list of float): current limit range in amps.
         """
         i = 0
         for ssc in self._sscs:
