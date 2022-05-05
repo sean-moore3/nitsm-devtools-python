@@ -10,24 +10,59 @@ from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 
 class Action(Enum):
+    """
+    Switch Actions
+
+    Args:
+        Enum: Inherits from enum class
+    """
+
     Disconnect = 0
     Connect = 1
     Disconnect_All = 2
     Read = 3
 
 
-class Topology(typing.NamedTuple):  # TODO Add rest of the topologies for the a more general case
+class Topology(typing.NamedTuple):
+    """
+    Currently supports 3 topologies need to add rest of the topologies for the a more general code
+
+    Args:
+        typing (tuple): topology and the names
+    """
+
     matrix_2738 = "2738/2-Wire 8x32 Matrix"
     mux_2525 = "2525/2-Wire Octal 8x1 Mux"
     matrix_2503 = "2503/2-Wire 4x6 Matrix"
 
 
 class Session(typing.NamedTuple):
+    """
+    Class to store on session
+
+    Args:
+        typing (tuple): session, pin, channel
+
+    Returns:
+        session_object: for one connection
+    """
+
     Session: niswitch.Session
     Pin: str
     Channel: str
 
     def info(self, route_value: str, action: Action, timeout: int):
+        """
+        performs various actions like connect, disconnect or disconnect all.
+
+        Args:
+            route_value (str): list of switchs
+            action (Action): to be performed on the swtiches
+            timeout (int): time within which the operation needs to be finished
+
+        Returns:
+            list of path capability: can be connected or not connected is the path capability
+        """
         data = []
         if action == Action.Disconnect_All:
             self.Session.disconnect_all()
@@ -45,12 +80,36 @@ class Session(typing.NamedTuple):
 
 
 class MultipleSessions:
+    """
+    Class for storing multiple sessions
+
+    Returns:
+        object: containing list of sessions
+    """
+
     Sessions: typing.List[Session]
 
     def __init__(self, sessions: typing.List[Session]):
+        """
+        contructor to store the sessions
+
+        Args:
+            sessions (typing.List[Session]): list of sessions for the current context
+        """
         self.Sessions = sessions
 
     def action_session_info(self, route_value: str = "", action: Action = Action.Disconnect, timeout: int = 40):
+        """
+        reads and returns the path capability
+
+        Args:
+            route_value (str, optional): comma seperated list of "en_" prefixed pins . Defaults to "".
+            action (Action, optional): connect or disconnect. Defaults to Action.Disconnect.
+            timeout (int, optional): timeout for the operation in seconds. Defaults to 40.
+
+        Returns:
+            list of session: list of session for the connection
+        """
         read_path_capability = []
         for session in self.Sessions:
             data = session.info(route_value, action, timeout)
@@ -72,7 +131,7 @@ def get_all_instruments_names(tsm: SMContext):
     Returns:
         tulple : instrument_names, channel_group_ids
     """
-    instrument_names, channel_group_ids, channel_lists = tsm.get_custom_instrument_names(instrument_type_id)
+    instrument_names, channel_group_ids, _ = tsm.get_custom_instrument_names(instrument_type_id)
     return instrument_names, channel_group_ids
 
 

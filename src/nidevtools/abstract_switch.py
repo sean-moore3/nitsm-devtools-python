@@ -27,6 +27,12 @@ StringTuple = typing.Tuple[str]
 
 
 class Control(enum.Enum):
+    """
+    control actions for abstract switch
+
+    Args:
+        enum : Inherits from enum class.
+    """
     get_connections = 0
     disconnect_all = 1
     init = 2
@@ -336,7 +342,7 @@ def initialize(tsm: SMContext):  # CHECK
 
 
 def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connections):
-    """ 
+    """
     Pin switch status fgv labview equivalent code 
     """
     connections = []

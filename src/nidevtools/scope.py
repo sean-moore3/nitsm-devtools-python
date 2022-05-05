@@ -219,7 +219,8 @@ def _configure_vertical_per_channel_arrays(
     Args:
         ssc_s (typing.List[_NIScopeSSC]): list of session channels
         ranges (typing.List[float]): vertical range list - one for each session
-        couplings (typing.List[niscope.VerticalCoupling]): vertical coupling list - one for each session
+        couplings (typing.List[niscope.VerticalCoupling]): vertical coupling list - one for each
+        session
         offsets (typing.List[float]): vertical offset list - one for each session
         probes_drop (typing.List[float]): probe attenuation drop list - one for each session
         enabled_s (typing.List[bool]): channel enabled list - one for each session
