@@ -122,14 +122,22 @@ class _NIDigitalSSC:
     """
 
     def __init__(self, session: nidigital.Session, channels: str, pins: str):
-        self._session = session  # mostly shared session depends on pinmap file.
-        self._channels = channels  # specific channel(s) of that session
-        self._pins = pins  # pin names mapped to the channels
+        """
+        constructor node for storing the session, channels and pins
+
+        Args:
+            session (nidigital.Session): mostly shared session depends on pinmap file.
+            channels (str): specific channel(s) of that session for this context.
+            pins (str): pins (names) mapped to the channels.
+        """
+        self._session = session  
+        self._channels = channels
+        self._pins = pins
         self._channels_session = session.channels[channels]  # session with specific channel(s)
 
     def cs_abort(self):
         """
-        Aborts the current session
+        Stops bursting the pattern.
         """
         self._session.abort()
 
@@ -158,7 +166,8 @@ class _NIDigitalSSC:
         """
         return self._channels_session.clock_generator_generate_clock(frequency, select_digital)
 
-    def cs_modify_time_set_for_clock_generation(self, frequency: float, duty_cycle: float, time_set: str):
+    def cs_modify_time_set_for_clock_generation(self, frequency: float, duty_cycle: float, 
+    time_set: str):
         """
         Configures the period of a time set, drive format and drive edge placement for the
         specified pins. Use this method to modify time set values after applying a timing
@@ -258,6 +267,24 @@ class _NIDigitalSSC:
         number_of_samples_is_finite: bool = True,
         buffer_size_per_site: int = 32000,
     ):
+        """
+        Configures which cycles History RAM acquires after the trigger conditions are met. If you configure History RAM to only acquire failed cycles, you must set the pretrigger samples for History RAM to 0.
+        Args:
+            cycles_to_acquire (enums.HistoryRAMCyclesToAcquire, optional): see the below table for details. Defaults to enums.HistoryRAMCyclesToAcquire.FAILED.
+        +----------------------------------+------------------------------------------------------+
+        | Defined Values:                  |                                                      |
+        +==================================+======================================================+
+        | HistoryRAMCyclesToAcquire.FAILED | Only acquires cycles that fail a compare after the 
+                                             triggering conditions are met.                       |
+        +----------------------------------+------------------------------------------------------+
+        | HistoryRAMCyclesToAcquire.ALL    | Acquires all cycles after the triggering conditions    
+                                             are met.                                             |
+        +----------------------------------+------------------------------------------------------+
+            pretrigger_samples (int, optional): number of pretrigger samples to acquire. Defaults to 0.
+            max_samples_to_acquire_per_site (int, optional): maximum number of samples to acquire. Defaults to 8191.
+            number_of_samples_is_finite (bool, optional): finite or infinite number of samples. Defaults to True.
+            buffer_size_per_site (int, optional): buffer size per site. Defaults to 32000.
+        """
         self._session.history_ram_cycles_to_acquire = cycles_to_acquire
         self._session.history_ram_pretrigger_samples = pretrigger_samples
         self._session.history_ram_max_samples_to_acquire_per_site = max_samples_to_acquire_per_site
@@ -272,6 +299,27 @@ class _NIDigitalSSC:
         cycle_offset: int = 0,
         vector_offset: int = 0,
     ):
+        """
+        Specifies the type of trigger condition on which History RAM starts acquiring pattern information.
+        Args:
+            triggers_type (enums.HistoryRAMTriggerType): _description_
+        +-------------------------------------+--------------------------------------------------+
+        | Defined Values:                     |                                                  |
+        +=====================================+==================================================+
+        | HistoryRAMTriggerType.FIRST_FAILURE | Starts acquiring pattern information in History
+                                                RAM on the first failed cycle in a pattern burst.|
+        +-------------------------------------+--------------------------------------------------+
+        | HistoryRAMTriggerType.CYCLE_NUMBER  | Starts acquiring pattern information in History RAM 
+                                                starting from a specified cycle number.          |
+        +-------------------------------------+--------------------------------------------------+
+        | HistoryRAMTriggerType.PATTERN_LABEL | Starts acquiring pattern information in History RAM 
+                                                starting from a specified pattern label, augmented by vector and cycle offsets.                      |
+        +-------------------------------------+---------------------------------------------------+
+            cycle_number (int, optional): cycle number at which trigger happens. Defaults to 0.
+            pattern_label (str, optional): pattern label in which trigger happens. Defaults to "".
+            cycle_offset (int, optional): cycle offset in the pattern. Defaults to 0.
+            vector_offset (int, optional): vector offset in the pattern. Defaults to 0.
+        """
         if triggers_type == enums.HistoryRAMTriggerType.FIRST_FAILURE:
             self._session.history_ram_trigger_type = triggers_type
         elif triggers_type == enums.HistoryRAMTriggerType.CYCLE_NUMBER:
@@ -323,6 +371,12 @@ class _NIDigitalSSC:
         return self._channels_session.get_fail_count()
 
     def cs_wait_until_done(self, timeout: float = 10):
+        """
+        Waits until the pattern burst has completed or the timeout has expired.
+
+        Args:
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error. Defaults to 10 seconds.
+        """
         self._session.wait_until_done(timeout)
 
     def cs_apply_tdr_offsets(self, per_instrument_offset: typing.List[float]):
@@ -386,6 +440,23 @@ class _NIDigitalSSC:
         self._session.commit()
 
     def cs_configure_termination_mode(self, termination_mode: enums.TerminationMode):
+        """
+        Specifies the behavior of the pin during non-drive cycles.
+        Args:
+            termination_mode (enums.TerminationMode) : value defined as per the table below
+        +-----------------------------+------------------------------------------------------------+
+        | Defined Values:             |                                                            |
+        +=============================+============================================================+
+        | TerminationMode.ACTIVE_LOAD | Specifies that, for non-drive pin states (L, H, X, V, M, E)
+                                        ,the active load is connected and the instrument sources or sinks a defined amount of current to load the DUT. The amount of current sourced by the instrument and therefore sunk by the DUT is specified by IOL. The amount of current sunk by the instrument and therefore sourced by the DUT is specified by IOH. The voltage at which the instrument changes between sourcing and sinking is specified by VCOM. |
+        +-----------------------------+------------------------------------------------------------+
+        | TerminationMode.VTERM       | Specifies that, for non-drive pin states (L, H, X, V, M, E)
+                                        , the pin driver terminates the pin to the configured VTERM voltage through a 50 Ω impedance. VTERM is adjustable to allow for the pin to terminate at a set level. This is useful for instruments that might operate incorrectly if an instrument pin is unterminated and is allowed to float to any voltage level within the instrument voltage range. To address this issue, enable VTERM by configuring the VTERM pin level to the desired voltage and selecting the VTERM termination mode. Setting VTERM to 0 V and selecting the VTERM termination mode has the effect of connecting a 50 Ω termination to ground, which provides an effective 50 Ω impedance for the pin. This can be useful for improving signal integrity of certain DUTs by reducing reflections while the DUT drives the pin.                              |
+        +-----------------------------+------------------------------------------------------------+
+        | TerminationMode.HIGH_Z      | Specifies that, for non-drive pin states (L, H, X, V, M, E)
+                                        , the pin driver is put in a high-impedance state and the active load is disabled.                                   |
+        +-----------------------------+------------------------------------------------------------+
+        """
         self._channels_session.termination_mode = termination_mode
 
     def cs_configure_time_set_compare_edge_per_pin(
@@ -406,6 +477,14 @@ class _NIDigitalSSC:
             self._channels_session.configure_time_set_compare_edges_strobe(time_set, compare_strobe)
 
     def cs_configure_time_set_compare_edge(self, time_set: str, compare_strobe: float):
+        """
+        Configures the strobe edge time for the specified pins. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+
+        Args:
+            time_set (str): The specified time set name.
+
+            compare_strobe (float in seconds): Time when the comparison happens within a vector period.
+        """
         self._channels_session.configure_time_set_compare_edges_strobe(time_set, compare_strobe)
         # End of Source and Capture Waveforms #
 
@@ -434,9 +513,17 @@ class _NIDigitalSSC:
 
     def cs_write_static(self, state: enums.WriteStaticPinState, auto_select=True):
         """
-        auto_select=True, specifies this function to configure the output function as digital automatically.
-        auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
-        Without configuring as digital and auto_select as false, this function will not work as expected.
+        Writes a static state to the specified pins. The selected pins remain in the specified state until the next pattern burst or call to this method. If there are uncommitted changes to levels or the termination mode, this method commits the changes to the pins. This method does not change the selected pin method. If you write a static state to a pin that does not have the Digital method selected, the new static state is stored by the instrument, and affects the state of the pin the next time you change the selected method to Digital.
+
+        Args:
+            per_site_per_pin_state (typing.List[typing.List[enums.WriteStaticPinState]]): Parameter that specifies one of the following digital states to assign to each pin per site.
+
+                -   WriteStaticPinState.ZERO: Specifies to drive low.
+                -   WriteStaticPinState.ONE: Specifies to drive high.
+                -   WriteStaticPinState.X: Specifies to not drive.
+
+            auto_select=True, specifies this function to configure the output function as digital automatically. auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
+            Without configuring as digital and auto_select as false, this function will not work as expected.
         """
         if auto_select:
             self.cs_select_function(enums.SelectedFunction.DIGITAL)
@@ -467,9 +554,40 @@ class _NIDigitalSSC:
 
     # Trigger #
     def cs_clear_start_trigger_signal(self):
+        """
+        Disables the Start trigger. Pattern bursting starts immediately after you call the init method or the burst_pattern method.
+        """
         self._session.start_trigger_type = enums.TriggerType.NONE
 
     def cs_configure_trigger_signal(self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING):
+        """
+        Specifies the source terminal for the Start trigger. configures the start_trigger_type property as Digital Edge.
+        
+        Args:
+            source (str): You can specify source terminals in one of two ways. If the digital pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0. The source terminal can also be a terminal from another device, in which case the NI-Digital Pattern Driver automatically finds a route (if one is available) from that terminal to the input terminal (going through a physical PXI backplane trigger line). For example, you can set the source terminal on Dev1 to be /Dev2/StartTrigger.
+
+            +-----------------+--------------------+
+            | Defined Values: |                    |
+            +=================+====================+
+            | PXI_Trig0       | PXI trigger line 0 |
+            +-----------------+--------------------+
+            | PXI_Trig1       | PXI trigger line 1 |
+            +-----------------+--------------------+
+            | PXI_Trig2       | PXI trigger line 2 |
+            +-----------------+--------------------+
+            | PXI_Trig3       | PXI trigger line 3 |
+            +-----------------+--------------------+
+            | PXI_Trig4       | PXI trigger line 4 |
+            +-----------------+--------------------+
+            | PXI_Trig5       | PXI trigger line 5 |
+            +-----------------+--------------------+
+            | PXI_Trig6       | PXI trigger line 6 |
+            +-----------------+--------------------+
+            | PXI_Trig7       | PXI trigger line 7 |
+            +-----------------+--------------------+
+
+            edge (enums.DigitalEdge, optional): rising or falling edge. Defaults to enums.DigitalEdge.RISING.
+        """
         self._session.digital_edge_start_trigger_source = source
         self._session.digital_edge_start_trigger_edge = edge
 
@@ -505,7 +623,6 @@ class _NIDigitalSSC:
     def cs_ppmu_source(self):
         """
         Starts sourcing voltage or current from the PPMU. This method automatically selects the PPMU method. Changes to PPMU source settings do not take effect until you call this method. If you modify source settings after you call this method, you must call this method again for changes in the configuration to take effect.
-
         """
         self._channels_session.ppmu_source()
 
@@ -600,13 +717,27 @@ class _NIDigitalSSC:
 
 
 class _NIDigitalTSM:
+    """
+    class to store session site channels 
 
+    Returns:
+        ssc_object: class to store session site object
+    """
     # SSC Digital array or list #
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDigitalSSC]):
+        """"
+        constructor method for digital sessions class object
+        """
         self._sscs = sessions_sites_channels
 
     @property
     def sessions_sites_channels(self):
+        """
+        returns the list of sessions in the current context
+
+        Returns:
+            sessions : digital sessions of all instrument in the context
+        """
         return self._sscs
 
     # Clock Generation #
@@ -736,6 +867,24 @@ class _NIDigitalTSM:
         number_of_samples_is_finite: bool = True,
         buffer_size_per_site: int = 32000,
     ):
+        """
+        Configures which cycles History RAM acquires after the trigger conditions are met. If you configure History RAM to only acquire failed cycles, you must set the pretrigger samples for History RAM to 0.
+        Args:
+            cycles_to_acquire (enums.HistoryRAMCyclesToAcquire, optional): see the below table for details. Defaults to enums.HistoryRAMCyclesToAcquire.FAILED.
+        +----------------------------------+------------------------------------------------------+
+        | Defined Values:                  |                                                      |
+        +==================================+======================================================+
+        | HistoryRAMCyclesToAcquire.FAILED | Only acquires cycles that fail a compare after the 
+                                             triggering conditions are met.                       |
+        +----------------------------------+------------------------------------------------------+
+        | HistoryRAMCyclesToAcquire.ALL    | Acquires all cycles after the triggering conditions    
+                                             are met.                                             |
+        +----------------------------------+------------------------------------------------------+
+            pretrigger_samples (int, optional): number of pretrigger samples to acquire. Defaults to 0.
+            max_samples_to_acquire_per_site (int, optional): maximum number of samples to acquire. Defaults to 8191.
+            number_of_samples_is_finite (bool, optional): finite or infinite number of samples. Defaults to True.
+            buffer_size_per_site (int, optional): buffer size per site. Defaults to 32000.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_hram_settings(
                 cycles_to_acquire,
@@ -753,10 +902,37 @@ class _NIDigitalTSM:
         cycle_offset: int = 0,
         vector_offset: int = 0,
     ):
+        """
+        Specifies the type of trigger condition on which History RAM starts acquiring pattern information.
+        Args:
+            triggers_type (enums.HistoryRAMTriggerType): _description_
+        +-------------------------------------+--------------------------------------------------+
+        | Defined Values:                     |                                                  |
+        +=====================================+==================================================+
+        | HistoryRAMTriggerType.FIRST_FAILURE | Starts acquiring pattern information in History
+                                                RAM on the first failed cycle in a pattern burst.|
+        +-------------------------------------+--------------------------------------------------+
+        | HistoryRAMTriggerType.CYCLE_NUMBER  | Starts acquiring pattern information in History RAM 
+                                                starting from a specified cycle number.          |
+        +-------------------------------------+--------------------------------------------------+
+        | HistoryRAMTriggerType.PATTERN_LABEL | Starts acquiring pattern information in History RAM 
+                                                starting from a specified pattern label, augmented by vector and cycle offsets.                      |
+        +-------------------------------------+---------------------------------------------------+
+            cycle_number (int, optional): cycle number at which trigger happens. Defaults to 0.
+            pattern_label (str, optional): pattern label in which trigger happens. Defaults to "".
+            cycle_offset (int, optional): cycle offset in the pattern. Defaults to 0.
+            vector_offset (int, optional): vector offset in the pattern. Defaults to 0.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_hram_trigger(triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset)
 
     def configure_hram(self, hram_configuration: HRAMConfiguration = HRAMConfiguration()):
+        """
+        Configures the History RAM trigger and acqusition settings
+
+        Args:
+            hram_configuration (HRAMConfiguration, optional): All HRAM settings in a single object. Defaults to HRAMConfiguration().
+        """
         number_of_samples_is_finite = hram_configuration.finite_samples
         cycles_to_acquire = hram_configuration.cycles_to_acquire
         pretrigger_samples = hram_configuration.pretrigger_samples
@@ -932,6 +1108,9 @@ class _NIDigitalTSM:
 
     # Pattern Actions #
     def abort(self):
+        """
+        Stops bursting the pattern.
+        """
         for ssc in self._sscs:
             ssc.cs_abort()
 
@@ -961,6 +1140,20 @@ class _NIDigitalTSM:
         timeout: float = 10,
         wait_until_done: bool = True,
     ):
+        """
+        Uses the start_label you specify to burst the pattern. Waits for the burst to complete if wait_until_done is True with a default timeout of 10 seconds.
+
+        Digital pins retain their state at the end of a pattern burst until the first vector of the pattern burst, a call to write_static, or a call to apply_levels_and_timing.
+
+        Args:
+            start_label (str): Pattern name or exported pattern label from which to start bursting the pattern.
+
+            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital method for the pins in the pattern prior to bursting. Defaults to True.
+
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error.Defaults to 10.
+
+            wait_until_done (bool, optional): A Boolean that indicates whether to wait until the bursting is complete. Defaults to True.
+        """
         for ssc in self._sscs:
             ssc.ps_burst_pattern(start_label, select_digital_function, timeout, wait_until_done)
 
@@ -987,6 +1180,12 @@ class _NIDigitalTSM:
         return per_instrument_pass
 
     def wait_until_done(self, timeout: float = 10):
+        """
+        Waits until the pattern burst has completed or the timeout has expired.
+
+        Args:
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error. Defaults to 10 seconds.
+        """
         for ssc in self._sscs:
             ssc.cs_wait_until_done(timeout)
 
@@ -994,6 +1193,14 @@ class _NIDigitalTSM:
 
     # Pin Levels and Timing #
     def apply_levels_and_timing(self, levels_sheet: str, timing_sheet: str):
+        """
+        Applies digital levels and timing values defined in previously loaded levels and timing sheets. When applying a levels sheet, only the levels specified in the sheet are affected. Any levels not specified in the sheet remain unchanged. When applying a timing sheet, all existing time sets are deleted before the new time sets are loaded.
+
+        Args:
+            levels_sheet (str): Name of the levels sheet to apply. Use the name of the sheet or pass the absolute file path you use in the load_specifications_levels_and_timing method. The name of the levels sheet is the file name without the directory and file extension.
+
+            timing_sheet (str): Name of the timing sheet to apply. Use the name of the sheet or pass the absolute file path that you use in the load_specifications_levels_and_timing method. The name of the timing sheet is the file name without the directory and file extension.
+        """
         for ssc in self._sscs:
             ssc._session.sites[ssc._pins].apply_levels_and_timing(levels_sheet, timing_sheet)
 
@@ -1083,6 +1290,23 @@ class _NIDigitalTSM:
             ssc.cs_configure_single_level(level_type_to_set, setting)
 
     def configure_termination_mode(self, termination_mode: enums.TerminationMode):
+        """
+        Specifies the behavior of the pin during non-drive cycles.
+        Args:
+            termination_mode (enums.TerminationMode) : value defined as per the table below
+        +-----------------------------+------------------------------------------------------------+
+        | Defined Values:             |                                                            |
+        +=============================+============================================================+
+        | TerminationMode.ACTIVE_LOAD | Specifies that, for non-drive pin states (L, H, X, V, M, E)
+                                        ,the active load is connected and the instrument sources or sinks a defined amount of current to load the DUT. The amount of current sourced by the instrument and therefore sunk by the DUT is specified by IOL. The amount of current sunk by the instrument and therefore sourced by the DUT is specified by IOH. The voltage at which the instrument changes between sourcing and sinking is specified by VCOM. |
+        +-----------------------------+------------------------------------------------------------+
+        | TerminationMode.VTERM       | Specifies that, for non-drive pin states (L, H, X, V, M, E)
+                                        , the pin driver terminates the pin to the configured VTERM voltage through a 50 Ω impedance. VTERM is adjustable to allow for the pin to terminate at a set level. This is useful for instruments that might operate incorrectly if an instrument pin is unterminated and is allowed to float to any voltage level within the instrument voltage range. To address this issue, enable VTERM by configuring the VTERM pin level to the desired voltage and selecting the VTERM termination mode. Setting VTERM to 0 V and selecting the VTERM termination mode has the effect of connecting a 50 Ω termination to ground, which provides an effective 50 Ω impedance for the pin. This can be useful for improving signal integrity of certain DUTs by reducing reflections while the DUT drives the pin.                              |
+        +-----------------------------+------------------------------------------------------------+
+        | TerminationMode.HIGH_Z      | Specifies that, for non-drive pin states (L, H, X, V, M, E)
+                                        , the pin driver is put in a high-impedance state and the active load is disabled.                                   |
+        +-----------------------------+------------------------------------------------------------+
+        """
         for ssc in self._sscs:
             ssc.cs_configure_termination_mode(termination_mode)
 
@@ -1120,10 +1344,29 @@ class _NIDigitalTSM:
                 ssc._session.channels[channel].configure_time_set_compare_edges_strobe(time_set, compare_strobe)
 
     def configure_time_set_compare_edge(self, time_set: str, compare_strobe: float):
+        """
+        Configures the strobe edge time for the specified pins. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+
+        Args:
+            time_set (str): The specified time set name.
+
+            compare_strobe (float in seconds): Time when the comparison happens within a vector period.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_time_set_compare_edge(time_set, compare_strobe)
 
     def configure_time_set_period(self, time_set: str, period: float):
+        """
+        Configures the period of a time set. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+
+        Args:
+            time_set_name (str): The specified time set name.
+
+            period (hightime.timedelta, datetime.timedelta, or float in seconds): Period for this time set, in seconds.
+
+        Returns:
+            period (float): configured period for this time set, in seconds
+        """
         configured_period = period
         if configured_period > 40e-6:
             configured_period = 40e-6
@@ -1287,12 +1530,52 @@ class _NIDigitalTSM:
 
     # Sequencer Flags and Registers #
     def read_sequencer_flag(self, sequencer_flag: enums.SequencerFlag):
+        """
+        Reads the state of a pattern sequencer flag. Use pattern sequencer flags to coordinate execution between the pattern sequencer and a runtime test program.
+
+        Args:
+            sequencer_flag (enums.SequencerFlag): The pattern sequencer flag you want to read.
+
+                -   SequencerFlag.FLAG0 ("seqflag0"): Reads pattern sequencer flag 0.
+                -   SequencerFlag.FLAG1 ("seqflag1"): Reads pattern sequencer flag 1.
+                -   SequencerFlag.FLAG2 ("seqflag2"): Reads pattern sequencer flag 2.
+                -   SequencerFlag.FLAG3 ("seqflag3"): Reads pattern sequencer flag 3.
+
+        Returns:
+            values (list of bool): A Boolean that indicates the state of the pattern sequencer flag you specify from different instrument sessions.
+        """
         per_instrument_state: typing.List[bool] = []
         for ssc in self._sscs:
             per_instrument_state.append(ssc._session.read_sequencer_flag(sequencer_flag))
         return per_instrument_state
 
     def read_sequencer_register(self, sequencer_register: enums.SequencerRegister):
+        """
+        Reads the value of a pattern sequencer register. Use pattern sequencer registers to pass numeric values between the pattern sequencer and a runtime test program. For example, you can use this method to read a register modified by the write_reg opcode during a pattern burst.
+
+        Args:
+            sequencer_register (enums.SequencerRegister): The sequencer register to read from.
+
+                -   SequencerRegister.REGISTER0 ("reg0"): Reads sequencer register 0.
+                -   SequencerRegister.REGISTER1 ("reg1"): Reads sequencer register 1.
+                -   SequencerRegister.REGISTER2 ("reg2"): Reads sequencer register 2.
+                -   SequencerRegister.REGISTER3 ("reg3"): Reads sequencer register 3.
+                -   SequencerRegister.REGISTER4 ("reg4"): Reads sequencer register 4.
+                -   SequencerRegister.REGISTER5 ("reg5"): Reads sequencer register 5.
+                -   SequencerRegister.REGISTER6 ("reg6"): Reads sequencer register 6.
+                -   SequencerRegister.REGISTER7 ("reg7"): Reads sequencer register 7.
+                -   SequencerRegister.REGISTER8 ("reg8"): Reads sequencer register 8.
+                -   SequencerRegister.REGISTER9 ("reg9"): Reads sequencer register 9.
+                -   SequencerRegister.REGISTER10 ("reg10"): Reads sequencer register 10.
+                -   SequencerRegister.REGISTER11 ("reg11"): Reads sequencer register 11.
+                -   SequencerRegister.REGISTER12 ("reg12"): Reads sequencer register 12.
+                -   SequencerRegister.REGISTER13 ("reg13"): Reads sequencer register 13.
+                -   SequencerRegister.REGISTER14 ("reg14"): Reads sequencer register 14.
+                -   SequencerRegister.REGISTER15 ("reg15"): Reads sequencer register 15.
+
+        Returns:
+            values (list of int): Value read from the sequencer register from different instrument sessions.
+        """
         per_instrument_register_values: typing.List[int] = []
         for ssc in self._sscs:
             per_instrument_register_values.append(ssc._session.read_sequencer_register(sequencer_register))
@@ -1303,6 +1586,19 @@ class _NIDigitalTSM:
         sequencer_flag: enums.SequencerFlag,
         state: bool = True,
     ):
+        """
+        Writes the state of a pattern sequencer flag. Use pattern sequencer flags to coordinate execution between the pattern sequencer and a runtime test program.
+
+        Args:
+            sequencer_flag (enums.SequencerFlag): The pattern sequencer flag to write.
+
+                -   SequencerFlag.FLAG0 ("seqflag0"): Writes pattern sequencer flag 0.
+                -   SequencerFlag.FLAG1 ("seqflag1"): Writes pattern sequencer flag 1.
+                -   SequencerFlag.FLAG2 ("seqflag2"): Writes pattern sequencer flag 2.
+                -   SequencerFlag.FLAG3 ("seqflag3"): Writes pattern sequencer flag 3.
+
+            state (bool, optional): A Boolean that assigns a state to the pattern sequencer flag you specify.Defaults to True.
+        """
         for ssc in self._sscs:
             ssc._session.write_sequencer_flag(sequencer_flag, state)
 
@@ -1311,6 +1607,31 @@ class _NIDigitalTSM:
         sequencer_register: enums.SequencerRegister,
         value: int = 0,
     ):
+        """
+        Writes a value to a pattern sequencer register. Use pattern sequencer registers to pass numeric values between the pattern sequencer and a runtime test program.
+
+        Args:
+            sequencer_register (enums.SequencerRegister): The sequencer register you want to write to.
+
+                -   SequencerRegister.REGISTER0 ("reg0"): Writes sequencer register 0.
+                -   SequencerRegister.REGISTER1 ("reg1"): Writes sequencer register 1.
+                -   SequencerRegister.REGISTER2 ("reg2"): Writes sequencer register 2.
+                -   SequencerRegister.REGISTER3 ("reg3"): Writes sequencer register 3.
+                -   SequencerRegister.REGISTER4 ("reg4"): Writes sequencer register 4.
+                -   SequencerRegister.REGISTER5 ("reg5"): Writes sequencer register 5.
+                -   SequencerRegister.REGISTER6 ("reg6"): Writes sequencer register 6.
+                -   SequencerRegister.REGISTER7 ("reg7"): Writes sequencer register 7.
+                -   SequencerRegister.REGISTER8 ("reg8"): Writes sequencer register 8.
+                -   SequencerRegister.REGISTER9 ("reg9"): Writes sequencer register 9.
+                -   SequencerRegister.REGISTER10 ("reg10"): Writes sequencer register 10.
+                -   SequencerRegister.REGISTER11 ("reg11"): Writes sequencer register 11.
+                -   SequencerRegister.REGISTER12 ("reg12"): Writes sequencer register 12.
+                -   SequencerRegister.REGISTER13 ("reg13"): Writes sequencer register 13.
+                -   SequencerRegister.REGISTER14 ("reg14"): Writes sequencer register 14.
+                -   SequencerRegister.REGISTER15 ("reg15"): Writes sequencer register 15.
+
+            value (int, optional): The value you want to write to the register. Defaults to 0.
+        """
         for ssc in self._sscs:
             ssc._session.write_sequencer_register(sequencer_register, value)
 
@@ -1349,6 +1670,16 @@ class _NIDigitalTSM:
         expand_to_minimum_size: bool = False,
         minimum_size: int = 128,
     ):
+        """
+        Writes the same waveform data to all sites. Use this write method if you set the data_mapping parameter of the create source waveform method to SourceDataMapping.BROADCAST.
+
+        Args:
+            waveform_name (str): The name to assign to the waveform. Use the waveform_name  with source_start opcode in your pattern.
+
+            waveform_data (list of int): 1D array of samples to use as source data to apply to all sites.
+            expand_to_minimum_size (bool, optional): decides to expand the waveform data or not. Defaults to False.
+            minimum_size (int, optional): minimum size to expand the waveform data. Defaults to 128.
+        """
         if minimum_size > len(waveform_data) and expand_to_minimum_size:
             initialized_array = [0 for _ in range(minimum_size)]
             for i in range(len(waveform_data)):
@@ -1413,39 +1744,103 @@ class _NIDigitalTSM:
 
     def write_static(self, state: enums.WriteStaticPinState, auto_select=True):
         """
-        auto_select=True, specifies this function to configure the output function as digital automatically.
-        auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
-        Without configuring as digital and auto_select as false, this function will not work as expected.
+        Writes a static state to the specified pins. The selected pins remain in the specified state until the next pattern burst or call to this method. If there are uncommitted changes to levels or the termination mode, this method commits the changes to the pins. This method does not change the selected pin method. If you write a static state to a pin that does not have the Digital method selected, the new static state is stored by the instrument, and affects the state of the pin the next time you change the selected method to Digital.
+
+        Args:
+            state (enums.WriteStaticPinState): Parameter that specifies one of the following digital states to assign to each pin per site.
+
+                -   WriteStaticPinState.ZERO: Specifies to drive low.
+                -   WriteStaticPinState.ONE: Specifies to drive high.
+                -   WriteStaticPinState.X: Specifies to not drive.
+
+            auto_select=True, specifies this function to configure the output function as digital automatically.auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().Without configuring as digital and auto_select as false, this function will not work as expected.
         """
         for ssc in self._sscs:
             ssc.cs_write_static(state, auto_select)
 
     def write_static_per_site_per_pin(
         self,
-        per_site_per_pin_state: typing.List[typing.List[enums.WriteStaticPinState]],
+        per_site_per_pin_state: typing.List[typing.List[enums.WriteStaticPinState]], auto_select=True
     ):
+        """
+        Writes a static state to the specified pins per site per pin. The selected pins remain in the specified state until the next pattern burst or call to this method. If there are uncommitted changes to levels or the termination mode, this method commits the changes to the pins. This method does not change the selected pin method. If you write a static state to a pin that does not have the Digital method selected, the new static state is stored by the instrument, and affects the state of the pin the next time you change the selected method to Digital.
+
+        Args:
+            per_site_per_pin_state (typing.List[typing.List[enums.WriteStaticPinState]]): Parameter that specifies one of the following digital states to assign to each pin per site.
+
+                -   WriteStaticPinState.ZERO: Specifies to drive low.
+                -   WriteStaticPinState.ONE: Specifies to drive high.
+                -   WriteStaticPinState.X: Specifies to not drive.
+            auto_select=True, specifies this function to configure the output function as digital automatically.auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().Without configuring as digital and auto_select as false, this function will not work as expected.
+        """
         for ssc, states in zip(self._sscs, per_site_per_pin_state):
             channels, _, _ = _channel_list_to_pins(ssc._channels)
             for channel, state in zip(channels, states):
+                if auto_select:
+                    ssc._session.channels[channel].select_function(enums.SelectedFunction.DIGITAL)
                 ssc._session.channels[channel].write_static(state)
 
     def write_static_per_site(
         self,
-        per_site_state: typing.List[typing.List[enums.WriteStaticPinState]],
+        per_site_state: typing.List[typing.List[enums.WriteStaticPinState]], auto_select=True
     ):
+        """
+        Writes a static state per site. The selected pins remain in the specified state until the next pattern burst or call to this method. If there are uncommitted changes to levels or the termination mode, this method commits the changes to the pins. This method does not change the selected pin method. If you write a static state to a pin that does not have the Digital method selected, the new static state is stored by the instrument, and affects the state of the pin the next time you change the selected method to Digital.
+
+        Args:
+            per_site_state (typing.List[typing.List[enums.WriteStaticPinState]]): Parameter that specifies one of the following digital states to assign to each pin per site.
+
+                -   WriteStaticPinState.ZERO: Specifies to drive low.
+                -   WriteStaticPinState.ONE: Specifies to drive high.
+                -   WriteStaticPinState.X: Specifies to not drive.
+            auto_select=True, specifies this function to configure the output function as digital automatically.auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().Without configuring as digital and auto_select as false, this function will not work as expected.
+        """
         for ssc, states in zip(self._sscs, per_site_state):
             channel_list_array, _, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
             for channel, state in zip(channel_list_array, states):
+                if auto_select:
+                    ssc._session.channels[channel].select_function(enums.SelectedFunction.DIGITAL)
                 ssc._session.channels[channel].write_static(state)
         # End of Static #
 
         # Trigger #
 
     def clear_start_trigger_signal(self):
+        """
+        Disables the Start trigger. Pattern bursting starts immediately after you call the init method or the burst_pattern method.
+        """
         for ssc in self._sscs:
             ssc.cs_clear_start_trigger_signal()
 
     def configure_trigger_signal(self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING):
+        """
+        Specifies the source terminal for the Start trigger. configures the start_trigger_type property as Digital Edge.
+        
+        Args:
+            source (str): You can specify source terminals in one of two ways. If the digital pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0. The source terminal can also be a terminal from another device, in which case the NI-Digital Pattern Driver automatically finds a route (if one is available) from that terminal to the input terminal (going through a physical PXI backplane trigger line). For example, you can set the source terminal on Dev1 to be /Dev2/StartTrigger.
+
+            +-----------------+--------------------+
+            | Defined Values: |                    |
+            +=================+====================+
+            | PXI_Trig0       | PXI trigger line 0 |
+            +-----------------+--------------------+
+            | PXI_Trig1       | PXI trigger line 1 |
+            +-----------------+--------------------+
+            | PXI_Trig2       | PXI trigger line 2 |
+            +-----------------+--------------------+
+            | PXI_Trig3       | PXI trigger line 3 |
+            +-----------------+--------------------+
+            | PXI_Trig4       | PXI trigger line 4 |
+            +-----------------+--------------------+
+            | PXI_Trig5       | PXI trigger line 5 |
+            +-----------------+--------------------+
+            | PXI_Trig6       | PXI trigger line 6 |
+            +-----------------+--------------------+
+            | PXI_Trig7       | PXI trigger line 7 |
+            +-----------------+--------------------+
+
+            edge (enums.DigitalEdge, optional): rising or falling edge. Defaults to enums.DigitalEdge.RISING.
+        """
         for ssc in self._sscs:
             ssc.cs_configure_trigger_signal(source, edge)
 
@@ -1473,11 +1868,7 @@ class _NIDigitalTSM:
         | PXI_Trig7       | PXI trigger line 7 |
         +-----------------+--------------------+
         Args:
-                signal_id (str): pxi trigger line name
-                terminal (str, optional): _description_. Defaults to "".
-
-        Args:
-            signal_id (str): _description_
+            signal_id (str): pxi trigger line name
             output_terminal (str, optional): _description_. Defaults to "".
         """
         for ssc in self._sscs:
@@ -1652,6 +2043,9 @@ class _NIDigitalTSM:
 
 
 class TSMDigital:
+    """
+    class that stores TSMDigital operations
+    """
     def __init__(
         self,
         pin_query_context: typing.Any,
@@ -1681,7 +2075,7 @@ class TSMDigital:
             list [ list[float]]: measurement frequencies per site per pin
 
         Returns:
-            _type_: _description_
+            per_site_per_pin_frequency_measurements: list of list of float
         """
         initialized_array = [[0.0 for _ in self.pins] for _ in self.sites]
         per_instrument_to_per_site_per_pin_lut = self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
@@ -2431,7 +2825,7 @@ def _channel_list_to_pins(channel_list: str):
     private function for converting the channel list to channels, pins and sites .
 
     Args:
-        channel_list (str): _description_
+        channel_list (str): comma seperated list of channels
 
     Returns:
         channels, pins and sites: string list of channels, Pins and sites

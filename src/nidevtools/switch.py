@@ -50,9 +50,7 @@ class MultipleSessions:
     def __init__(self, sessions: typing.List[Session]):
         self.Sessions = sessions
 
-    def action_session_info(
-        self, route_value: str = "", action: Action = Action.Disconnect, timeout: int = 40
-    ):
+    def action_session_info(self, route_value: str = "", action: Action = Action.Disconnect, timeout: int = 40):
         read_path_capability = []
         for session in self.Sessions:
             data = session.info(route_value, action, timeout)
@@ -74,9 +72,7 @@ def get_all_instruments_names(tsm: SMContext):
     Returns:
         tulple : instrument_names, channel_group_ids
     """
-    instrument_names, channel_group_ids, channel_lists = tsm.get_custom_instrument_names(
-        instrument_type_id
-    )
+    instrument_names, channel_group_ids, channel_lists = tsm.get_custom_instrument_names(instrument_type_id)
     return instrument_names, channel_group_ids
 
 
@@ -109,15 +105,13 @@ def pin_to_sessions_session_info(tsm: SMContext, pin: str = ""):
 
 
 @nitsm.codemoduleapi.code_module
-def set_sessions(
-    tsm: SMContext, switch_name: str, session: niswitch.Session, channel_group_id: str
-):
+def set_sessions(tsm: SMContext, switch_name: str, session: niswitch.Session, channel_group_id: str):
     """
     Adds the session to the list of switch sessions in tsm context
 
     Args:
         tsm (SMContext): Semiconductor module Reference from the TestStand.
-        switch_name (str): name of the switch 
+        switch_name (str): name of the switch
         session (niswitch.Session): session created fo the switch
         channel_group_id (str): unique id of the channel group
     """
@@ -128,7 +122,7 @@ def set_sessions(
 def close_sessions(tsm: SMContext):
     """
     closes all the session associated with the switch drivers
-    in the semiconductor module context. 
+    in the semiconductor module context.
 
 
     Args:
@@ -170,7 +164,8 @@ def name_to_topology(name: str = ""):
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm: SMContext):
     """
-    open sessions for all switch instrument channels that are defined in the pinmap associated with the tsm context
+    open sessions for all switch instrument channels that are defined in the pinmap associated with
+     the tsm context
 
     Args:
         tsm (SMContext): TestStand semiconductor module context

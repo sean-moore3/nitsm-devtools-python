@@ -17,9 +17,6 @@ class _NIFGenSSC:
     _Site specific _Session and _Channel.
     Each object of this class is used to store info for a specified pin under specific Site.
     To store a _Session and _Channel(s) for different _Site(s) you need an array of this class object.
-    """
-
-    """
     Prefix cs is used in all methods that operates on a given channels in a session. 
     These are for internal use only and can be changed any time. 
     External module should not use these methods with prefix 'cs_' directly.  
@@ -175,6 +172,12 @@ class _NIFGenTSM:
 
 
 class TSMFGen(typing.NamedTuple):
+    """
+    Class to store the FGen TSM object for the given set of pins
+
+    Args:
+        typing (tuple): pin_query_context, SSC, sites
+    """
     pin_query_context: typing.Any
     ssc: _NIFGenTSM
     sites: typing.List[int]
