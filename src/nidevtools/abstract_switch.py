@@ -28,10 +28,7 @@ StringTuple = typing.Tuple[str]
 
 class Control(enum.Enum):
     """
-    control actions for abstract switch
-
-    Args:
-        enum : Inherits from enum class.
+    control actions for abstract switch Inherits from enum class.
     """
 
     get_connections = 0
@@ -56,12 +53,15 @@ class Session:
         status: str,
     ):
         """
-        Constructor method for switch session class. This stores the enable pin details.
+        Constructor method for switch session class. This class stores enable pin details.
 
         Args:
-            enable_pin (str): The Enable pin in the pinmap file which has prefix En_ for which the session is created.
-            instrument_type (typing.Union[InstrumentTypes, str]): digital or daqmx or switch instrument used in the routes.
-            route_value (str): comma seperated list of pins with values to set in order to connect the desired path
+            enable_pin (str): Enable pin in the pinmap file which has prefix En_ for which the
+            session is created.
+            instrument_type (typing.Union[InstrumentTypes, str]): digital or daqmx or switch
+            instrument used in the routes.
+            route_value (str): comma separated list of pins with values to set in order to connect
+            the desired path
             site (int): site for which this needs to executed
             status (str): connect or disconnect status
         """
@@ -73,7 +73,7 @@ class Session:
 
     def ss_connect(self, tsm: SMContext):
         """
-        connects to make desired electrical path specificed in the route attribute of the pinmap file
+        connects to make desired electrical path specified in the route attribute of the pinmap file
 
         Args:
             tsm (SMContext): TestStand semiconductor module context
@@ -149,7 +149,7 @@ class Session:
 
     def ss_read_state(self, tsm: SMContext):
         """
-        reads the current state of the swtiches of the switch object
+        reads the current state of the switches of the switch object
 
         Args:
             tsm (SMContext): TestStand semiconductor module context
@@ -192,12 +192,8 @@ class Session:
 
 class AbstractSession(typing.NamedTuple):
     """
-    Abstract Session class to store pin specific sessions
-
-    Args:
-        enable_pins: typing.List[Session]
+    Abstract Session class to store pin specific sessions. enable_pins are prefixed with "en_".
     """
-
     enable_pins: typing.List[Session]
 
     def set_sessions(self, tsm: SMContext, switch_name: str = ""):  # CHECK
@@ -308,8 +304,8 @@ def disconnect_pin(tsm: SMContext, pin: str):
 
 def initialize(tsm: SMContext):  # CHECK
     """
-    Initialize the TSM context with all the Abstract switch sessions. Based on the instrument type it will create
-    session to individual drivers. so it is essential to
+    Initialize the TSM context with all the Abstract switch sessions. Based on the instrument type it
+    will create session to individual drivers. so it is essential to define the route in pinmap.
     Args:
         tsm: TSM context where the sessions will be initialized
     """
@@ -440,10 +436,10 @@ def pin_name_to_instrument(pinmap_path: str = ""):
     """
     tree = Et.parse(pinmap_path)
     connections = get_first_matched_node(tree, "Connections")
-    pingroups = get_first_matched_node(tree, "PinGroups")
+    pin_groups = get_first_matched_node(tree, "PinGroups")
     connection = get_all_matched_nodes(connections, "Connection")
-    multiplexedconnection = get_all_matched_nodes(connections, "MultiplexedConnection")
-    pingroup = get_all_matched_nodes(pingroups, "PinGroup")
+    multiplexed_connection = get_all_matched_nodes(connections, "MultiplexedConnection")
+    pin_group = get_all_matched_nodes(pin_groups, "PinGroup")
     subarray1 = []
     subarray2 = []
     for element in connection:
@@ -457,7 +453,7 @@ def pin_name_to_instrument(pinmap_path: str = ""):
         ]
         subarray1.append(var1)
     subarray21 = []
-    for element in multiplexedconnection:
+    for element in multiplexed_connection:
         dut_route = get_all_matched_nodes(element, "MultiplexedDUTPinRoute")
         subarray21 = []
         for j in dut_route:
@@ -465,7 +461,7 @@ def pin_name_to_instrument(pinmap_path: str = ""):
                 [j.attrib["pin"], element.attrib["instrument"], element.attrib["channel"]]
             )
     subarray22 = []
-    for element in pingroup:
+    for element in pin_group:
         reference = get_all_matched_nodes(element, "PinReference")
         subarray22_e = [element.attrib["name"] + "_DUT"]
         for j in reference:

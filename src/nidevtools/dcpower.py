@@ -102,7 +102,7 @@ class CustomTransientResponse:
         self, gain_bandwidth: float, compensation_frequency: float, pole_zero_ratio: float
     ):
         """
-        constructor for storing custom trasient response
+        constructor for storing custom transient response
 
         Args:
             gain_bandwidth (float): gain bandwidth is stored as floating point number
@@ -935,7 +935,7 @@ class _NIDCPowerSSC:
         """
         Specifies whether the output relay is connected (closed) or disconnected (open). The output_enabled property does not change based on this property; they are independent of each other.
         about supported devices.
-        Set this property to False to disconnect the output terminal from the output.
+        Set this property to False inorder to disconnect the output terminal from the output.
         to the output terminal might discharge unless the relay is disconnected. Excessive connecting and disconnecting of the output can cause premature wear on the relay.
 
         Note: Only disconnect the output when disconnecting is necessary for your application. For example, a battery connected
@@ -948,12 +948,15 @@ class _NIDCPowerSSC:
     def cs_configure_output_enabled(self, output_enabled=False):
         """
         Specifies whether the output is enabled (True) or disabled (False).
-        Depending on the value you specify for the output_function property, you also must set the voltage level or current level in addition to enabling the output
-        the initiate method. Refer to the Programming States topic in the NI DC Power Supplies and SMUs Help for more information about NI-DCPower programming states.
-        Default Value: The default value is True if you use the __init__ method to open the session. Otherwise the default value is False, including when you use a calibration session or the deprecated programming model.
+        Depending on the value you specify for the output_function property, you also must set the
+        voltage level or current level in addition to enabling the output the initiate method.
+        Refer to the Programming States topic in the NI DC Power Supplies and SMUs Help for more
+        information about NI-DCPower programming states. Default Value: The default value is True
+        if you use the __init__ method to open the session. Otherwise, the default value is False,
+        including when you use a calibration session or the deprecated programming model.
 
-        Note: If the session is in the Committed or Uncommitted states, enabling the output does not take effect until you call
-
+        Note: If the session is in the Committed or Uncommitted states, enabling the output does
+        not take effect until you call the Init session
 
         Args:
             output_enabled (bool, optional): selects the output to be enabled or not. Defaults to False.
@@ -1132,7 +1135,7 @@ class _NIDCPowerSSC:
 
         The session monitors whether each type of event has occurred at least
         once since the last time this method or the initiate
-        method were called. If an event has only been generated once and you
+        method were called. If an event has only been generated once, and you
         call this method successively, the method times out. Individual
         events must be generated between separate calls of this method.
 
@@ -1172,7 +1175,7 @@ class _NIDCPowerSSC:
         configures measurement settings and commits the changes
 
         Args:
-            sample_rate (hertz in float): samples per second for data acquisitation
+            sample_rate (hertz in float): samples per second for data acquisition
             buffer_length (float, optional): Number of samples to hold in memory. Defaults to 1.0.
 
         Returns:
@@ -1237,7 +1240,7 @@ class _NIDCPowerSSC:
         measurement setup mode and get a boolean for fetching or measuring.
 
         Args:
-            measurement_mode (MeasurementMode): measuremultiple or software triggered or default
+            measurement_mode (MeasurementMode): measure_multiple or software triggered or default
 
         Returns:
             fetch_measure (bool): This can be used to decide between to use fetch or measure operation to perform.
@@ -1282,7 +1285,7 @@ class _NIDCPowerSSC:
 
     def cs_get_properties(self):
         """
-        for each channel find its properties like level, limit, voltage range, currnt range
+        for each channel find its properties like level, limit, voltage range, current range
 
         Returns:
             list of channel properties: list of channel properties of all channels in the session
@@ -1379,10 +1382,10 @@ class _NIDCPowerTSM:
     @staticmethod
     def _parse_instrument_names(resource_string: str) -> typing.Set[str]:
         """
-        returns a set of intrument names from the channels of resource string
+        returns a set of instrument names from the channels of resource string
 
         Args:
-            resource_string (str): comma seperated list of channels from different cards
+            resource_string (str): comma separated list of channels from different cards
 
         Returns:
             typing.Set[str]: set of instruments names
@@ -1884,7 +1887,7 @@ class _NIDCPowerTSM:
         """
         Specifies whether the output relay is connected (closed) or disconnected (open). The output_enabled property does not change based on this property; they are independent of each other.
         about supported devices.
-        Set this property to False to disconnect the output terminal from the output.
+        Set this property to False inorder to disconnect the output terminal from the output.
         to the output terminal might discharge unless the relay is disconnected. Excessive connecting and disconnecting of the output can cause premature wear on the relay.
 
         Note: Only disconnect the output when disconnecting is necessary for your application. For example, a battery connected
@@ -1959,7 +1962,8 @@ class _NIDCPowerTSM:
 
     def configure_source_delay(self, source_delay=0.01667):
         """
-        Determines when, in seconds, the device generates the Source Complete event, potentially starting a measurement if the measure_when property is set to MeasureWhen.AUTOMATICALLY_AFTER_SOURCE_COMPLETE.
+        Determines when, in seconds, the device generates the Source Complete event, potentially
+        starting a measurement if the measure_when property is set to MeasureWhen.AUTOMATICALLY_AFTER_SOURCE_COMPLETE.
         Refer to the Single Point Source Mode and Sequence Source Mode topics for more information.
 
         Note:
@@ -1967,18 +1971,21 @@ class _NIDCPowerTSM:
 
 
         Args:
-            source_delay (float, optional): hightime.timedelta, datetime.timedelta, or float in seconds. Defaults to 0.01667.Valid Values: 0 to 167 seconds.
+            source_delay (float, optional): hightime.timedelta, datetime.timedelta, or float in
+            seconds. Defaults to 0.01667.Valid Values: 0 to 167 seconds.
         """
         for ssc in self._sscs:
             ssc.cs_configure_source_delay(source_delay)
 
     def configure_source_mode(self, source_mode=nidcpower.SourceMode.SINGLE_POINT):
         """
-        Specifies whether to run a single output point or a sequence. Refer to the Single Point Source Mode and Sequence Source Mode topics in the NI DC Power Supplies and SMUs Help for more information about source modes.
-        Default value: SourceMode.SINGLE_POINT
+        Specifies whether to run a single output point or a sequence. Refer to the Single Point
+        Source Mode and Sequence Source Mode topics in the NI DC Power Supplies and SMUs Help for
+        more information about source modes.Default value: SourceMode.SINGLE_POINT
 
         Args:
-            source_mode (nidcpower.SourceMode, optional): configures the single point or sequence. Defaults to nidcpower.SourceMode.SINGLE_POINT.
+            source_mode (nidcpower.SourceMode, optional): configures the single point or sequence.
+            Defaults to nidcpower.SourceMode.SINGLE_POINT.
         """
         for ssc in self._sscs:
             ssc.cs_configure_source_mode(source_mode)
@@ -1998,39 +2005,35 @@ class _NIDCPowerTSM:
 
         The session monitors whether each type of event has occurred at least
         once since the last time this method or the initiate
-        method were called. If an event has only been generated once and you
+        method were called. If an event has only been generated once, and you
         call this method successively, the method times out. Individual
         events must be generated between separate calls of this method.
 
         Args:
-            event_id (enums.Event): Specifies which event to wait for.Defaults to nidcpower.Event.SOURCE_COMPLETE.
-        **Defined Values:**
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SOURCE_COMPLETE_EVENT    | Waits for the Source Complete event.  |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_MEASURE_COMPLETE_EVENT   | Waits for the Measure Complete event. |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SEQUENCE_ITERATION_COMPLETE_EVENT | Waits for Specified event.   |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SEQUENCE_ENGINE_DONE_EVENT| Waits for the Seq Engine Done event. |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_PULSE_COMPLETE_EVENT     | Waits for the Pulse Complete event.   |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_READY_FOR_PULSE_TRIGGER_EVENT| Waits for Specified event.        |
-        +----------------------------------------+---------------------------------------+
+            event (enums.Event): Specifies which event to wait for.Defaults to nidcpower.Event.SOURCE_COMPLETE.
+            **Defined Values:**
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_SOURCE_COMPLETE_EVENT    | Waits for the Source Complete event.  |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_MEASURE_COMPLETE_EVENT   | Waits for the Measure Complete event. |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_SEQUENCE_ITERATION_COMPLETE_EVENT | Waits for Specified event.   |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_SEQUENCE_ENGINE_DONE_EVENT| Waits for the Seq Engine Done event. |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_PULSE_COMPLETE_EVENT     | Waits for the Pulse Complete event.   |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_READY_FOR_PULSE_TRIGGER_EVENT| Waits for Specified event.        |
+            +----------------------------------------+---------------------------------------+
+
+            timeout (hightime.timedelta, datetime.timedelta, or float in seconds): Specifies the
+                maximum time allowed for this method to complete, in seconds. If the method does
+                not complete within this time interval, NI-DCPower returns an error. Defaults to
+                10.0.
 
         Note:
-        One or more of the referenced values are not in the Python API for this driver. Enums that only define values, or represent True/False, have been removed.
-
-        timeout (hightime.timedelta, datetime.timedelta, or float in seconds): Specifies the maximum time allowed for this method to complete, in
-        seconds. If the method does not complete within this time interval,
-        NI-DCPower returns an error. Defaults to 10.0.
-
-        Note:
-        When setting the timeout interval, ensure you take into account any
-        triggers so that the timeout interval is long enough for your
-        application.
-
+        When setting the timeout interval, ensure you take into account any triggers so that the
+        timeout interval is long enough for your application.
         """
         for ssc in self._sscs:
             ssc.cs_wait_for_event(event, timeout)
@@ -2041,8 +2044,8 @@ class _NIDCPowerTSM:
         configures and records previous settings and start the waveform acquisition
 
         Args:
-            sample_rate (float, optional): sampling rate for acquition. Defaults to 0.0.
-            buffer_length (float, optional): length of measurment to be stored in memory. Defaults to 0.0.
+            sample_rate (float, optional): sampling rate for acquisition. Defaults to 0.0.
+            buffer_length (float, optional): length of measurement to be stored in memory. Defaults to 0.0.
 
         Returns:
             settings: list of settings and start time
@@ -2076,28 +2079,25 @@ class _NIDCPowerTSM:
         self, trigger_to_send=nidcpower.SendSoftwareEdgeTriggerType.MEASURE
     ):
         """
-        Asserts the specified trigger. This method can override an external
-        edge trigger.
+        Asserts the specified trigger. This method can override an external edge trigger.
 
         Args:
-            trigger_to_send (enums.SendSoftwareEdgeTriggerType, optional): Specifies which trigger to assert. Defaults to enums.SendSoftwareEdgeTriggerType.MEASURE.
-        **Defined Values:**
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_START_TRIGGER            | Asserts the Start trigger.            |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SOURCE_TRIGGER           | Asserts the Source trigger.           |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_MEASURE_TRIGGER          | Asserts the Measure trigger.          |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SEQUENCE_ADVANCE_TRIGGER | Asserts the Sequence Advance trigger. |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_PULSE_TRIGGER            | Asserts the Pulse trigger.            |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SHUTDOWN_TRIGGER         | Asserts the Shutdown trigger.         |
-        +----------------------------------------+---------------------------------------+
-
-        Note:
-        One or more of the referenced values are not in the Python API for this driver. Enums that only define values, or represent True/False, have been removed.
+            trigger_to_send (enums.SendSoftwareEdgeTriggerType, optional): Specifies which trigger
+            to assert. Defaults to enums.SendSoftwareEdgeTriggerType.MEASURE.
+            **Defined Values:**
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_START_TRIGGER            | Asserts the Start trigger.            |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_SOURCE_TRIGGER           | Asserts the Source trigger.           |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_MEASURE_TRIGGER          | Asserts the Measure trigger.          |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_SEQUENCE_ADVANCE_TRIGGER | Asserts the Sequence Advance trigger. |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_PULSE_TRIGGER            | Asserts the Pulse trigger.            |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_SHUTDOWN_TRIGGER         | Asserts the Shutdown trigger.         |
+            +----------------------------------------+---------------------------------------+
         """
         for ssc in self._sscs:
             ssc.cs_send_software_edge_trigger(trigger_to_send)
@@ -2187,7 +2187,7 @@ class _NIDCPowerTSM:
 
     def get_properties(self):
         """
-        for each channel find its properties like level, limit, voltage range, currnt range
+        for each channel find its properties like level, limit, voltage range, current range
 
         Returns:
             list of channel properties: list of channel properties of all channels in the session
@@ -2212,7 +2212,8 @@ class _NIDCPowerTSM:
 
     def configure_measurements(self, mode=MeasurementMode.AUTO):
         """
-        configure the measurement mode to be auto by default, otherwise the value specified by the parameter passed. Then configures additional settings that are required by the measurement mode
+        configure the measurement mode to be auto by default, otherwise the value specified by the
+        parameter passed. Then configures additional settings that are required by the measurement mode
 
         Args:
             mode (MeasurementMode, optional): measurement mode to configure. Defaults to MeasurementMode.AUTO.

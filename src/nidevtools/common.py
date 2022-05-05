@@ -62,14 +62,8 @@ class PinType(enum.Enum):
 
 class PinInformation(typing.NamedTuple):
     """
-    pin information stores pin name, type, count
-
-    Args:
-        pin: string
-        type : Pintype object
-        count : integer
+    pin information stores pin name (str), pin_type(object), count (int)
     """
-
     # pin: _Pin
     pin: str
     type: PinType
@@ -78,14 +72,8 @@ class PinInformation(typing.NamedTuple):
 
 class ExpandedPinInformation(typing.NamedTuple):
     """
-    pin information stores pin name, type, index
-
-    Args:
-        pin: string
-        type : Pintype object
-        index : integer
+    pin information stores pin name, pin type object, index (int)
     """
-
     # pin: _Pin
     pin: str
     type: PinType
@@ -97,7 +85,7 @@ def channel_list_to_pins(channel_list: str):
     Maps the channel list of the hardware to pins from the pinmap file
 
     Args:
-        channel_list (str): comma seperated list of channels
+        channel_list (str): comma separated list of channels
 
     Returns:
         tuple: sites_and_pins, sites, pins
@@ -155,7 +143,7 @@ def get_dut_pins_and_system_pins_from_expanded_pin_list(
     expanded_pin_info: typing.List[ExpandedPinInformation],
 ):
     """
-    from expanded pin information seperates the dut pins and the system pins and returns them
+    from expanded pin information separates the dut pins and the system pins and returns them
 
     Args:
         expanded_pin_info (typing.List[ExpandedPinInformation]): list of expanded pin information
@@ -218,7 +206,7 @@ def remove_duplicates_from_tsm_pin_information_array(
     pins_info: typing.List[PinInformation], pins_expanded: typing.List[ExpandedPinInformation]
 ):
     """
-    removes any duplicate pins in the pins expaned list and the pins info
+    removes any duplicate pins in the pins expanded list and the pins info
 
     Args:
         pins_info (typing.List[PinInformation]): list of pins_info
@@ -247,7 +235,7 @@ def select_between_expanded_pin_information_options(
     pin_group_info: typing.List[PinInformation],
 ):
     """
-    selects the best expanedpinfo from the arguments
+    selects the best expanded pin info from the arguments
 
     Args:
         current (ExpandedPinInformation): current pin expanded info
@@ -343,11 +331,11 @@ def identify_pin_types(tsm: SMContext, pins_or_pins_group: typing.Union[str, typ
     identify if there is any pin_group in the input list
 
     Args:
-        tsm (SMContext): semiconductor module context from teststand
-        pins_or_pins_group (typing.Union[str, typing.Sequence[str]]): list of pins or pingroup names
+        tsm (SMContext): semiconductor module context from Teststand
+        pins_or_pins_group (typing.Union[str, typing.Sequence[str]]): list of pins or pin group names
 
     Returns:
-        pintypes, pingroupfound: for each of the input pin find its pin type and a flag about pingroupfound
+        pin_types, pin_group_found: for each of the input pin find its pin type and a flag about pin_group_found
     """
     all_pin_names, all_pin_types = get_all_pins(tsm)
     pin_group_found = False
@@ -366,14 +354,14 @@ def identify_pin_types(tsm: SMContext, pins_or_pins_group: typing.Union[str, typ
 @nitsm.codemoduleapi.code_module
 def _check_for_pin_group(tsm: SMContext, pins_or_pins_group):
     """
-    private function for finding the pingrup in the list of pins
+    private function for finding the pin_group in the list of pins
 
     Args:
         tsm (SMContext): semiconductor module context from teststand
-        pins_or_pins_group (_type_): list of pins or pingroup names
+        pins_or_pins_group (_type_): list of pins or pin_group names
 
     Returns:
-        pintypes, pins: for each of the input pin find its pin type and pins
+        pin_types, pins: for each of the input pin find its pin type and pins
     """
     pins = pins_or_pins_group
     pins_types, pin_group_found = identify_pin_types(tsm, pins_or_pins_group)
