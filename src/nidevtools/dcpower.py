@@ -143,12 +143,8 @@ class CustomTransientResponse:
 
 class ChannelProperties(typing.NamedTuple):
     """
-    for storing several the channel properties in the class
-
-    Args:
-        typing (named tuple): stores many properties of channel
+    for storing several the channel properties in a single object
     """
-
     instrument_name: str
     model: str
     channel: str
@@ -648,11 +644,11 @@ class _NIDCPowerSSC:
 
     def cs_configure_voltage_limit_range(self, voltage_limit_range=0.0):
         """
-        Specifies the voltage limit range, in volts, for the specified pins(s).
-        The range defines the valid values to which the voltage limit can be set.
-        Use the voltage_limit_autorange property to enable automatic selection of the voltage limit range.
-        The voltage_limit_range property is applicable only if the output_function property is set to OutputFunction.DC_CURRENT.
-        output_enabled property for more information about enabling the output channel.
+        Specifies the voltage limit range, in volts, for the specified pins(s). The range defines
+        the valid values to which the voltage limit can be set. Use the voltage_limit_autorange
+        property to enable automatic selection of the voltage limit range. The voltage_limit_range
+        property is applicable only if the output_function property is set to
+        OutputFunction.DC_CURRENT.
 
         Args:
             voltage_limit_range (float, optional): voltage limit range to set in volts. Defaults to 0.0.
@@ -661,8 +657,12 @@ class _NIDCPowerSSC:
 
     def cs_configure_voltage_limit(self, voltage_limit=0.0):
         """
-        Specifies the voltage limit, in volts, that the output cannot exceed when generating the desired current level on the specified channels.
-        This property is applicable only if the output_function property is set to OutputFunction.DC_CURRENT and the compliance_limit_symmetry property is set to ComplianceLimitSymmetry.SYMMETRIC.output_enabled property for more information about enabling the output channel.Valid Values: The valid values for this property are defined by the values to which the voltage_limit_range property is set.
+        Specifies the voltage limit, in volts, that the output cannot exceed when generating the
+        desired current level on the specified channels. This property is applicable only if the
+        output_function property is set to OutputFunction.DC_CURRENT and the
+        compliance_limit_symmetry property is set to ComplianceLimitSymmetry.SYMMETRIC.
+        The valid values for this property are defined by the values to which the
+        voltage_limit_range property is set.
 
 
         Args:
@@ -718,13 +718,11 @@ class _NIDCPowerSSC:
 
     def cs_configure_current_limit_range(self, current_limit_range=0.0):
         """
-        Specifies the current limit range, in amps, for the specified pin(s).
-        The range defines the valid value to which the current limit can be set. Use the current_limit_autorange property to enable automatic selection of the current limit range.
-        The current_limit_range property is applicable only if the output_function property is set to OutputFunction.DC_VOLTAGE.
+        Specifies the current limit range, in amps, for the specified pin(s). The range defines the
+        valid value to which the current limit can be set. Use the current_limit_autorange property
+        to enable automatic selection of the current limit range.The current_limit_range property
+        is applicable only if the output_function property is set to OutputFunction.DC_VOLTAGE.
         output_enabled property for more information about enabling the output channel.
-        For valid ranges, refer to the Ranges topic for your device in the NI DC Power Supplies and SMUs Help.
-
-        Note: The channel must be enabled for the specified current limit to take effect.
 
         Args:
             current_limit_range (float, optional): _description_. Defaults to 0.0.
@@ -733,12 +731,13 @@ class _NIDCPowerSSC:
 
     def cs_configure_current_limit(self, current_limit=0.0):
         """
-        Specifies the current limit, in amps, that the output cannot exceed when generating the desired voltage level on the specified pin(s).
-        This property is applicable only if the output_function property is set to OutputFunction.DC_VOLTAGE and the compliance_limit_symmetry property is set to ComplianceLimitSymmetry.SYMMETRIC.
+        Specifies the current limit, in amps, that the output cannot exceed when generating the
+        desired voltage level on the specified pin(s). This property is applicable only if the
+        output_function property is set to OutputFunction.DC_VOLTAGE and the
+        compliance_limit_symmetry property is set to ComplianceLimitSymmetry.SYMMETRIC.
         output_enabled property for more information about enabling the output channel.
-        Valid Values: The valid values for this property are defined by the values to which current_limit_range property is set.
-
-        Note: The channel must be enabled for the specified current limit to take effect.
+        The valid values for this property are defined by the values to which current_limit_range
+        property is set.The channel must be enabled for the specified current limit to take effect.
 
         Args:
             current_limit (float, optional): _description_. Defaults to 0.0.
@@ -810,13 +809,12 @@ class _NIDCPowerSSC:
 
     def cs_configure_voltage_level_range(self, voltage_level_range=0.0):
         """
-        Specifies the voltage level range, in volts, for the specified pin(s).
-        The range defines the valid values to which the voltage level can be set. Use the voltage_level_autorange property to enable automatic selection of the voltage level range.
-        The voltage_level_range property is applicable only if the output_function property is set to OutputFunction.DC_VOLTAGE.
-        output_enabled property for more information about enabling the output channel.
-        For valid ranges, refer to the Ranges topic for your device in the NI DC Power Supplies and SMUs Help.
-
-        Note: The pin must be enabled for the specified voltage level range to take effect.
+        Specifies the voltage level range, in volts, for the specified pin(s).The range defines the
+        valid values to which the voltage level can be set. Use the voltage_level_autorange
+        property to enable automatic selection of the voltage level range. The voltage_level_range
+        property is applicable only if the output_function property is set to
+        OutputFunction.DC_VOLTAGE.output_enabled property for more information about enabling the
+        output channel.
 
         Args:
             voltage_level_range (float, optional): voltage level range volts. Defaults to 0.0.
@@ -825,12 +823,12 @@ class _NIDCPowerSSC:
 
     def cs_configure_voltage_level(self, voltage_level=0.0):
         """
-        Specifies the voltage level, in volts, that the device attempts to generate on the specified pin(s).
-        This property is applicable only if the output_function property is set to OutputFunction.DC_VOLTAGE.
-        output_enabled property for more information about enabling the output channel.
-        Valid Values: The valid values for this property are defined by the values you specify for the voltage_level_range property.
-
-        Note: The pin must be enabled for the specified voltage level to take effect.
+        Specifies the voltage level, in volts, that the device attempts to generate on the
+        specified pin(s). This property is applicable only if the output_function property is set
+        to OutputFunction.DC_VOLTAGE. output_enabled property for more information about enabling
+        the output channel.The valid values for this property are defined by the values you specify
+        for the voltage_level_range property.The pin must be enabled for the specified voltage
+        level to take effect.
 
         Args:
             voltage_level (float, optional): voltage level in volts . Defaults to 0.0.
@@ -903,13 +901,12 @@ class _NIDCPowerSSC:
 
     def cs_configure_transient_response(self, transient_response=enums.TransientResponse.NORMAL):
         """
-        Specifies the transient response.
-        Default Value: TransientResponse.NORMAL
-
-        Note: This property is not supported by all devices.
+        Specifies the transient response.Default Value: TransientResponse.NORMAL. This property is
+        not supported by all devices.
 
         Args:
-            transient_response (TransientResponse, optional): specifies custom response settings or normal. Defaults to enums.TransientResponse.NORMAL.
+            transient_response (TransientResponse, optional): specifies custom response settings or
+            normal. Defaults to enums.TransientResponse.NORMAL.
         """
         self._channels_session.transient_response = transient_response
 
@@ -933,12 +930,14 @@ class _NIDCPowerSSC:
 
     def cs_configure_output_connected(self, output_connected=False):
         """
-        Specifies whether the output relay is connected (closed) or disconnected (open). The output_enabled property does not change based on this property; they are independent of each other.
-        about supported devices.
-        Set this property to False inorder to disconnect the output terminal from the output.
-        to the output terminal might discharge unless the relay is disconnected. Excessive connecting and disconnecting of the output can cause premature wear on the relay.
+        Specifies whether the output relay is connected (closed) or disconnected (open). The
+        output_enabled property does not change based on this property; they are independent of
+        each other.Set this property to False inorder to disconnect the output terminal from the
+        output. to the output terminal might discharge unless the relay is disconnected. Excessive
+        connecting and disconnecting of the output can cause premature wear on the relay.
 
-        Note: Only disconnect the output when disconnecting is necessary for your application. For example, a battery connected
+        Note: Only disconnect the output when disconnecting is necessary for your application. For
+        example, a battery connected
 
         Args:
             output_connected (bool, optional): controls the output relay. Defaults to False.
@@ -959,14 +958,17 @@ class _NIDCPowerSSC:
         not take effect until you call the Init session
 
         Args:
-            output_enabled (bool, optional): selects the output to be enabled or not. Defaults to False.
+            output_enabled (bool, optional): selects the output to be enabled or not. Defaults to
+            False.
         """
         self._channels_session.output_enabled = output_enabled
 
     def cs_configure_output_function(self, output_function=nidcpower.OutputFunction.DC_VOLTAGE):
         """
         Configures the method to generate on the specified channel(s).
-        When OutputFunction.DC_VOLTAGE is selected, the device generates the desired voltage level on the output as long as the output current is below the current limit. You can use the following properties to configure the channel when OutputFunction.DC_VOLTAGE is selected:
+        When OutputFunction.DC_VOLTAGE is selected, the device generates the desired voltage level
+        on the output as long as the output current is below the current limit. You can use the
+        following properties to configure the channel when OutputFunction.DC_VOLTAGE is selected:
         voltage_level
         current_limit
         current_limit_high
@@ -974,7 +976,9 @@ class _NIDCPowerSSC:
         voltage_level_range
         current_limit_range
         compliance_limit_symmetry
-        When OutputFunction.DC_CURRENT is selected, the device generates the desired current level on the output as long as the output voltage is below the voltage limit. You can use the following properties to configure the channel when OutputFunction.DC_CURRENT is selected:
+        When OutputFunction.DC_CURRENT is selected, the device generates the desired current level
+        on the output as long as the output voltage is below the voltage limit. You can use the
+        following properties to configure the channel when OutputFunction.DC_CURRENT is selected:
         current_level
         voltage_limit
         voltage_limit_high
@@ -985,17 +989,15 @@ class _NIDCPowerSSC:
 
 
         Args:
-            output_function (nidcpower.OutputFunction, optional): selects the output function to be dc_voltage or dc_current. Defaults to nidcpower.OutputFunction.DC_VOLTAGE.
+            output_function (nidcpower.OutputFunction, optional): selects the output function to be
+            dc_voltage or dc_current. Defaults to nidcpower.OutputFunction.DC_VOLTAGE.
         """
         self._channels_session.output_function = output_function
 
     def cs_configure_output_resistance(self, output_resistance=0.0):
         """
-        Specifies the output resistance that the device attempts to generate for the specified pin(s). This property is available only when you set the output_function property on a support device. Refer to a supported device's topic about output resistance for more information about selecting an output resistance.
-        about supported devices.
-        Default Value: 0.0
-
-        Note: This property is not supported by all devices. Refer to Supported Properties by Device topic for information
+        Specifies the output resistance for the selected pin(s).This property is available only
+        when you set the output_function property on a support device. Default Value: 0.0
 
         Args:
             output_resistance (float, optional): resistance value in ohms. Defaults to 0.0.
@@ -1004,7 +1006,9 @@ class _NIDCPowerSSC:
 
     def cs_configure_source_delay(self, source_delay=0.01667):
         """
-        Determines when, in seconds, the device generates the Source Complete event, potentially starting a measurement if the measure_when property is set to MeasureWhen.AUTOMATICALLY_AFTER_SOURCE_COMPLETE.
+        Determines when, in seconds, the device generates the Source Complete event, potentially
+        starting a measurement if the measure_when property is set to
+        MeasureWhen.AUTOMATICALLY_AFTER_SOURCE_COMPLETE.
         Refer to the Single Point Source Mode and Sequence Source Mode topics for more information.
 
         Note:
@@ -1012,17 +1016,21 @@ class _NIDCPowerSSC:
 
 
         Args:
-            source_delay (float, optional): hightime.timedelta, datetime.timedelta, or float in seconds. Defaults to 0.01667.Valid Values: 0 to 167 seconds.
+            source_delay (float, optional): hightime.timedelta, datetime.timedelta, or float in
+            seconds. Defaults to 0.01667.Valid Values: 0 to 167 seconds.
         """
         self._channels_session.source_delay = source_delay
 
     def cs_configure_source_mode(self, source_mode=nidcpower.SourceMode.SINGLE_POINT):
         """
-        Specifies whether to run a single output point or a sequence. Refer to the Single Point Source Mode and Sequence Source Mode topics in the NI DC Power Supplies and SMUs Help for more information about source modes.
+        Specifies whether to run a single output point or a sequence. Refer to the Single Point
+        Source Mode and Sequence Source Mode topics in the NI DC Power Supplies and SMUs Help for
+        more information about source modes.
         Default value: SourceMode.SINGLE_POINT
 
         Args:
-            source_mode (nidcpower.SourceMode, optional): configures the single point or sequence. Defaults to nidcpower.SourceMode.SINGLE_POINT.
+            source_mode (nidcpower.SourceMode, optional): configures the single point or sequence.
+            Defaults to nidcpower.SourceMode.SINGLE_POINT.
         """
         self._channels_session.source_mode = source_mode
 
@@ -1055,7 +1063,9 @@ class _NIDCPowerSSC:
 
     def cs_configure_measurements(self, mode=MeasurementMode.AUTO):
         """
-        configure the measurement mode to be auto by default, otherwise the value specified by the parameter passed. Then configures additional settings that are required by the measurement mode
+        configure the measurement mode to be auto by default, otherwise the value specified by the
+        parameter passed. Then configures additional settings that are required by the measurement
+        mode.
 
         Args:
             mode (MeasurementMode, optional): . Defaults to MeasurementMode.AUTO.
@@ -1104,28 +1114,25 @@ class _NIDCPowerSSC:
         self, trigger_to_send=enums.SendSoftwareEdgeTriggerType.MEASURE
     ):
         """
-        Asserts the specified trigger. This method can override an external
-        edge trigger.
+        Asserts the specified trigger. This method can override an external edge trigger.
 
         Args:
-            trigger_to_send (enums.SendSoftwareEdgeTriggerType): Specifies which trigger to assert. Defaults to enums.SendSoftwareEdgeTriggerType.MEASURE.
-        **Defined Values:**
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_START_TRIGGER            | Asserts the Start trigger.            |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SOURCE_TRIGGER           | Asserts the Source trigger.           |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_MEASURE_TRIGGER          | Asserts the Measure trigger.          |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SEQUENCE_ADVANCE_TRIGGER | Asserts the Sequence Advance trigger. |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_PULSE_TRIGGER            | Asserts the Pulse trigger.            |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SHUTDOWN_TRIGGER         | Asserts the Shutdown trigger.         |
-        +----------------------------------------+---------------------------------------+
-
-        Note:
-        One or more of the referenced values are not in the Python API for this driver. Enums that only define values, or represent True/False, have been removed.
+            trigger_to_send (enums.SendSoftwareEdgeTriggerType): Specifies which trigger to assert.
+            Defaults to enums.SendSoftwareEdgeTriggerType.MEASURE.
+            **Defined Values:**
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_START_TRIGGER            | Asserts the Start trigger.            |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_SOURCE_TRIGGER           | Asserts the Source trigger.           |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_MEASURE_TRIGGER          | Asserts the Measure trigger.          |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_SEQUENCE_ADVANCE_TRIGGER | Asserts the Sequence Advance trigger. |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_PULSE_TRIGGER            | Asserts the Pulse trigger.            |
+            +----------------------------------------+---------------------------------------+
+            | NIDCPOWER_VAL_SHUTDOWN_TRIGGER         | Asserts the Shutdown trigger.         |
+            +----------------------------------------+---------------------------------------+
         """
         return self._channels_session.send_software_edge_trigger(trigger_to_send)
 
@@ -1140,33 +1147,30 @@ class _NIDCPowerSSC:
         events must be generated between separate calls of this method.
 
         Args:
-            event_id (enums.Event): Specifies which event to wait for.Defaults to nidcpower.Event.SOURCE_COMPLETE.
-        **Defined Values:**
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SOURCE_COMPLETE_EVENT    | Waits for the Source Complete event.  |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_MEASURE_COMPLETE_EVENT   | Waits for the Measure Complete event. |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SEQUENCE_ITERATION_COMPLETE_EVENT | Waits for Specified event.   |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_SEQUENCE_ENGINE_DONE_EVENT| Waits for the Seq Engine Done event. |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_PULSE_COMPLETE_EVENT     | Waits for the Pulse Complete event.   |
-        +----------------------------------------+---------------------------------------+
-        | NIDCPOWER_VAL_READY_FOR_PULSE_TRIGGER_EVENT| Waits for Specified event.        |
-        +----------------------------------------+---------------------------------------+
+            event (enums.Event): Specifies which event to wait for.Defaults to
+            nidcpower.Event.SOURCE_COMPLETE.
+                **Defined Values:**
+                +----------------------------------------+---------------------------------------+
+                | NIDCPOWER_VAL_SOURCE_COMPLETE_EVENT    | Waits for the Source Complete event.  |
+                +----------------------------------------+---------------------------------------+
+                | NIDCPOWER_VAL_MEASURE_COMPLETE_EVENT   | Waits for the Measure Complete event. |
+                +----------------------------------------+---------------------------------------+
+                | NIDCPOWER_VAL_SEQUENCE_ITERATION_COMPLETE_EVENT | Waits for Specified event.   |
+                +----------------------------------------+---------------------------------------+
+                | NIDCPOWER_VAL_SEQUENCE_ENGINE_DONE_EVENT| Waits for the Seq Engine Done event. |
+                +----------------------------------------+---------------------------------------+
+                | NIDCPOWER_VAL_PULSE_COMPLETE_EVENT     | Waits for the Pulse Complete event.   |
+                +----------------------------------------+---------------------------------------+
+                | NIDCPOWER_VAL_READY_FOR_PULSE_TRIGGER_EVENT| Waits for Specified event.        |
+                +----------------------------------------+---------------------------------------+
 
-        Note:
-        One or more of the referenced values are not in the Python API for this driver. Enums that only define values, or represent True/False, have been removed.
+            timeout (float in seconds): Specifies the maximum time allowed for this method to
+                complete, in seconds. If the method does not complete within this time interval,
+                NI-DCPower returns an error. Defaults to 10.0.
 
-        timeout (hightime.timedelta, datetime.timedelta, or float in seconds): Specifies the maximum time allowed for this method to complete, in
-        seconds. If the method does not complete within this time interval,
-        NI-DCPower returns an error. Defaults to 10.0.
-
-        Note:
-        When setting the timeout interval, ensure you take into account any
-        triggers so that the timeout interval is long enough for your
-        application.
+            Note:
+            When setting the timeout interval, ensure you take into account any triggers so that the
+            timeout interval is long enough for your application.
         """
         return self._channels_session.wait_for_event(event, timeout)
 
@@ -1489,8 +1493,8 @@ class _NIDCPowerTSM:
         Args:
             current_levels (list of float): current levels in amps.
             current_level_ranges (list of float): current level ranges in amps.
-            voltage_limits_highs (list of float): voltage higher limits in volts.
-            voltage_limits_lows (list of float): voltage lower limits in volts.
+            voltage_limit_highs (list of float): voltage higher limits in volts.
+            voltage_limit_lows (list of float): voltage lower limits in volts.
             voltage_limit_ranges (list of float): voltage limit range in volts.
         """
         i = 0
@@ -1542,8 +1546,9 @@ class _NIDCPowerTSM:
         Args:
             voltage_levels (list of float): voltage levels in volts.
             voltage_level_ranges (list of float): voltage level ranges in volts.
-            current_limits_highs (list of float): current higher limits in amps.
-            current_limits_lows (list of float): current lower limits in amps.            current_limit_ranges (list of float): current limit range in amps.
+            current_limit_highs (list of float): current higher limits in amps.
+            current_limit_lows (list of float): current lower limits in amps.
+            current_limit_ranges (list of float): current limit range in amps.
         """
         i = 0
         for ssc in self._sscs:
@@ -1820,7 +1825,8 @@ class _NIDCPowerTSM:
 
     def get_aperture_times_in_seconds(self):
         """
-        get the aperture time in seconds for all channels in the session. if the model has different units convert them into seconds.
+        get the aperture time in seconds for all channels in the session. if the model has
+        different units convert them into seconds.
 
         Returns:
             list of float: aperture times in seconds
@@ -1832,7 +1838,8 @@ class _NIDCPowerTSM:
 
     def get_power_line_frequencies(self):
         """
-        get the power line frequencies stored in the object or from the instrument based on the supported model
+        get the power line frequencies stored in the object or from the instrument based on the
+        supported model
 
         Returns:
             list of float: power line frequency in hertz
@@ -1871,13 +1878,12 @@ class _NIDCPowerTSM:
 
     def configure_transient_response(self, transient_response=enums.TransientResponse.NORMAL):
         """
-        Specifies the transient response.
-        Default Value: TransientResponse.NORMAL
-
-        Note: This property is not supported by all devices.
+        Specifies the transient response.Default Value: TransientResponse.NORMAL. This property is
+        not supported by all devices.
 
         Args:
-            transient_response (TransientResponse, optional): specifies custom response settings or normal. Defaults to enums.TransientResponse.NORMAL.
+            transient_response (TransientResponse, optional): specifies custom response settings or
+            normal. Defaults to enums.TransientResponse.NORMAL.
         """
         for ssc in self._sscs:
             ssc.cs_configure_transient_response(transient_response)
@@ -1885,12 +1891,11 @@ class _NIDCPowerTSM:
 
     def configure_output_connected(self, output_connected=False):
         """
-        Specifies whether the output relay is connected (closed) or disconnected (open). The output_enabled property does not change based on this property; they are independent of each other.
-        about supported devices.
-        Set this property to False inorder to disconnect the output terminal from the output.
-        to the output terminal might discharge unless the relay is disconnected. Excessive connecting and disconnecting of the output can cause premature wear on the relay.
-
-        Note: Only disconnect the output when disconnecting is necessary for your application. For example, a battery connected
+        Specifies whether the output relay is connected (closed) or disconnected (open). The
+        output_enabled property does not change based on this property; they are independent of
+        each other. Set this property to False inorder to disconnect the output terminal from the
+        output. to the output terminal might discharge unless the relay is disconnected. Excessive
+        connecting and disconnecting of the output can cause premature wear on the relay.
 
         Args:
             output_connected (bool, optional): controls the output relay. Defaults to False.
@@ -1901,15 +1906,13 @@ class _NIDCPowerTSM:
 
     def configure_output_enabled(self, output_enabled=False):
         """
-        Specifies whether the output is enabled (True) or disabled (False).
-        Depending on the value you specify for the output_function property, you also must set the voltage level or current level in addition to enabling the output
-        the initiate method.
-
-        Note: If the session is in the Committed or Uncommitted states, enabling the output does not take effect until you call
-
+        Specifies whether the output is enabled (True) or disabled (False).Depending on the value
+        you specify for the output_function property, you also must set the voltage level or
+        current level in addition to enabling the output the initiate method.
 
         Args:
-            output_enabled (bool, optional): selects the output to be enabled or not. Defaults to False.
+            output_enabled (bool, optional): selects the output to be enabled or not. Defaults to
+            False.
         """
         for ssc in self._sscs:
             ssc.cs_configure_output_enabled(output_enabled)
@@ -1917,10 +1920,12 @@ class _NIDCPowerTSM:
 
     def configure_output_enabled_and_connected(self, output_enabled_and_connected=False):
         """
-        Specifies whether the output relay is connected (closed) or disconnected (open). The output_enabled property also changes based on this property;
+        Specifies whether the output relay is connected (closed) or disconnected (open).
+        The output_enabled property also changes based on this property;
 
         Args:
-            output_enabled_and_connected (bool, optional):controls the output relay and enables the output. Defaults to False.
+            output_enabled_and_connected (bool, optional):controls the output relay and enables the
+            output. Defaults to False.
         """
         if output_enabled_and_connected:
             self.configure_output_enabled(output_enabled_and_connected)
@@ -1931,10 +1936,8 @@ class _NIDCPowerTSM:
 
     def configure_output_resistance(self, output_resistance=0.0):
         """
-        Specifies the output resistance that the device attempts to generate for the specified pin(s). This property is available only when you set the output_function property on a support device. Refer to a supported device's topic about output resistance for more information about selecting an output resistance.
-        about supported devices.
-
-        Note: This property is not supported by all devices. Refer to Supported Properties by Device topic for information
+        Specifies the output resistance that the device attempts to generate for the specified pin(s).
+        This property is available only when you set the output_function property on a supported device.
 
         Args:
             output_resistance (float, optional): resistance value in ohms. Defaults to 0.0.
@@ -1946,10 +1949,9 @@ class _NIDCPowerTSM:
 
     def configure_output_resistance_array(self, output_resistance):
         """
-        Specifies the output resistance that the device attempts to generate for the specified pin(s). This property is available only when you set the output_function property on a support device. Refer to a supported device's topic about output resistance for more information about selecting an output resistance.
-        about supported devices.
-
-        Note: This property is not supported by all devices. Refer to Supported Properties by Device topic for information
+        Specifies the output resistance that the device attempts to generate for the specified
+        pin(s). This property is available only when you set the output_function property on a
+        supported device.
 
         Args:
             output_resistance (List of float): resistance values in ohms.
