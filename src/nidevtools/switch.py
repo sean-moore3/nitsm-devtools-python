@@ -87,7 +87,7 @@ class MultipleSessions:
         object: containing list of sessions
     """
 
-    Sessions: typing.List[Session]
+    sessions: typing.List[Session]
 
     def __init__(self, sessions: typing.List[Session]):
         """
@@ -96,9 +96,10 @@ class MultipleSessions:
         Args:
             sessions (typing.List[Session]): list of sessions for the current context
         """
-        self.Sessions = sessions
+        self.sessions = sessions
 
-    def action_session_info(self, route_value: str = "", action: Action = Action.Disconnect,timeout: int = 40):
+    def action_session_info(self, route_value: str = "", action: Action = Action.Disconnect,
+    timeout: int = 40):
         """
         reads and returns the path capability
 
@@ -111,7 +112,7 @@ class MultipleSessions:
             list of session: list of session for the connection
         """
         read_path_capability = []
-        for session in self.Sessions:
+        for session in self.sessions:
             data = session.info(route_value, action, timeout)
             read_path_capability += data
         return read_path_capability

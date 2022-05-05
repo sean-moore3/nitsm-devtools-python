@@ -16,6 +16,7 @@ class Resolution:
     """
     DMM resolutions
     """
+
     Res_3_05 = 3.5
     Res_4_05 = 4.5
     Res_5_05 = 5.5
@@ -27,10 +28,10 @@ class InputResistance:
     """
     DMM Input Resistance
     """
+
     IR_1_MOhm = 1e6
     IR_10_MOhm = 1e7
     IR_Greater_Than_10_GOhm = 1e10
-
 
 
 class TSMDMM:
@@ -40,6 +41,7 @@ class TSMDMM:
     Returns:
         object: TSMDMM context object
     """
+
     pin_query_context: PinQuery
     sessions: typing.Sequence[nidmm.Session]
 
@@ -49,34 +51,46 @@ class TSMDMM:
 
         Args:
             pin_query_context (PinQuery): pin query context object stores the pin related info
-            sessions (typing.Sequence[nidmm.session.Session]): sessions to perform various actions on the dmm instrument associated with it.
+            sessions (typing.Sequence[nidmm.session.Session]): sessions to perform various actions
+            on the dmm instrument associated with it.
         """
         self.pin_query_context = pin_query_context
         self.sessions = sessions
 
-    def config_apperture_time(self, apperture_time: float, apperture_time_units: nidmm.ApertureTimeUnits):
+    def config_apperture_time(self, apperture_time: float, units: nidmm.ApertureTimeUnits):
         """
-        Configures the measurement aperture time for the current configuration.  Aperture time is specified in units set by aperture_time_units.
+        Configures the measurement aperture time for the current configuration.  Aperture time is
+        specified in units set by aperture_time_units.
 
         Args:
             apperture_time (float): On the NI 4070/4071/4072, the minimum aperture time is 8.89
-                usec,  and the maximum aperture time is 149 sec. Any number of powerline cycles (PLCs)  within the minimum and maximum ranges is allowed on the NI 4070/4071/4072.On the NI 4065 the minimum aperture time is 333 µs, and the maximum aperture time  is 78.2 s. If setting the number of averages directly, the total measurement time is  aperture time X the number of averages, which must be less than 72.8 s. The aperture  times allowed are 333 µs, 667 µs, or multiples of 1.11 ms-for example 1.11 ms, 2.22 ms,  3.33 ms, and so on. If you set an aperture time other than 333 µs, 667 µs, or multiples  of 1.11 ms, the value will be coerced up to the next supported aperture time.
-            apperture_time_units (nidmm.ApertureTimeUnits): Specifies the units of aperture time
+                usec,  and the maximum aperture time is 149 sec. Any number of powerline cycles
+                (PLCs) within the minimum and maximum ranges is allowed on the NI 4070/4071/4072.
+                On the NI 4065 the minimum aperture time is 333 µs, and the maximum aperture time
+                is 78.2 s. If setting the number of averages directly, the total measurement time
+                is  aperture time X the number of averages, which must be less than 72.8 s. The
+                aperture  times allowed are 333 µs, 667 µs, or multiples of 1.11 ms-for example
+                1.11 ms, 2.22 ms,  3.33 ms, and so on. If you set an aperture time other than 333
+                µs, 667 µs, or multiples  of 1.11 ms, the value will be coerced up to the next
+                supported aperture time.
+            units (nidmm.ApertureTimeUnits): Specifies the units of aperture time
                 for the current configuration.The NI 4060 does not support an aperture time set in
                 seconds.
         """
         for session in self.sessions:
-            session.aperture_time_units = apperture_time_units
+            session.aperture_time_units = units
             session.aperture_time = apperture_time
 
-    def config_measurement(self,
-                           function: nidmm.Function,
-                           range_raw: float,
-                           resolution_in_digits: Resolution,
-                           input_resistance: InputResistance):
+    def config_measurement(
+        self,
+        function: nidmm.Function,
+        range_raw: float,
+        resolution_in_digits: Resolution,
+        input_resistance: InputResistance,
+    ):
         """
-        Configures the common properties of the measurement. These properties
-        include method, range, and resolution_in_digits.
+        Configures the common properties of the measurement. These properties include method,
+        range, and resolution_in_digits.
 
         Args:
             function (enums.Function): Specifies the **measurement_function** used to acquire the
@@ -84,26 +98,26 @@ class TSMDMM:
 
             range_raw (float): Specifies the range for the method specified in the
                 **Measurement_Function** parameter. When frequency is specified in the
-                **Measurement_Function** parameter, you must supply the minimum
-                frequency expected in the **range** parameter. For example, you must
-                type in 100 Hz if you are measuring 101 Hz or higher.
-                For all other methods, you must supply a range that exceeds the value
-                that you are measuring. For example, you must type in 10 V if you are
-                measuring 9 V. range values are coerced up to the closest input range.
-                Refer to the `Devices
-                Overview <REPLACE_DRIVER_SPECIFIC_URL_1(devices)>`__ for a list of valid
-                ranges. The driver sets range to this value. The default is
-                0.02 V.
+                **Measurement_Function** parameter, you must supply the minimum frequency expected
+                in the **range** parameter. For example, you must type in 100 Hz if you are
+                measuring 101 Hz or higher.For all other methods, you must supply a range that
+                exceeds the value that you are measuring. For example, you must type in 10 V if you
+                are measuring 9 V. range values are coerced up to the closest input range.The
+                driver sets range to this value. The default is 0.02 V.
 
                 +---------------------------+------+----------------------------------------------+
                 | NIDMM_VAL_AUTO_RANGE_ON   | -1.0 | NI-DMM performs an Auto Range before acquiring
                                                      the measurement.                             |
                 +---------------------------+------+----------------------------------------------+
                 | NIDMM_VAL_AUTO_RANGE_OFF  | -2.0 | NI-DMM sets the Range to the current
-                                                    auto_range_value and uses this range for all subsequent measurements until the measurement configuration is changed.                     |
+                                                    auto_range_value and uses this range for all
+                                                    subsequent measurements until the measurement
+                                                    configuration is changed.                     |
                 +---------------------------+------+----------------------------------------------+
-                | NIDMM_VAL_AUTO_RANGE_ONCE | -3.0 | NI-DMM performs an Auto Range before acquiring 
-                                                    the measurement. The auto_range_value is stored and used for all subsequent measurements until the measurement configuration is changed.     |
+                | NIDMM_VAL_AUTO_RANGE_ONCE | -3.0 | NI-DMM performs an Auto Range before acquiring
+                                                    the measurement. The auto_range_value is stored
+                                                    and used for all subsequent measurements until
+                                                    the measurement configuration is changed.     |
                 +---------------------------+------+----------------------------------------------+
 
                 Note:
@@ -111,21 +125,24 @@ class TSMDMM:
                 trigger and sample trigger are set to IMMEDIATE.
 
                 Note:
-                One or more of the referenced values are not in the Python API for this driver. Enums that only define values, or represent True/False, have been removed.
+                One or more of the referenced values are not in the Python API for this driver.
+                Enums that only define values, or represent True/False, have been removed.
 
-            resolution_in_digits (float): Specifies the resolution of the measurement in digits.  
-                The driver sets resolution_digits property to this value. The PXIe-4080/4081/4082 uses the resolution you specify. The NI 4065 and NI 4070/4071/4072 ignore this parameter when the **Range** parameter is set to NIDMM_VAL_AUTO_RANGE_ON (-1.0) or
+            resolution_in_digits (float): Specifies the resolution of the measurement in digits.
+                The driver sets resolution_digits property to this value. The PXIe-4080/4081/4082
+                uses the resolution you specify. The NI 4065 and NI 4070/4071/4072 ignore this
+                parameter when the **Range** parameter is set to NIDMM_VAL_AUTO_RANGE_ON (-1.0) or
                 NIDMM_VAL_AUTO_RANGE_ONCE (-3.0). The default is 5½.
 
                 Note:
-                NI-DMM ignores this parameter for capacitance and inductance measurements on the NI 4072. To achieve better resolution for such measurements, use the lc_number_meas_to_average property.
+                NI-DMM ignores this parameter for capacitance and inductance measurements on the
+                NI 4072. To achieve better resolution for such measurements, use the
+                lc_number_meas_to_average property.
             input_resistance (float): Specifies the input resistance of the instrument.The NI 4050
                 and NI 4060 are not supported.
         """
         for session in self.sessions:
-            session.configure_measurement_digits(measurement_function=function,
-                                                 range=range_raw,
-                                                 resolution_digits=resolution_in_digits)
+            session.configure_measurement_digits(function, range_raw, resolution_in_digits)
             session.input_resistance = input_resistance
 
     def abort(self):
@@ -164,7 +181,7 @@ class TSMDMM:
 def pins_to_sessions(tsm: SMContext, pins: PinsArg):
     """
     Returns the NI-DMM instrument sessions required to access the pin(s).
-  
+
     Args:
         tsm (SMContext): _description_
         pins (PinsArg): The names of the pin(s) or pin group(s) to translate to instrument sessions.

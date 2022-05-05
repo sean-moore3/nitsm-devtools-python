@@ -437,8 +437,10 @@ class _NIScopeTSM:
             coupling (niscope.VerticalCoupling, optional): Vertical Coupling AC or DC.
                 Defaults to niscope.VerticalCoupling.DC.
             offset (float, optional): Vertical offset. Defaults to 0.0.
-            probe_attenuation (float, optional): Vertical probe attenuation like 1x or 10x. Defaults to 1.0.
-            enabled (bool, optional): Channels enabled or disabled for data capture. Defaults to True.
+            probe_attenuation (float, optional): Vertical probe attenuation like 1x or 10x.
+                Defaults to 1.0.
+            enabled (bool, optional): Channels enabled or disabled for data capture. Defaults to
+                True.
         """
         for ssc in self._sscs:
             ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, probe_attenuation, enabled)
