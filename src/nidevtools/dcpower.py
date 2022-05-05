@@ -2573,39 +2573,6 @@ def filter_sites(tsm: TSMDCPower, sites):
 
 
 @nitsm.codemoduleapi.code_module
-def initialize_sessions(tsm: SMContext, power_line_frequency=60.0, **kwargs):
-    """Creates the sessions for all the nidcpower resource string available in the tsm context for instruments"""
-    # cache kwargs
-    reset = kwargs["reset"] if "reset" in kwargs.keys() else False
-    options = kwargs["options"] if "options" in kwargs.keys() else {}
-
-    # initialize and reset sessions
-    resource_strings = tsm.get_all_nidcpower_resource_strings()
-    for resource_string in resource_strings:
-        session = nidcpower.Session(resource_string, reset=reset, options=options)
-        try:
-            session.reset()
-        except nidcpower.errors.DriverError as error:
-            if error.code == -1074118575:
-                session.reset_device()
-            else:
-                raise
-
-        # set start up state on each channel
-        for i in range(session.channel_count):
-            channel_name = session.get_channel_name(i + 1)
-            resource_name = channel_name.split("/")[0]
-            instrument_model = session.instruments[resource_name].instrument_model
-            if instrument_model in _ModelSupport.POWER_LINE_FREQUENCY:
-                session.channels[channel_name].power_line_frequency = power_line_frequency
-            if instrument_model not in _ModelSupport.DEFAULT_OUTPUT_STATE_0V:
-                session.channels[channel_name].initiate()
-
-        # set session in the tsm context
-        tsm.set_nidcpower_session(resource_string, session)
-
-
-@nitsm.codemoduleapi.code_module
 def pins_to_sessions(
     tsm: SMContext,
     pins: typing.List[str],
@@ -2647,8 +2614,52 @@ def pins_to_sessions(
 
 
 @nitsm.codemoduleapi.code_module
+def initialize_sessions(tsm: SMContext, power_line_frequency=60.0, **kwargs):
+    """
+    Creates the sessions for all the nidcpower resource string available in the tsm context for instruments
+
+    Args:
+        tsm (SMContext): TestStand semiconductor module context
+        power_line_frequency(float, Optional): power line frequency of the power supply. Defaults to 60 Hz.
+    """
+    # cache kwargs
+    reset = kwargs["reset"] if "reset" in kwargs.keys() else False
+    options = kwargs["options"] if "options" in kwargs.keys() else {}
+
+    # initialize and reset sessions
+    resource_strings = tsm.get_all_nidcpower_resource_strings()
+    for resource_string in resource_strings:
+        session = nidcpower.Session(resource_string, reset=reset, options=options)
+        try:
+            session.reset()
+        except nidcpower.errors.DriverError as error:
+            if error.code == -1074118575:
+                session.reset_device()
+            else:
+                raise
+
+        # set start up state on each channel
+        for i in range(session.channel_count):
+            channel_name = session.get_channel_name(i + 1)
+            resource_name = channel_name.split("/")[0]
+            instrument_model = session.instruments[resource_name].instrument_model
+            if instrument_model in _ModelSupport.POWER_LINE_FREQUENCY:
+                session.channels[channel_name].power_line_frequency = power_line_frequency
+            if instrument_model not in _ModelSupport.DEFAULT_OUTPUT_STATE_0V:
+                session.channels[channel_name].initiate()
+
+        # set session in the tsm context
+        tsm.set_nidcpower_session(resource_string, session)
+
+
+@nitsm.codemoduleapi.code_module
 def close_sessions(tsm: SMContext):
-    """Closes the sessions associated with the tsm context"""
+    """
+    Closes the sessions associated with the tsm context
+    
+    Args:
+        tsm (SMContext): TestStand semiconductor module context
+    """
     sessions = tsm.get_all_nidcpower_sessions()
     for session in sessions:
         session.abort()
