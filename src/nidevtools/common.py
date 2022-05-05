@@ -1,5 +1,5 @@
 """
-This is common function codes used by devtool apis 
+This is common function codes used by devtool apis.
 """
 import enum
 import re
@@ -41,6 +41,7 @@ class PinType(enum.Enum):
     """
     Pin type classification
     """
+
     DUT_PIN = 0
     r"""
     This pin belongs to the device under test
@@ -66,8 +67,9 @@ class PinInformation(typing.NamedTuple):
     Args:
         pin: string
         type : Pintype object
-        count : integer 
+        count : integer
     """
+
     # pin: _Pin
     pin: str
     type: PinType
@@ -81,8 +83,9 @@ class ExpandedPinInformation(typing.NamedTuple):
     Args:
         pin: string
         type : Pintype object
-        index : integer 
+        index : integer
     """
+
     # pin: _Pin
     pin: str
     type: PinType
@@ -94,7 +97,7 @@ def channel_list_to_pins(channel_list: str):
     Maps the channel list of the hardware to pins from the pinmap file
 
     Args:
-        channel_list (str): comma seperated list of channels 
+        channel_list (str): comma seperated list of channels
 
     Returns:
         tuple: sites_and_pins, sites, pins
@@ -139,7 +142,7 @@ def get_pin_names_from_expanded_pin_information(
     gets all the pins from the expanded pin object
 
     Args:
-        expanded_pin_info (typing.List[ExpandedPinInformation]): list of expanded pin information 
+        expanded_pin_info (typing.List[ExpandedPinInformation]): list of expanded pin information
 
     Returns:
         pins: list of pins in the pins expanded object
@@ -158,7 +161,7 @@ def get_dut_pins_and_system_pins_from_expanded_pin_list(
         expanded_pin_info (typing.List[ExpandedPinInformation]): list of expanded pin information
 
     Returns:
-        dut_pins, system_pins : tuple of dut_pins and system_pins 
+        dut_pins, system_pins : tuple of dut_pins and system_pins
     """
     dut_pins = []
     system_pins = []
@@ -180,7 +183,7 @@ def expand_pin_groups_and_identify_pin_types(tsm: SMContext, pins_in):
         pins_in (_type_): list of pins for which information needs to be expanded if it is pin group
 
     Returns:
-        pins_info, pins_expanded: tuple of pins_info and pins_expanded. 
+        pins_info, pins_expanded: tuple of pins_info and pins_expanded.
     """
     pins_temp, pin_types_temp = get_all_pins(tsm)
     pins_info = []

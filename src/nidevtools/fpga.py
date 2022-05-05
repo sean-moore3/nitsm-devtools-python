@@ -37,6 +37,7 @@ class ReadData(typing.NamedTuple):  # AllConnector Data
     """
     Class that describes list of connectors of FPGA to support read functions
     """
+
     Connector0: int
     Connector1: int
     Connector2: int
@@ -47,6 +48,7 @@ class I2CMaster(Enum):
     """
     Class that describes supported types of FPGAs
     """
+
     I2C_3V3_7822_SINK = 0
     I2C_3V3_7822_LINT = 1
     DIB_I2C = 2
@@ -57,6 +59,7 @@ class BoardType(Enum):
     """
     Class that describes supported hardward
     """
+
     PXIe_7822R = 0
     PXIe_7821R = 1
     PXIe_7820R = 2
@@ -66,6 +69,7 @@ class DIOLines(Enum):
     """
     Class that describes DIO pins from connectors
     """
+
     DIO0 = 0
     DIO1 = 1
     DIO2 = 2
@@ -105,6 +109,7 @@ class Connectors(Enum):
     """
     Class that describes FPGA connectors
     """
+
     Connector0 = 0
     Connector1 = 1
     Connector2 = 2
@@ -116,6 +121,7 @@ class StaticStates(Enum):
     """
     Class that describes bits status that supports the reading functions
     """
+
     Zero = 0
     One = 1
     X = 2
@@ -125,6 +131,7 @@ class States(Enum):  # DIO Line State with I2C
     """
     Class that describes bits status that supports the reading and writing functions
     """
+
     Zero = 0
     One = 1
     X = 2
@@ -135,6 +142,7 @@ class LineLocation(typing.NamedTuple):  # Channel
     """
     Class that contains channel and connector data to support write and read functions
     """
+
     channel: DIOLines
     connector: Connectors
 
@@ -143,6 +151,7 @@ class DIOLineLocationAndStaticState(typing.NamedTuple):  # Channel
     """
     Class that contains channel, connector and state data to support write and read functions
     """
+
     channel: DIOLines
     connector: Connectors
     state: StaticStates
@@ -152,6 +161,7 @@ class LineLocationAndStates(typing.NamedTuple):  # Channel
     """
     Class that contains channel, connector and states data to support write and read functions
     """
+
     channel: DIOLines
     connector: Connectors
     state: States
@@ -161,6 +171,7 @@ class DIOLineLocationAndReadState(typing.NamedTuple):  # Channel
     """
     Class that contains channel, connector and state data to support write and read functions
     """
+
     channel: DIOLines
     connector: Connectors
     state: bool
@@ -170,28 +181,31 @@ class I2CMasterLineConfiguration(typing.NamedTuple):  # I2C Channel Mapping
     """
     Class that contains SDA and SCL data to support write and read functions
     """
+
     SDA: LineLocation
     SCL: LineLocation
 
 
 class _SSCFPGA(typing.NamedTuple):
     """
-    Private class that contains data of the individual session, including Session, Channel Group ID, Channels, Channel List
+    Private class that contains data of the individual session, including Session, Channel Group
+    ID, Channels, Channel List
     """
+
     Session: nifpga.Session
     ChannelGroupID: str
     Channels: str
     ChannelList: str
 
-    def ss_wr_static_array(self, static_states: typing.Union[StaticStates, typing.List[StaticStates]]):
+    def ss_wr_static_array(self, states: typing.Union[StaticStates, typing.List[StaticStates]]):
         """
-        This function allows to write a static array of StaticStates for the specific single session
+        This function allows to write a static array of States for the specific single session
 
         Args:
             static_states: Array of objects class StaticStates to be written on the single session
         """
-        if isinstance(static_states, StaticStates):
-            static_states = [static_states]
+        if isinstance(states, StaticStates):
+            states = [states]
         ch_list = self.ChannelList.split(",")
         iq_list = []
         r_list = []
@@ -199,7 +213,7 @@ class _SSCFPGA(typing.NamedTuple):
             iq_list.append(int(ch) // 32)
             r_list.append(int(ch) % 32)
         lines_to_write = []
-        for s_s, iq, r in zip(static_states, iq_list, r_list):
+        for s_s, iq, r in zip(states, iq_list, r_list):
             element = DIOLineLocationAndStaticState(DIOLines(r), Connectors(iq), s_s)
             lines_to_write.append(element)
         self.write_multiple_dio_lines(lines_to_write)
@@ -209,7 +223,8 @@ class _SSCFPGA(typing.NamedTuple):
         This function allows to write a static array of StaticStates for the specific single session
 
         Args:
-            static_states: Single or array of objects class StaticStates to be written on the single session
+            static_states: Single or array of objects class StaticStates to be written on the
+            single session
         """
         if isinstance(static_states, StaticStates):
             static_states = [static_states]
@@ -245,7 +260,8 @@ class _SSCFPGA(typing.NamedTuple):
 
     def ss_read_c_states(self):  # TODO CHECK
         """
-        This function reads from FPGA the States of each pin and returns two arreys states and commanded_states
+        This function reads from FPGA the States of each pin and returns two arreys states and
+        commanded_states
         Returns:
             states: Array of current states read from FPGA
             commanded_states: Array of current commanded_states read from FPGA
@@ -264,9 +280,9 @@ class _SSCFPGA(typing.NamedTuple):
 
     def close_session(self, reset_if_last_session: bool = True):
         """
-        Closes the reference to the FPGA session and, optionally, resets execution of the session. By default,
-        the Close FPGA session Reference function closes the reference to the FPGA session and resets the FPGA session.
-        To configure this function only to close the reference, change the value of the argument when calling the
+        Closes the reference to the FPGA session and, optionally, resets execution of the session.
+        By default, the Close FPGA session Reference function closes the reference to the FPGA
+        session and resets the FPGA session.To configure this function only to close the reference, change the value of the argument when calling the
         function. The Close FPGA session reference function also stops all DMA FIFOs on the FPGA.
 
         Args:
@@ -431,7 +447,7 @@ class _SSCFPGA(typing.NamedTuple):
         master_go.write(True)
         self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         data = master_data.read()
-        data = data[0:number_of_bytes + 1]
+        data = data[0 : number_of_bytes + 1]
         return data
 
     def i2c_master_write(
@@ -481,7 +497,9 @@ class _SSCFPGA(typing.NamedTuple):
         data = ReadData(data_rd[0], data_rd[1], data_rd[2], data_rd[3])
         return data
 
-    def read_multiple_dio_commanded_states(self, lines_to_read: typing.Union[LineLocation, typing.Sequence[LineLocation]]):
+    def read_multiple_dio_commanded_states(
+        self, lines_to_read: typing.Union[LineLocation, typing.Sequence[LineLocation]]
+    ):
         """
         Reads the commanded states (0, 1, X, I2C) from the provided list of FPGA Lines and returns an array with their
         value
@@ -531,7 +549,9 @@ class _SSCFPGA(typing.NamedTuple):
             states_list.append(state)
         return states_list
 
-    def read_multiple_lines(self, lines_to_read: typing.Union[LineLocation, typing.Sequence[LineLocation]]):
+    def read_multiple_lines(
+        self, lines_to_read: typing.Union[LineLocation, typing.Sequence[LineLocation]]
+    ):
         """
         Reads a provided list of lines from the FPGA
         Args:
@@ -586,7 +606,12 @@ class _SSCFPGA(typing.NamedTuple):
         line_state = state_list[line.value]
         return line_state
 
-    def write_multiple_dio_lines(self, lines_to_write: typing.Union[DIOLineLocationAndStaticState, typing.Sequence[DIOLineLocationAndStaticState]]):
+    def write_multiple_dio_lines(
+        self,
+        lines_to_write: typing.Union[
+            DIOLineLocationAndStaticState, typing.Sequence[DIOLineLocationAndStaticState]
+        ],
+    ):
         """
         Writes the provided list of DIOLineLocationAndStaticState objects into the FPGA using the address provided in
         each element
@@ -608,11 +633,10 @@ class _SSCFPGA(typing.NamedTuple):
             if 0 <= lines.connector.value <= 3:
                 self.write_single_dio_line(lines.connector, lines.channel, lines.state)
         try:
-            update_state = self.Session.registers['Update State']
+            update_state = self.Session.registers["Update State"]
             update_state.write(True)
         except KeyError:
             pass
-
 
     def write_single_dio_line(
         self,
@@ -634,11 +658,10 @@ class _SSCFPGA(typing.NamedTuple):
             con_enable.write(enable)
             con_data.write(data)
             try:
-                update_state = self.Session.registers['Update State']
+                update_state = self.Session.registers["Update State"]
                 update_state.write(True)
             except KeyError:
                 pass
-
 
 
 class TSMFPGA(typing.NamedTuple):
@@ -744,7 +767,9 @@ class TSMFPGA(typing.NamedTuple):
             line_states.append(data[0])
         return readings, line_states
 
-    def write_static_array(self, static_state: typing.Union[StaticStates, typing.List[StaticStates]]):
+    def write_static_array(
+        self, static_state: typing.Union[StaticStates, typing.List[StaticStates]]
+    ):
         """
         Write a list of Static States on the FPGA session
         Args:
@@ -914,7 +939,9 @@ def initialize_sessions(tsm_context: SMContext, ldb_type: str = ""):
 
 
 def pins_to_sessions(
-    tsm_context: SMContext, pins: typing.Union[str, typing.Sequence[str]], site_numbers: typing.Union[int, typing.Sequence[int]] = []
+    tsm_context: SMContext,
+    pins: typing.Union[str, typing.Sequence[str]],
+    site_numbers: typing.Union[int, typing.Sequence[int]] = [],
 ):
     """
     Returns an object that contains a list of sessions generated for the provided pins.

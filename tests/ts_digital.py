@@ -345,4 +345,3 @@ def misc(tsm: SMContext, pins: typing.List[str]):
     # dpi_pin1.publish([True, True, True], "Publish_3")
     dpi_pin1.publish([[True, True, True]], "Publish_3")
     dpi_pin1.publish([[True, True], [True, True], [True, True]], "Publish_4")
-

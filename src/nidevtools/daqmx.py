@@ -36,6 +36,7 @@ class TaskProperties(typing.NamedTuple):
             TriggerChannel: str
             Edge: str
     """
+
     InstrumentName: str
     Channel: str
     Pin: str
@@ -57,6 +58,7 @@ class _Session(typing.NamedTuple):
         Pins: Pins assigned to the specific task
         Site: Site in which the task is running
     """
+
     Task: nidaqmx.Task
     ChannelList: str
     Pins: str
@@ -94,7 +96,7 @@ class _Session(typing.NamedTuple):
 
         This write method is dynamic, and is capable of accepting the
         samples to write in the various forms for most operations:
-        
+
         - Scalar: Single sample for 1 channel.
         - List/1D numpy.ndarray: Multiple samples for 1 channel or 1
           sample for multiple channels.
@@ -106,11 +108,11 @@ class _Session(typing.NamedTuple):
 
         For counter output pulse operations, this write method only
         accepts samples in these forms:
-        
-        - Scalar CtrFreq, CtrTime, CtrTick (from nidaqmx.types): 
+
+        - Scalar CtrFreq, CtrTime, CtrTick (from nidaqmx.types):
           Single sample for 1 channel.
         - List of CtrFreq, CtrTime, CtrTick (from nidaqmx.types):
-          Multiple samples for 1 channel or 1 sample for multiple 
+          Multiple samples for 1 channel or 1 sample for multiple
           channels.
 
         If the task uses on-demand timing, this method returns only
@@ -128,7 +130,7 @@ class _Session(typing.NamedTuple):
                 The data you write must be in the units of the
                 generation, including any custom scales. Use the DAQmx
                 Create Channel methods to specify these units.
-            
+
         Returns:
             int:
 
@@ -290,6 +292,7 @@ class _Sessions:
     """
     Class that contains a list of DAQmx sessions with methods to control all sessions inside the object
     """
+
     sessions: typing.List[_Session]
 
     # Read
@@ -367,7 +370,7 @@ class _Sessions:
 
         This write method is dynamic, and is capable of accepting the
         samples to write in the various forms for most operations:
-        
+
         - Scalar: Single sample for 1 channel.
         - List/1D numpy.ndarray: Multiple samples for 1 channel or 1
           sample for multiple channels.
@@ -379,11 +382,11 @@ class _Sessions:
 
         For counter output pulse operations, this write method only
         accepts samples in these forms:
-        
-        - Scalar CtrFreq, CtrTime, CtrTick (from nidaqmx.types): 
+
+        - Scalar CtrFreq, CtrTime, CtrTick (from nidaqmx.types):
           Single sample for 1 channel.
         - List of CtrFreq, CtrTime, CtrTick (from nidaqmx.types):
-          Multiple samples for 1 channel or 1 sample for multiple 
+          Multiple samples for 1 channel or 1 sample for multiple
           channels.
 
         If the task uses on-demand timing, this method returns only
@@ -401,7 +404,7 @@ class _Sessions:
                 The data you write must be in the units of the
                 generation, including any custom scales. Use the DAQmx
                 Create Channel methods to specify these units.
-            
+
         Returns:
             int:
 

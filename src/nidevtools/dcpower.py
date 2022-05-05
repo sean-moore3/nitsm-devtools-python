@@ -98,7 +98,9 @@ class CustomTransientResponse:
     class to store and access the custom transient response settings
     """
 
-    def __init__(self, gain_bandwidth: float, compensation_frequency: float, pole_zero_ratio: float):
+    def __init__(
+        self, gain_bandwidth: float, compensation_frequency: float, pole_zero_ratio: float
+    ):
         """
         constructor for storing custom trasient response
 
@@ -376,7 +378,9 @@ class _NIDCPowerSSC:
         self._channels_session.aperture_time_units = aperture_time_units
         self._channels_session.initiate()
 
-    def cs_configure_aperture_time(self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS):
+    def cs_configure_aperture_time(
+        self, aperture_time=16.667e-03, aperture_time_units=enums.ApertureTimeUnits.SECONDS
+    ):
         """
         Configures the measurement aperture time for the channel configuration.
         Aperture time is specified in the units set by the aperture_time_units property.
@@ -500,9 +504,13 @@ class _NIDCPowerSSC:
         ]
         actual_aperture_time = self._channels_session.aperture_time_units
         if match in all_supported_models + ["4112", "4113", "4132"]:
-            if self._channels_session.aperture_time_units == enums.ApertureTimeUnits.POWER_LINE_CYCLES:
+            if (
+                self._channels_session.aperture_time_units
+                == enums.ApertureTimeUnits.POWER_LINE_CYCLES
+            ):
                 actual_aperture_time = (
-                    self._channels_session.aperture_time_units / self._channels_session.power_line_frequency
+                    self._channels_session.aperture_time_units
+                    / self._channels_session.power_line_frequency
                 )
 
         if match in ["4110", "4130"]:
@@ -551,7 +559,9 @@ class _NIDCPowerSSC:
         """
         output_states = []
         for ch in self._ch_list:
-            state = self.session.channels[ch].query_output_state(output_state)  # access one channel at a time.
+            state = self.session.channels[ch].query_output_state(
+                output_state
+            )  # access one channel at a time.
             output_states.append(state)
         return output_states
 
@@ -604,7 +614,9 @@ class _NIDCPowerSSC:
         if v_value == 0.0:
             v_value = max(abs(voltage_limit_high), abs(voltage_limit_low))
         self._channels_session.voltage_limit_range = v_value
-        self._channels_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
+        self._channels_session.compliance_limit_symmetry = (
+            nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
+        )
 
     def cs_configure_single_pt_force_current_symmetric_limits(
         self, current_level=0.0, current_level_range=0.0, voltage_limit=0.0, voltage_limit_range=0.0
@@ -630,7 +642,9 @@ class _NIDCPowerSSC:
         if v_value == 0.0:
             v_value = abs(voltage_limit)
         self._channels_session.voltage_limit_range = v_value
-        self._channels_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.SYMMETRIC
+        self._channels_session.compliance_limit_symmetry = (
+            nidcpower.ComplianceLimitSymmetry.SYMMETRIC
+        )
 
     def cs_configure_voltage_limit_range(self, voltage_limit_range=0.0):
         """
@@ -762,7 +776,9 @@ class _NIDCPowerSSC:
         if c_value == 0.0:
             c_value = max(abs(current_limit_high), abs(current_limit_low))
         self._channels_session.current_limit_range = c_value
-        self._channels_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
+        self._channels_session.compliance_limit_symmetry = (
+            nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
+        )
 
     def cs_configure_single_point_force_dc_voltage_symmetric_limits(
         self, voltage_level=0.0, voltage_level_range=0.0, current_limit=0.0, current_limit_range=0.0
@@ -788,7 +804,9 @@ class _NIDCPowerSSC:
         if c_value == 0.0:
             c_value = abs(current_limit)
         self._channels_session.current_limit_range = c_value
-        self._channels_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.SYMMETRIC
+        self._channels_session.compliance_limit_symmetry = (
+            nidcpower.ComplianceLimitSymmetry.SYMMETRIC
+        )
 
     def cs_configure_voltage_level_range(self, voltage_level_range=0.0):
         """
@@ -865,7 +883,9 @@ class _NIDCPowerSSC:
         )
         self._channels_session.commit()
 
-    def cs_configure_source_adapt(self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse):
+    def cs_configure_source_adapt(
+        self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse
+    ):
         """
         configure the source adapt settings for custom transient response for voltage current
 
@@ -1069,13 +1089,17 @@ class _NIDCPowerSSC:
         elif signal == enums.SendSoftwareEdgeTriggerType.MEASURE:
             self._channels_session.exported_measure_trigger_output_terminal = output_terminal
         elif signal == enums.SendSoftwareEdgeTriggerType.SEQUENCE_ADVANCE:
-            self._channels_session.exported_sequence_advance_trigger_output_terminal = output_terminal
+            self._channels_session.exported_sequence_advance_trigger_output_terminal = (
+                output_terminal
+            )
         elif signal == enums.SendSoftwareEdgeTriggerType.PULSE:
             self._channels_session.exported_pulse_trigger_output_terminal = output_terminal
         else:
             pass  # Todo Need to define for other signals.
 
-    def cs_send_software_edge_trigger(self, trigger_to_send=enums.SendSoftwareEdgeTriggerType.MEASURE):
+    def cs_send_software_edge_trigger(
+        self, trigger_to_send=enums.SendSoftwareEdgeTriggerType.MEASURE
+    ):
         """
         Asserts the specified trigger. This method can override an external
         edge trigger.
@@ -1161,7 +1185,11 @@ class _NIDCPowerSSC:
         self._channels_session.measure_when = nidcpower.MeasureWhen.ON_MEASURE_TRIGGER
         self._channels_session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
         self._channels_session.commit()
-        num_samples = int(math.ceil(buffer_length / self._channels_session.measure_record_delta_time.total_seconds()))
+        num_samples = int(
+            math.ceil(
+                buffer_length / self._channels_session.measure_record_delta_time.total_seconds()
+            )
+        )
         # coerce num_samples to be between 1 and max value of I32 (2147483647)
         if num_samples < 1:
             num_samples = 1
@@ -1200,7 +1228,9 @@ class _NIDCPowerSSC:
         self._channels_session.measure_when = settings["measure_when"]
         self._channels_session.measure_trigger_type = settings["measure_trigger_type"]
         self._channels_session.measure_record_length = settings["measure_record_length"]
-        self._channels_session.measure_record_length_is_finite = settings["measure_record_length_is_finite"]
+        self._channels_session.measure_record_length_is_finite = settings[
+            "measure_record_length_is_finite"
+        ]
 
     def cs_measure_setup(self, measurement_mode: MeasurementMode):
         """
@@ -1217,15 +1247,19 @@ class _NIDCPowerSSC:
         elif measurement_mode == MeasurementMode.SOFTWARE_TRIGGER:
             fetch_or_measure = not self.measure_multiple_only
         else:
-            fetch_or_measure = self._channels_session.measure_when == enums.MeasureWhen.ON_MEASURE_TRIGGER
+            fetch_or_measure = (
+                self._channels_session.measure_when == enums.MeasureWhen.ON_MEASURE_TRIGGER
+            )
 
         if fetch_or_measure:
-            self._channels_session.send_software_edge_trigger(enums.SendSoftwareEdgeTriggerType.MEASURE)
+            self._channels_session.send_software_edge_trigger(
+                enums.SendSoftwareEdgeTriggerType.MEASURE
+            )
         return fetch_or_measure
 
     def cs_measure_execute(self, fetch_or_measure: bool):
         """
-        fetches or measures based on the boolean parameter passed 
+        fetches or measures based on the boolean parameter passed
 
         Args:
             fetch_or_measure (bool): decides the operation between fetch and measure
@@ -1332,6 +1366,7 @@ class _NIDCPowerTSM:
     """
     Class to store the sessions for each context of pins.
     """
+
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDCPowerSSC]):
         """
         constructor function for NIDCPowerTSM private class
@@ -1418,7 +1453,14 @@ class _NIDCPowerTSM:
             transient_responses (list of enum): Controls how to control the response based on load.
                 Defaults to enums.TransientResponse.NORMAL.
         """
-        for (ssc, aperture_time, source_delay, sense, aperture_time_unit, transient_response,) in zip(
+        for (
+            ssc,
+            aperture_time,
+            source_delay,
+            sense,
+            aperture_time_unit,
+            transient_response,
+        ) in zip(
             self._sscs,
             aperture_times,
             source_delays,
@@ -1426,7 +1468,9 @@ class _NIDCPowerTSM:
             aperture_time_units,
             transient_responses,
         ):
-            ssc.cs_configure_settings(aperture_time, source_delay, sense, aperture_time_unit, transient_response)
+            ssc.cs_configure_settings(
+                aperture_time, source_delay, sense, aperture_time_unit, transient_response
+            )
 
     def _force_current_asymmetric_limits_array(
         self,
@@ -1586,7 +1630,9 @@ class _NIDCPowerTSM:
             voltage_limit_ranges,
         )
 
-    def _force_current_symmetric_limits(self, current_level, current_level_range, voltage_limit, voltage_limit_range):
+    def _force_current_symmetric_limits(
+        self, current_level, current_level_range, voltage_limit, voltage_limit_range
+    ):
         """
         private function which performs sourcing of current with symmetric voltage limit settings
 
@@ -1641,7 +1687,9 @@ class _NIDCPowerTSM:
             current_limit_ranges,
         )
 
-    def _force_voltage_symmetric_limits(self, voltage_level, voltage_level_range, current_limit, current_limit_range):
+    def _force_voltage_symmetric_limits(
+        self, voltage_level, voltage_level_range, current_limit, current_limit_range
+    ):
         """
         private function which performs sourcing of voltage with symmetric current limit settings
 
@@ -1739,7 +1787,9 @@ class _NIDCPowerTSM:
             None: when this operation is completed successfully, i.e. no error.
         """
         for ssc in self._sscs:
-            ssc.cs_configure_aperture_time_with_abort_and_initiate(aperture_time, aperture_time_units)
+            ssc.cs_configure_aperture_time_with_abort_and_initiate(
+                aperture_time, aperture_time_units
+            )
         return
 
     def configure_power_line_frequency(self, power_line_frequency=60.0):
@@ -1836,7 +1886,7 @@ class _NIDCPowerTSM:
         about supported devices.
         Set this property to False to disconnect the output terminal from the output.
         to the output terminal might discharge unless the relay is disconnected. Excessive connecting and disconnecting of the output can cause premature wear on the relay.
-      
+
         Note: Only disconnect the output when disconnecting is necessary for your application. For example, a battery connected
 
         Args:
@@ -1850,7 +1900,7 @@ class _NIDCPowerTSM:
         """
         Specifies whether the output is enabled (True) or disabled (False).
         Depending on the value you specify for the output_function property, you also must set the voltage level or current level in addition to enabling the output
-        the initiate method. 
+        the initiate method.
 
         Note: If the session is in the Committed or Uncommitted states, enabling the output does not take effect until you call
 
@@ -1864,8 +1914,8 @@ class _NIDCPowerTSM:
 
     def configure_output_enabled_and_connected(self, output_enabled_and_connected=False):
         """
-        Specifies whether the output relay is connected (closed) or disconnected (open). The output_enabled property also changes based on this property; 
-        
+        Specifies whether the output relay is connected (closed) or disconnected (open). The output_enabled property also changes based on this property;
+
         Args:
             output_enabled_and_connected (bool, optional):controls the output relay and enables the output. Defaults to False.
         """
@@ -2022,7 +2072,9 @@ class _NIDCPowerTSM:
             ssc.cs_configure_export_signal(signal, output_terminal)
             break
 
-    def send_software_edge_trigger(self, trigger_to_send=nidcpower.SendSoftwareEdgeTriggerType.MEASURE):
+    def send_software_edge_trigger(
+        self, trigger_to_send=nidcpower.SendSoftwareEdgeTriggerType.MEASURE
+    ):
         """
         Asserts the specified trigger. This method can override an external
         edge trigger.
@@ -2061,7 +2113,9 @@ class _NIDCPowerTSM:
         Returns:
             voltage and current waveforms: tuple of voltage and current waveforms
         """
-        voltage_waveforms, current_waveforms = self.fetch_waveform(settings["start_time"], fetch_waveform_length_s)
+        voltage_waveforms, current_waveforms = self.fetch_waveform(
+            settings["start_time"], fetch_waveform_length_s
+        )
         self.abort()
         self.set_measurement_settings(settings["previous_settings"])
         self.initiate()
@@ -2091,7 +2145,9 @@ class _NIDCPowerTSM:
                 fetch_samples = fetch_backlog
             else:
                 fetch_samples = int(waveform_length_s / record_dt)
-            samples = ssc._channels_session.fetch_multiple(fetch_samples, timeout=waveform_length_s + 1)
+            samples = ssc._channels_session.fetch_multiple(
+                fetch_samples, timeout=waveform_length_s + 1
+            )
             voltages = []
             currents = []
             in_compliance = []
@@ -2191,7 +2247,9 @@ class _NIDCPowerTSM:
         aperture_times = self._expand_array_to_sessions(aperture_time)
         source_delays = self._expand_array_to_sessions(source_delay)
         senses = self._expand_array_to_sessions(sense)
-        self._configure_settings_array(aperture_times, source_delays, senses, aperture_time_units, transient_responses)
+        self._configure_settings_array(
+            aperture_times, source_delays, senses, aperture_time_units, transient_responses
+        )
 
     def configure_current_level_range(self, current_level_range=0.0):
         """
@@ -2354,7 +2412,9 @@ class _NIDCPowerTSM:
             voltage_limit_ranges,
         )
 
-    def force_current_symmetric_limits(self, current_level, current_level_range, voltage_limit, voltage_limit_range):
+    def force_current_symmetric_limits(
+        self, current_level, current_level_range, voltage_limit, voltage_limit_range
+    ):
         """
                Source same voltage limit on both sides (positive and negative)
 
@@ -2447,7 +2507,9 @@ class _NIDCPowerTSM:
             i += 1
         return voltages, currents
 
-    def configure_source_adapt(self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse):
+    def configure_source_adapt(
+        self, voltage_ctr: CustomTransientResponse, current_ctr: CustomTransientResponse
+    ):
         """configures the transient responses for both voltage and current
 
         Args:
@@ -2551,8 +2613,12 @@ def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
         if index_d >= 0:
             pins_expand_new.append(data)
         i += 1
-    dut_pins, system_pins = ni_dt_common.get_dut_pins_and_system_pins_from_expanded_pin_list(pins_expand_new)
-    pins_to_query_ctx = ni_dt_common.get_pin_names_from_expanded_pin_information(dut_pins + system_pins)
+    dut_pins, system_pins = ni_dt_common.get_dut_pins_and_system_pins_from_expanded_pin_list(
+        pins_expand_new
+    )
+    pins_to_query_ctx = ni_dt_common.get_pin_names_from_expanded_pin_information(
+        dut_pins + system_pins
+    )
     dc_power_tsm.pin_query_context.Pins = pins_to_query_ctx
     return dc_power_tsm
 
@@ -2605,9 +2671,12 @@ def pins_to_sessions(
             a = ni_dt_common.PinInformation  # create instance of class
             a.pin = pin
             pins_info.append(a)
-    _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, sites)
+    _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(
+        pin_query_context, pins_expanded, sites
+    )
     sscs = [
-        _NIDCPowerSSC(session, channel, pin_list) for session, channel, pin_list in zip(sessions, channels, pin_lists)
+        _NIDCPowerSSC(session, channel, pin_list)
+        for session, channel, pin_list in zip(sessions, channels, pin_lists)
     ]
     dc_power_tsm = _NIDCPowerTSM(sscs)
     return TSMDCPower(pin_query_context, dc_power_tsm, sites, pins_info, pins_expanded)
@@ -2656,7 +2725,7 @@ def initialize_sessions(tsm: SMContext, power_line_frequency=60.0, **kwargs):
 def close_sessions(tsm: SMContext):
     """
     Closes the sessions associated with the tsm context
-    
+
     Args:
         tsm (SMContext): TestStand semiconductor module context
     """

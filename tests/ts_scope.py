@@ -82,7 +82,9 @@ def plot_data(measurements, record_length):
 
 @nitsm.codemoduleapi.code_module
 def open_sessions(tsm: SMContext):
-    scope.initialize_sessions(tsm,)
+    scope.initialize_sessions(
+        tsm,
+    )
 
 
 @nitsm.codemoduleapi.code_module
@@ -177,9 +179,7 @@ def fetch_waveform(tsm: SMContext, pins: typing.List[str], sites: typing.List[in
     return data1, info, v_peak, v_max
 
 
-
 @nitsm.codemoduleapi.code_module
 def close_sessions(tsm: SMContext):
     print(" Closing sessions")
     scope.close_sessions(tsm)
-

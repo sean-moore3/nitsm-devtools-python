@@ -228,8 +228,9 @@ def _configure_vertical_per_channel_arrays(
     for (ssc, v_range, coupling, offset, drop, enabled) in zip(
         ssc_s, ranges, couplings, offsets, probes_drop, enabled_s
     ):
-        ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, drop,
-        enabled)
+        ssc.session.channels[ssc.channels].configure_vertical(
+            v_range, coupling, offset, drop, enabled
+        )
 
 
 # Digital Sub routines
@@ -443,7 +444,9 @@ class _NIScopeTSM:
                 True.
         """
         for ssc in self._sscs:
-            ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, probe_attenuation, enabled)
+            ssc.session.channels[ssc.channels].configure_vertical(
+                v_range, coupling, offset, probe_attenuation, enabled
+            )
         return
 
     def configure(
@@ -510,7 +513,9 @@ class _NIScopeTSM:
         ranges = _expand_to_requested_array_size(vertical_range, size)
         offsets = _expand_to_requested_array_size(offset, size)
         enabled_out = _expand_to_requested_array_size(channel_enabled, size)
-        _configure_vertical_per_channel_arrays(ssc_per_channel, ranges, couplings, offsets, probe_drops, enabled_out)
+        _configure_vertical_per_channel_arrays(
+            ssc_per_channel, ranges, couplings, offsets, probe_drops, enabled_out
+        )
         return
 
     # Configure Timing
@@ -756,7 +761,9 @@ class _NIScopeTSM:
                 ssc.session.commit()
                 start_trigger = "/" + ssc.session.io_resource_descriptor + "/" + output_terminal
             else:
-                ssc.session.configure_trigger_digital(start_trigger, trigger_slope, holdoff=0.0, delay=0.0)
+                ssc.session.configure_trigger_digital(
+                    start_trigger, trigger_slope, holdoff=0.0, delay=0.0
+                )
                 ssc.session.initiate()
         return start_trigger
 
@@ -840,7 +847,9 @@ class _NIScopeTSM:
         waveforms: typing.Any = []
         waveform_info: typing.List[niscope.WaveformInfo] = []
         for ssc in self._sscs:
-            channels, pins, sites = _channel_list_to_pins(ssc.channel_list)  # Unused no waveform attribute in python
+            channels, pins, sites = _channel_list_to_pins(
+                ssc.channel_list
+            )  # Unused no waveform attribute in python
             waveform = ssc.session.channels[ssc.channels].fetch(
                 meas_num_samples, relative_to=niscope.FetchRelativeTo.PRETRIGGER
             )
@@ -862,7 +871,9 @@ class _NIScopeTSM:
         waveforms: typing.Any = []
         waveform_info: typing.List[niscope.WaveformInfo] = []
         for ssc in self._sscs:
-            channels, pins, sites = _channel_list_to_pins(ssc.channel_list)  # Unused no waveform attribute in python
+            channels, pins, sites = _channel_list_to_pins(
+                ssc.channel_list
+            )  # Unused no waveform attribute in python
             ssc.session._fetch_num_records = num_records
             waveform = ssc.session.channels[ssc.channels].fetch(
                 relative_to=niscope.FetchRelativeTo.PRETRIGGER,
@@ -897,7 +908,9 @@ class _NIScopeTSM:
                 clearable_measurement_function=niscope.ClearableMeasurement.ALL_MEASUREMENTS
             )
             ssc.session.initiate()
-            measurement_stats.append(ssc.session.channels[ssc.channels].fetch_measurement_stats(scalar_meas_function))
+            measurement_stats.append(
+                ssc.session.channels[ssc.channels].fetch_measurement_stats(scalar_meas_function)
+            )
         return measurement_stats
 
     def fetch_meas_stats_per_channel(self, scalar_measurement: niscope.ScalarMeasurement):
@@ -949,7 +962,9 @@ class _NIScopeTSM:
                 -	**record** (int): record number of this result
         """
         ssc_per_channel = _expand_ssc_to_ssc_per_channel(list(self._sscs))
-        scalar_measurements = _expand_to_requested_array_size(scalar_measurement, len(ssc_per_channel))
+        scalar_measurements = _expand_to_requested_array_size(
+            scalar_measurement, len(ssc_per_channel)
+        )
         measurement_stats = _fetch_measurement_stats_arrays(ssc_per_channel, scalar_measurements)
         return measurement_stats
 
@@ -1032,12 +1047,21 @@ def _pin_query_context_to_channel_list(
         """
         initialized_pins: typing.List[str] = [""] * number_of_pins
         pins_array_for_session_input.append(PinsCluster(Pins=initialized_pins))
-    for (per_site_transposed_channel_group_indices, per_site_transposed_channel_indices, site_number,) in zip(
+    for (
+        per_site_transposed_channel_group_indices,
+        per_site_transposed_channel_indices,
+        site_number,
+    ) in zip(
         numpy.transpose(ch_gp_indices),
         numpy.transpose(ch_indices),
         sites,
     ):
-        for (per_pin_transposed_channel_group_index, per_pin_transposed_channel_index, pin, pin_type,) in zip(
+        for (
+            per_pin_transposed_channel_group_index,
+            per_pin_transposed_channel_index,
+            pin,
+            pin_type,
+        ) in zip(
             per_site_transposed_channel_group_indices,
             per_site_transposed_channel_indices,
             pin_names,
@@ -1079,7 +1103,8 @@ def pins_to_sessions(tsm: SMContext, pins: typing.List[str], sites: typing.List[
     sites, pin_lists = _pin_query_context_to_channel_list(pin_query_context, [], sites)
     # sites, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
     sscs = [
-        _NIScopeSSC(session, channel, pin_list) for session, channel, pin_list in zip(sessions, channels, pin_lists)
+        _NIScopeSSC(session, channel, pin_list)
+        for session, channel, pin_list in zip(sessions, channels, pin_lists)
     ]
     scope_tsm = _NIScopeTSM(sscs)
     return TSMScope(pin_query_context, scope_tsm, sites)

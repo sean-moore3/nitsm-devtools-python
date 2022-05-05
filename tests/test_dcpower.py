@@ -301,15 +301,12 @@ def source_voltage(tsm: SMContext):
         voltage_level=3.8, voltage_level_range=6.0, current_limit=10e-3, current_limit_range=100e-3
     )
     time.sleep(0.5)
-    
-    
+
     # output_terminal_name =dc_tsm.ssc.cs_session.exported_source_trigger_output_terminal # something like this "/Dev1/PXI_Trig0" will be returned
     # session2 = dc_tsm.ssc.cs_session
     # session2.source_trigger_type = nidcpower.Enum.TriggerType.DIGITAL_EDGE
     # session2.digital_edge_source_trigger_input_terminal = output_terminal_name
     # dc_tsm.ssc.cs_send_software_edge_trigger()
-
-
 
 
 @nitsm.codemoduleapi.code_module

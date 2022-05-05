@@ -23,5 +23,5 @@ for pin_count in range(10):
 print(data)
 tsm = "tsm"
 
-absobj = ni_dt_abs.pins_to_sessions_sessions_info(tsm, "ldo23" )
+absobj = ni_dt_abs.pins_to_sessions_sessions_info(tsm, "ldo23")
 absobj.connect_sessions_info(tsm)

@@ -33,6 +33,7 @@ class Control(enum.Enum):
     Args:
         enum : Inherits from enum class.
     """
+
     get_connections = 0
     disconnect_all = 1
     init = 2
@@ -196,6 +197,7 @@ class AbstractSession(typing.NamedTuple):
     Args:
         enable_pins: typing.List[Session]
     """
+
     enable_pins: typing.List[Session]
 
     def set_sessions(self, tsm: SMContext, switch_name: str = ""):  # CHECK
@@ -343,7 +345,7 @@ def initialize(tsm: SMContext):  # CHECK
 
 def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connections):
     """
-    Pin switch status fgv labview equivalent code 
+    Pin switch status fgv labview equivalent code
     """
     connections = []
     while True:
@@ -389,7 +391,7 @@ def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connect
         elif action == Control.init:
             pinmap_path = tsm.pin_map_file_path
             connections += pin_name_to_instrument(pinmap_path)
-        break #TODO consider removing the while loop which breaks always
+        break  # TODO consider removing the while loop which breaks always
 
 
 def get_first_matched_node(tree: Et.ElementTree, key: str):
@@ -412,14 +414,14 @@ def get_first_matched_node(tree: Et.ElementTree, key: str):
 
 def get_all_matched_nodes(element: Et.Element, key: str):
     """
-    finds all the key matched nodes inside the element tag  
+    finds all the key matched nodes inside the element tag
 
     Args:
         element (Et.Element): xml element in which searching happens
         key (str): string to search in the element
 
     Returns:
-        list: list of child elements 
+        list: list of child elements
     """
     key = "{http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd}" + key
     children = list(element)
@@ -558,7 +560,9 @@ def pins_to_sessions_sessions_info(tsm: SMContext, pin: str):
         for element1, element2 in zip(list1, list2):
             condition = False
             for single_session in session.enable_pins:
-                # Change id 050322 "Moving the lines that set the route_value for each element and the site inside the if statement avoids overwriting correct route_value with following for loops"
+                # Change id 050322 "Moving the lines that set the route_value for each element
+                # and the site inside the if statement avoids overwriting correct route_value
+                # with following for loops"
                 if single_session.enable_pin.strip().lower() == element1.lower():
                     single_session.route_value = element2
                     single_session.site = i

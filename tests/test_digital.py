@@ -651,7 +651,6 @@ def configure_pins(tsm: SMContext):
     dpi_tsm_o.ssc.write_static(dt_dpi.enums.WriteStaticPinState.ZERO)
 
 
-
 @nitsm.codemoduleapi.code_module
 def read_pins(tsm: SMContext):
     dpi_tsm_i = dt_dpi.pins_to_sessions(tsm, ["DPI_PG_Inputs"])

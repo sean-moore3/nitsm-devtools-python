@@ -130,7 +130,7 @@ class _NIDigitalSSC:
             channels (str): specific channel(s) of that session for this context.
             pins (str): pins (names) mapped to the channels.
         """
-        self._session = session  
+        self._session = session
         self._channels = channels
         self._pins = pins
         self._channels_session = session.channels[channels]  # session with specific channel(s)
@@ -166,8 +166,9 @@ class _NIDigitalSSC:
         """
         return self._channels_session.clock_generator_generate_clock(frequency, select_digital)
 
-    def cs_modify_time_set_for_clock_generation(self, frequency: float, duty_cycle: float, 
-    time_set: str):
+    def cs_modify_time_set_for_clock_generation(
+        self, frequency: float, duty_cycle: float, time_set: str
+    ):
         """
         Configures the period of a time set, drive format and drive edge placement for the
         specified pins. Use this method to modify time set values after applying a timing
@@ -274,10 +275,10 @@ class _NIDigitalSSC:
         +----------------------------------+------------------------------------------------------+
         | Defined Values:                  |                                                      |
         +==================================+======================================================+
-        | HistoryRAMCyclesToAcquire.FAILED | Only acquires cycles that fail a compare after the 
+        | HistoryRAMCyclesToAcquire.FAILED | Only acquires cycles that fail a compare after the
                                              triggering conditions are met.                       |
         +----------------------------------+------------------------------------------------------+
-        | HistoryRAMCyclesToAcquire.ALL    | Acquires all cycles after the triggering conditions    
+        | HistoryRAMCyclesToAcquire.ALL    | Acquires all cycles after the triggering conditions
                                              are met.                                             |
         +----------------------------------+------------------------------------------------------+
             pretrigger_samples (int, optional): number of pretrigger samples to acquire. Defaults to 0.
@@ -309,10 +310,10 @@ class _NIDigitalSSC:
         | HistoryRAMTriggerType.FIRST_FAILURE | Starts acquiring pattern information in History
                                                 RAM on the first failed cycle in a pattern burst.|
         +-------------------------------------+--------------------------------------------------+
-        | HistoryRAMTriggerType.CYCLE_NUMBER  | Starts acquiring pattern information in History RAM 
+        | HistoryRAMTriggerType.CYCLE_NUMBER  | Starts acquiring pattern information in History RAM
                                                 starting from a specified cycle number.          |
         +-------------------------------------+--------------------------------------------------+
-        | HistoryRAMTriggerType.PATTERN_LABEL | Starts acquiring pattern information in History RAM 
+        | HistoryRAMTriggerType.PATTERN_LABEL | Starts acquiring pattern information in History RAM
                                                 starting from a specified pattern label, augmented by vector and cycle offsets.                      |
         +-------------------------------------+---------------------------------------------------+
             cycle_number (int, optional): cycle number at which trigger happens. Defaults to 0.
@@ -336,7 +337,7 @@ class _NIDigitalSSC:
         gets the current HRAM settings in a tuple format
 
         Returns:
-            HRAM_settings(tuple): contains HRAM Cycles to acquire,pretrigger samples, max samples to acquire per site, is number of samples finite, and buffer size per site 
+            HRAM_settings(tuple): contains HRAM Cycles to acquire,pretrigger samples, max samples to acquire per site, is number of samples finite, and buffer size per site
         """
         return (
             self._session.history_ram_cycles_to_acquire,
@@ -559,10 +560,12 @@ class _NIDigitalSSC:
         """
         self._session.start_trigger_type = enums.TriggerType.NONE
 
-    def cs_configure_trigger_signal(self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING):
+    def cs_configure_trigger_signal(
+        self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING
+    ):
         """
         Specifies the source terminal for the Start trigger. configures the start_trigger_type property as Digital Edge.
-        
+
         Args:
             source (str): You can specify source terminals in one of two ways. If the digital pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0. The source terminal can also be a terminal from another device, in which case the NI-Digital Pattern Driver automatically finds a route (if one is available) from that terminal to the input terminal (going through a physical PXI backplane trigger line). For example, you can set the source terminal on Dev1 to be /Dev2/StartTrigger.
 
@@ -618,7 +621,9 @@ class _NIDigitalSSC:
                 signal_id (str): id of the signal that is used for indexing events.
                 terminal (str, optional): pxi trigger line name. Defaults to "".
         """
-        self._session.pattern_opcode_events[signal_id].exported_pattern_opcode_event_output_terminal = terminal
+        self._session.pattern_opcode_events[
+            signal_id
+        ].exported_pattern_opcode_event_output_terminal = terminal
 
     def cs_ppmu_source(self):
         """
@@ -661,7 +666,9 @@ class _NIDigitalSSC:
         self._channels_session.ppmu_voltage_level = voltage_level
         self.cs_ppmu_source()
 
-    def ps_burst_pattern_pass_fail(self, start_label: str, select_digital_function: bool = True, timeout: float = 10):
+    def ps_burst_pattern_pass_fail(
+        self, start_label: str, select_digital_function: bool = True, timeout: float = 10
+    ):
         """
         Uses the start_label you specify to burst the pattern on the sites you specify. Waits for the burst to complete, and returns comparison results for each site.
 
@@ -679,7 +686,9 @@ class _NIDigitalSSC:
             List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site number and value is pass/fail.
         """
         return list(
-            self._session.sites[self._pins].burst_pattern(start_label, select_digital_function, True, timeout).values()
+            self._session.sites[self._pins]
+            .burst_pattern(start_label, select_digital_function, True, timeout)
+            .values()
         )
 
     def ps_burst_pattern(
@@ -704,7 +713,9 @@ class _NIDigitalSSC:
 
             wait_until_done (bool, optional): A Boolean that indicates whether to wait until the bursting is complete. Defaults to True.
         """
-        self._session.sites[self._pins].burst_pattern(start_label, select_digital_function, wait_until_done, timeout)
+        self._session.sites[self._pins].burst_pattern(
+            start_label, select_digital_function, wait_until_done, timeout
+        )
 
     def ps_get_site_pass_fail(self):
         """
@@ -718,14 +729,15 @@ class _NIDigitalSSC:
 
 class _NIDigitalTSM:
     """
-    class to store session site channels 
+    class to store session site channels
 
     Returns:
         ssc_object: class to store session site object
     """
+
     # SSC Digital array or list #
     def __init__(self, sessions_sites_channels: typing.Iterable[_NIDigitalSSC]):
-        """"
+        """ "
         constructor method for digital sessions class object
         """
         self._sscs = sessions_sites_channels
@@ -751,7 +763,9 @@ class _NIDigitalTSM:
         for ssc in self._sscs:
             ssc.cs_clock_generator_abort()
 
-    def clock_generator_generate_clock(self, frequency: float, select_digital_function: bool = True):
+    def clock_generator_generate_clock(
+        self, frequency: float, select_digital_function: bool = True
+    ):
         """
         Configures clock generator frequency and initiates clock generation on all the channel(s) or
         pin(s) and pin group(s).
@@ -767,7 +781,9 @@ class _NIDigitalTSM:
         for ssc in self._sscs:
             ssc.cs_clock_generator_generate_clock(frequency, select_digital_function)
 
-    def modify_time_set_for_clock_generation(self, frequency: float, duty_cycle: float, time_set: str):
+    def modify_time_set_for_clock_generation(
+        self, frequency: float, duty_cycle: float, time_set: str
+    ):
         """
         Configures the period of a time set, drive format and drive edge placement for all the specified pins.
         Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing
@@ -874,10 +890,10 @@ class _NIDigitalTSM:
         +----------------------------------+------------------------------------------------------+
         | Defined Values:                  |                                                      |
         +==================================+======================================================+
-        | HistoryRAMCyclesToAcquire.FAILED | Only acquires cycles that fail a compare after the 
+        | HistoryRAMCyclesToAcquire.FAILED | Only acquires cycles that fail a compare after the
                                              triggering conditions are met.                       |
         +----------------------------------+------------------------------------------------------+
-        | HistoryRAMCyclesToAcquire.ALL    | Acquires all cycles after the triggering conditions    
+        | HistoryRAMCyclesToAcquire.ALL    | Acquires all cycles after the triggering conditions
                                              are met.                                             |
         +----------------------------------+------------------------------------------------------+
             pretrigger_samples (int, optional): number of pretrigger samples to acquire. Defaults to 0.
@@ -912,10 +928,10 @@ class _NIDigitalTSM:
         | HistoryRAMTriggerType.FIRST_FAILURE | Starts acquiring pattern information in History
                                                 RAM on the first failed cycle in a pattern burst.|
         +-------------------------------------+--------------------------------------------------+
-        | HistoryRAMTriggerType.CYCLE_NUMBER  | Starts acquiring pattern information in History RAM 
+        | HistoryRAMTriggerType.CYCLE_NUMBER  | Starts acquiring pattern information in History RAM
                                                 starting from a specified cycle number.          |
         +-------------------------------------+--------------------------------------------------+
-        | HistoryRAMTriggerType.PATTERN_LABEL | Starts acquiring pattern information in History RAM 
+        | HistoryRAMTriggerType.PATTERN_LABEL | Starts acquiring pattern information in History RAM
                                                 starting from a specified pattern label, augmented by vector and cycle offsets.                      |
         +-------------------------------------+---------------------------------------------------+
             cycle_number (int, optional): cycle number at which trigger happens. Defaults to 0.
@@ -924,7 +940,9 @@ class _NIDigitalTSM:
             vector_offset (int, optional): vector offset in the pattern. Defaults to 0.
         """
         for ssc in self._sscs:
-            ssc.cs_configure_hram_trigger(triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset)
+            ssc.cs_configure_hram_trigger(
+                triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset
+            )
 
     def configure_hram(self, hram_configuration: HRAMConfiguration = HRAMConfiguration()):
         """
@@ -950,14 +968,16 @@ class _NIDigitalTSM:
             number_of_samples_is_finite,
             buffer_size_per_site,
         )
-        self.configure_hram_trigger(triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset)
+        self.configure_hram_trigger(
+            triggers_type, cycle_number, pattern_label, cycle_offset, vector_offset
+        )
 
     def get_hram_settings(self):
         """
         gets the current HRAM settings in a tuple of lists format
 
         Returns:
-            HRAM_settings(tuple of lists): contains HRAM Cycles to acquire,pretrigger samples, max samples to acquire per site, is number of samples finite, and buffer size per site 
+            HRAM_settings(tuple of lists): contains HRAM Cycles to acquire,pretrigger samples, max samples to acquire per site, is number of samples finite, and buffer size per site
         """
         per_instrument_cycles_to_acquire: typing.List[enums.HistoryRAMCyclesToAcquire] = []
         per_instrument_pretrigger_samples: typing.List[int] = []
@@ -1073,14 +1093,18 @@ class _NIDigitalTSM:
                    the pin list. Pins without defined edges in the specified DUT cycle will have a value of pass (True).
                    Length of the outer list will be equal to the value of edge multiplier for the given vector.
                    Length of the inner list will be equal to the number of pins requested.
-                number_of_samples (int): total number of samples in the record 
+                number_of_samples (int): total number of samples in the record
         """
         per_instrument_per_site_array: typing.List[_NIDigitalSSC] = []
         for ssc in self._sscs:
-            channel_list_array, site_list_array, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
+            channel_list_array, site_list_array, _ = _arrange_channels_per_site(
+                ssc._channels, ssc._pins
+            )
             for channel, site in zip(channel_list_array, site_list_array):
                 per_instrument_per_site_array.append(_NIDigitalSSC(ssc._session, channel, site))
-        per_instrument_per_site_cycle_information: typing.List[typing.List[HistoryRAMCycleInformation]] = []
+        per_instrument_per_site_cycle_information: typing.List[
+            typing.List[HistoryRAMCycleInformation]
+        ] = []
         number_of_samples = 0
         for ssc in per_instrument_per_site_array:
             cycle_information: typing.List[HistoryRAMCycleInformation] = []
@@ -1093,7 +1117,8 @@ class _NIDigitalTSM:
                 sample_count = ssc._session.sites[ssc._pins].get_history_ram_sample_count()
                 samples_to_read = sample_count - read_position
                 cycle_information += (
-                    ssc._session.sites[sites].pins[pins]
+                    ssc._session.sites[sites]
+                    .pins[pins]
                     .fetch_history_ram_cycle_information(read_position, samples_to_read)
                 )
                 read_position = sample_count
@@ -1129,7 +1154,7 @@ class _NIDigitalTSM:
             timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error.Defaults to 10.
 
         Returns:
-            List of List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site number and value is pass/fail.  
+            List of List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site number and value is pass/fail.
         """
         return [s.ps_burst_pattern_pass_fail(start_label, digital, timeout) for s in self._sscs]
 
@@ -1341,7 +1366,9 @@ class _NIDigitalTSM:
         for ssc, compare_strobes in zip(self._sscs, per_site_compare_strobe):
             channel_list_array, _, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
             for channel, compare_strobe in zip(channel_list_array, compare_strobes):
-                ssc._session.channels[channel].configure_time_set_compare_edges_strobe(time_set, compare_strobe)
+                ssc._session.channels[channel].configure_time_set_compare_edges_strobe(
+                    time_set, compare_strobe
+                )
 
     def configure_time_set_compare_edge(self, time_set: str, compare_strobe: float):
         """
@@ -1452,7 +1479,9 @@ class _NIDigitalTSM:
         """
         per_instrument_measurements: typing.List[typing.List[float]] = []
         for ssc in self._sscs:
-            per_instrument_measurements.append(ssc._session.channels[ssc._channels].ppmu_measure(measurement_type))
+            per_instrument_measurements.append(
+                ssc._session.channels[ssc._channels].ppmu_measure(measurement_type)
+            )
         return per_instrument_measurements
 
     def ppmu_source_current(self, current_level: float, current_level_range: float = 0):
@@ -1481,7 +1510,9 @@ class _NIDigitalTSM:
         """
         current_limit_range = abs(current_limit_range)
         for ssc, source_voltages in zip(self._sscs, per_site_per_pin_source_voltages):
-            ssc._session.channels[ssc._channels].ppmu_output_function = enums.PPMUOutputFunction.VOLTAGE
+            ssc._session.channels[
+                ssc._channels
+            ].ppmu_output_function = enums.PPMUOutputFunction.VOLTAGE
             ssc._session.channels[ssc._channels].ppmu_current_limit_range = current_limit_range
             channels, _, _ = _channel_list_to_pins(ssc._channels)
             for channel, source_voltage in zip(channels, source_voltages):
@@ -1502,7 +1533,9 @@ class _NIDigitalTSM:
         """
         current_limit_range = abs(current_limit_range)
         for ssc, source_voltages in zip(self._sscs, per_site_source_voltages):
-            ssc._session.channels[ssc._channels].ppmu_output_function = enums.PPMUOutputFunction.VOLTAGE
+            ssc._session.channels[
+                ssc._channels
+            ].ppmu_output_function = enums.PPMUOutputFunction.VOLTAGE
             ssc._session.channels[ssc._channels].ppmu_current_limit_range = current_limit_range
             channel_list_array, _, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
             for channel, source_voltage in zip(channel_list_array, source_voltages):
@@ -1578,7 +1611,9 @@ class _NIDigitalTSM:
         """
         per_instrument_register_values: typing.List[int] = []
         for ssc in self._sscs:
-            per_instrument_register_values.append(ssc._session.read_sequencer_register(sequencer_register))
+            per_instrument_register_values.append(
+                ssc._session.read_sequencer_register(sequencer_register)
+            )
         return per_instrument_register_values
 
     def write_sequencer_flag(
@@ -1659,7 +1694,9 @@ class _NIDigitalTSM:
         """
         per_instrument_capture: typing.List[typing.List[typing.List[int]]] = []
         for ssc in self._sscs:
-            waveforms = ssc._session.sites[ssc._pins].fetch_capture_waveform(waveform_name, samples_to_read, timeout)
+            waveforms = ssc._session.sites[ssc._pins].fetch_capture_waveform(
+                waveform_name, samples_to_read, timeout
+            )
             per_instrument_capture.append([list(waveforms[i]) for i in waveforms.keys()])
         return per_instrument_capture
 
@@ -1708,7 +1745,9 @@ class _NIDigitalTSM:
             rows, cols = numpy.shape(per_instrument_waveform)
             site_numbers, _ = _site_list_to_site_numbers(ssc._pins)
             if minimum_size > cols and expand_to_minimum_size:
-                initialized_array = [[0 for _ in range(minimum_size)] for _ in range(len(site_numbers))]
+                initialized_array = [
+                    [0 for _ in range(minimum_size)] for _ in range(len(site_numbers))
+                ]
                 for row in range(rows):
                     for col in range(cols):
                         initialized_array[row][col] = per_instrument_waveform[row][col]
@@ -1760,7 +1799,8 @@ class _NIDigitalTSM:
 
     def write_static_per_site_per_pin(
         self,
-        per_site_per_pin_state: typing.List[typing.List[enums.WriteStaticPinState]], auto_select=True
+        per_site_per_pin_state: typing.List[typing.List[enums.WriteStaticPinState]],
+        auto_select=True,
     ):
         """
         Writes a static state to the specified pins per site per pin. The selected pins remain in the specified state until the next pattern burst or call to this method. If there are uncommitted changes to levels or the termination mode, this method commits the changes to the pins. This method does not change the selected pin method. If you write a static state to a pin that does not have the Digital method selected, the new static state is stored by the instrument, and affects the state of the pin the next time you change the selected method to Digital.
@@ -1781,8 +1821,7 @@ class _NIDigitalTSM:
                 ssc._session.channels[channel].write_static(state)
 
     def write_static_per_site(
-        self,
-        per_site_state: typing.List[typing.List[enums.WriteStaticPinState]], auto_select=True
+        self, per_site_state: typing.List[typing.List[enums.WriteStaticPinState]], auto_select=True
     ):
         """
         Writes a static state per site. The selected pins remain in the specified state until the next pattern burst or call to this method. If there are uncommitted changes to levels or the termination mode, this method commits the changes to the pins. This method does not change the selected pin method. If you write a static state to a pin that does not have the Digital method selected, the new static state is stored by the instrument, and affects the state of the pin the next time you change the selected method to Digital.
@@ -1812,10 +1851,12 @@ class _NIDigitalTSM:
         for ssc in self._sscs:
             ssc.cs_clear_start_trigger_signal()
 
-    def configure_trigger_signal(self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING):
+    def configure_trigger_signal(
+        self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING
+    ):
         """
         Specifies the source terminal for the Start trigger. configures the start_trigger_type property as Digital Edge.
-        
+
         Args:
             source (str): You can specify source terminals in one of two ways. If the digital pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0. The source terminal can also be a terminal from another device, in which case the NI-Digital Pattern Driver automatically finds a route (if one is available) from that terminal to the input terminal (going through a physical PXI backplane trigger line). For example, you can set the source terminal on Dev1 to be /Dev2/StartTrigger.
 
@@ -1888,15 +1929,21 @@ class _NIDigitalTSM:
         """
         sscs_new: typing.List[_NIDigitalSSC] = []
         for ssc in self._sscs:
-            channel_list_array, site_list_array, site_numbers = _arrange_channels_per_site(ssc._channels, ssc._pins)
+            channel_list_array, site_list_array, site_numbers = _arrange_channels_per_site(
+                ssc._channels, ssc._pins
+            )
             channel_list: typing.List[str] = []
             site_list: typing.List[str] = []
-            for _channel_list, _site_list, site_number in zip(channel_list_array, site_list_array, site_numbers):
+            for _channel_list, _site_list, site_number in zip(
+                channel_list_array, site_list_array, site_numbers
+            ):
                 if site_number in desired_sites:
                     channel_list.append(_channel_list)
                     site_list.append(_site_list)
             if site_list:
-                sscs_new.append(_NIDigitalSSC(ssc._session, ",".join(channel_list), ",".join(site_list)))
+                sscs_new.append(
+                    _NIDigitalSSC(ssc._session, ",".join(channel_list), ",".join(site_list))
+                )
         nidigital_tsm = _NIDigitalTSM(sscs_new)
         return nidigital_tsm
 
@@ -1948,7 +1995,9 @@ class _NIDigitalTSM:
             per_instrument_to_per_site_lut.append(Location1DArray(array))
         return per_instrument_to_per_site_lut
 
-    def calculate_per_instrument_to_per_site_per_pin_lut(self, sites: typing.List[int], pins: typing.List[str]):
+    def calculate_per_instrument_to_per_site_per_pin_lut(
+        self, sites: typing.List[int], pins: typing.List[str]
+    ):
         """
         computes per insturment to per site per pin lookup table
 
@@ -1968,7 +2017,9 @@ class _NIDigitalTSM:
             per_instrument_to_per_site_per_pin_lut.append(Location2DArray(array))
         return per_instrument_to_per_site_per_pin_lut
 
-    def calculate_per_site_per_pin_to_per_instrument_lut(self, sites: typing.List[int], pins: typing.List[str]):
+    def calculate_per_site_per_pin_to_per_instrument_lut(
+        self, sites: typing.List[int], pins: typing.List[str]
+    ):
         """
         coomputes the per site per pin to per instrument lookup table
 
@@ -2046,6 +2097,7 @@ class TSMDigital:
     """
     class that stores TSMDigital operations
     """
+
     def __init__(
         self,
         pin_query_context: typing.Any,
@@ -2070,7 +2122,7 @@ class TSMDigital:
     def frequency_counter_measure_frequency(self):
         """
         Measures the frequency on all the channel(s) over the specified measurement time.
-        
+
         Returns:
             list [ list[float]]: measurement frequencies per site per pin
 
@@ -2078,8 +2130,8 @@ class TSMDigital:
             per_site_per_pin_frequency_measurements: list of list of float
         """
         initialized_array = [[0.0 for _ in self.pins] for _ in self.sites]
-        per_instrument_to_per_site_per_pin_lut = self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
-            self.sites, self.pins
+        per_instrument_to_per_site_per_pin_lut = (
+            self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(self.sites, self.pins)
         )
         per_instrument_frequencies = self.ssc.frequency_counter_measure_frequency()
         per_site_per_pin_frequency_measurements = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -2121,7 +2173,9 @@ class TSMDigital:
         hram_configuration.cycles_to_acquire = per_instrument_cycles_to_acquire[-1]
         hram_configuration.pretrigger_samples = per_instrument_pretrigger_samples[-1]
         hram_configuration.buffer_size_per_site = per_instrument_buffer_size_per_site[-1]
-        hram_configuration.max_samples_to_acquire_per_site = per_instrument_max_samples_to_acquire_per_site[-1]
+        hram_configuration.max_samples_to_acquire_per_site = (
+            per_instrument_max_samples_to_acquire_per_site[-1]
+        )
         return hram_configuration
 
     def log_hram_results(
@@ -2131,11 +2185,11 @@ class TSMDigital:
         destination_dir: str,
     ):
         """
-        stores the HRAM results from every site into multiple log files 
+        stores the HRAM results from every site into multiple log files
 
         Args:
             per_site_cycle_information (typing.List[typing.List[HistoryRAMCycleInformation]]): HRAM results
-            pattern_name (str): pattern name used for bursting 
+            pattern_name (str): pattern name used for bursting
             destination_dir (str): destination folder under which the log files are created.
 
         Returns:
@@ -2148,7 +2202,10 @@ class TSMDigital:
         for cycle_informations, site_number in zip(per_site_cycle_information, self.sites):
             results: typing.List[typing.List[typing.Any]] = []
             if not cycle_informations or all(
-                [not cycle_information.per_pin_pass_fail for cycle_information in cycle_informations]
+                [
+                    not cycle_information.per_pin_pass_fail
+                    for cycle_information in cycle_informations
+                ]
             ):
                 results.append(["PATTERN PASSED - NO FAILURES"])
             else:
@@ -2159,7 +2216,11 @@ class TSMDigital:
                             cycle_information.time_set_name,
                             str(cycle_information.cycle_number),
                             str(cycle_information.scan_cycle_number),
-                            str((lambda x: "P" if x else "F")(all(cycle_information.per_pin_pass_fail))),
+                            str(
+                                (lambda x: "P" if x else "F")(
+                                    all(cycle_information.per_pin_pass_fail)
+                                )
+                            ),
                             "{" + ",".join(self.pins) + "}",
                             "{"
                             + ",".join(
@@ -2169,8 +2230,16 @@ class TSMDigital:
                                 ]
                             )
                             + "}",
-                            "{" + ",".join([str(value) for value in cycle_information.expected_pin_states]) + "}",
-                            "{" + ",".join([str(value) for value in cycle_information.actual_pin_states]) + "}",
+                            "{"
+                            + ",".join(
+                                [str(value) for value in cycle_information.expected_pin_states]
+                            )
+                            + "}",
+                            "{"
+                            + ",".join(
+                                [str(value) for value in cycle_information.actual_pin_states]
+                            )
+                            + "}",
                         ]
                     )
                 results.insert(
@@ -2188,7 +2257,11 @@ class TSMDigital:
                     ],
                 )
             filename = (
-                "HRAM_Results_site" + str(site_number) + "_" + datetime.now().strftime("%d-%b-%Y-%H-%M-%S") + ".csv"
+                "HRAM_Results_site"
+                + str(site_number)
+                + "_"
+                + datetime.now().strftime("%d-%b-%Y-%H-%M-%S")
+                + ".csv"
             )
             files_generated.append(filename)
             file_handle = open(filename, "w")
@@ -2257,9 +2330,12 @@ class TSMDigital:
             per_instrument_per_site_cycle_information,
             number_of_samples,
         ) = self.ssc.stream_hram_results()
-        per_instrument_per_site_to_per_site_lut = self.ssc.calculate_per_instrument_per_site_to_per_site_lut(self.sites)
+        per_instrument_per_site_to_per_site_lut = (
+            self.ssc.calculate_per_instrument_per_site_to_per_site_lut(self.sites)
+        )
         per_site_cycle_information = [
-            [HistoryRAMCycleInformation(0, 0, 0, 0, 0, 0, 0, 0)] * number_of_samples for _ in self.sites
+            [HistoryRAMCycleInformation(0, 0, 0, 0, 0, 0, 0, 0)] * number_of_samples
+            for _ in self.sites
         ]
         for lut, cycle_information in zip(
             per_instrument_per_site_to_per_site_lut,
@@ -2289,11 +2365,15 @@ class TSMDigital:
             timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error.Defaults to 10.
 
         Returns:
-            List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site number and value is pass/fail.  
+            List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site number and value is pass/fail.
         """
         initialized_array = [False for _ in self.sites]
-        per_instrument_to_per_site_lut = self.ssc.calculate_per_instrument_to_per_site_lut(self.sites)
-        per_instrument_pass = self.ssc.burst_pattern_pass_fail(start_label, select_digital_function, timeout)
+        per_instrument_to_per_site_lut = self.ssc.calculate_per_instrument_to_per_site_lut(
+            self.sites
+        )
+        per_instrument_pass = self.ssc.burst_pattern_pass_fail(
+            start_label, select_digital_function, timeout
+        )
         per_site_pass = _apply_lut_per_instrument_to_per_site(
             initialized_array, per_instrument_to_per_site_lut, per_instrument_pass
         )
@@ -2307,8 +2387,8 @@ class TSMDigital:
             failure_count (list of list of int): Number of failures per site per pin. If a site is disabled or not enabled for burst, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
         """
         initialized_array = [[0 for _ in self.pins] for _ in self.sites]
-        per_instrument_to_per_site_per_pin_lut = self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
-            self.sites, self.pins
+        per_instrument_to_per_site_per_pin_lut = (
+            self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(self.sites, self.pins)
         )
         per_instrument_failure_counts = self.ssc.get_fail_count()
         per_site_per_pin_fail_counts = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -2326,14 +2406,18 @@ class TSMDigital:
             pass_fail (List[Bool]): list of pass or fail for each pin
         """
         initialized_array = [False for _ in self.sites]
-        per_instrument_to_per_site_lut = self.ssc.calculate_per_instrument_to_per_site_lut(self.sites)
+        per_instrument_to_per_site_lut = self.ssc.calculate_per_instrument_to_per_site_lut(
+            self.sites
+        )
         per_instrument_pass = self.ssc.get_site_pass_fail()
         per_site_pass = _apply_lut_per_instrument_to_per_site(
             initialized_array, per_instrument_to_per_site_lut, per_instrument_pass
         )
         return per_site_pass
 
-    def apply_tdr_offsets_per_site_per_pin(self, per_site_per_pin_tdr_values: typing.List[typing.List[float]]):
+    def apply_tdr_offsets_per_site_per_pin(
+        self, per_site_per_pin_tdr_values: typing.List[typing.List[float]]
+    ):
         """
         Applies the correction for propagation delay offsets to a digital pattern instrument. Use this method to apply TDR offsets that are stored from a past measurement or are measured by means other than the tdr method. Also use this method to apply correction for offsets if the **applyOffsets** input of the tdr method was set to False at the time of measurement.
 
@@ -2345,7 +2429,9 @@ class TSMDigital:
             instrument_count,
             max_sites_on_instrument,
         ) = self.ssc.calculate_per_site_per_pin_to_per_instrument_lut(self.sites, self.pins)
-        initialized_array = [[0.0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)]
+        initialized_array = [
+            [0.0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
+        ]
         per_instrument_tdr_values = _apply_lut_per_site_per_pin_to_per_instrument(
             initialized_array,
             per_site_per_pin_to_per_instrument_lut,
@@ -2375,7 +2461,9 @@ class TSMDigital:
             instrument_count,
             max_sites_on_instrument,
         ) = self.ssc.calculate_per_site_to_per_instrument_lut(self.sites)
-        initialized_array = [[0.0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)]
+        initialized_array = [
+            [0.0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
+        ]
         per_instrument_value = _apply_lut_per_site_to_per_instrument(
             initialized_array, per_site_to_per_instrument_lut, per_site_value
         )
@@ -2398,15 +2486,21 @@ class TSMDigital:
             instrument_count,
             max_sites_on_instrument,
         ) = self.ssc.calculate_per_site_per_pin_to_per_instrument_lut(self.sites, self.pins)
-        initialized_array = [[0.0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)]
+        initialized_array = [
+            [0.0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
+        ]
         per_instrument_compare_strobe = _apply_lut_per_site_per_pin_to_per_instrument(
             initialized_array,
             per_site_per_pin_to_per_instrument_lut,
             per_site_per_pin_compare_strobe,
         )
-        self.ssc.configure_time_set_compare_edge_per_site_per_pin(time_set, per_instrument_compare_strobe)
+        self.ssc.configure_time_set_compare_edge_per_site_per_pin(
+            time_set, per_instrument_compare_strobe
+        )
 
-    def configure_time_set_compare_edge_per_site(self, time_set: str, per_site_compare_strobe: typing.List[float]):
+    def configure_time_set_compare_edge_per_site(
+        self, time_set: str, per_site_compare_strobe: typing.List[float]
+    ):
         """
         Configures the strobe edge time for the pins in context. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
 
@@ -2420,7 +2514,9 @@ class TSMDigital:
             instrument_count,
             max_sites_on_instrument,
         ) = self.ssc.calculate_per_site_to_per_instrument_lut(self.sites)
-        initialized_array = [[0.0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)]
+        initialized_array = [
+            [0.0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
+        ]
         per_instrument_compare_strobe = _apply_lut_per_site_to_per_instrument(
             initialized_array, per_site_to_per_instrument_lut, per_site_compare_strobe
         )
@@ -2428,14 +2524,14 @@ class TSMDigital:
 
     def ppmu_measure_current(self):
         """
-        Instructs the PPMU to measure current. 
+        Instructs the PPMU to measure current.
 
         Returns:
             per_site_per_pin_measurements (list of float): The returned array of measurements in the order you specify in the repeated capabilities. If a site is disabled, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
         """
         initialized_array = [[0.0 for _ in self.pins] for _ in self.sites]
-        per_instrument_to_per_site_per_pin_lut = self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
-            self.sites, self.pins
+        per_instrument_to_per_site_per_pin_lut = (
+            self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(self.sites, self.pins)
         )
         per_instrument_measurements = self.ssc.ppmu_measure(enums.PPMUMeasurementType.CURRENT)
         per_site_per_pin_measurements = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -2453,8 +2549,8 @@ class TSMDigital:
             per_site_per_pin_measurements (list of float): The returned array of measurements in the order you specify in the repeated capabilities. If a site is disabled, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
         """
         initialized_array = [[0.0 for _ in self.pins] for _ in self.sites]
-        per_instrument_to_per_site_per_pin_lut = self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
-            self.sites, self.pins
+        per_instrument_to_per_site_per_pin_lut = (
+            self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(self.sites, self.pins)
         )
         per_instrument_measurements = self.ssc.ppmu_measure(enums.PPMUMeasurementType.VOLTAGE)
         per_site_per_pin_measurements = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -2481,13 +2577,17 @@ class TSMDigital:
             instrument_count,
             max_sites_on_instrument,
         ) = self.ssc.calculate_per_site_per_pin_to_per_instrument_lut(self.sites, self.pins)
-        initialized_array = [[0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)]
+        initialized_array = [
+            [0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
+        ]
         per_instrument_source_voltages = _apply_lut_per_site_per_pin_to_per_instrument(
             initialized_array,
             per_site_per_pin_to_per_instrument_lut,
             per_site_per_pin_source_voltages,
         )
-        self.ssc.ppmu_source_voltage_per_site_per_pin(current_limit_range, per_instrument_source_voltages)
+        self.ssc.ppmu_source_voltage_per_site_per_pin(
+            current_limit_range, per_instrument_source_voltages
+        )
 
     def ppmu_source_voltage_per_site(
         self,
@@ -2506,7 +2606,9 @@ class TSMDigital:
             instrument_count,
             max_sites_on_instrument,
         ) = self.ssc.calculate_per_site_to_per_instrument_lut(self.sites)
-        initialized_array = [[0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)]
+        initialized_array = [
+            [0 for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
+        ]
         per_instrument_source_voltages = _apply_lut_per_site_to_per_instrument(
             initialized_array, per_site_to_per_instrument_lut, per_site_source_voltages
         )
@@ -2527,8 +2629,12 @@ class TSMDigital:
             per site waveform capture ({ int: memoryview of array.array of unsigned int, int: memoryview of array.array of unsigned int, ... }): Dictionary where each key is a site number and value is a collection of digital states representing capture waveform data
         """
         initialized_array = [[0 for _ in range(samples_to_read)] for _ in range(len(self.sites))]
-        per_instrument_to_per_site_lut = self.ssc.calculate_per_instrument_to_per_site_lut(self.sites)
-        per_instrument_capture = self.ssc.fetch_capture_waveform(waveform_name, samples_to_read, timeout)
+        per_instrument_to_per_site_lut = self.ssc.calculate_per_instrument_to_per_site_lut(
+            self.sites
+        )
+        per_instrument_capture = self.ssc.fetch_capture_waveform(
+            waveform_name, samples_to_read, timeout
+        )
         per_site_waveforms = _apply_lut_per_instrument_to_per_site(
             initialized_array, per_instrument_to_per_site_lut, per_instrument_capture
         )
@@ -2559,7 +2665,8 @@ class TSMDigital:
             max_sites_on_instrument,
         ) = self.ssc.calculate_per_site_to_per_instrument_lut(self.sites)
         initialized_array = [
-            [[0 for _ in range(cols)] for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
+            [[0 for _ in range(cols)] for _ in range(max_sites_on_instrument)]
+            for _ in range(instrument_count)
         ]
         per_instrument_waveforms = _apply_lut_per_site_to_per_instrument(
             initialized_array, per_site_to_per_instrument_lut, per_site_waveforms
@@ -2580,8 +2687,8 @@ class TSMDigital:
         if auto_select:
             self.ssc.select_function(enums.SelectedFunction.DIGITAL)
         initialized_array = [[enums.PinState.ZERO for _ in self.pins] for _ in self.sites]
-        per_instrument_to_per_site_per_pin_lut = self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(
-            self.sites, self.pins
+        per_instrument_to_per_site_per_pin_lut = (
+            self.ssc.calculate_per_instrument_to_per_site_per_pin_lut(self.sites, self.pins)
         )
         per_instrument_data = self.ssc.read_static()
         per_site_per_pin_data = _apply_lut_per_instrument_to_per_site_per_pin(
@@ -2607,7 +2714,8 @@ class TSMDigital:
             max_sites_on_instrument,
         ) = self.ssc.calculate_per_site_per_pin_to_per_instrument_lut(self.sites, self.pins)
         initialized_array = [
-            [enums.WriteStaticPinState.ZERO for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
+            [enums.WriteStaticPinState.ZERO for _ in range(max_sites_on_instrument)]
+            for _ in range(instrument_count)
         ]
         per_instrument_state = _apply_lut_per_site_per_pin_to_per_instrument(
             initialized_array,
@@ -2616,7 +2724,9 @@ class TSMDigital:
         )
         self.ssc.write_static_per_site_per_pin(per_instrument_state)
 
-    def write_static_per_site(self, per_site_state: typing.List[enums.WriteStaticPinState], auto_select=True):
+    def write_static_per_site(
+        self, per_site_state: typing.List[enums.WriteStaticPinState], auto_select=True
+    ):
         """
         auto_select=True, specifies this function to configure the output function as digital automatically.
         auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
@@ -2630,7 +2740,8 @@ class TSMDigital:
             max_sites_on_instrument,
         ) = self.ssc.calculate_per_site_to_per_instrument_lut(self.sites)
         initialized_array = [
-            [enums.WriteStaticPinState.X for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
+            [enums.WriteStaticPinState.X for _ in range(max_sites_on_instrument)]
+            for _ in range(instrument_count)
         ]
         per_instrument_state = _apply_lut_per_site_to_per_instrument(
             initialized_array, per_site_to_per_instrument_lut, per_site_state
@@ -2655,7 +2766,9 @@ class TSMDigital:
                 max_sites_on_instrument,
             ) = self.ssc.calculate_per_site_to_per_instrument_lut(self.sites)
             default = {bool: False, float: 0.0}[type(data_to_publish[0])]
-            initialized_array = [[default for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)]
+            initialized_array = [
+                [default for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
+            ]
             per_instrument_data = _apply_lut_per_site_to_per_instrument(
                 initialized_array, per_site_to_per_instrument_lut, data_to_publish
             )
@@ -2667,7 +2780,9 @@ class TSMDigital:
                 max_sites_on_instrument,
             ) = self.ssc.calculate_per_site_per_pin_to_per_instrument_lut(self.sites, self.pins)
             default = {bool: False, float: 0.0}[type(data_to_publish[0][0])]
-            initialized_array = [[default for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)]
+            initialized_array = [
+                [default for _ in range(max_sites_on_instrument)] for _ in range(instrument_count)
+            ]
             per_instrument_data = _apply_lut_per_site_per_pin_to_per_instrument(
                 initialized_array, per_site_per_pin_to_per_instrument_lut, data_to_publish
             )
@@ -2862,18 +2977,24 @@ def initialize_sessions(tsm: SMContext, options: dict = {}):
             session = nidigital.Session(instrument_name, options=options)
             tsm.set_nidigital_session(instrument_name, session)
             session.load_pin_map(pin_map_file_path)
-            session.load_specifications_levels_and_timing(specifications_files, levels_files, timing_files)
+            session.load_specifications_levels_and_timing(
+                specifications_files, levels_files, timing_files
+            )
             session.unload_all_patterns()
             for pattern_file in pattern_files:
                 session.load_pattern(pattern_file)
             for capture_waveform_file in capture_waveform_files:
                 filename = os.path.basename(capture_waveform_file)
                 waveform_name, _ = filename.split(".")
-                session.create_capture_waveform_from_file_digicapture(waveform_name, capture_waveform_file)
+                session.create_capture_waveform_from_file_digicapture(
+                    waveform_name, capture_waveform_file
+                )
             for source_waveform_file in source_waveform_files:
                 filename = os.path.basename(source_waveform_file)
                 waveform_name, _ = filename.split(".")
-                session.create_source_waveform_from_file_tdms(waveform_name, source_waveform_file, False)
+                session.create_source_waveform_from_file_tdms(
+                    waveform_name, source_waveform_file, False
+                )
 
 
 @nitsm.codemoduleapi.code_module
