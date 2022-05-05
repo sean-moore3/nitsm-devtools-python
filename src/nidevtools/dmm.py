@@ -49,7 +49,7 @@ class TSMDMM:
 
         Args:
             pin_query_context (PinQuery): pin query context object stores the pin related info
-            sessions (typing.Sequence[nidmm.session.Session]): sessions to perform various actions on the dmm instrument associated with it. 
+            sessions (typing.Sequence[nidmm.session.Session]): sessions to perform various actions on the dmm instrument associated with it.
         """
         self.pin_query_context = pin_query_context
         self.sessions = sessions
@@ -59,9 +59,9 @@ class TSMDMM:
         Configures the measurement aperture time for the current configuration.  Aperture time is specified in units set by aperture_time_units.
     
         Args:
-            apperture_time (float): On the NI 4070/4071/4072, the minimum aperture time is 8.89 
+            apperture_time (float): On the NI 4070/4071/4072, the minimum aperture time is 8.89
                 usec,  and the maximum aperture time is 149 sec. Any number of powerline cycles (PLCs)  within the minimum and maximum ranges is allowed on the NI 4070/4071/4072.On the NI 4065 the minimum aperture time is 333 µs, and the maximum aperture time  is 78.2 s. If setting the number of averages directly, the total measurement time is  aperture time X the number of averages, which must be less than 72.8 s. The aperture  times allowed are 333 µs, 667 µs, or multiples of 1.11 ms-for example 1.11 ms, 2.22 ms,  3.33 ms, and so on. If you set an aperture time other than 333 µs, 667 µs, or multiples  of 1.11 ms, the value will be coerced up to the next supported aperture time.
-            apperture_time_units (nidmm.ApertureTimeUnits): Specifies the units of aperture time 
+            apperture_time_units (nidmm.ApertureTimeUnits): Specifies the units of aperture time
                 for the current configuration.The NI 4060 does not support an aperture time set in seconds.
         """
         for session in self.sessions:
@@ -178,7 +178,8 @@ def pins_to_sessions(tsm: SMContext, pins: PinsArg):
 @nitsm.codemoduleapi.code_module
 def initialize_session(tsm: SMContext):
     """
-    creates the sessions for all the niDMM resource string available in the tsm context for instruments 
+    creates the sessions for all the niDMM resource string available in the tsm context for
+    instruments.
 
     Args:
         tsm (SMContext): TestStand semiconductor module context
@@ -194,7 +195,7 @@ def initialize_session(tsm: SMContext):
 def close_session(tsm: SMContext):
     """
     Closes the sessions associated with the tsm context
-    
+
     Args:
         tsm (SMContext): TestStand semiconductor module context
     """

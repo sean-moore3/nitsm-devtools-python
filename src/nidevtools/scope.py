@@ -228,7 +228,8 @@ def _configure_vertical_per_channel_arrays(
     for (ssc, v_range, coupling, offset, drop, enabled) in zip(
         ssc_s, ranges, couplings, offsets, probes_drop, enabled_s
     ):
-        ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, drop, enabled)
+        ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, drop,
+        enabled)
 
 
 # Digital Sub routines
@@ -329,8 +330,8 @@ def _fetch_measurement_stats_arrays(
         measurement to be performed on each fetched waveform.
 
     Returns:
-        list of measurement_stats (list of MeasurementStats): Returns a list of class instances with the following measurement statistics
-            about the specified measurement:
+        list of measurement_stats (list of MeasurementStats): Returns a list of class instances
+            with the following measurement statistics about the specified measurement:
 
             -	**result** (float): the resulting measurement
             -	**mean** (float): the mean scalar value, which is obtained by
@@ -410,7 +411,8 @@ class _NIScopeTSM:
         Configures the reference level for the channels in the current TSMScope object
 
         Args:
-            channel_based_mid_ref_level (float, optional): Valid values from 0 to 100. Defaults to 50.0.
+            channel_based_mid_ref_level (float, optional): Valid values from 0 to 100. Defaults to
+            50.0.
         """
         for ssc in self._sscs:
             channels = ssc.session.channels[ssc.channels]

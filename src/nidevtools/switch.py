@@ -98,8 +98,7 @@ class MultipleSessions:
         """
         self.Sessions = sessions
 
-    def action_session_info(self, route_value: str = "", action: Action = Action.Disconnect, 
-    timeout: int = 40):
+    def action_session_info(self, route_value: str = "", action: Action = Action.Disconnect,timeout: int = 40):
         """
         reads and returns the path capability
 
@@ -148,7 +147,7 @@ def get_all_sessions(tsm: SMContext):
     Returns:
         list of sessions: all the switch sessions in the current context
     """
-    session_data, channel_group_ids, channel_lists = tsm.get_all_custom_sessions(instrument_type_id)
+    session_data, _, _ = tsm.get_all_custom_sessions(instrument_type_id)
     list_of_sessions = []
     for session in session_data:
         list_of_sessions.append(session)
@@ -168,12 +167,7 @@ def pin_to_sessions_session_info(tsm: SMContext, pin: str = ""):
         session: An object that tracks the session associated with pin provided.
     """
     try:
-        (
-            pin_query_context,
-            session_data,
-            channel_group_id,
-            channel_list,
-        ) = tsm.pins_to_custom_session(instrument_type_id, pin)
+        _, session_data, channel_group_id, _ = tsm.pins_to_custom_session(instrument_type_id, pin)
         relay_name = channel_group_id
         # TODO CHECK for better equivalent
         data = MultipleSessions([Session(session_data, pin, relay_name)])
