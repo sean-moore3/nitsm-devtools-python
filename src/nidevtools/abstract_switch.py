@@ -514,7 +514,8 @@ def get_all_instruments_names(tsm: SMContext):
 
 def get_all_sessions(tsm: SMContext):  # CHECK
     """
-    Gets a list of Abstract Switch references corresponding to the set Abstract sessions on TSM Context
+    Gets a list of Abstract Switch references corresponding to the set Abstract sessions on TSM
+    Context
     """
     session_data = tsm.get_all_switch_sessions(instrument_type_id)
     if len(session_data) == 0:
@@ -571,7 +572,8 @@ def pins_to_task_and_connect(tsm: SMContext, task_name: PinsArg, pins: PinsArg):
         task_name: The name of the pin(s) or pin group(s) to translate to a set of tasks.
         pins: The name of the pin(s) or pin group(s) to translate to a set of abstract sessions.
     Return:
-        session: An object that tracks the tasks associated with this pin query. Use this object to publish
+        session: An object that tracks the tasks associated with this pin query. Use this object to
+        publish
         measurements and extract data from a set of measurements.
     """
     pin_list = tsm.filter_pins_by_instrument_type(pins, "abstinst", nitsm.enums.Capability.ALL)
