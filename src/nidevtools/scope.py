@@ -228,8 +228,7 @@ def _configure_vertical_per_channel_arrays(
     for (ssc, v_range, coupling, offset, drop, enabled) in zip(
         ssc_s, ranges, couplings, offsets, probes_drop, enabled_s
     ):
-        ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, drop,
-        enabled)
+        ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, drop, enabled)
 
 
 # Digital Sub routines
@@ -326,7 +325,7 @@ def _fetch_measurement_stats_arrays(
 
     Args:
         ssc_s (typing.List[_NIScopeSSC]): List of sessions for various channels in groups.
-        scalar_measurements (typing.List[niscope.ScalarMeasurement]): The list of scalar 
+        scalar_measurements (typing.List[niscope.ScalarMeasurement]): The list of scalar
         measurement to be performed on each fetched waveform.
 
     Returns:

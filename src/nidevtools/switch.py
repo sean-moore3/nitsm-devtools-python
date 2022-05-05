@@ -98,7 +98,8 @@ class MultipleSessions:
         """
         self.Sessions = sessions
 
-    def action_session_info(self, route_value: str = "", action: Action = Action.Disconnect, timeout: int = 40):
+    def action_session_info(self, route_value: str = "", action: Action = Action.Disconnect, 
+    timeout: int = 40):
         """
         reads and returns the path capability
 
