@@ -57,12 +57,13 @@ class TSMDMM:
     def config_apperture_time(self, apperture_time: float, apperture_time_units: nidmm.ApertureTimeUnits):
         """
         Configures the measurement aperture time for the current configuration.  Aperture time is specified in units set by aperture_time_units.
-    
+
         Args:
             apperture_time (float): On the NI 4070/4071/4072, the minimum aperture time is 8.89
                 usec,  and the maximum aperture time is 149 sec. Any number of powerline cycles (PLCs)  within the minimum and maximum ranges is allowed on the NI 4070/4071/4072.On the NI 4065 the minimum aperture time is 333 µs, and the maximum aperture time  is 78.2 s. If setting the number of averages directly, the total measurement time is  aperture time X the number of averages, which must be less than 72.8 s. The aperture  times allowed are 333 µs, 667 µs, or multiples of 1.11 ms-for example 1.11 ms, 2.22 ms,  3.33 ms, and so on. If you set an aperture time other than 333 µs, 667 µs, or multiples  of 1.11 ms, the value will be coerced up to the next supported aperture time.
             apperture_time_units (nidmm.ApertureTimeUnits): Specifies the units of aperture time
-                for the current configuration.The NI 4060 does not support an aperture time set in seconds.
+                for the current configuration.The NI 4060 does not support an aperture time set in
+                seconds.
         """
         for session in self.sessions:
             session.aperture_time_units = apperture_time_units
@@ -78,7 +79,7 @@ class TSMDMM:
         include method, range, and resolution_in_digits.
 
         Args:
-            function (enums.Function): Specifies the **measurement_function** used to acquire the 
+            function (enums.Function): Specifies the **measurement_function** used to acquire the
                 measurement.The driver sets method to this value.
 
             range_raw (float): Specifies the range for the method specified in the
@@ -118,8 +119,8 @@ class TSMDMM:
 
                 Note:
                 NI-DMM ignores this parameter for capacitance and inductance measurements on the NI 4072. To achieve better resolution for such measurements, use the lc_number_meas_to_average property.
-            input_resistance (float): Specifies the input resistance of the instrument.The NI 4050 
-                and NI 4060 are not supported.            
+            input_resistance (float): Specifies the input resistance of the instrument.The NI 4050
+                and NI 4060 are not supported.
         """
         for session in self.sessions:
             session.configure_measurement_digits(measurement_function=function,

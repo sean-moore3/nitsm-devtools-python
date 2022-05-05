@@ -179,7 +179,7 @@ def pin_to_sessions_session_info(tsm: SMContext, pin: str = ""):
 
 
 @nitsm.codemoduleapi.code_module
-def set_sessions(tsm: SMContext, switch_name: str, session: niswitch.Session, channel_group_id: str):
+def set_sessions(tsm: SMContext, switch_name: str, session: niswitch.Session, channel_grp_id: str):
     """
     Adds the session to the list of switch sessions in tsm context
 
@@ -187,9 +187,9 @@ def set_sessions(tsm: SMContext, switch_name: str, session: niswitch.Session, ch
         tsm (SMContext): Semiconductor module Reference from the TestStand.
         switch_name (str): name of the switch
         session (niswitch.Session): session created fo the switch
-        channel_group_id (str): unique id of the channel group
+        channel_grp_id (str): unique id of the channel group
     """
-    tsm.set_custom_session(instrument_type_id, switch_name, channel_group_id, session)
+    tsm.set_custom_session(instrument_type_id, switch_name, channel_grp_id, session)
 
 
 @nitsm.codemoduleapi.code_module
