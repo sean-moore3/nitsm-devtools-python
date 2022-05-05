@@ -78,6 +78,16 @@ def get_all_instruments_names(tsm: SMContext):
 
 @nitsm.codemoduleapi.code_module
 def get_all_sessions(tsm: SMContext):
+    """
+    Gets a list of Switch references corresponding to the set sessions on TSM
+    Context
+
+    Args:
+        tsm (SMContext): Semiconductor module Reference from the TestStand.
+
+    Returns:
+        list of sessions: all the switch sessions in the current context
+    """
     session_data, channel_group_ids, channel_lists = tsm.get_all_custom_sessions(instrument_type_id)
     list_of_sessions = []
     for session in session_data:
@@ -87,6 +97,16 @@ def get_all_sessions(tsm: SMContext):
 
 @nitsm.codemoduleapi.code_module
 def pin_to_sessions_session_info(tsm: SMContext, pin: str = ""):
+    """
+    Returns an Switch Session object containing a list of switch sessions detailed on the pinmap
+
+    Args:
+        tsm (SMContext): Pin context defined by pin map
+        pin (str, optional): The name of the pin to translate to a session. Defaults to "".
+
+    Returns:
+        session: An object that tracks the session associated with pin provided.
+    """
     try:
         (
             pin_query_context,
