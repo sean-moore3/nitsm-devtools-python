@@ -225,10 +225,11 @@ def _configure_vertical_per_channel_arrays(
         probes_drop (typing.List[float]): probe attenuation drop list - one for each session
         enabled_s (typing.List[bool]): channel enabled list - one for each session
     """
-    for (ssc, v_range, coupling, offset, probe_drop, enabled) in zip(
+    for (ssc, v_range, coupling, offset, drop, enabled) in zip(
         ssc_s, ranges, couplings, offsets, probes_drop, enabled_s
     ):
-        ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, probe_drop, enabled)
+        ssc.session.channels[ssc.channels].configure_vertical(v_range, coupling, offset, drop,
+        enabled)
 
 
 # Digital Sub routines
@@ -325,7 +326,8 @@ def _fetch_measurement_stats_arrays(
 
     Args:
         ssc_s (typing.List[_NIScopeSSC]): List of sessions for various channels in groups.
-        scalar_measurements (typing.List[niscope.ScalarMeasurement]): The list of scalar measurement to be performed on each fetched waveform.
+        scalar_measurements (typing.List[niscope.ScalarMeasurement]): The list of scalar 
+        measurement to be performed on each fetched waveform.
 
     Returns:
         list of measurement_stats (list of MeasurementStats): Returns a list of class instances with the following measurement statistics

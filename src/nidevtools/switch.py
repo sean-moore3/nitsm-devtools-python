@@ -103,7 +103,7 @@ class MultipleSessions:
         reads and returns the path capability
 
         Args:
-            route_value (str, optional): comma seperated list of "en_" prefixed pins . Defaults to "".
+            route_value (str, optional): comma seperated list of "en_" routes. Defaults to "".
             action (Action, optional): connect or disconnect. Defaults to Action.Disconnect.
             timeout (int, optional): timeout for the operation in seconds. Defaults to 40.
 
