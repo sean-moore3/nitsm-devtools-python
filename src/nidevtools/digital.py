@@ -229,7 +229,7 @@ class _NIDigitalSSC:
         +-----------------------------+------------------------------------------------------------+
         | SelectedFunction.DISCONNECT | The pin is electrically disconnected from instrument
                                         methods.Selecting this method causes the PPMU to stop
-                                        sourcing priorto disconnecting the pin.                    |
+                                        sourcing prior to disconnecting the pin.                   |
         +-----------------------------+------------------------------------------------------------+
 
         Args:
@@ -584,7 +584,7 @@ class _NIDigitalSSC:
                 -   WriteStaticPinState.ONE: Specifies to drive high.
                 -   WriteStaticPinState.X: Specifies to not drive.
 
-            auto_select=True, specifies this function to configure the output function as digital
+            auto_select (bool):True, specifies this function to configure the output function as digital
             automatically. auto_select=False, if the pin is explicitly configured as digital already
             with the tsm_object.ssc.select_function(). Without configuring as digital and
             auto_select as false, this function will not work as expected.
@@ -1021,19 +1021,21 @@ class _NIDigitalTSM:
         information.
         Args:
             triggers_type (enums.HistoryRAMTriggerType): see the below table for details.
-        +-------------------------------------+--------------------------------------------------+
-        | Defined Values:                     |                                                  |
-        +=====================================+==================================================+
-        | HistoryRAMTriggerType.FIRST_FAILURE | Starts acquiring pattern information in History
-                                                RAM on the first failed cycle in a pattern burst.|
-        +-------------------------------------+--------------------------------------------------+
-        | HistoryRAMTriggerType.CYCLE_NUMBER  | Starts acquiring pattern information in History RAM
-                                                starting from a specified cycle number.          |
-        +-------------------------------------+--------------------------------------------------+
-        | HistoryRAMTriggerType.PATTERN_LABEL | Starts acquiring pattern information in History RAM
-                                                starting from a specified pattern label, augmented
-                                                by vector and cycle offsets.                      |
-        +-------------------------------------+---------------------------------------------------+
+            +-------------------------------------+-----------------------------------------------+
+            | Defined Values:                     |                                               |
+            +=====================================+===============================================+
+            | HistoryRAMTriggerType.FIRST_FAILURE | Starts acquiring pattern information in
+                                                    History RAM on the first failed cycle in a
+                                                    pattern burst.                                |
+            +-------------------------------------+-----------------------------------------------+
+            | HistoryRAMTriggerType.CYCLE_NUMBER  | Starts acquiring pattern information in
+                                                    History RAM starting from a specified cycle
+                                                    number.                                       |
+            +-------------------------------------+-----------------------------------------------+
+            | HistoryRAMTriggerType.PATTERN_LABEL | Starts acquiring pattern information in
+                                                    History RAM starting from a specified pattern
+                                                    label, augmented by vector and cycle offsets. |
+            +-------------------------------------+-----------------------------------------------+
             cycle_number (int, optional): cycle number at which trigger happens. Defaults to 0.
             pattern_label (str, optional): pattern label in which trigger happens. Defaults to "".
             cycle_offset (int, optional): cycle offset in the pattern. Defaults to 0.
@@ -1046,7 +1048,7 @@ class _NIDigitalTSM:
 
     def configure_hram(self, hram_configuration: HRAMConfiguration = HRAMConfiguration()):
         """
-        Configures the History RAM trigger and acqusition settings
+        Configures the History RAM trigger and acquisition settings
 
         Args:
             hram_configuration (HRAMConfiguration, optional): All HRAM settings in a single object.
@@ -1648,7 +1650,7 @@ class _NIDigitalTSM:
         ppmu_output_function property to DC Voltage.
 
         Args:
-            current_limit_range (float): current limt range in amps
+            current_limit_range (float): current limit range in amps
         """
         current_limit_range = abs(current_limit_range)
         for ssc in self._sscs:
@@ -1711,7 +1713,7 @@ class _NIDigitalTSM:
         per_site_per_pin_source_voltages: typing.List[typing.List[float]],
     ):
         """
-        Configures the PPMU to outputfunction as Voltage and starts sourcing voltage from the PPMU.
+        Configures the PPMU to output function as Voltage and starts sourcing voltage from the PPMU.
         configures the current limit range for sourcing voltage.
 
         Args:
@@ -1736,7 +1738,7 @@ class _NIDigitalTSM:
         per_site_source_voltages: typing.List[typing.List[float]],
     ):
         """
-        Configures the PPMU to outputfunction as Voltage and starts sourcing voltage from the PPMU.
+        Configures the PPMU to output function as Voltage and starts sourcing voltage from the PPMU.
         configures the current limit range for sourcing voltage.
 
         Args:
@@ -1917,8 +1919,8 @@ class _NIDigitalTSM:
                 returns an error. Defaults to 10.
 
         Returns:
-            per instrument waveform capture ({ int: memoryview of array.array of unsigned int, int:
-            memoryview of array.array of unsigned int, ... }): Dictionary where each key is a site
+            per instrument waveform capture ({ int: memory view of array. array of unsigned int, int:
+            memory view of array. array of unsigned int, ... }): Dictionary where each key is a site
             number and value is a collection of digital states representing capture waveform data
         """
         per_instrument_capture: typing.List[typing.List[typing.List[int]]] = []
@@ -1937,7 +1939,7 @@ class _NIDigitalTSM:
         minimum_size: int = 128,
     ):
         """
-        Writes the same waveform data to all sites. Use this write method if you set the
+        Writes the same waveform data to all sites. Use this method if you set the
         data_mapping parameter of the create source waveform method to SourceDataMapping.BROADCAST.
 
         Args:
@@ -1966,7 +1968,7 @@ class _NIDigitalTSM:
         minimum_size: int = 128,
     ):
         """
-        Writes one waveform per site. Use this write method if you set the parameter of the create
+        Writes one waveform per site. Use this method if you set the parameter of the create
         source waveform method to Site Unique.
 
         Args:
@@ -1978,7 +1980,7 @@ class _NIDigitalTSM:
                 collection of samples to use as source data
             expand_to_minimum_size (bool, optional): if set to true the array of waveform will be of
                 "minimum_size" parameter with zeros padded as required. Defaults to False.
-            minimum_size (int, optional): specifices the minimum length of each waveform per site.
+            minimum_size (int, optional): specifies the minimum length of each waveform per site.
                 Defaults to 128.
         """
         for ssc, per_instrument_waveform in zip(self._sscs, per_instrument_waveforms):
@@ -2099,7 +2101,7 @@ class _NIDigitalTSM:
                 -   WriteStaticPinState.X: Specifies to not drive.
             auto_select=True, specifies this function to configure the output function as digital
             automatically.auto_select=False, if the pin is explicitly configured as digital already
-            with the tsmobj.ssc.select_function().Without configuring as digital and auto_select as
+            with the tsm_object.ssc.select_function().Without configuring as digital and auto_select as
             false, this function will not work as expected.
         """
         for ssc, states in zip(self._sscs, per_site_state):
@@ -3258,7 +3260,7 @@ def _apply_lut_per_site_to_per_instrument(
 
     Args:
         initialized_array (typing.List[typing.List[typing.Any]]): List containing the result
-        information
+            information.
         lut (typing.List[Location2D]): Lookup table containing the location information
         results_to_apply_lut_to (typing.List[typing.Any]): result array
 

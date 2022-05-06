@@ -47,7 +47,7 @@ class TSMDMM:
 
     def __init__(self, pin_query_context: PinQuery, sessions: typing.Sequence[nidmm.Session]):
         """
-        constructor for TSMDMM class to store  Pinquery and sessions
+        constructor for TSMDMM class to store Pin query and sessions
 
         Args:
             pin_query_context (PinQuery): pin query context object stores the pin related info
@@ -57,13 +57,13 @@ class TSMDMM:
         self.pin_query_context = pin_query_context
         self.sessions = sessions
 
-    def config_apperture_time(self, apperture_time: float, units: nidmm.ApertureTimeUnits):
+    def configure_aperture_time(self, aperture_time: float, units: nidmm.ApertureTimeUnits):
         """
         Configures the measurement aperture time for the current configuration.  Aperture time is
         specified in units set by aperture_time_units.
 
         Args:
-            apperture_time (float): On the NI 4070/4071/4072, the minimum aperture time is 8.89
+            aperture_time (float): On the NI 4070/4071/4072, the minimum aperture time is 8.89
                 usec,  and the maximum aperture time is 149 sec. Any number of powerline cycles
                 (PLCs) within the minimum and maximum ranges is allowed on the NI 4070/4071/4072.
                 On the NI 4065 the minimum aperture time is 333 µs, and the maximum aperture time
@@ -79,14 +79,14 @@ class TSMDMM:
         """
         for session in self.sessions:
             session.aperture_time_units = units
-            session.aperture_time = apperture_time
+            session.aperture_time = aperture_time
 
-    def config_measurement(
+    def configure_measurement(
         self,
         function: nidmm.Function,
         range_raw: float,
-        resolution_in_digits: Resolution,
-        input_resistance: InputResistance,
+        resolution_in_digits: float,
+        input_resistance: float,
     ):
         """
         Configures the common properties of the measurement. These properties include method,
@@ -104,7 +104,6 @@ class TSMDMM:
                 exceeds the value that you are measuring. For example, you must type in 10 V if you
                 are measuring 9 V. range values are coerced up to the closest input range.The
                 driver sets range to this value. The default is 0.02 V.
-
                 +---------------------------+------+----------------------------------------------+
                 | NIDMM_VAL_AUTO_RANGE_ON   | -1.0 | NI-DMM performs an Auto Range before acquiring
                                                      the measurement.                             |
@@ -119,25 +118,20 @@ class TSMDMM:
                                                     and used for all subsequent measurements until
                                                     the measurement configuration is changed.     |
                 +---------------------------+------+----------------------------------------------+
-
                 Note:
                 The NI 4050, NI 4060, and NI 4065 only support Auto Range when the
                 trigger and sample trigger are set to IMMEDIATE.
-
-                Note:
-                One or more of the referenced values are not in the Python API for this driver.
-                Enums that only define values, or represent True/False, have been removed.
 
             resolution_in_digits (float): Specifies the resolution of the measurement in digits.
                 The driver sets resolution_digits property to this value. The PXIe-4080/4081/4082
                 uses the resolution you specify. The NI 4065 and NI 4070/4071/4072 ignore this
                 parameter when the **Range** parameter is set to NIDMM_VAL_AUTO_RANGE_ON (-1.0) or
                 NIDMM_VAL_AUTO_RANGE_ONCE (-3.0). The default is 5½.
-
                 Note:
                 NI-DMM ignores this parameter for capacitance and inductance measurements on the
                 NI 4072. To achieve better resolution for such measurements, use the
                 lc_number_meas_to_average property.
+
             input_resistance (float): Specifies the input resistance of the instrument.The NI 4050
                 and NI 4060 are not supported.
         """
