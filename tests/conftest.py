@@ -198,6 +198,10 @@ def tests_pins(request):
         # for function generator driver i.e. nifpga testing
         input_dut_pins = ["RIO_Pins"]
         pins_selected = [input_dut_pins]
+    elif file_name == "test_dmm.py":
+        # for function generator driver i.e. nifpga testing
+        input_dut_pins = ["CH0"]
+        pins_selected = [input_dut_pins]
     else:
         pins_selected = ["dummy", "pins", "to_fail"]
     return pins_selected
