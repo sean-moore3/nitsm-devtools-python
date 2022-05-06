@@ -98,6 +98,7 @@ class TestDMM:
             finally:
                 dmm_tsm.abort()
 
+
 @nitsm.codemoduleapi.code_module
 def open_sessions(tsm: SMContext):
     ni_dmm.initialize_session(tsm)
@@ -107,6 +108,7 @@ def open_sessions(tsm: SMContext):
 def close_sessions(tsm: SMContext):
     ni_dmm.close_session(tsm)
 
+
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
     tsm: SMContext,
@@ -114,12 +116,16 @@ def pins_to_sessions(
 ):
     return ni_dmm.pins_to_sessions(tsm, pins)
 
+
 @nitsm.codemoduleapi.code_module
 def configure(tsm: SMContext, pins: typing.List[str] = ["CH0"]):
-    print(0)
-    tsm_sessions = ni_dmm.pins_to_sessions(tsm, pins)
-    print(0)
-    for dmm_tsm in tsm_sessions.sessions:
+    dmm_tsms = []
+    sessions = []
+    for test_pin in pins:
+        data = ni_dmm.pins_to_sessions(tsm, test_pin)
+        dmm_tsms.append(data)
+        sessions += data.sessions
+    for dmm_tsm in dmm_tsms:
         dmm_tsm.configure_measurement(function=nidmm.Function.DC_VOLTS,
                                       range_raw=10,
                                       resolution_in_digits=ni_dmm.Resolution.Res_5_05,
