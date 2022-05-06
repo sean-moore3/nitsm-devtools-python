@@ -221,8 +221,8 @@ class AbstractSession(typing.NamedTuple):
 
     def disconnect_sessions_info(self, tsm: SMContext):  # CHECK
         """
-        Disconnects the provided session from the TSM context it works for DAQmx, Digital Pattern, FPGA and Switch
-        sessions only
+        Disconnects the provided session from the TSM context it works for DAQmx, Digital Pattern,
+        FPGA and Switch sessions only
         """
         for session in self.enable_pins:
             session.ss_disconnect(tsm)
@@ -239,12 +239,11 @@ class AbstractSession(typing.NamedTuple):
 
 def check_debug_ui_tool(
     path_in: str,
-    path_teststand: str = "C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)",
+    path_teststand="C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)",
 ):
     """
     checks the debug UI tool connected or not
     """
-
     path_icons = os.path.join(path_teststand, "Components\\Icons")
     path_in = os.path.join(
         path_in, "..\\Code Modules\\Common\\Instrument Control\\Abstract Switch\\Debug UI"
@@ -305,8 +304,8 @@ def disconnect_pin(tsm: SMContext, pin: str):
 
 def initialize(tsm: SMContext):  # CHECK
     """
-    Initialize the TSM context with all the Abstract switch sessions. Based on the instrument type it
-    will create session to individual drivers. so it is essential to define the route in pinmap.
+    Initialize the TSM context with all the Abstract switch sessions. Based on the instrument type
+    it will create session to individual drivers. so it is essential to define the route in pinmap.
     Args:
         tsm: TSM context where the sessions will be initialized
     """
@@ -493,7 +492,8 @@ def pin_name_to_instrument(pinmap_path: str = ""):
 
 def enable_pins_to_sessions(tsm: SMContext, enable_pins: typing.List[str]):
     """
-    Receives enable pins list and return a Multi-session object with the sessions corresponding to those pins
+    Receives enable pins list and return a Multi-session object with the sessions corresponding to
+    those pins
     Args:
         tsm: Pin context
         enable_pins: List of pins for session creation
@@ -534,7 +534,8 @@ def get_all_sessions(tsm: SMContext):  # CHECK
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions_sessions_info(tsm: SMContext, pin: str):
     """
-    Returns an AbstractSession object containing a list al Abstract switch sessions detailed on the pinmap
+    Returns an AbstractSession object containing a list al Abstract switch sessions detailed on the
+    pinmap
     Args:
         tsm: Pin context defined by pin map
         pin: The name of the pin to translate to a session.

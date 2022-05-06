@@ -334,10 +334,12 @@ def identify_pin_types(tsm: SMContext, pins_or_pins_group: typing.Union[str, typ
 
     Args:
         tsm (SMContext): semiconductor module context from Teststand
-        pins_or_pins_group (typing.Union[str, typing.Sequence[str]]): list of pins or pin group names
+        pins_or_pins_group (typing.Union[str, typing.Sequence[str]]): list of pins or pin group
+            names
 
     Returns:
-        pin_types, pin_group_found: for each of the input pin find its pin type and a flag about pin_group_found
+        pin_types, pin_group_found: for each of the input pin find its pin type and a flag about
+        pin_group_found.
     """
     all_pin_names, all_pin_types = get_all_pins(tsm)
     pin_group_found = False

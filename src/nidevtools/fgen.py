@@ -16,8 +16,8 @@ class _NIFGenSSC:
     """
     _Site specific _Session and _Channel.
     Each object of this class is used to store info for a specified pin under specific Site.
-    To store a _Session and _Channel(s) for different _Site(s) you need an array of this class object.
-    Prefix cs is used in all methods that operates on a given channels in a session.
+    To store a _Session and _Channel(s) for different _Site(s) you need an array of this class
+    object. Prefix cs is used in all methods that operates on a given channels in a session.
     These are for internal use only and can be changed any time.
     External module should not use these methods with prefix 'cs_' directly.
     """
@@ -27,7 +27,7 @@ class _NIFGenSSC:
         Updates the sessions in the class object for pin name based operations
 
         Args:
-            session (nifgen.Session): stores the session of the fgen card
+            session (nifgen.Session): stores the session of the function generator card
             channels (str): comma separated list of channels in the session
             pin_list (str): pin names from the pinmap corresponding to the channels
         """
@@ -43,7 +43,7 @@ class _NIFGenSSC:
         This allows to access the session stored in each instance of the class
 
         Returns:
-            nifgen.Session : session of fgen
+            nifgen.Session : session of function generator
         """
         return self._session  # This session may contain other pin's channels
 
@@ -53,7 +53,7 @@ class _NIFGenSSC:
         This allows to access the channels stored in each instance of the class
 
         Returns:
-            str : comma seperated list of channels
+            str : comma separated list of channels
         """
         return self._channels
 
@@ -61,15 +61,17 @@ class _NIFGenSSC:
         self, waveform_data, sample_rate=1.0, gain=1.0, offset=0.0, enable_filter=True
     ):
         """
-        generates the sine waveform of desired sampling rate, gain and offset using the waveform data
+        generates the sine waveform of desired sampling rate, gain and offset using the waveform
+        data.
 
         Args:
             waveform_data (_type_): this is the data reference in memory for signal generation
             sample_rate (float, optional): number of samples per second. Defaults to 1.0.
-            gain (float, optional): gain to be applied on the signal during generation. Defaults to 1.0.
+            gain (float, optional): gain to be applied on the signal during generation. Defaults to
+                1.0.
             offset (float, optional): any dc offset to add on the generated signal. Defaults to 0.0.
-            enable_filter (bool, optional): enable filter for smooth signal generation so the higher order signals are
-                removed in the output. Defaults to True.
+            enable_filter (bool, optional): enable filter for smooth signal generation so the higher
+                order signals are removed in the output. Defaults to True.
         """
         self.session.abort()
         self.session.clear_arb_memory()
@@ -104,7 +106,8 @@ class _NIFGenTSM:
 
         Args:
             samples (int, optional): number of points to generate. Defaults to 128.
-            frequency (_type_, optional): frequency of the sine signal generated. Defaults to 7.8125e-3.
+            frequency (_type_, optional): frequency of the sine signal generated. Defaults to
+                7.8125e-3.
             phase_degree (int, optional): phase of the sine wave. Defaults to 0.
 
         Returns:
@@ -136,9 +139,11 @@ class _NIFGenTSM:
             frequency (float, optional): of the sine waveform. Defaults to 100e3.
             amplitude (float, optional): of the sine waveform. Defaults to 1.0.
             offset (float, optional): dc signal added to the sine waveform. Defaults to 0.0.
-            wfm_len_min (int, optional): minimum number of points to be there in the waveform. Defaults to 4.
+            wfm_len_min (int, optional): minimum number of points to be there in the waveform.
+                Defaults to 4.
             wfm_len_inc (int, optional): step size for length. Defaults to 16.
-            generation_rate (float, optional): determines the speed of waveform driven out. Defaults to 100e6.
+            generation_rate (float, optional): determines the speed of waveform driven out. Defaults
+                to 100e6.
             enable_filter (bool, optional): for filtering high frequency signals. Defaults to True.
 
         Returns:
@@ -174,10 +179,7 @@ class _NIFGenTSM:
 
 class TSMFGen(typing.NamedTuple):
     """
-    Class to store the FGen TSM object for the given set of pins
-
-    Args:
-        typing (tuple): pin_query_context, SSC, sites
+    Class to store the FGen TSM object for the given set of pins with pin_query_context, SSC, sites.
     """
 
     pin_query_context: typing.Any
