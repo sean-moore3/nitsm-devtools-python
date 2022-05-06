@@ -24,8 +24,8 @@ class ChannelsToRead:
 
 class TaskProperties(typing.NamedTuple):
     """
-    This class serves as a container for the properties obtained by the function get_task_properties.
-    This is as instance of NamedTuple data type, so it inherits all its methods.
+    This class serves as a container for the properties obtained by the function
+    get_task_properties.This is as instance of NamedTuple data type, so it inherits all its methods.
     Properties:
             InstrumentName: str
             Channel: str
@@ -94,7 +94,7 @@ class _Session(typing.NamedTuple):
         """
         Writes samples to the task or virtual channels you specify.
 
-        This write method is dynamic, and is capable of accepting the
+        This method is dynamic, and is capable of accepting the
         samples to write in the various forms for most operations:
 
         - Scalar: Single sample for 1 channel.
@@ -106,7 +106,7 @@ class _Session(typing.NamedTuple):
         The data type of the samples passed in must be appropriate for
         the channel type of the task.
 
-        For counter output pulse operations, this write method only
+        For counter output pulse operations, this method only
         accepts samples in these forms:
 
         - Scalar CtrFreq, CtrTime, CtrTick (from nidaqmx.types):
@@ -152,14 +152,15 @@ class _Session(typing.NamedTuple):
     # Task Control
     def st_ctrl_start(self):
         """
-        Transitions the task in the session to the running state to begin the measurement or generation
-        Using this method is required for some applications and optional for others
+        Transitions the task in the session to the running state to begin the measurement or
+        generation. Using this method is required for some applications and optional for others
         """
         self.Task.start()
 
     def st_ctrl_stop(self):
         """
-        Stops the task referenced in the session and return it to the stats the task was before the Start method ran
+        Stops the task referenced in the session and return it to the stats the task was before the
+        Start method ran
         """
         self.Task.stop()
 
@@ -237,24 +238,27 @@ class _Session(typing.NamedTuple):
         pre_trigger_samples_per_channel: int = 500,
     ):
         """
-        Configures the task to stop the acquisition when the device acquires all pre-trigger samples;
-        an analog signal reaches the level you specify; and the device acquires all post-trigger samples.
-        When you use a Reference Trigger, the default for the read RelativeTo property is First Pre-trigger
-        Sample with a read Offset of 0.
+        Configures the task to stop the acquisition when the device acquires all pre-trigger
+        samples;an analog signal reaches the level you specify; and the device acquires all
+        post-trigger samples. When you use a Reference Trigger, the default for the read RelativeTo
+        property is First Pre-trigger Sample with a read Offset of 0.
         Args:
-            trigger_source: (String) is the name of a virtual channel or terminal where there is an analog
-                signal to use as the source of the trigger. For E Series devices, if you use a virtual channel,
-                it must be the only channel in the task. The only terminal you can use for E Series devices is PFI0.
+            trigger_source: (String) is the name of a virtual channel or terminal where there is an
+                analog signal to use as the source of the trigger. For E Series devices, if you use
+                a virtual channel, it must be the only channel in the task. The only terminal you
+                can use for E Series devices is PFI0.
             edge: (Enum) Specifies on which edge of the signal the reference trigger occurs.
-                nidaqmx.constants.Edge.RISING (Default): Trigger when the signal crosses level on a rising Edge.
-                nidaqmx.constants.Edge.FALLING: Trigger when the signal crosses level on a falling Edge.
-            level_v: float = specifies at what threshold to trigger. Specify this value in the units of the
-                measurement or generation. Use slope to specify on which slope to trigger at this threshold.
-                If not specified it has value = 0.0
-            pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per channel before
-            recognizing the Reference Trigger. The number of post-trigger samples per channel is equal to number
-            of samples per channel in the DAQmx Timing VI minus pre-trigger samples per channel. If not specified it
-            has value = 500.
+                nidaqmx.constants.Edge.RISING (Default): Trigger when the signal crosses level on a
+                rising Edge.
+                nidaqmx.constants.Edge.FALLING: Trigger when the signal crosses level on a
+                falling Edge.
+            level_v: float = specifies at what threshold to trigger. Specify this value in the units
+                of the measurement or generation. Use slope to specify on which slope to trigger at
+                this threshold. If not specified it has value = 0.0
+            pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per
+                channel before recognizing the Reference Trigger. The number of post-trigger samples
+                per channel is equal to number of samples per channel in the DAQmx Timing VI minus
+                pre-trigger samples per channel. If not specified it has value = 500.
         """
         self.Task.triggers.reference_trigger.cfg_anlg_edge_ref_trig(
             trigger_source, pre_trigger_samples_per_channel, edge, level_v
@@ -273,15 +277,16 @@ class _Session(typing.NamedTuple):
         RelativeTo property is First Pre-trigger Sample with a read Offset of 0.
 
         Args:
-            trigger_source: specifies the name of a terminal where there is a digital signal to use as
-                the source of the trigger.
+            trigger_source: specifies the name of a terminal where there is a digital signal to use
+                as the source of the trigger.
             edge: specifies on which edge of the digital signal the Reference Trigger occurs.
-                nidaqmx.constants.Slope.RISING: (Default) Trigger on a rising edge of the digital signal.
+                nidaqmx.constants.Slope.RISING: (Default) Trigger on a rising edge of the digital
+                signal.
                 nidaqmx.constants.Slope.FALLING: Trigger on a falling edge of the digital signal.
-            pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per channel
-                before recognizing the Reference Trigger. The number of post-trigger samples per channel is
-                equal to number of samples per channel in the DAQmx Timing VI minus pre-trigger samples per
-                channel.
+            pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per
+                channel before recognizing the Reference Trigger. The number of post-trigger samples
+                per channel is equal to number of samples per channel in the DAQmx Timing VI minus
+                pre-trigger samples per channel.
         """
         self.Task.triggers.reference_trigger.cfg_dig_edge_ref_trig(
             trigger_source, pre_trigger_samples_per_channel, edge
@@ -290,7 +295,8 @@ class _Session(typing.NamedTuple):
 
 class _Sessions:
     """
-    Class that contains a list of DAQmx sessions with methods to control all sessions inside the object
+    Class that contains a list of DAQmx sessions with methods to control all sessions inside the
+    object
     """
 
     sessions: typing.List[_Session]
@@ -313,15 +319,17 @@ class _Sessions:
                 nidaqmx.constants.READ_ALL_AVAILABLE, this method reads all the samples currently
                 available in the buffer.
                 If the task acquires a finite number of samples, and you set this input
-                to nidaqmx.constants.READ_ALL_AVAILABLE, the method waits for the task to acquire all requested
-                samples, then reads those samples. If you set the “read_all_avail_samp” property to True, the
-                method reads the samples currently available in the buffer and does not wait for the task to
-                acquire all requested samples.
-            timeout:  Specifies the amount of time in seconds to wait for samples to become available. If the time
-                elapses, the method returns an error and any samples read before the timeout elapsed. The default
-                timeout is 10 seconds. If you set timeout to nidaqmx.constants.WAIT_INFINITELY, the method waits
-                indefinitely. If you set timeout to 0, the method tries once to read the requested samples and
-                returns an error if it is unable to.
+                to nidaqmx.constants.READ_ALL_AVAILABLE, the method waits for the task to acquire
+                all requested samples, then reads those samples. If you set the
+                “read_all_avail_samp” property to True, the method reads the samples currently
+                available in the buffer and does not wait for the task to acquire all requested
+                samples.
+            timeout:  Specifies the amount of time in seconds to wait for samples to become
+                available. If the time elapses, the method returns an error and any samples read
+                before the timeout elapsed. The default timeout is 10 seconds. If you set timeout to
+                nidaqmx.constants.WAIT_INFINITELY, the method waits indefinitely. If you set timeout
+                to 0, the method tries once to read the requested samples and returns an error if it
+                is unable to read.
         Return:
             Array of data
         """
@@ -346,15 +354,17 @@ class _Sessions:
                 nidaqmx.constants.READ_ALL_AVAILABLE, this method reads all the samples currently
                 available in the buffer.
                 If the task acquires a finite number of samples, and you set this input
-                to nidaqmx.constants.READ_ALL_AVAILABLE, the method waits for the task to acquire all requested
-                samples, then reads those samples. If you set the “read_all_avail_samp” property to True, the
-                method reads the samples currently available in the buffer and does not wait for the task to
-                acquire all requested samples.
-            timeout:  Specifies the amount of time in seconds to wait for samples to become available. If the time
-                elapses, the method returns an error and any samples read before the timeout elapsed. The default
-                timeout is 10 seconds. If you set timeout to nidaqmx.constants.WAIT_INFINITELY, the method waits
-                indefinitely. If you set timeout to 0, the method tries once to read the requested samples and
-                returns an error if it is unable to.
+                to nidaqmx.constants.READ_ALL_AVAILABLE, the method waits for the task to acquire
+                all requested samples, then reads those samples. If you set the
+                “read_all_avail_samp” property to True, the method reads the samples currently
+                available in the buffer and does not wait for the task to acquire all requested
+                samples.
+            timeout:  Specifies the amount of time in seconds to wait for samples to become
+                available. If the time elapses, the method returns an error and any samples read
+                before the timeout elapsed. The default timeout is 10 seconds. If you set timeout to
+                nidaqmx.constants.WAIT_INFINITELY, the method waits indefinitely. If you set timeout
+                to 0, the method tries once to read the requested samples and returns an error if it
+                is unable to read.
         Return:
             Array of data
         """
@@ -368,7 +378,7 @@ class _Sessions:
         """
         Writes samples to the task or virtual channels you specify.
 
-        This write method is dynamic, and is capable of accepting the
+        This method is dynamic, and is capable of accepting the
         samples to write in the various forms for most operations:
 
         - Scalar: Single sample for 1 channel.
@@ -380,7 +390,7 @@ class _Sessions:
         The data type of the samples passed in must be appropriate for
         the channel type of the task.
 
-        For counter output pulse operations, this write method only
+        For counter output pulse operations, this method only
         accepts samples in these forms:
 
         - Scalar CtrFreq, CtrTime, CtrTick (from nidaqmx.types):
@@ -420,7 +430,8 @@ class _Sessions:
     # Read Configuration
     def configure_channels(self):
         """
-        For each session in the list specifies ChannelList as a subset of channels in the task from which to read.
+        For each session in the list specifies ChannelList as a subset of channels in the task from
+        which to read.
         """
         for session in self.sessions:
             session.st_cnfg_chan_to_read()
@@ -428,16 +439,16 @@ class _Sessions:
     # Task Control
     def start_task(self):
         """
-        Transitions each task in the session list to the running state to begin the measurement or generation
-        Using this method is required for some applications and optional for others
+        Transitions each task in the session list to the running state to begin the measurement or
+        generation. Using this method is required for some applications and optional for others
         """
         for session in self.sessions:
             session.st_ctrl_start()
 
     def stop_task(self):
         """
-        Stops each task referenced in the session list and return it to the stats the task was before the
-        Start method ran.
+        Stops each task referenced in the session list and return it to the stats the task was
+        before the Start method ran.
         """
         for session in self.sessions:
             session.st_ctrl_stop()
@@ -445,9 +456,9 @@ class _Sessions:
     # Task Properties
     def get_task_properties(self):
         """
-        Get the configuration properties of each pair channel-pin assigned to the tasks in this session list,
-        and store them in a **TaskProperties object**. It then returns a list of **TaskProperties object**
-        per pair channel-pin for each task in the list.
+        Get the configuration properties of each pair channel-pin assigned to the tasks in this
+        session list, and store them in a **TaskProperties object**. It then returns a list of
+        **TaskProperties object** per pair channel-pin for each task in the list.
         Return:
             List of properties per pin/channel
         """
@@ -471,10 +482,10 @@ class _Sessions:
         Args:
             samples_per_channel: specifies the number of samples to acquire or generate for each
                 channel in the task. NI-DAQmx uses this value to determine the buffer size.
-                This method returns an error if the specified value is negative. Default value = 1000
+                This method returns an error if the specified value is negative. Default to 1000
             sampling_rate_hz: specifies the sampling rate in samples per channel, per second.
                 If you use an external source for the Sample Clock, set this input to the maximum
-                expected rate of that clock. Default value = 1000
+                expected rate of that clock. Default to 1000
             clock_source: specifies the source terminal of the Sample Clock. Leave this input
                 undefined to use the default onboard clock of the device.
         """
@@ -490,24 +501,27 @@ class _Sessions:
         pre_trigger_samples_per_channel: int = 500,
     ):
         """
-        Configures each task  in the session list to stop the acquisition when the device acquires all pre-trigger
-        samples; an analog signal reaches the level you specify; and the device acquires all post-trigger samples.
-        When you use a Reference Trigger, the default for the read RelativeTo property is First Pre-trigger
-        Sample with a read Offset of 0.
+        Configures each task  in the session list to stop the acquisition when the device acquires
+        all pre-trigger samples; an analog signal reaches the level you specify; and the device
+        acquires all post-trigger samples. When you use a Reference Trigger, the default for the
+        read RelativeTo property is First Pre-trigger Sample with a read Offset of 0.
         Args:
-            trigger_source: (String) is the name of a virtual channel or terminal where there is an analog
-                signal to use as the source of the trigger. For E Series devices, if you use a virtual channel,
-                it must be the only channel in the task. The only terminal you can use for E Series devices is PFI0.
+            trigger_source: (String) is the name of a virtual channel or terminal where there is an
+                analog signal to use as the source of the trigger. For E Series devices, if you use
+                a virtual channel, it must be the only channel in the task. The only terminal you
+                can use for E Series devices is PFI0.
             edge: (Enum) Specifies on which edge of the signal the reference trigger occurs.
-                nidaqmx.constants.Edge.RISING (Default): Trigger when the signal crosses level on a rising Edge.
-                nidaqmx.constants.Edge.FALLING: Trigger when the signal crosses level on a falling Edge.
-            level_v: (float) specifies at what threshold to trigger. Specify this value in the units of the
-                measurement or generation. Use slope to specify on which slope to trigger at this threshold.
-                If not specified it has value = 0.0
-            pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per channel before
-                recognizing the Reference Trigger. The number of post-trigger samples per channel is equal to number
-                of samples per channel in the DAQmx Timing VI minus pre-trigger samples per channel. If not specified it
-                has value = 500.
+                nidaqmx.constants.Edge.RISING (Default): Trigger when the signal crosses level on a
+                rising Edge.
+                nidaqmx.constants.Edge.FALLING: Trigger when the signal crosses level on a falling
+                Edge.
+            level_v: (float) specifies at what threshold to trigger. Specify this value in the units
+                of the measurement or generation. Use slope to specify on which slope to trigger at
+                this threshold. If not specified it has value = 0.0
+            pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per
+                channel before recognizing the Reference Trigger. The number of post-trigger samples
+                per channel is equal to number of samples per channel in the DAQmx Timing VI minus
+                pre-trigger samples per channel. If not specified it has value = 500.
         """
         for session in self.sessions:
             session.st_ref_analog_edge(
@@ -521,21 +535,22 @@ class _Sessions:
         pre_trigger_samples_per_channel: int = 500,
     ):
         """
-        Configures each task in this session list to stop the acquisition when the device acquires all
-        pre-trigger samples, detects a rising or falling edge of a digital signal, and acquires
+        Configures each task in this session list to stop the acquisition when the device acquires
+        all pre-trigger samples, detects a rising or falling edge of a digital signal, and acquires
         all post-trigger samples. When you use a Reference Trigger, the default for the read
         RelativeTo property is First Pre-trigger Sample with a read Offset of 0.
 
         Args:
-            trigger_source: specifies the name of a terminal where there is a digital signal to use as
-                the source of the trigger.
+            trigger_source: specifies the name of a terminal where there is a digital signal to use
+                as the source of the trigger.
             edge: specifies on which edge of the digital signal the Reference Trigger occurs.
-                nidaqmx.constants.Slope.RISING: (Default) Trigger on a rising edge of the digital signal.
+                nidaqmx.constants.Slope.RISING: (Default) Trigger on a rising edge of the digital
+                signal.
                 nidaqmx.constants.Slope.FALLING: Trigger on a falling edge of the digital signal.
-            pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per channel
-                before recognizing the Reference Trigger. The number of post-trigger samples per channel is
-                equal to number of samples per channel in the DAQmx Timing VI minus pre-trigger samples per
-                channel.
+            pre_trigger_samples_per_channel: specifies the minimum number of samples to acquire per
+                channel before recognizing the Reference Trigger. The number of post-trigger samples
+                per channel is equal to number of samples per channel in the DAQmx Timing VI minus
+                pre-trigger samples per channel.
         """
         for session in self.sessions:
             session.st_ref_digital_edge(trigger_source, edge, pre_trigger_samples_per_channel)
@@ -543,8 +558,9 @@ class _Sessions:
 
 class MultipleSessions(_Sessions):
     """
-    Class that contains a list of DAQmx sessions with methods to control all sessions inside the object.
-    It also contains the pin query contex that can be related to each of the sessions inside the sessions list.
+    Class that contains a list of DAQmx sessions with methods to control all sessions inside the
+    object. It also contains the pin query contex that can be related to each of the sessions inside
+    the sessions list.
     """
 
     pin_query_context: PinQuery
@@ -580,9 +596,9 @@ def reset_devices(task: nidaqmx.Task):
 @nitsm.codemoduleapi.code_module
 def clear_task(tsm: SMContext):
     """
-    Clears all the tasks in the SMContext. Before clearing, this method will abort all tasks, if necessary,
-    and will release any resources the tasks reserved. You cannot use a task after you clear it unless you
-    set it again.
+    Clears all the tasks in the SMContext. Before clearing, this method will abort all tasks, if
+    necessary, and will release any resources the tasks reserved. You cannot use a task after you
+    clear it unless you set it again.
     """
     task_ao = tsm.get_all_nidaqmx_tasks("AnalogOutput")
     tasks_ai = tsm.get_all_nidaqmx_tasks("AnalogInput")
@@ -710,15 +726,15 @@ def set_task(tsm: SMContext):
 @nitsm.codemoduleapi.code_module
 def get_all_instrument_names(tsm: SMContext, task_type: str = ""):
     """
-    Returns the channel group ID and associated instrument names and channel lists of all instruments
-    of type Instrument Type ID defined in the Semiconductor Module context. You can use instrument names,
-    channel group IDs, and channel lists to open driver sessions. The Instrument Names and Channel Lists
-    parameters always return the same number of elements. Instrument names repeat in the Instrument Names
-    parameter if the instrument has multiple channel groups.
+    Returns the channel group ID and associated instrument names and channel lists of all
+    instruments of type Instrument Type ID defined in the Semiconductor Module context. You can use
+    instrument names, channel group IDs, and channel lists to open driver sessions. The Instrument
+    Names and Channel Lists parameters always return the same number of elements. Instrument names
+    repeat in the Instrument Names parameter if the instrument has multiple channel groups.
     Args:
         tsm: Pin context defined by pin map
-        task_type: Specifies the type of NI-DAQmx task to return. Use an empty string to obtain the names of all
-        tasks regardless of task type.
+        task_type: Specifies the type of NI-DAQmx task to return. Use an empty string to obtain the
+            names of all tasks regardless of task type.
     Return:
         A tuple of the NI-DAQmx task names.
     """
@@ -729,10 +745,12 @@ def get_all_instrument_names(tsm: SMContext, task_type: str = ""):
 @nitsm.codemoduleapi.code_module
 def get_all_sessions(tsm: SMContext, task_type: str = ""):
     """
-    Returns all sessions in the Semiconductor Module Context that belong to multiple instruments of the type DAQmx.
+    Returns all sessions in the Semiconductor Module Context that belong to multiple instruments of
+    the type DAQmx.
     Args:
         tsm: Pin context defined by pin map
-        task_type: Specifies the type of NI-DAQmx task to return. Use an empty string to obtain the names of all
+        task_type: Specifies the type of NI-DAQmx task to return. Use an empty string to obtain the
+            names of all
         tasks regardless of task type
     Return:
         List of tasks of the specific type
@@ -750,8 +768,8 @@ def pins_to_session_sessions_info(tsm: SMContext, pins: PinsArg):
         tsm: Pin context defined by pin map
         pins: The name of the pin(s) or pin group(s) to translate to a task.
     Return:
-        Multiple_Sessions: An object that tracks the task associated with this pin query. Use this object
-        to publish measurements and extract data from a set of measurements.
+        Multiple_Sessions: An object that tracks the task associated with this pin query. Use this
+        object to publish measurements and extract data from a set of measurements.
     """
     if type(pins) == str:
         pins = [pins]
@@ -778,8 +796,8 @@ def pins_to_sessions_sessions(tsm: SMContext, pins: PinsArg):
         tsm: Pin context defined by pin map
         pins: The name of the pin(s) or pin group(s) to translate to a set of tasks.
     Return:
-        session: An object that tracks the tasks associated with this pin query. Use this object to publish
-        measurements and extract data from a set of measurements.
+        session: An object that tracks the tasks associated with this pin query. Use this object to
+        publish measurements and extract data from a set of measurements.
     """
     session = tsm.pins_to_nidaqmx_tasks(pins)  # pin_query_context, task, channel_lists
     return session
