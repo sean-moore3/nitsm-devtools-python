@@ -83,16 +83,16 @@ class TestDMM:
         for dmm_tsm in list_dmm_tsm:
             print("\nTest_pin_to_sessions\n", dmm_tsm)
             print(dmm_tsm.sessions)
-            dmm_tsm.initiate()
+            dmm_tsm.configure_measurement(function=nidmm.Function.DC_VOLTS,
+                                          range_raw=10,
+                                          resolution_in_digits=ni_dmm.Resolution.Res_5_05,
+                                          input_resistance=ni_dmm.InputResistance.IR_1_MOhm)
+            dmm_tsm.configure_aperture_time(aperture_time=1,
+                                            units=nidmm.ApertureTimeUnits.SECONDS)
             try:
-                dmm_tsm.config_measurement(function=nidmm.Function.DC_VOLTS,
-                                           range_raw=1,
-                                           resolution_in_digits=ni_dmm.Resolution.Res_7_05,
-                                           input_resistance=ni_dmm.InputResistance.IR_1_MOhm)
-                dmm_tsm.config_apperture_time(apperture_time=1,
-                                              units=nidmm.ApertureTimeUnits.SECONDS)
+                # dmm_tsm.initiate()
                 data = dmm_tsm.measure()
-                print(data)
+                print("Data", data)
             except Exception as e:
                 print(e)
             finally:
