@@ -7,21 +7,10 @@ import shutil
 import typing
 from enum import Enum
 from time import time
-
 import nifpga
 import nitsm.pinquerycontexts
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
-
 import nidevtools.common as ni_dt_common
-
-# from time import sleep
-# import site
-
-# import nitsm.codemoduleapi
-# from nitsm.enums import Capability
-# from nidaqmx.constants import TerminalConfiguration
-# from nitsm.enums import InstrumentTypeIdConstants
-
 
 # Types Definition
 
@@ -57,7 +46,7 @@ class I2CMaster(Enum):
 
 class BoardType(Enum):
     """
-    Class that describes supported hardward
+    Class that describes supported hardware
     """
 
     PXIe_7822R = 0
@@ -282,8 +271,9 @@ class _SSCFPGA(typing.NamedTuple):
         """
         Closes the reference to the FPGA session and, optionally, resets execution of the session.
         By default, the Close FPGA session Reference function closes the reference to the FPGA
-        session and resets the FPGA session.To configure this function only to close the reference, change the value of the argument when calling the
-        function. The Close FPGA session reference function also stops all DMA FIFOs on the FPGA.
+        session and resets the FPGA session.To configure this function only to close the reference,
+        change the value of the argument when calling the function. The Close FPGA session reference
+        function also stops all DMA FIFOs on the FPGA.
 
         Args:
             reset_if_last_session: configuration variable should be a boolean, it is True by default
@@ -318,8 +308,8 @@ class _SSCFPGA(typing.NamedTuple):
         """
         Configures the provided SDA and SCL channels with the indicated I2C master configuration.
         Args:
-            i2c_master_in: Objet of class I2CMaster that indicates the configuration to configure. It should Match with
-            the physical hardware.
+            i2c_master_in: Objet of class I2CMaster that indicates the configuration to configure.
+                It should Match with the physical hardware.
             sda_channel: Location of the SDA channel given by DioLine and Connector.
                 Line location type of object is expected
             scl_channel: Location of the SCL channel given by DioLine and Connector.
@@ -344,8 +334,8 @@ class _SSCFPGA(typing.NamedTuple):
         Allows to configure the host setting in the master device. Data provided should be
         supported by the FPGA and match HW configuration
         Args:
-            i2c_master_in: Objet of class I2CMaster that indicates the configuration to configure. It should Match with
-            the physical hardware.
+            i2c_master_in: Objet of class I2CMaster that indicates the configuration to configure.
+                It should Match with the physical hardware.
             divide: int value
             ten_bit_addressing: configuration variable should be a bool
             clock_stretching: configuration variable should be a bool
@@ -372,11 +362,12 @@ class _SSCFPGA(typing.NamedTuple):
         timeout: float = 0.0,
     ):
         """
-        Waits slave ready signal until configured timeout has passed. After the signal has been received it releases the
-        resources to write or read. If the timeout expires it will rise an error 5000
+        Waits slave ready signal until configured timeout has passed. After the signal has been
+        received it releases the resources to write or read. If the timeout expires it will rise an
+        error 5000
         Args:
-            i2c_master_in: Objet of class I2CMaster that indicates the configuration to configure. It should Match with
-            the physical hardware.
+            i2c_master_in: Objet of class I2CMaster that indicates the configuration to configure.
+                It should Match with the physical hardware.
             start_time: Float variable that indicates the function start time
             timeout: Time until timeout. After it passes the function will raise an exception
         """
@@ -501,8 +492,8 @@ class _SSCFPGA(typing.NamedTuple):
         self, lines_to_read: typing.Union[LineLocation, typing.Sequence[LineLocation]]
     ):
         """
-        Reads the commanded states (0, 1, X, I2C) from the provided list of FPGA Lines and returns an array with their
-        value
+        Reads the commanded states (0, 1, X, I2C) from the provided list of FPGA Lines and returns
+        an array with their value
         Args:
             lines_to_read: List of line locations to be read
         Returns:
@@ -613,8 +604,8 @@ class _SSCFPGA(typing.NamedTuple):
         ],
     ):
         """
-        Writes the provided list of DIOLineLocationAndStaticState objects into the FPGA using the address provided in
-        each element
+        Writes the provided list of DIOLineLocationAndStaticState objects into the FPGA using the
+        address provided in each element
         Args:
             lines_to_write: List of DIOLineLocationAndStaticState objects to be written
         """
@@ -673,8 +664,8 @@ class TSMFPGA(typing.NamedTuple):
         self, ten_bit_addressing: bool = False, divide: int = 8, clock_stretching: bool = True
     ):
         """
-        Allows to configure the host setting for the TSMFPGA session. Data provided should be supported
-        by the FPGA and match HW configuration for that specific session.
+        Allows to configure the host setting for the TSMFPGA session. Data provided should be
+        supported by the FPGA and match HW configuration for that specific session.
         Args:
             ten_bit_addressing: Configuration variable false by default
             divide: configuration variable 8 by default
@@ -899,12 +890,12 @@ def channel_list_to_pins(channel_list: str = ""):
 
 def close_sessions(tsm_context: SMContext):
     """
-    Clears the FPGA session.  Before clearing, this method aborts the session, if necessary, and releases any resources
-    the session has reserved. You cannot use a session after you clear it unless you recreate the session.
-    If you create the FPGA session object within a loop, use this method within the loop after you are finished with the
-    session to avoid allocating unnecessary memory.
+    Clears the FPGA session.  Before clearing, this method aborts the session, if necessary, and
+    releases any resources the session has reserved. You cannot use a session after you clear it
+    unless you recreate the session. If you create the FPGA session object within a loop, use this
+    method within the loop after you are finished with the session to avoid allocating unnecessary
+    memory.
     """
-    # session_data, channel_group_ids, channel_lists = tsm_context.get_all_custom_sessions(InstrumentTypeId)
     session_data, _, _ = tsm_context.get_all_custom_sessions(InstrumentTypeId)
     for session in session_data:
         session.close()
@@ -922,7 +913,8 @@ def initialize_sessions(tsm_context: SMContext, ldb_type: str = ""):
         InstrumentTypeId
     )
     # when the output from a function is unused use _ instead of variables like below
-    # instrument_names, channel_group_ids, _ = tsm_context.get_custom_instrument_names(InstrumentTypeId)
+    # instrument_names, channel_group_ids, _ = tsm_context.get_custom_instrument_names(
+    # InstrumentTypeId)
     for instrument, group_id in zip(instrument_names, channel_group_ids):
         # target_list = ["PXIe-7822R", "PXIe-7821R", "PXIe-7820R"]
         ref_out = ""
@@ -1019,7 +1011,7 @@ def get_i2c_master_session(
 
 def check_ui_tool(
     path_in: str,
-    path_teststand: str = "C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)",
+    path_teststand="C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)",
 ):
     path_icons = os.path.join(path_teststand, "Components\\Icons")
     path_in = os.path.join(
