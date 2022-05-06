@@ -25,7 +25,7 @@ class Action(Enum):
 
 class Topology(typing.NamedTuple):
     """
-    Currently supports 3 topologies need to add rest of the topologies for the a more general code
+    Currently supports 3 topologies need to add rest of the topologies for more general code
 
     Args:
         typing (tuple): topology and the names
@@ -56,8 +56,8 @@ class Session(typing.NamedTuple):
         performs various actions like connect, disconnect or disconnect all.
 
         Args:
-            route_value (str): list of switchs
-            action (Action): to be performed on the swtiches
+            route_value (str): list of Digital lines to drive
+            action (Action): to be performed on the digital line
             timeout (int): time within which the operation needs to be finished
 
         Returns:
@@ -91,7 +91,7 @@ class MultipleSessions:
 
     def __init__(self, sessions: typing.List[Session]):
         """
-        contructor to store the sessions
+        constructor to store the sessions
 
         Args:
             sessions (typing.List[Session]): list of sessions for the current context
@@ -105,7 +105,7 @@ class MultipleSessions:
         reads and returns the path capability
 
         Args:
-            route_value (str, optional): comma seperated list of "en_" routes. Defaults to "".
+            route_value (str, optional): comma separated list of "en_" routes. Defaults to "".
             action (Action, optional): connect or disconnect. Defaults to Action.Disconnect.
             timeout (int, optional): timeout for the operation in seconds. Defaults to 40.
 
@@ -131,7 +131,7 @@ def get_all_instruments_names(tsm: SMContext):
         tsm (SMContext): Semiconductor module Reference from the TestStand.
 
     Returns:
-        tulple : instrument_names, channel_group_ids
+        tuple : instrument_names, channel_group_ids
     """
     instrument_names, channel_group_ids, _ = tsm.get_custom_instrument_names(instrument_type_id)
     return instrument_names, channel_group_ids
@@ -159,7 +159,7 @@ def get_all_sessions(tsm: SMContext):
 @nitsm.codemoduleapi.code_module
 def pin_to_sessions_session_info(tsm: SMContext, pin: str = ""):
     """
-    Returns an Switch Session object containing a list of switch sessions detailed on the pinmap
+    Returns a Switch Session object containing a list of switch sessions detailed on the pinmap
 
     Args:
         tsm (SMContext): Pin context defined by pin map

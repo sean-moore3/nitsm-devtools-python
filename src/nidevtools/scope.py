@@ -220,7 +220,7 @@ def _configure_vertical_per_channel_arrays(
         ssc_s (typing.List[_NIScopeSSC]): list of session channels
         ranges (typing.List[float]): vertical range list - one for each session
         couplings (typing.List[niscope.VerticalCoupling]): vertical coupling list - one for each
-        session
+            session.
         offsets (typing.List[float]): vertical offset list - one for each session
         probes_drop (typing.List[float]): probe attenuation drop list - one for each session
         enabled_s (typing.List[bool]): channel enabled list - one for each session
@@ -470,7 +470,8 @@ class _NIScopeTSM:
             vertical_range (float, optional): _description_. Defaults to 5.0.
             probe_attenuation (float, optional): _description_. Defaults to 1.0.
             offset (float, optional): _description_. Defaults to 0.0.
-            coupling (niscope.VerticalCoupling, optional): _description_. Defaults to niscope.VerticalCoupling.DC.
+            coupling (niscope.VerticalCoupling, optional): _description_. Defaults to
+                niscope.VerticalCoupling.DC.
             min_sample_rate (float, optional): _description_. Defaults to 10e6.
             min_record_length (int, optional): _description_. Defaults to 1000.
             ref_position (float, optional): _description_. Defaults to 0.0.
@@ -615,15 +616,13 @@ class _NIScopeTSM:
         Args:
             trigger_source (str): Specifies the trigger source. Refer to trigger_source
                 for defined values
-            slope (niscope.TriggerSlope): Specifies whether you want a rising edge or a falling edge to trigger
-                the digitizer. Refer to trigger_slope for more
-                information
-            holdoff (float, optional): The length of time the digitizer waits after detecting a trigger before
-                enabling NI-SCOPE to detect another trigger. Refer to
-                trigger_holdoff for more information. Defaults to 0.0.
-            delay (float, optional): How long the digitizer waits after receiving the trigger to start
-                acquiring data. Refer to trigger_delay_time for more
-                information. Defaults to 0.0.
+            slope (niscope.TriggerSlope): Specifies whether you want a rising edge or a falling edge
+                to trigger the digitizer. Refer to trigger_slope for more information
+            holdoff (float, optional): The length of time the digitizer waits after detecting a
+                trigger before enabling NI-SCOPE to detect another trigger. Defaults to 0.0.
+            delay (float, optional): How long the digitizer waits after receiving the trigger to
+                start acquiring data. Refer to trigger_delay_time for more information. Defaults to
+                0.0.
         """
         for ssc in self._sscs:
             ssc.session.configure_trigger_digital(
@@ -649,17 +648,15 @@ class _NIScopeTSM:
         Args:
             level (float): The voltage threshold for the trigger. Refer to
                 trigger_level for more information.
-            trigger_coupling (niscope.TriggerCoupling): Applies coupling and filtering options to the trigger signal.
-                Refer to trigger_coupling for more information.
-            slope (niscope.TriggerSlope):  Specifies whether you want a rising edge or a falling edge to trigger
-                the digitizer. Refer to trigger_slope for more
-                information.
-            holdoff (float, optional): The length of time the digitizer waits after detecting a trigger before
-                enabling NI-SCOPE to detect another trigger. Refer to
-                trigger_holdoff for more information. Defaults to 0.0.
-            delay (float, optional): How long the digitizer waits after receiving the trigger to start
-                acquiring data. Refer to trigger_delay_time for more
-                information. Defaults to 0.0.
+            trigger_coupling (niscope.TriggerCoupling): Applies coupling and filtering options to
+                the trigger signal. Refer to trigger_coupling for more information.
+            slope (niscope.TriggerSlope):  Specifies whether you want a rising edge or a falling
+                edge to trigger the digitizer. Refer to trigger_slope for more information.
+            holdoff (float, optional): The length of time the digitizer waits after detecting a
+                trigger before enabling NI-SCOPE to detect another trigger. Defaults to 0.0.
+            delay (float, optional): How long the digitizer waits after receiving the trigger to
+                start acquiring data. Refer to trigger_delay_time for more information. Defaults to
+                0.0.
         """
         for ssc in self._sscs:
             ssc.session.configure_trigger_edge(
@@ -732,7 +729,8 @@ class _NIScopeTSM:
         trigger_slope=niscope.TriggerSlope.POSITIVE,
     ):
         """
-        Configure the selected pin for analog edge trigger and make other channels to wait for trigger
+        Configure the selected pin for analog edge trigger and make other channels to wait for
+        trigger
         """
         start_trigger: str = ""
         trigger_source: str = "0"
@@ -823,7 +821,8 @@ class _NIScopeTSM:
             scalar_meas_function (niscope.ScalarMeasurement): select the type of measurement.
 
         Returns:
-            varies: based on the type of measurement the return datatype varies but mostly numeric list.
+            varies: based on the type of measurement the return datatype varies but mostly numeric
+            list.
         """
         measurements: typing.List[float] = []
         for ssc in self._sscs:
@@ -863,7 +862,8 @@ class _NIScopeTSM:
         fetch multi-record waveform from all channels in the current TSMScope object
 
         Args:
-            num_records (int, optional): number of records to fetch. fetch everything by default. Defaults to -1.
+            num_records (int, optional): number of records to fetch. fetch everything by default.
+            Defaults to -1.
 
         Returns:
             list records: multi-record waveform from all channels in list
@@ -897,7 +897,8 @@ class _NIScopeTSM:
         get measure statistics for all channels in the current TSMScope object
 
         Args:
-            scalar_meas_function (niscope.ScalarMeasurement): measurement function to use for statistics
+            scalar_meas_function (niscope.ScalarMeasurement): measurement function to use for
+                statistics.
 
         Returns:
             varies : returns the list of measurement statistics
@@ -941,13 +942,12 @@ class _NIScopeTSM:
         differently.
 
         Args:
-            ssc_s (typing.List[_NIScopeSSC]): List of sessions for various channels in groups.
-            scalar_measurement (niscope.ScalarMeasurement): The scalar measurement to be performed on each fetched waveform.
+            scalar_measurement (niscope.ScalarMeasurement): The scalar measurement to be performed
+            on each fetched waveform.
 
         Returns:
-            list of measurement_stats (list of MeasurementStats): Returns a list of class instances with the following measurement statistics
-                about the specified measurement:
-
+            list of measurement_stats (list of MeasurementStats): Returns a list of class instances
+            with the following measurement statistics about the specified measurement:
                 -	**result** (float): the resulting measurement
                 -	**mean** (float): the mean scalar value, which is obtained by
                 averaging each fetch_measurement_stats call
@@ -957,7 +957,8 @@ class _NIScopeTSM:
                 of the **numInStats** measurements)
                 -	**max_val** (float): the largest scalar value acquired (the maximum
                 of the **numInStats** measurements)
-                -	**num_in_stats** (int): the number of times fetch_measurement_stats has been called
+                -	**num_in_stats** (int): the number of times fetch_measurement_stats has been
+                    called
                 -	**channel** (str): channel name this result was acquired from
                 -	**record** (int): record number of this result
         """
@@ -1101,7 +1102,8 @@ def pins_to_sessions(tsm: SMContext, pins: typing.List[str], sites: typing.List[
         sites = list(tsm.site_numbers)  # This is tested and works
     pin_query_context, sessions, channels = tsm.pins_to_niscope_sessions(pins)
     sites, pin_lists = _pin_query_context_to_channel_list(pin_query_context, [], sites)
-    # sites, pin_lists = ni_dt_common.pin_query_context_to_channel_list(pin_query_context, [], sites)
+    # sites, pin_lists = ni_dt_common.pin_query_context_to_channel_list(
+    # pin_query_context, [], sites)
     sscs = [
         _NIScopeSSC(session, channel, pin_list)
         for session, channel, pin_list in zip(sessions, channels, pin_lists)
@@ -1113,10 +1115,12 @@ def pins_to_sessions(tsm: SMContext, pins: typing.List[str], sites: typing.List[
 @nitsm.codemoduleapi.code_module
 def initialize_sessions(tsm: SMContext, options: dict = {}):
     """
-    Open sessions for all NI-SCOPE instrument channels that are defined in pinmap associated with the tsm context
+    Open sessions for all NI-SCOPE instrument channels that are defined in pinmap associated with
+    the tsm context
 
     Args:
         tsm (SMContext): TestStand semiconductor module context
+        options: Dictionary containing options for driver initialisation.
     """
     instrument_names = tsm.get_all_niscope_instrument_names()
     for instrument_name in instrument_names:
