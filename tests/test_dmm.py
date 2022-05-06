@@ -76,7 +76,7 @@ class TestDMM:
             assert isinstance(dmm_tsm.sessions, typing.Sequence)
             assert len(dmm_tsm.sessions) == len(tsm.site_numbers)
 
-    def test_init_close_session(self, dmm_tsm_s):
+    def test_configure(self, dmm_tsm_s):
         tsm = dmm_tsm_s[0]
         list_dmm_tsm = dmm_tsm_s[1]
         print(list_dmm_tsm)
@@ -90,10 +90,45 @@ class TestDMM:
             dmm_tsm.configure_aperture_time(aperture_time=1,
                                             units=nidmm.ApertureTimeUnits.SECONDS)
             try:
-                # dmm_tsm.initiate()
+                dmm_tsm.initiate()
                 data = dmm_tsm.measure()
                 print("Data", data)
             except Exception as e:
                 print(e)
             finally:
                 dmm_tsm.abort()
+
+@nitsm.codemoduleapi.code_module
+def open_sessions(tsm: SMContext):
+    ni_dmm.initialize_session(tsm)
+
+
+@nitsm.codemoduleapi.code_module
+def close_sessions(tsm: SMContext):
+    ni_dmm.close_session(tsm)
+
+@nitsm.codemoduleapi.code_module
+def pins_to_sessions(
+    tsm: SMContext,
+    pins: typing.List[str] = ["CH0"],
+):
+    return ni_dmm.pins_to_sessions(tsm, pins)
+
+@nitsm.codemoduleapi.code_module
+def configure(tsm: SMContext, pins: typing.List[str]):
+    tsm_sessions = ni_dmm.pins_to_sessions(tsm, pins)
+    for dmm_tsm in tsm_sessions:
+        dmm_tsm.configure_measurement(function=nidmm.Function.DC_VOLTS,
+                                      range_raw=10,
+                                      resolution_in_digits=ni_dmm.Resolution.Res_5_05,
+                                      input_resistance=ni_dmm.InputResistance.IR_1_MOhm)
+        dmm_tsm.configure_aperture_time(aperture_time=1,
+                                        units=nidmm.ApertureTimeUnits.SECONDS)
+        try:
+            dmm_tsm.initiate()
+            data = dmm_tsm.measure()
+            print("Data", data)
+        except Exception as e:
+            print(e)
+        finally:
+            dmm_tsm.abort()
