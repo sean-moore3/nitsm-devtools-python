@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.6">
+	<Instruments>
+		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Digital1" />
+		<NIDCPowerInstrument name="SMU1" numberOfChannels="1">
+			<ChannelGroup name="VCC_G_SY" channels="0" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU2" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU3" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU4" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU5" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU6" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU7" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU8" numberOfChannels="4">
+			<ChannelGroup name="IP_G" channels="0-1" />
+			<ChannelGroup name="OP_G" channels="2-3" />
+		</NIDCPowerInstrument>
+		<NIScopeInstrument name="OSC1" numberOfChannels="8" group="Scope8" />
+		<NIScopeInstrument name="OSC2" numberOfChannels="8" group="Scope8" />
+		<NIScopeInstrument name="OSC3" numberOfChannels="2" group="Scope2" />
+		<NIDAQmxTask name="DAQ1" taskType="AI" channelList="DAQ1/ai0,DAQ1/ai1,DAQ1/ai2,DAQ1/ai3,DAQ1/ai4,DAQ1/ai5,DAQ1/ai6,DAQ1/ai7" />
+		<NIDAQmxTask name="DAQ2" taskType="AI" channelList="DAQ2/ai0,DAQ2/ai1,DAQ2/ai2,DAQ2/ai3,DAQ2/ai4,DAQ2/ai5,DAQ2/ai6,DAQ2/ai7" />
+		<NIFGenInstrument name="FGN1" numberOfChannels="1" />
+		<NIFGenInstrument name="FGN2" numberOfChannels="1" />
+		<NIFGenInstrument name="FGN3" numberOfChannels="1" />
+		<NIFGenInstrument name="FGN4" numberOfChannels="1" />
+		<NIFGenInstrument name="FGN5" numberOfChannels="1" />
+		<NIFGenInstrument name="FGN6" numberOfChannels="1" />
+		<NIFGenInstrument name="FGN7" numberOfChannels="1" />
+		<NIFGenInstrument name="FGN8" numberOfChannels="1" />
+	</Instruments>
+	<Pins>
+		<DUTPin name="DPI_DO_SCL" />
+		<DUTPin name="DPI_DI_SCL" />
+		<DUTPin name="DPI_DI_SDA" />
+		<DUTPin name="DPI_DO_SDA" />
+		<SystemPin name="DPI_SR_VDD" />
+		<SystemPin name="DPI_PM_VDD" />
+		<SystemPin name="DPI_SR_VDDIO" />
+		<SystemPin name="DPI_PM_VDDIO" />
+		<SystemPin name="SMU_VI_VCC" />
+		<DUTPin name="SMU_VI_V_In" />
+		<DUTPin name="SMU_VI_V_Out" />
+		<DUTPin name="OSC_xA_P_In" />
+		<DUTPin name="OSC_xA_P_Out" />
+		<DUTPin name="DAQ_AI_SGL1" />
+		<DUTPin name="DAQ_AI_SGL2" />
+		<SystemPin name="FGN_SI_RefSGL" />
+		<DUTPin name="FGN_SI_SGL_In" />
+	</Pins>
+	<PinGroups>
+		<PinGroup name="DPI_PG_Inputs">
+			<PinReference pin="DPI_DI_SDA" />
+			<PinReference pin="DPI_DI_SCL" />
+		</PinGroup>
+		<PinGroup name="DPI_PG_Outputs">
+			<PinReference pin="DPI_DO_SCL" />
+			<PinReference pin="DPI_DO_SDA" />
+		</PinGroup>
+		<PinGroup name="DPI_PG_AllPins">
+			<PinReference pin="DPI_PG_Outputs" />
+			<PinReference pin="DPI_PG_Inputs" />
+		</PinGroup>
+		<PinGroup name="SMU_PG_SYS">
+			<PinReference pin="SMU_VI_VCC" />
+		</PinGroup>
+		<PinGroup name="SMU_PG_Logic">
+			<PinReference pin="SMU_VI_V_In" />
+			<PinReference pin="SMU_VI_V_Out" />
+		</PinGroup>
+		<PinGroup name="DAQ_PG_Audio">
+			<PinReference pin="DAQ_AI_SGL1" />
+			<PinReference pin="DAQ_AI_SGL2" />
+		</PinGroup>
+		<PinGroup name="OSC_PG_AllPins">
+			<PinReference pin="OSC_xA_P_In" />
+			<PinReference pin="OSC_xA_P_Out" />
+		</PinGroup>
+		<PinGroup name="OSC_PG_Input">
+			<PinReference pin="OSC_xA_P_In" />
+		</PinGroup>
+		<PinGroup name="OSC_PG_Output">
+			<PinReference pin="OSC_xA_P_Out" />
+		</PinGroup>
+		<PinGroup name="FGN_PG_Signal">
+			<PinReference pin="FGN_SI_RefSGL" />
+		</PinGroup>
+	</PinGroups>
+	<Sites>
+		<Site siteNumber="0" />
+		<Site siteNumber="1" />
+		<Site siteNumber="2" />
+		<Site siteNumber="3" />
+		<Site siteNumber="4" />
+		<Site siteNumber="5" />
+		<Site siteNumber="6" />
+	</Sites>
+	<Connections>
+		<SystemConnection pin="SMU_VI_VCC" instrument="SMU1" channel="0" />
+		<SystemConnection pin="DPI_SR_VDD" instrument="DPI1" channel="0" />
+		<SystemConnection pin="DPI_SR_VDDIO" instrument="DPI1" channel="2" />
+		<Connection pin="DPI_DO_SCL" siteNumber="0" instrument="DPI1" channel="4" />
+		<Connection pin="DPI_DI_SCL" siteNumber="0" instrument="DPI1" channel="5" />
+		<Connection pin="DPI_DI_SDA" siteNumber="0" instrument="DPI1" channel="6" />
+		<Connection pin="DPI_DO_SDA" siteNumber="0" instrument="DPI1" channel="7" />
+		<Connection pin="DPI_DO_SCL" siteNumber="1" instrument="DPI1" channel="8" />
+		<Connection pin="DPI_DI_SCL" siteNumber="1" instrument="DPI1" channel="9" />
+		<Connection pin="DPI_DI_SDA" siteNumber="1" instrument="DPI1" channel="10" />
+		<Connection pin="DPI_DO_SDA" siteNumber="1" instrument="DPI1" channel="11" />
+		<Connection pin="DPI_DO_SCL" siteNumber="2" instrument="DPI1" channel="12" />
+		<Connection pin="DPI_DI_SCL" siteNumber="2" instrument="DPI1" channel="13" />
+		<Connection pin="DPI_DI_SDA" siteNumber="2" instrument="DPI1" channel="14" />
+		<Connection pin="DPI_DO_SDA" siteNumber="2" instrument="DPI1" channel="15" />
+		<Connection pin="DPI_DO_SCL" siteNumber="3" instrument="DPI1" channel="16" />
+		<Connection pin="DPI_DI_SCL" siteNumber="3" instrument="DPI1" channel="17" />
+		<Connection pin="DPI_DI_SDA" siteNumber="3" instrument="DPI1" channel="18" />
+		<Connection pin="DPI_DO_SDA" siteNumber="3" instrument="DPI1" channel="19" />
+		<Connection pin="DPI_DO_SCL" siteNumber="4" instrument="DPI1" channel="20" />
+		<Connection pin="DPI_DI_SCL" siteNumber="4" instrument="DPI1" channel="21" />
+		<Connection pin="DPI_DI_SDA" siteNumber="4" instrument="DPI1" channel="22" />
+		<Connection pin="DPI_DO_SDA" siteNumber="4" instrument="DPI1" channel="23" />
+		<Connection pin="DPI_DO_SCL" siteNumber="5" instrument="DPI1" channel="24" />
+		<Connection pin="DPI_DI_SCL" siteNumber="5" instrument="DPI1" channel="25" />
+		<Connection pin="DPI_DI_SDA" siteNumber="5" instrument="DPI1" channel="26" />
+		<Connection pin="DPI_DO_SDA" siteNumber="5" instrument="DPI1" channel="27" />
+		<Connection pin="DPI_DO_SCL" siteNumber="6" instrument="DPI1" channel="28" />
+		<Connection pin="DPI_DI_SCL" siteNumber="6" instrument="DPI1" channel="29" />
+		<Connection pin="DPI_DI_SDA" siteNumber="6" instrument="DPI1" channel="30" />
+		<Connection pin="DPI_DO_SDA" siteNumber="6" instrument="DPI1" channel="31" />
+		<Connection pin="SMU_VI_V_In" siteNumber="0" instrument="SMU2" channel="0" />
+		<Connection pin="SMU_VI_V_Out" siteNumber="0" instrument="SMU2" channel="3" />
+		<Connection pin="SMU_VI_V_In" siteNumber="1" instrument="SMU3" channel="0" />
+		<Connection pin="SMU_VI_V_Out" siteNumber="1" instrument="SMU3" channel="3" />
+		<Connection pin="SMU_VI_V_In" siteNumber="2" instrument="SMU4" channel="0" />
+		<Connection pin="SMU_VI_V_Out" siteNumber="2" instrument="SMU4" channel="3" />
+		<Connection pin="SMU_VI_V_In" siteNumber="3" instrument="SMU5" channel="0" />
+		<Connection pin="SMU_VI_V_Out" siteNumber="3" instrument="SMU5" channel="3" />
+		<Connection pin="SMU_VI_V_In" siteNumber="4" instrument="SMU6" channel="0" />
+		<Connection pin="SMU_VI_V_Out" siteNumber="4" instrument="SMU6" channel="3" />
+		<Connection pin="SMU_VI_V_In" siteNumber="5" instrument="SMU7" channel="0" />
+		<Connection pin="SMU_VI_V_Out" siteNumber="5" instrument="SMU7" channel="3" />
+		<Connection pin="SMU_VI_V_In" siteNumber="6" instrument="SMU8" channel="0" />
+		<Connection pin="SMU_VI_V_Out" siteNumber="6" instrument="SMU8" channel="3" />
+		<Connection pin="OSC_xA_P_In" siteNumber="0" instrument="OSC1" channel="0" />
+		<Connection pin="OSC_xA_P_In" siteNumber="1" instrument="OSC1" channel="2" />
+		<Connection pin="OSC_xA_P_In" siteNumber="2" instrument="OSC1" channel="4" />
+		<Connection pin="OSC_xA_P_In" siteNumber="3" instrument="OSC1" channel="6" />
+		<Connection pin="OSC_xA_P_In" siteNumber="4" instrument="OSC2" channel="0" />
+		<Connection pin="OSC_xA_P_In" siteNumber="5" instrument="OSC2" channel="2" />
+		<Connection pin="OSC_xA_P_In" siteNumber="6" instrument="OSC2" channel="4" />
+		<Connection pin="OSC_xA_P_Out" siteNumber="0" instrument="OSC1" channel="1" />
+		<Connection pin="OSC_xA_P_Out" siteNumber="1" instrument="OSC1" channel="3" />
+		<Connection pin="OSC_xA_P_Out" siteNumber="2" instrument="OSC1" channel="5" />
+		<Connection pin="OSC_xA_P_Out" siteNumber="3" instrument="OSC1" channel="7" />
+		<Connection pin="OSC_xA_P_Out" siteNumber="4" instrument="OSC2" channel="1" />
+		<Connection pin="OSC_xA_P_Out" siteNumber="5" instrument="OSC2" channel="3" />
+		<Connection pin="OSC_xA_P_Out" siteNumber="6" instrument="OSC2" channel="5" />
+		<Connection pin="DAQ_AI_SGL1" siteNumber="0" instrument="DAQ1" channel="DAQ1/ai0" />
+		<Connection pin="DAQ_AI_SGL1" siteNumber="1" instrument="DAQ1" channel="DAQ1/ai1" />
+		<Connection pin="DAQ_AI_SGL1" siteNumber="2" instrument="DAQ1" channel="DAQ1/ai2" />
+		<Connection pin="DAQ_AI_SGL1" siteNumber="3" instrument="DAQ1" channel="DAQ1/ai3" />
+		<Connection pin="DAQ_AI_SGL1" siteNumber="4" instrument="DAQ1" channel="DAQ1/ai4" />
+		<Connection pin="DAQ_AI_SGL1" siteNumber="5" instrument="DAQ1" channel="DAQ1/ai5" />
+		<Connection pin="DAQ_AI_SGL1" siteNumber="6" instrument="DAQ1" channel="DAQ1/ai6" />
+		<Connection pin="DAQ_AI_SGL2" siteNumber="0" instrument="DAQ2" channel="DAQ2/ai0" />
+		<Connection pin="DAQ_AI_SGL2" siteNumber="1" instrument="DAQ2" channel="DAQ2/ai1" />
+		<Connection pin="DAQ_AI_SGL2" siteNumber="2" instrument="DAQ2" channel="DAQ2/ai2" />
+		<Connection pin="DAQ_AI_SGL2" siteNumber="3" instrument="DAQ2" channel="DAQ2/ai3" />
+		<Connection pin="DAQ_AI_SGL2" siteNumber="4" instrument="DAQ2" channel="DAQ2/ai4" />
+		<Connection pin="DAQ_AI_SGL2" siteNumber="5" instrument="DAQ2" channel="DAQ2/ai5" />
+		<Connection pin="DAQ_AI_SGL2" siteNumber="6" instrument="DAQ2" channel="DAQ2/ai6" />
+		<Connection pin="FGN_SI_SGL_In" siteNumber="0" instrument="FGN1" channel="0" />
+		<Connection pin="FGN_SI_SGL_In" siteNumber="1" instrument="FGN2" channel="0" />
+		<Connection pin="FGN_SI_SGL_In" siteNumber="2" instrument="FGN3" channel="0" />
+		<Connection pin="FGN_SI_SGL_In" siteNumber="3" instrument="FGN4" channel="0" />
+		<Connection pin="FGN_SI_SGL_In" siteNumber="4" instrument="FGN5" channel="0" />
+		<Connection pin="FGN_SI_SGL_In" siteNumber="5" instrument="FGN6" channel="0" />
+		<Connection pin="FGN_SI_SGL_In" siteNumber="6" instrument="FGN7" channel="0" />
+		<SystemConnection pin="DPI_PM_VDD" instrument="DPI1" channel="1" />
+		<SystemConnection pin="DPI_PM_VDDIO" instrument="DPI1" channel="3" />
+		<SystemConnection pin="FGN_SI_RefSGL" instrument="FGN8" channel="0" />
+	</Connections>
+</PinMap>

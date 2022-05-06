@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.5">
+	<Instruments>
+		<Multiplexer multiplexerTypeId="Matrix" name="Masterconnect" />
+		<NIDAQmxTask name="DAQ2" taskType="DigitalOutput" channelList="DAQ2/port0/line2" />
+		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Digital" />
+		<Instrument name="RIO1" instrumentTypeId="782xFPGA">
+			<ChannelGroup id="DIO">
+				<Channel id="0" />
+			</ChannelGroup>
+		</Instrument>
+		<Instrument name="Switch" instrumentTypeId="_niSwitch">
+			<Channel id="0" />
+		</Instrument>
+		<Instrument instrumentTypeId="abstinst" name="AbstractInstrument">
+			<Channel id="0" />
+		</Instrument>
+	</Instruments>
+	<Pins>
+		<DUTPin name="En_Daq" />
+		<DUTPin name="eN_Digital" />
+		<DUTPin name="EN_FPGA" />
+		<DUTPin name="en_Switch" />
+		<DUTPin name="BuckSGL_1_DUT" />
+		<DUTPin name="BuckSGL_2_DUT" />
+		<DUTPin name="BuckSGL_3_DUT" />
+		<DUTPin name="BuckSGL_4_DUT" />
+		<DUTPin name="BuckSGL_5_DUT" />
+		<DUTPin name="BuckSGL_6_DUT" />
+		<DUTPin name="BuckSGL_7_DUT" />
+		<DUTPin name="BuckSGL_8_DUT" />
+		<DUTPin name="DPI_DO_SCL" />
+		<DUTPin name="DPI_DI_SCL" />
+		<DUTPin name="DPI_DO_SDA" />
+		<DUTPin name="DPI_DI_SDA" />
+	</Pins>
+	<PinGroups>
+		<PinGroup name="BuckSGL_1">
+			<PinReference pin="BuckSGL_1_DUT" />
+			<PinReference pin="EN_FPGA" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_2">
+			<PinReference pin="BuckSGL_2_DUT" />
+			<PinReference pin="EN_FPGA" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_3">
+			<PinReference pin="BuckSGL_3_DUT" />
+			<PinReference pin="En_Daq" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_4">
+			<PinReference pin="BuckSGL_4_DUT" />
+			<PinReference pin="En_Daq" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_5">
+			<PinReference pin="BuckSGL_5_DUT" />
+			<PinReference pin="eN_Digital" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_6">
+			<PinReference pin="BuckSGL_6_DUT" />
+			<PinReference pin="eN_Digital" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_7">
+			<PinReference pin="BuckSGL_7_DUT" />
+			<PinReference pin="en_Switch" />
+		</PinGroup>
+		<PinGroup name="BuckSGL_8">
+			<PinReference pin="BuckSGL_8_DUT" />
+			<PinReference pin="en_Switch" />
+		</PinGroup>
+	</PinGroups>
+	<Sites>
+		<Site siteNumber="0" />
+	</Sites>
+	<Connections>
+		<Connection pin="DPI_DI_SCL" siteNumber="0" instrument="DPI1" channel="2" />
+		<Connection pin="DPI_DI_SDA" siteNumber="0" instrument="DPI1" channel="4" />
+		<Connection pin="DPI_DO_SCL" siteNumber="0" instrument="DPI1" channel="1" />
+		<Connection pin="DPI_DO_SDA" siteNumber="0" instrument="DPI1" channel="3" />
+		<Connection pin="EN_FPGA" siteNumber="0" instrument="RIO1" channel="0" />
+		<Connection pin="En_Daq" siteNumber="0" instrument="DAQ2" channel="DAQ2/port0/line2" />
+		<Connection pin="eN_Digital" siteNumber="0" instrument="DPI1" channel="0" />
+		<Connection pin="en_Switch" siteNumber="0" instrument="Switch" channel="0" />
+		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
+			<MultiplexedDUTPinRoute pin="BuckSGL_1_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="EN_FPGA=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_2_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="EN_FPGA=1" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_3_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_4_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq=1" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_5_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="eN_Digital=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_6_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="eN_Digital=1" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_7_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="en_Switch=0" />
+			<MultiplexedDUTPinRoute pin="BuckSGL_8_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="en_Switch=1" />
+		</MultiplexedConnection>
+	</Connections>
+</PinMap>

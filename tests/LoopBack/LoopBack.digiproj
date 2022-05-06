@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SourceFile Checksum="0A3E679019746F3826A5B9311FAB2B3C" xmlns="http://www.ni.com/PlatformFramework">
+	<SourceModelFeatureSet>
+		<ParsableNamespace AssemblyFileVersion="5.3.2.50247" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
+		<ParsableNamespace AssemblyFileVersion="5.3.2.50247" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
+		<ApplicationVersionInfo Build="5.3.2.50247" Name="Digital Pattern Editor" Version="20.6.0" />
+	</SourceModelFeatureSet>
+	<Project xmlns="http://www.ni.com/PlatformFramework">
+		<ProjectSettings Id="1" ModelDefinitionType="ProjectSettings" Name="ZProjectSettings" />
+		<EmbeddedDefinitionReference Id="2" ModelDefinitionType="NationalInstruments.ProjectExplorer.Modeling.ProjectDataManager" Name="ProjectExplorer">
+			<ProjectExplorer />
+		</EmbeddedDefinitionReference>
+		<NameScopingEnvoy Id="3" ModelDefinitionType="DefaultTarget" Name="DefaultTarget">
+			<DefaultTarget />
+			<FileReference Id="12" ModelDefinitionType="SpecificationsDefinition" Name="I2C_Electrical\.specs" StoragePath="Specifications\I2C_Electrical.specs" />
+			<FileReference Id="19" ModelDefinitionType="TimingDefinition" Name="I2C_Timing\.digitiming" StoragePath="Timing\I2C_Timing.digitiming" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
+			<FileReference Id="20" ModelDefinitionType="PinLevelsDefinition" Name="I2C_Levels\.digilevels" StoragePath="Levels\I2C_Levels.digilevels" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
+			<EmbeddedDefinitionReference Id="212" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}CaptureResultsDefinition" Name="CaptureResults">
+				<CaptureResultsDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
+			</EmbeddedDefinitionReference>
+			<EmbeddedDefinitionReference Id="214" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}BurstResultsDefinition" Name="BurstResults">
+				<BurstResultsDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
+			</EmbeddedDefinitionReference>
+			<EmbeddedDefinitionReference Id="217" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}DigitalScopeDefinition" Name="DigitalScope">
+				<DigitalScopeDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
+			</EmbeddedDefinitionReference>
+			<FileReference Id="225" ModelDefinitionType="CaptureWaveformDefinition" Name="I2C_Capture_Buffer\.digicapture" StoragePath="Waveforms\I2C_Capture_Buffer.digicapture" />
+			<FileReference Id="226" ModelDefinitionType="DigitalPatternEditor.PatternDefinition" Name="I2C_Read_Loop\.digipat" StoragePath="Patterns\I2C_Read_Loop.digipat" />
+			<FileReference Id="227" ModelDefinitionType="DigitalPatternEditor.PatternDefinition" Name="I2C_Write\.digipat" StoragePath="Patterns\I2C_Write.digipat" />
+			<FileReference Id="228" ModelDefinitionType="SourceWaveformDefinition" Name="I2C_Source_Buffer\.tdms" StoragePath="Waveforms\I2C_Source_Buffer.tdms" />
+			<FileReference Id="232" ModelDefinitionType="SpecificationsDefinition" Name="I2C_Time\.specs" StoragePath="Specifications\I2C_Time.specs" />
+			<FileReference Id="277" ModelDefinitionType="DigitalPatternEditor.PatternDefinition" Name="I2C_Read\.digipat" StoragePath="Patterns\I2C_Read.digipat" />
+			<FileReference Id="278" ModelDefinitionType="DigitalPatternEditor.PatternDefinition" Name="I2C_Write_Loop\.digipat" StoragePath="Patterns\I2C_Write_Loop.digipat" />
+			<FileReference Id="281" ModelDefinitionType="SourceWaveformDefinition" Name="I2C_SiteUnique\.tdms" StoragePath="Waveforms\I2C_SiteUnique.tdms" />
+			<FileReference Id="282" ModelDefinitionType="SourceWaveformDefinition" Name="I2C_Broadcast\.tdms" StoragePath="Waveforms\I2C_Broadcast.tdms" />
+			<FileReference Id="294" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}DutBringupDefinition" Name="I2C_Bringup\.dutbringup" StoragePath="Misc\I2C_Bringup.dutbringup" />
+			<FileReference Id="295" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}RegisterMapDefinition" Name="I2C_Reg\.digireg" StoragePath="Misc\I2C_Reg.digireg" />
+			<SourceFileReference Id="296" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}SystemViewDefinition" Name="I2C_SystemView\.digisysview" StoragePath="Misc\I2C_SystemView.digisysview" />
+			<FileReference Id="316" ModelDefinitionType="PinMap" Name="Rainbow\.pinmap" StoragePath="Rainbow.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
+			<FileReference Id="319" ModelDefinitionType="PinMap" Name="MonoLithic\.pinmap" StoragePath="MonoLithic.pinmap" />
+			<FileReference Id="320" ModelDefinitionType="PinMap" Name="YinYang\.pinmap" StoragePath="YinYang.pinmap" />
+			<FileReference Id="323" ModelDefinitionType="PinMap" Name="AbstInst\.pinmap" StoragePath="AbstInst.pinmap" />
+			<FileReference Id="326" ModelDefinitionType="PinMap" Name="Switch\.pinmap" StoragePath="Switch.pinmap" />
+			<FileReference Id="327" ModelDefinitionType="PinMap" Name="FPGA\.pinmap" StoragePath="FPGA.pinmap" />
+			<FileReference Id="330" ModelDefinitionType="PinMap" Name="Baku_uSTS\.pinmap" StoragePath="..\..\..\..\Users\ni\Desktop\Baku_uSTS.pinmap" />
+		</NameScopingEnvoy>
+		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">
+			<ProjectPropertiesDefinition xmlns="http://www.ni.com/PatternBasedDigital" />
+		</EmbeddedDefinitionReference>
+	</Project>
+	<ProjectInformation xmlns="http://www.ni.com/PlatformFramework" />
+</SourceFile>

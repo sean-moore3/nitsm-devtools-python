@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.1">
+	<Instruments>
+		<Instrument name="Switch" instrumentTypeId="_niSwitch">
+			<Channel id="0" />
+			<Channel id="1" />
+			<Channel id="2" />
+			<Channel id="3" />
+			<Channel id="4" />
+			<Channel id="5" />
+			<Channel id="6" />
+			<Channel id="7" />
+			<Channel id="8" />
+			<Channel id="9" />
+		</Instrument>
+	</Instruments>
+	<Pins>
+		<DUTPin name="Pin0" />
+		<DUTPin name="Pin1" />
+		<DUTPin name="Pin2" />
+		<DUTPin name="Pin3" />
+		<DUTPin name="Pin4" />
+		<DUTPin name="Pin5" />
+		<DUTPin name="Pin6" />
+		<DUTPin name="Pin7" />
+		<DUTPin name="Pin8" />
+		<DUTPin name="Pin9" />
+	</Pins>
+	<PinGroups>
+		<PinGroup name="AllSwitch">
+			<PinReference pin="Pin0" />
+			<PinReference pin="Pin1" />
+			<PinReference pin="Pin2" />
+			<PinReference pin="Pin9" />
+			<PinReference pin="Pin8" />
+			<PinReference pin="Pin7" />
+			<PinReference pin="Pin6" />
+			<PinReference pin="Pin5" />
+			<PinReference pin="Pin4" />
+			<PinReference pin="Pin3" />
+		</PinGroup>
+	</PinGroups>
+	<Sites>
+		<Site siteNumber="0" />
+	</Sites>
+	<Connections>
+		<Connection pin="Pin0" siteNumber="0" instrument="Switch" channel="0" />
+		<Connection pin="Pin1" siteNumber="0" instrument="Switch" channel="1" />
+		<Connection pin="Pin2" siteNumber="0" instrument="Switch" channel="2" />
+		<Connection pin="Pin3" siteNumber="0" instrument="Switch" channel="3" />
+		<Connection pin="Pin4" siteNumber="0" instrument="Switch" channel="4" />
+		<Connection pin="Pin5" siteNumber="0" instrument="Switch" channel="5" />
+		<Connection pin="Pin6" siteNumber="0" instrument="Switch" channel="6" />
+		<Connection pin="Pin7" siteNumber="0" instrument="Switch" channel="7" />
+		<Connection pin="Pin8" siteNumber="0" instrument="Switch" channel="8" />
+		<Connection pin="Pin9" siteNumber="0" instrument="Switch" channel="9" />
+	</Connections>
+</PinMap>

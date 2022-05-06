@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<PinMap schemaVersion="1.6" xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<Instruments>
+		<!--- - - - Chassis 1 - - - - -->
+		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Group1" />
+		<NIFGenInstrument name="FGN1" numberOfChannels="1" />
+		<NIScopeInstrument name="OSC1" numberOfChannels="8" group="Scope" />
+		<NIScopeInstrument name="OSC2" numberOfChannels="8" group="Scope" />
+		<NIScopeInstrument name="OSC3" numberOfChannels="4" group="Scope" />
+		<NIDCPowerInstrument name="SMU1" numberOfChannels="1">
+			<ChannelGroup name="CommonDCPowerChannelGroup1" />
+		</NIDCPowerInstrument>
+		<NIDCPowerInstrument name="SMU2" numberOfChannels="4">
+			<ChannelGroup name="CommonDCPowerChannelGroup2" />
+		</NIDCPowerInstrument>
+		<NIDAQmxTask channelList="DAQ3/ai0,DAQ3/ai1" name="DAQ3_AI" taskType="AnalogInputDSA" />
+		<NIDAQmxTask name="DAQ3_AO" taskType="AnalogOutputDSA" channelList="DAQ3/ao0,DAQ3/ao1" />
+		<NIDAQmxTask channelList="DAQ1/ai0,DAQ1/ai1,DAQ1/ai2,DAQ1/ai3,DAQ1/ai4,DAQ1/ai5,DAQ1/ai6,DAQ1/ai7,DAQ1/ai8,DAQ1/ai9,DAQ1/ai10,DAQ1/ai11,DAQ1/ai12,DAQ1/ai13,DAQ1/ai14,DAQ1/ai15" name="DAQ1_AI" taskType="AnalogInput" />
+		<NIDAQmxTask channelList="DAQ2/ai0,DAQ2/ai1,DAQ2/ai2,DAQ2/ai3,DAQ2/ai4,DAQ2/ai5,DAQ2/ai6,DAQ2/ai7,DAQ2/ai8,DAQ2/ai9,DAQ2/ai10,DAQ2/ai11,DAQ2/ai12,DAQ2/ai13,DAQ2/ai14,DAQ2/ai15" name="DAQ2_AI" taskType="AnalogInput" />
+		<NIDAQmxTask channelList="DAQ2/ao0,DAQ2/ao1" name="DAQ2_AO" taskType="AnalogOutput" />
+		<NIDAQmxTask channelList="DAQ1/port0/line2" name="DAQ1_P0_2" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ1/port0/line3" name="DAQ1_P0_3" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ1/port0/line4" name="DAQ1_P0_4" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ1/port0/line5" name="DAQ1_P0_5" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ1/port0/line8" name="DAQ1_P0_8" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ1/port0/line9" name="DAQ1_P0_9" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ1/port0/line14" name="DAQ1_P0_14" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ1/port0/line15" name="DAQ1_P0_15" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ1/port0/line16" name="DAQ1_P0_16" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ1/port0/line17" name="DAQ1_P0_17" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ1/port1/line3" name="DAQ1_P1_3" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port0/line14" name="DAQ2_P0_14" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port0/line15" name="DAQ2_P0_15" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port0/line2" name="DAQ2_P0_2" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port0/line3" name="DAQ2_P0_3" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port0/line4" name="DAQ2_P0_4" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port0/line9" name="DAQ2_P0_9" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port1/line0" name="DAQ2_P1_0" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port1/line1" name="DAQ2_P1_1" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port1/line2" name="DAQ2_P1_2" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port1/line3" name="DAQ2_P1_3" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port1/line4" name="DAQ2_P1_4" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port1/line5" name="DAQ2_P1_5" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port1/line6" name="DAQ2_P1_6" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ2/port1/line7" name="DAQ2_P1_7" taskType="DigitalOutput" />
+		<Instrument name="AbstractInstrument" instrumentTypeId="abstinst">
+			<Channel id="0" />
+		</Instrument>
+	</Instruments>
+	<Pins>
+		<DUTPin name="FGN_SI_SGL_In" />
+		<DUTPin name="DPI_DI_IN_1" />
+		<DUTPin name="DPI_DI_IN_2" />
+		<DUTPin name="DPI_DI_IN_3" />
+		<DUTPin name="DPI_DO_OUT_1" />
+		<DUTPin name="DPI_DO_OUT_2" />
+		<DUTPin name="DPI_DO_OUT_3" />
+		<DUTPin name="OSC_xA_ANA1" />
+		<DUTPin name="OSC_xA_ANA2" />
+		<DUTPin name="OSC_xA_ANA3" />
+		<DUTPin name="OSC_xA_ANA4" />
+		<DUTPin name="OSC_xA_ANA5" />
+		<DUTPin name="SMU_VI_ANA1" />
+		<DUTPin name="SMU_VI_ANA2" />
+		<DUTPin name="SMU_VI_ANA3" />
+		<DUTPin name="SMU_VI_ANA4" />
+		<DUTPin name="SMU_VI_ANA5" />
+		<DUTPin name="En_DIO_5V0_6368_VDD_LDO2_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_VDD_LDO15_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_BUCK0_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_BUCK10_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_VDD_LDO7_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_VDD_LDO10_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_VDD_SW0_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_VDD_LDO13_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_VDD_SW1_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_VDD_SW2_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_BUCK11_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_VDD_SW3_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_VDD_SW4_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_VDD_SW5_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_BUCK1_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_BUCK2_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_BUCK8_RLY_EN" />
+		<DUTPin name="En_DIO_5V0_6368_4464_MUX_A0" />
+		<DUTPin name="En_DIO_5V0_6368_4464_MUX_A1" />
+		<DUTPin name="En_DIO_5V0_6368_4464_MUX_A2" />
+		<DUTPin name="En_DIO_5V0_6368_4464_MUX_A3" />
+		<DUTPin name="En_DIO_5V0_6368_4464_MUX2_A0" />
+		<DUTPin name="En_DIO_5V0_6368_4464_MUX2_A1" />
+		<DUTPin name="En_DIO_5V0_6368_4464_MUX2_A2" />
+		<DUTPin name="En_DIO_5V0_6368_4464_MUX_EN" />
+		<DUTPin name="BUTTON1_DAQ" />
+		<DUTPin name="BUTTON2_DAQ" />
+		<DUTPin name="BUTTON3_DAQ" />
+		<DUTPin name="BUTTON4_DAQ" />
+		<DUTPin name="ACTIVE_READY_DAQ" />
+		<DUTPin name="SYS_ALIVE_DAQ" />
+		<DUTPin name="SHDN_DAQ" />
+		<DUTPin name="RESET_L_DAQ" />
+		<DUTPin name="GPIO20_DAQ" />
+		<DUTPin name="GPIO21_DAQ" />
+		<DUTPin name="GPIO22_DAQ" />
+		<DUTPin name="GPIO23_DAQ" />
+		<DUTPin name="GPIO17_DAQ" />
+		<DUTPin name="GPIO18_DAQ" />
+		<DUTPin name="GPIO24_DAQ" />
+		<DUTPin name="GPIO25_DAQ" />
+		<DUTPin name="SLEEP_32K_DAQ" />
+		<DUTPin name="GPIO10_DAQ" />
+		<DUTPin name="OUT32K_DAQ" />
+		<DUTPin name="GPIO11_DAQ" />
+		<DUTPin name="GPIO12_DAQ" />
+		<DUTPin name="GPIO13_DAQ" />
+		<DUTPin name="GPIO14_DAQ" />
+		<DUTPin name="GPIO15_DAQ" />
+		<DUTPin name="GPIO6_DAQ" />
+		<DUTPin name="SPMI_SCLK_R_DAQ" />
+		<DUTPin name="GPIO7_DAQ" />
+		<DUTPin name="SPMI_SDATA_R_DAQ" />
+		<DUTPin name="GPIO8_DAQ" />
+		<DUTPin name="GPIO9_DAQ" />
+		<DUTPin name="GPIO16_DAQ" />
+		<DUTPin name="GPIO19_DAQ" />
+		<DUTPin name="VPROBE1_4464" />
+		<DUTPin name="VPROBE2_4464" />
+		<DUTPin name="AO0" />
+		<DUTPin name="AO1" />
+		<DUTPin name="AO3" />
+		<DUTPin name="AO4" />
+	</Pins>
+	<PinGroups>
+		<PinGroup name="FGN_PG_Signal">
+			<PinReference pin="FGN_SI_SGL_In" />
+		</PinGroup>
+		<PinGroup name="Inputs">
+			<PinReference pin="DPI_DI_IN_1" />
+			<PinReference pin="DPI_DI_IN_2" />
+			<PinReference pin="DPI_DI_IN_3" />
+		</PinGroup>
+		<PinGroup name="Outputs">
+			<PinReference pin="DPI_DO_OUT_1" />
+			<PinReference pin="DPI_DO_OUT_2" />
+			<PinReference pin="DPI_DO_OUT_3" />
+		</PinGroup>
+		<PinGroup name="Inputs_OSC_ANA">
+			<PinReference pin="OSC_xA_ANA1" />
+			<PinReference pin="OSC_xA_ANA2" />
+		</PinGroup>
+		<PinGroup name="Inputs_SMU_ANA">
+			<PinReference pin="SMU_VI_ANA1" />
+		</PinGroup>
+		<PinGroup name="DAQ_Pins1">
+			<PinReference pin="ACTIVE_READY_DAQ" />
+			<PinReference pin="BUTTON1_DAQ" />
+			<PinReference pin="BUTTON2_DAQ" />
+			<PinReference pin="GPIO17_DAQ" />
+			<PinReference pin="GPIO18_DAQ" />
+			<PinReference pin="GPIO20_DAQ" />
+			<PinReference pin="GPIO21_DAQ" />
+			<PinReference pin="GPIO22_DAQ" />
+			<PinReference pin="GPIO23_DAQ" />
+			<PinReference pin="GPIO24_DAQ" />
+			<PinReference pin="GPIO25_DAQ" />
+			<PinReference pin="RESET_L_DAQ" />
+			<PinReference pin="SHDN_DAQ" />
+			<PinReference pin="SYS_ALIVE_DAQ" />
+		</PinGroup>
+		<PinGroup name="DAQ_Pins2">
+			<PinReference pin="GPIO6_DAQ" />
+			<PinReference pin="GPIO7_DAQ" />
+			<PinReference pin="GPIO8_DAQ" />
+			<PinReference pin="GPIO9_DAQ" />
+			<PinReference pin="GPIO10_DAQ" />
+			<PinReference pin="GPIO11_DAQ" />
+			<PinReference pin="GPIO12_DAQ" />
+			<PinReference pin="GPIO13_DAQ" />
+			<PinReference pin="GPIO14_DAQ" />
+			<PinReference pin="GPIO15_DAQ" />
+			<PinReference pin="GPIO16_DAQ" />
+			<PinReference pin="GPIO19_DAQ" />
+			<PinReference pin="OUT32K_DAQ" />
+			<PinReference pin="SLEEP_32K_DAQ" />
+		</PinGroup>
+		<PinGroup name="TestAnalogO">
+			<PinReference pin="AO0" />
+			<PinReference pin="AO1" />
+		</PinGroup>
+		<PinGroup name="TestOut2">
+			<PinReference pin="AO3" />
+			<PinReference pin="AO4" />
+		</PinGroup>
+		<PinGroup name="TestIn">
+			<PinReference pin="VPROBE1_4464" />
+			<PinReference pin="VPROBE2_4464" />
+		</PinGroup>
+	</PinGroups>
+	<Sites>
+		<Site siteNumber="0" />
+	</Sites>
+	<Connections>
+		<Connection pin="FGN_SI_SGL_In" siteNumber="0" instrument="FGN1" channel="0" />
+		<Connection pin="DPI_DI_IN_1" siteNumber="0" instrument="DPI1" channel="1" />
+		<Connection pin="DPI_DI_IN_2" siteNumber="0" instrument="DPI1" channel="3" />
+		<Connection pin="DPI_DI_IN_3" siteNumber="0" instrument="DPI1" channel="5" />
+		<Connection pin="DPI_DO_OUT_1" siteNumber="0" instrument="DPI1" channel="0" />
+		<Connection pin="DPI_DO_OUT_2" siteNumber="0" instrument="DPI1" channel="2" />
+		<Connection pin="DPI_DO_OUT_3" siteNumber="0" instrument="DPI1" channel="4" />
+		<Connection pin="OSC_xA_ANA1" siteNumber="0" instrument="OSC1" channel="0" />
+		<Connection pin="OSC_xA_ANA2" siteNumber="0" instrument="OSC1" channel="1" />
+		<Connection pin="OSC_xA_ANA3" siteNumber="0" instrument="OSC2" channel="0" />
+		<Connection pin="OSC_xA_ANA4" siteNumber="0" instrument="OSC2" channel="1" />
+		<Connection pin="OSC_xA_ANA5" siteNumber="0" instrument="OSC2" channel="2" />
+		<Connection pin="SMU_VI_ANA1" siteNumber="0" instrument="SMU1" channel="0" />
+		<Connection pin="SMU_VI_ANA2" siteNumber="0" instrument="SMU2" channel="0" />
+		<Connection pin="SMU_VI_ANA3" siteNumber="0" instrument="SMU2" channel="1" />
+		<Connection pin="SMU_VI_ANA4" siteNumber="0" instrument="SMU2" channel="2" />
+		<Connection pin="SMU_VI_ANA5" siteNumber="0" instrument="SMU2" channel="3" />
+		<Connection channel="DAQ3/ai0" instrument="DAQ3_AI" pin="VPROBE1_4464" siteNumber="0" />
+		<Connection channel="DAQ3/ai1" instrument="DAQ3_AI" pin="VPROBE2_4464" siteNumber="0" />
+		<Connection channel="DAQ1/ai0" instrument="DAQ1_AI" pin="BUTTON1_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai1" instrument="DAQ1_AI" pin="BUTTON2_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai2" instrument="DAQ1_AI" pin="BUTTON3_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai3" instrument="DAQ1_AI" pin="BUTTON4_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai4" instrument="DAQ1_AI" pin="ACTIVE_READY_DAQ" siteNumber="0" />
+		<Connection pin="AO0" siteNumber="0" instrument="DAQ2_AO" channel="DAQ2/ao0" />
+		<Connection pin="AO1" siteNumber="0" instrument="DAQ2_AO" channel="DAQ2/ao1" />
+		<Connection pin="AO3" siteNumber="0" instrument="DAQ3_AO" channel="DAQ3/ao0" />
+		<Connection pin="AO4" siteNumber="0" instrument="DAQ3_AO" channel="DAQ3/ao1" />
+		<Connection channel="DAQ1/ai5" instrument="DAQ1_AI" pin="SYS_ALIVE_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai6" instrument="DAQ1_AI" pin="SHDN_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai7" instrument="DAQ1_AI" pin="RESET_L_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai8" instrument="DAQ1_AI" pin="GPIO20_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai9" instrument="DAQ1_AI" pin="GPIO21_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai10" instrument="DAQ1_AI" pin="GPIO22_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai11" instrument="DAQ1_AI" pin="GPIO23_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai12" instrument="DAQ1_AI" pin="GPIO17_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai13" instrument="DAQ1_AI" pin="GPIO18_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai14" instrument="DAQ1_AI" pin="GPIO24_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/ai15" instrument="DAQ1_AI" pin="GPIO25_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai0" instrument="DAQ2_AI" pin="SLEEP_32K_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai1" instrument="DAQ2_AI" pin="GPIO10_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai2" instrument="DAQ2_AI" pin="OUT32K_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai3" instrument="DAQ2_AI" pin="GPIO11_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai4" instrument="DAQ2_AI" pin="GPIO12_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai5" instrument="DAQ2_AI" pin="GPIO13_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai6" instrument="DAQ2_AI" pin="GPIO14_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai7" instrument="DAQ2_AI" pin="GPIO15_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai8" instrument="DAQ2_AI" pin="GPIO6_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai9" instrument="DAQ2_AI" pin="SPMI_SCLK_R_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai10" instrument="DAQ2_AI" pin="GPIO7_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai11" instrument="DAQ2_AI" pin="SPMI_SDATA_R_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai12" instrument="DAQ2_AI" pin="GPIO8_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai13" instrument="DAQ2_AI" pin="GPIO9_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai14" instrument="DAQ2_AI" pin="GPIO16_DAQ" siteNumber="0" />
+		<Connection channel="DAQ2/ai15" instrument="DAQ2_AI" pin="GPIO19_DAQ" siteNumber="0" />
+		<Connection channel="DAQ1/port0/line2" instrument="DAQ1_P0_2" pin="En_DIO_5V0_6368_VDD_LDO2_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ1/port0/line3" instrument="DAQ1_P0_3" pin="En_DIO_5V0_6368_VDD_LDO15_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ1/port0/line4" instrument="DAQ1_P0_4" pin="En_DIO_5V0_6368_BUCK0_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ1/port0/line5" instrument="DAQ1_P0_5" pin="En_DIO_5V0_6368_BUCK10_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ1/port0/line8" instrument="DAQ1_P0_8" pin="En_DIO_5V0_6368_VDD_LDO7_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ1/port0/line9" instrument="DAQ1_P0_9" pin="En_DIO_5V0_6368_VDD_LDO10_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ1/port0/line14" instrument="DAQ1_P0_14" pin="En_DIO_5V0_6368_VDD_SW0_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ1/port0/line15" instrument="DAQ1_P0_15" pin="En_DIO_5V0_6368_VDD_LDO13_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ1/port0/line16" instrument="DAQ1_P0_16" pin="En_DIO_5V0_6368_VDD_SW1_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ1/port0/line17" instrument="DAQ1_P0_17" pin="En_DIO_5V0_6368_VDD_SW2_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ1/port1/line3" instrument="DAQ1_P1_3" pin="En_DIO_5V0_6368_BUCK11_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ2/port0/line2" instrument="DAQ2_P0_2" pin="En_DIO_5V0_6368_VDD_SW3_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ2/port0/line3" instrument="DAQ2_P0_3" pin="En_DIO_5V0_6368_VDD_SW4_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ2/port0/line4" instrument="DAQ2_P0_4" pin="En_DIO_5V0_6368_VDD_SW5_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ2/port0/line9" instrument="DAQ2_P0_9" pin="En_DIO_5V0_6368_BUCK1_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ2/port0/line14" instrument="DAQ2_P0_14" pin="En_DIO_5V0_6368_BUCK2_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ2/port0/line15" instrument="DAQ2_P0_15" pin="En_DIO_5V0_6368_BUCK8_RLY_EN" siteNumber="0" />
+		<Connection channel="DAQ2/port1/line0" instrument="DAQ2_P1_0" pin="En_DIO_5V0_6368_4464_MUX_A0" siteNumber="0" />
+		<Connection channel="DAQ2/port1/line1" instrument="DAQ2_P1_1" pin="En_DIO_5V0_6368_4464_MUX_A1" siteNumber="0" />
+		<Connection channel="DAQ2/port1/line2" instrument="DAQ2_P1_2" pin="En_DIO_5V0_6368_4464_MUX_A2" siteNumber="0" />
+		<Connection channel="DAQ2/port1/line3" instrument="DAQ2_P1_3" pin="En_DIO_5V0_6368_4464_MUX_A3" siteNumber="0" />
+		<Connection channel="DAQ2/port1/line4" instrument="DAQ2_P1_4" pin="En_DIO_5V0_6368_4464_MUX2_A0" siteNumber="0" />
+		<Connection channel="DAQ2/port1/line5" instrument="DAQ2_P1_5" pin="En_DIO_5V0_6368_4464_MUX2_A1" siteNumber="0" />
+		<Connection channel="DAQ2/port1/line6" instrument="DAQ2_P1_6" pin="En_DIO_5V0_6368_4464_MUX2_A2" siteNumber="0" />
+		<Connection channel="DAQ2/port1/line7" instrument="DAQ2_P1_7" pin="En_DIO_5V0_6368_4464_MUX_EN" siteNumber="0" />
+	</Connections>
+</PinMap>

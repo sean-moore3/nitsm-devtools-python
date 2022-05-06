@@ -1,7 +1,28 @@
 # PyCharm
 .idea/
 
+# OS specific
+.DS_Store
+
 # Python
 __pycache__
 *.pyc
 .venv/
+# Project specific
+*.exists
+*.zip
+*.xml
+*.digiprojcache
+.cache/
+*.html
+*.txt
+*.std
+*.csv
+*.digiprojcache
+*Simulate.driver
+/venv/*
+
+tests/_வணக்கம்.py
+
+/.project
+/.pydevproject
