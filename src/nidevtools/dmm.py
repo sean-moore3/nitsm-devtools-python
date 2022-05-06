@@ -118,7 +118,6 @@ class TSMDMM:
                                                     and used for all subsequent measurements until
                                                     the measurement configuration is changed.     |
                 +---------------------------+------+----------------------------------------------+
-                Note:
                 The NI 4050, NI 4060, and NI 4065 only support Auto Range when the
                 trigger and sample trigger are set to IMMEDIATE.
 
@@ -127,7 +126,6 @@ class TSMDMM:
                 uses the resolution you specify. The NI 4065 and NI 4070/4071/4072 ignore this
                 parameter when the **Range** parameter is set to NIDMM_VAL_AUTO_RANGE_ON (-1.0) or
                 NIDMM_VAL_AUTO_RANGE_ONCE (-3.0). The default is 5½.
-                Note:
                 NI-DMM ignores this parameter for capacitance and inductance measurements on the
                 NI 4072. To achieve better resolution for such measurements, use the
                 lc_number_meas_to_average property.
