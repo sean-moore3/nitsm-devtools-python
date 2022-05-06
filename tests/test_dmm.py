@@ -115,9 +115,11 @@ def pins_to_sessions(
     return ni_dmm.pins_to_sessions(tsm, pins)
 
 @nitsm.codemoduleapi.code_module
-def configure(tsm: SMContext, pins: typing.List[str]):
+def configure(tsm: SMContext, pins: typing.List[str] = ["CH0"]):
+    print(0)
     tsm_sessions = ni_dmm.pins_to_sessions(tsm, pins)
-    for dmm_tsm in tsm_sessions:
+    print(0)
+    for dmm_tsm in tsm_sessions.sessions:
         dmm_tsm.configure_measurement(function=nidmm.Function.DC_VOLTS,
                                       range_raw=10,
                                       resolution_in_digits=ni_dmm.Resolution.Res_5_05,
