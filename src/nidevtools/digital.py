@@ -1,14 +1,12 @@
 """
 This is nidigital wrapper for use with STS test codes
 """
-
 import copy
 from datetime import datetime
 from enum import Enum
 import os
 import re
 import typing
-
 from nidigital import enums
 import nidigital
 from nidigital.history_ram_cycle_information import HistoryRAMCycleInformation
@@ -24,7 +22,6 @@ class LevelTypeToSet(Enum):
     Args:
         typing.enum : voltage level defines the voltage for High or Low and for Input or Output
     """
-
     VIL = 0
     VIH = 1
     VOL = 2
@@ -198,40 +195,42 @@ class _NIDigitalSSC:
         """
         Specifies whether digital pattern instrument channels are controlled by the
         pattern sequencer or PPMU, disconnected, or off.
-
-        +-----------------------------+----------------------------------------------------------------+
-        | Defined Values:             |
-        +=============================+================================================================+
+        +-----------------------------+------------------------------------------------------------+
+        | Defined Values:             |                                                            |
+        +=============================+============================================================+
         | SelectedFunction.DIGITAL    | The pin is connected to the driver, comparator, and active
                                         load methods. The PPMU is not sourcing, but can make voltage
-                                        measurements. The state of the digital pin driver when you change
-                                        the selected_function to Digital is determined by the most recent
-                                        call to the write_static method or the last vector of the most
-                                        recently executed pattern burst, whichever happened last. Use the
-                                        write_static method to control the state of the digital pin driver
-                                        through software. Use the burst_pattern method to control the state
+                                        measurements. The state of the digital pin driver when you
+                                        change the selected_function to Digital is determined by the
+                                        most recent call to the write_static method or the last
+                                        vector of the most recently executed pattern burst,
+                                        whichever happened last. Use the write_static method to
+                                        control the state of the digital pin driver through
+                                        software. Use the burst_pattern method to control the state
                                         of the digital pin driver through a pattern. Set the
-                                        **selectDigitalFunction** parameter of the burst_pattern method to
-                                        True to automatically switch the selected_function of the pins in
-                                        the pattern burst to SelectedFunction.DIGITAL. |
-        +-----------------------------+------------------------------------------------------------------------+
-        | SelectedFunction.PPMU       | The pin is connected to the PPMU. The driver, comparator, and active
-                                        load are off while this method is selected. Call the ppmu_source method
-                                        to source a voltage or current. The ppmu_source method automatically
-                                        switches the selected_function to the PPMU state and starts sourcing
-                                        from the PPMU. Changing the selected_function to SelectedFunction.
-                                        DISCONNECT, SelectedFunction.OFF, or SelectedFunction.DIGITAL causes
-                                        the PPMU to stop sourcing. If you set the selected_function property
-                                        to PPMU, the PPMU is initially not sourcing.
-        +-----------------------------+------------------------------------------------------------------------+
-        | SelectedFunction.OFF        | The pin is electrically connected, and the PPMU and digital pin driver
-                                        are off while this method is selected.
-        +-----------------------------+------------------------------------------------------------------------+
-        | SelectedFunction.DISCONNECT | The pin is electrically disconnected from instrument methods.
-                                        Selecting this method causes the PPMU to stop sourcing prior
-                                        to disconnecting the pin.                                             |
-        +-----------------------------+-----------------------------------------------------------------------+
-
+                                        **selectDigitalFunction** parameter of the burst_pattern
+                                        method to True to automatically switch the selected_function
+                                        of the pins in the pattern burst to
+                                        SelectedFunction.DIGITAL.                                  |
+        +-----------------------------+------------------------------------------------------------+
+        | SelectedFunction.PPMU       | The pin is connected to the PPMU. The driver, comparator,
+                                        and active load are off while this method is selected. Call
+                                        the ppmu_source method to source a voltage or current. The
+                                        ppmu_source method automatically switches the
+                                        selected_function to the PPMU state and starts sourcing
+                                        from the PPMU. Changing the selected_function to
+                                        SelectedFunction.DISCONNECT, SelectedFunction.OFF, or
+                                        SelectedFunction.DIGITAL causes the PPMU to stop sourcing.
+                                        If you set the selected_function property to PPMU, the PPMU
+                                        is initially not sourcing.                                 |
+        +-----------------------------+------------------------------------------------------------+
+        | SelectedFunction.OFF        | The pin is electrically connected, and the PPMU and digital
+                                        pin driver are off while this method is selected.          |
+        +-----------------------------+------------------------------------------------------------+
+        | SelectedFunction.DISCONNECT | The pin is electrically disconnected from instrument
+                                        methods.Selecting this method causes the PPMU to stop
+                                        sourcing priorto disconnecting the pin.                    |
+        +-----------------------------+------------------------------------------------------------+
 
         Args:
             function (enums.SelectedFunction): selected state to change.
@@ -269,21 +268,27 @@ class _NIDigitalSSC:
         buffer_size_per_site: int = 32000,
     ):
         """
-        Configures which cycles History RAM acquires after the trigger conditions are met. If you configure History RAM to only acquire failed cycles, you must set the pretrigger samples for History RAM to 0.
+        Configures which cycles History RAM acquires after the trigger conditions are met. If you
+        configure History RAM to only acquire failed cycles, you must set the pretrigger samples
+        for History RAM to 0.
         Args:
-            cycles_to_acquire (enums.HistoryRAMCyclesToAcquire, optional): see the below table for details. Defaults to enums.HistoryRAMCyclesToAcquire.FAILED.
-        +----------------------------------+------------------------------------------------------+
-        | Defined Values:                  |                                                      |
-        +==================================+======================================================+
-        | HistoryRAMCyclesToAcquire.FAILED | Only acquires cycles that fail a compare after the
-                                             triggering conditions are met.                       |
-        +----------------------------------+------------------------------------------------------+
-        | HistoryRAMCyclesToAcquire.ALL    | Acquires all cycles after the triggering conditions
-                                             are met.                                             |
-        +----------------------------------+------------------------------------------------------+
-            pretrigger_samples (int, optional): number of pretrigger samples to acquire. Defaults to 0.
-            max_samples_to_acquire_per_site (int, optional): maximum number of samples to acquire. Defaults to 8191.
-            number_of_samples_is_finite (bool, optional): finite or infinite number of samples. Defaults to True.
+            cycles_to_acquire (enums.HistoryRAMCyclesToAcquire, optional): see the below table for
+            details. Defaults to enums.HistoryRAMCyclesToAcquire.FAILED.
+            +----------------------------------+--------------------------------------------------+
+            | Defined Values:                  |                                                  |
+            +==================================+==================================================+
+            | HistoryRAMCyclesToAcquire.FAILED | Only acquires cycles that fail a compare after the
+                                                 triggering conditions are met.                   |
+            +----------------------------------+--------------------------------------------------+
+            | HistoryRAMCyclesToAcquire.ALL    | Acquires all cycles after the triggering
+                                                 conditions are met.                              |
+            +----------------------------------+--------------------------------------------------+
+            pretrigger_samples (int, optional): number of pretrigger samples to acquire. Defaults
+                to 0.
+            max_samples_to_acquire_per_site (int, optional): maximum number of samples to acquire.
+                Defaults to 8191.
+            number_of_samples_is_finite (bool, optional): finite or infinite number of samples.
+                Defaults to True.
             buffer_size_per_site (int, optional): buffer size per site. Defaults to 32000.
         """
         self._session.history_ram_cycles_to_acquire = cycles_to_acquire
@@ -301,21 +306,24 @@ class _NIDigitalSSC:
         vector_offset: int = 0,
     ):
         """
-        Specifies the type of trigger condition on which History RAM starts acquiring pattern information.
+        Specifies the type of trigger condition on which History RAM starts acquiring pattern
+        information.
         Args:
-            triggers_type (enums.HistoryRAMTriggerType): _description_
-        +-------------------------------------+--------------------------------------------------+
-        | Defined Values:                     |                                                  |
-        +=====================================+==================================================+
-        | HistoryRAMTriggerType.FIRST_FAILURE | Starts acquiring pattern information in History
-                                                RAM on the first failed cycle in a pattern burst.|
-        +-------------------------------------+--------------------------------------------------+
-        | HistoryRAMTriggerType.CYCLE_NUMBER  | Starts acquiring pattern information in History RAM
-                                                starting from a specified cycle number.          |
-        +-------------------------------------+--------------------------------------------------+
-        | HistoryRAMTriggerType.PATTERN_LABEL | Starts acquiring pattern information in History RAM
-                                                starting from a specified pattern label, augmented by vector and cycle offsets.                      |
-        +-------------------------------------+---------------------------------------------------+
+            triggers_type (enums.HistoryRAMTriggerType): see the below table for details.
+            +-------------------------------------+------------------------------------------------+
+            | Defined Values:                     |                                                |
+            +=====================================+================================================+
+            | HistoryRAMTriggerType.FIRST_FAILURE | Starts acquiring pattern information in
+                                                    History RAM on the first failed cycle in a
+                                                    pattern burst.                                 |
+            +-------------------------------------+------------------------------------------------+
+            | HistoryRAMTriggerType.CYCLE_NUMBER  | Starts acquiring pattern information in History
+                                                    RAM starting from a specified cycle number.    |
+            +-------------------------------------+------------------------------------------------+
+            | HistoryRAMTriggerType.PATTERN_LABEL | Starts acquiring pattern information in History
+                                                    RAM starting from a specified pattern label,
+                                                    augmented by vector and cycle offsets.         |
+            +-------------------------------------+------------------------------------------------+
             cycle_number (int, optional): cycle number at which trigger happens. Defaults to 0.
             pattern_label (str, optional): pattern label in which trigger happens. Defaults to "".
             cycle_offset (int, optional): cycle offset in the pattern. Defaults to 0.
@@ -337,7 +345,8 @@ class _NIDigitalSSC:
         gets the current HRAM settings in a tuple format
 
         Returns:
-            HRAM_settings(tuple): contains HRAM Cycles to acquire,pretrigger samples, max samples to acquire per site, is number of samples finite, and buffer size per site
+            HRAM_settings(tuple): contains HRAM Cycles to acquire,pretrigger samples, max samples to
+            acquire per site, is number of samples finite, and buffer size per site
         """
         return (
             self._session.history_ram_cycles_to_acquire,
@@ -349,7 +358,8 @@ class _NIDigitalSSC:
 
     def cs_get_hram_trigger_settings(self):
         """
-        returns the tuple containing HRAM trigger type,cycle number, label, cycle offset and vector offset
+        returns the tuple containing HRAM trigger type,cycle number, label, cycle offset and vector
+        offset
 
         Returns:
             HRAM tuple: HRAM trigger settings
@@ -367,7 +377,10 @@ class _NIDigitalSSC:
         Returns the comparison fail count for pins in the repeated capabilities.
 
         Returns:
-            failure_count (list of int): Number of failures in an array. If a site is disabled or not enabled for burst, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
+            failure_count (list of int): Number of failures in an array. If a site is disabled or
+            not enabled for burst, the method does not return data for that site. You can also use
+            the get_pin_results_pin_information method to obtain a sorted list of returned sites and
+            channels.
         """
         return self._channels_session.get_fail_count()
 
@@ -376,16 +389,22 @@ class _NIDigitalSSC:
         Waits until the pattern burst has completed or the timeout has expired.
 
         Args:
-            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error. Defaults to 10 seconds.
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method
+            to complete. If this method does not complete within this time interval, this method
+            returns an error. Defaults to 10 seconds.
         """
         self._session.wait_until_done(timeout)
 
     def cs_apply_tdr_offsets(self, per_instrument_offset: typing.List[float]):
         """
-        Applies the correction for propagation delay offsets to a digital pattern instrument. Use this method to apply TDR offsets that are stored from a past measurement or are measured by means other than the tdr method. Also use this method to apply correction for offsets if the **applyOffsets** input of the tdr method was set to False at the time of measurement.
+        Applies the correction for propagation delay offsets to a digital pattern instrument. Use
+        this method to apply TDR offsets that are stored from a past measurement or are measured by
+        means other than the tdr method. Also use this method to apply correction for offsets if the
+        **applyOffsets** input of the tdr method was set to False at the time of measurement.
 
         Args:
-            per_instrument_offset (typing.List[float]): TDR offsets to apply, in seconds. Specify an offset for each pin or channel.
+            per_instrument_offset (typing.List[float]): TDR offsets to apply, in seconds. Specify an
+            offset for each pin or channel.
         """
         self._channels_session.apply_tdr_offsets(per_instrument_offset)
 
@@ -412,14 +431,22 @@ class _NIDigitalSSC:
     def cs_configure_single_level(self, level_type_to_set: LevelTypeToSet, setting: float):
         """
         LevelTypeToSet
-            VIH or VIL - Specifies the voltage that the digital pattern instrument will apply to the input of the DUT when the test instrument drives a logic high (1) or low (0).
-            VOH or VOL - Specifies the output voltage from the DUT above (or below) which the comparator on the digital pattern test instrument interprets a logic high (H) or low (L).
-            VTERM - Specifies the termination voltage the digital pattern instrument applies during non-drive cycles when the termination mode is set to V :sub:`term`. The instrument applies the termination voltage through a 50 Ω parallel termination resistance.
-            IOL or IOH - Specifies the current that the DUT sources (or sinks) to the active load while outputting a voltage above (or below) VCOM.
-            VCOM - Specifies the voltage level at which the active load circuit switches between sourcing current and sinking current.
+            VIH or VIL - Specifies the voltage that the digital pattern instrument will apply to the
+                input of the DUT when the test instrument drives a logic high (1) or low (0).
+            VOH or VOL - Specifies the output voltage from the DUT above (or below) which the
+                comparator on the digital pattern test instrument interprets a logic high (H) or
+                low (L).
+            VTERM - Specifies the termination voltage the digital pattern instrument applies during
+                non-drive cycles when the termination mode is set to V :sub:`term`. The instrument
+                applies the termination voltage through a 50 Ω parallel termination resistance.
+            IOL or IOH - Specifies the current that the DUT sources (or sinks) to the active load
+                while outputting a voltage above (or below) VCOM.
+            VCOM - Specifies the voltage level at which the active load circuit switches between
+                sourcing current and sinking current.
 
         Args:
-            level_type_to_set (LevelTypeToSet): VIH or VIL or VOH or VOL or IOL or IOH or VCOM or VTERM
+            level_type_to_set (LevelTypeToSet): VIH or VIL or VOH or VOL or IOL or IOH or VCOM or
+                VTERM
             setting (float) : value to set
         """
         if level_type_to_set == LevelTypeToSet.VIL:
@@ -449,13 +476,33 @@ class _NIDigitalSSC:
         | Defined Values:             |                                                            |
         +=============================+============================================================+
         | TerminationMode.ACTIVE_LOAD | Specifies that, for non-drive pin states (L, H, X, V, M, E)
-                                        ,the active load is connected and the instrument sources or sinks a defined amount of current to load the DUT. The amount of current sourced by the instrument and therefore sunk by the DUT is specified by IOL. The amount of current sunk by the instrument and therefore sourced by the DUT is specified by IOH. The voltage at which the instrument changes between sourcing and sinking is specified by VCOM. |
+                                        ,the active load is connected and the instrument sources or
+                                        sinks a defined amount of current to load the DUT. The
+                                        amount of current sourced by the instrument and therefore
+                                        sunk by the DUT is specified by IOL. The amount of current
+                                        sunk by the instrument and therefore sourced by the DUT is
+                                        specified by IOH. The voltage at which the instrument
+                                        changes between sourcing and sinking is specified by VCOM. |
         +-----------------------------+------------------------------------------------------------+
         | TerminationMode.VTERM       | Specifies that, for non-drive pin states (L, H, X, V, M, E)
-                                        , the pin driver terminates the pin to the configured VTERM voltage through a 50 Ω impedance. VTERM is adjustable to allow for the pin to terminate at a set level. This is useful for instruments that might operate incorrectly if an instrument pin is unterminated and is allowed to float to any voltage level within the instrument voltage range. To address this issue, enable VTERM by configuring the VTERM pin level to the desired voltage and selecting the VTERM termination mode. Setting VTERM to 0 V and selecting the VTERM termination mode has the effect of connecting a 50 Ω termination to ground, which provides an effective 50 Ω impedance for the pin. This can be useful for improving signal integrity of certain DUTs by reducing reflections while the DUT drives the pin.                              |
+                                        , the pin driver terminates the pin to the configured VTERM
+                                        voltage through a 50 Ω impedance. VTERM is adjustable to
+                                        allow for the pin to terminate at a set level. This is
+                                        useful for instruments that might operate incorrectly if an
+                                        instrument pin is unterminated and is allowed to float to
+                                        any voltage level within the instrument voltage range. To
+                                        address this issue, enable VTERM by configuring the VTERM
+                                        pin level to the desired voltage and selecting the VTERM
+                                        termination mode. Setting VTERM to 0 V and selecting the
+                                        VTERM termination mode has the effect of connecting a 50 Ω
+                                        termination to ground, which provides an effective 50 Ω
+                                        impedance for the pin. This can be useful for improving
+                                        signal integrity of certain DUTs by reducing reflections
+                                        while the DUT drives the pin.                              |
         +-----------------------------+------------------------------------------------------------+
         | TerminationMode.HIGH_Z      | Specifies that, for non-drive pin states (L, H, X, V, M, E)
-                                        , the pin driver is put in a high-impedance state and the active load is disabled.                                   |
+                                        , the pin driver is put in a high-impedance state and the
+                                        active load is disabled.                                   |
         +-----------------------------+------------------------------------------------------------+
         """
         self._channels_session.termination_mode = termination_mode
@@ -466,12 +513,16 @@ class _NIDigitalSSC:
         compare_strobes: typing.List[float],
     ):
         """
-        Configures the strobe edge time for the pins in the context. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the strobe edge time for the pins in the context. Use this method to modify time
+        set values after applying a timing sheet with the apply_levels_and_timing method, or to
+        create time sets programmatically without the use of timing sheets. This method does not
+        modify the timing sheet file or the timing sheet contents that will be used in future calls
+        to apply_levels_and_timing; it only affects the values of the current timing context.
 
         Args:
-            time_set_name (str): The specified time set name.
-
-            compare_strobes (typing.List[float]): Time when the comparison happens within a vector period.
+            time_set (str): The specified time set name.
+            compare_strobes (typing.List[float]): Time when the comparison happens within a vector
+            period.
         """
         channels, _, _ = _channel_list_to_pins(self._channels)
         for channel, compare_strobe in zip(channels, compare_strobes):
@@ -479,12 +530,16 @@ class _NIDigitalSSC:
 
     def cs_configure_time_set_compare_edge(self, time_set: str, compare_strobe: float):
         """
-        Configures the strobe edge time for the specified pins. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the strobe edge time for the specified pins. Use this method to modify time set
+        values after applying a timing sheet with the apply_levels_and_timing method, or to create
+        time sets programmatically without the use of timing sheets. This method does not modify the
+        timing sheet file or the timing sheet contents that will be used in future calls to
+        apply_levels_and_timing; it only affects the values of the current timing context.
 
         Args:
             time_set (str): The specified time set name.
-
-            compare_strobe (float in seconds): Time when the comparison happens within a vector period.
+            compare_strobe (float in seconds): Time when the comparison happens within a vector
+                period.
         """
         self._channels_session.configure_time_set_compare_edges_strobe(time_set, compare_strobe)
         # End of Source and Capture Waveforms #
@@ -500,8 +555,8 @@ class _NIDigitalSSC:
         Returns:
             data (list of enums.PinState): The returned array of pin states read from the channels
             in the repeated capabilities. Data is returned as per the order you specify in the
-            repeated capabilities. If a site is disabled, the method does not return data for that site.
-            You can also use the get_pin_results_pin_information method to obtain a sorted
+            repeated capabilities. If a site is disabled, the method does not return data for that
+            site. You can also use the get_pin_results_pin_information method to obtain a sorted
             list of returned sites and channels.
 
                 -   PinState.L: The comparators read a logic low pin state.
@@ -514,17 +569,25 @@ class _NIDigitalSSC:
 
     def cs_write_static(self, state: enums.WriteStaticPinState, auto_select=True):
         """
-        Writes a static state to the specified pins. The selected pins remain in the specified state until the next pattern burst or call to this method. If there are uncommitted changes to levels or the termination mode, this method commits the changes to the pins. This method does not change the selected pin method. If you write a static state to a pin that does not have the Digital method selected, the new static state is stored by the instrument, and affects the state of the pin the next time you change the selected method to Digital.
+        Writes a static state to the specified pins. The selected pins remain in the specified
+        state until the next pattern burst or call to this method. If there are uncommitted changes
+        to levels or the termination mode, this method commits the changes to the pins. This method
+        does not change the selected pin method. If you write a static state to a pin that does not
+        have the Digital method selected, the new static state is stored by the instrument, and
+        affects the state of the pin the next time you change the selected method to Digital.
 
         Args:
-            per_site_per_pin_state (typing.List[typing.List[enums.WriteStaticPinState]]): Parameter that specifies one of the following digital states to assign to each pin per site.
+            state (typing.List[typing.List[enums.WriteStaticPinState]]): Parameter that specifies
+            one of the following digital states to assign to each pin per site.
 
                 -   WriteStaticPinState.ZERO: Specifies to drive low.
                 -   WriteStaticPinState.ONE: Specifies to drive high.
                 -   WriteStaticPinState.X: Specifies to not drive.
 
-            auto_select=True, specifies this function to configure the output function as digital automatically. auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
-            Without configuring as digital and auto_select as false, this function will not work as expected.
+            auto_select=True, specifies this function to configure the output function as digital
+            automatically. auto_select=False, if the pin is explicitly configured as digital already
+            with the tsm_object.ssc.select_function(). Without configuring as digital and
+            auto_select as false, this function will not work as expected.
         """
         if auto_select:
             self.cs_select_function(enums.SelectedFunction.DIGITAL)
@@ -533,7 +596,8 @@ class _NIDigitalSSC:
     # Session Properties #
     def cs_get_properties(self):  # checked _
         """
-        Returns the session properties i.e. Voh, Vol, Vih, Vil, Vterm, frequency_counter_measurement_time in a named tuple format
+        Returns the session properties i.e. Voh, Vol, Vih, Vil, Vterm,
+        frequency_counter_measurement_time in a named tuple format
 
         Returns:
             session_property: Named tuple of session property
@@ -556,7 +620,8 @@ class _NIDigitalSSC:
     # Trigger #
     def cs_clear_start_trigger_signal(self):
         """
-        Disables the Start trigger. Pattern bursting starts immediately after you call the init method or the burst_pattern method.
+        Disables the Start trigger. Pattern bursting starts immediately after you call the init
+        method or the burst_pattern method.
         """
         self._session.start_trigger_type = enums.TriggerType.NONE
 
@@ -564,10 +629,18 @@ class _NIDigitalSSC:
         self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING
     ):
         """
-        Specifies the source terminal for the Start trigger. configures the start_trigger_type property as Digital Edge.
+        Specifies the source terminal for the Start trigger. configures the start_trigger_type
+        property as Digital Edge.
 
         Args:
-            source (str): You can specify source terminals in one of two ways. If the digital pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0. The source terminal can also be a terminal from another device, in which case the NI-Digital Pattern Driver automatically finds a route (if one is available) from that terminal to the input terminal (going through a physical PXI backplane trigger line). For example, you can set the source terminal on Dev1 to be /Dev2/StartTrigger.
+            source (str): You can specify source terminals in one of two ways. If the digital
+            pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the
+            terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened
+            terminal name, PXI_Trig0. The source terminal can also be a terminal from another
+            device, in which case the NI-Digital Pattern Driver automatically finds a route (if one
+            is available) from that terminal to the input terminal (going through a physical PXI
+            backplane trigger line). For example, you can set the source terminal on Dev1 to be
+            /Dev2/StartTrigger.
 
             +-----------------+--------------------+
             | Defined Values: |                    |
@@ -589,14 +662,18 @@ class _NIDigitalSSC:
             | PXI_Trig7       | PXI trigger line 7 |
             +-----------------+--------------------+
 
-            edge (enums.DigitalEdge, optional): rising or falling edge. Defaults to enums.DigitalEdge.RISING.
+            edge (enums.DigitalEdge, optional): rising or falling edge. Defaults to
+            enums.DigitalEdge.RISING.
         """
         self._session.digital_edge_start_trigger_source = source
         self._session.digital_edge_start_trigger_edge = edge
 
     def cs_export_opcode_trigger_signal(self, signal_id: str, terminal: str = ""):
         """
-        Specifies the destination terminal for exporting the Pattern Opcode Event. Terminals can be specified in one of two ways. If the digital pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0.
+        Specifies the destination terminal for exporting the Pattern Opcode Event. Terminals can be
+        specified in one of two ways. If the digital pattern instrument is named Dev1 and your
+        terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name,
+        /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0.
 
         +-----------------+--------------------+
         | Defined Values: |                    |
@@ -627,13 +704,17 @@ class _NIDigitalSSC:
 
     def cs_ppmu_source(self):
         """
-        Starts sourcing voltage or current from the PPMU. This method automatically selects the PPMU method. Changes to PPMU source settings do not take effect until you call this method. If you modify source settings after you call this method, you must call this method again for changes in the configuration to take effect.
+        Starts sourcing voltage or current from the PPMU. This method automatically selects the PPMU
+        method. Changes to PPMU source settings do not take effect until you call this method. If
+        you modify source settings after you call this method, you must call this method again for
+        changes in the configuration to take effect.
         """
         self._channels_session.ppmu_source()
 
     def cs_ppmu_source_current(self, current_level: float, current_level_range: float = 0):
         """
-        Configures output function as current and selects the PPMU method and applies current level and range passed as parameters. Starts sourcing current from the PPMU.
+        Configures output function as current and selects the PPMU method and applies current level
+        and range passed as parameters. Starts sourcing current from the PPMU.
 
         Args:
             current_level (float): current in amps to source on the pins
@@ -670,20 +751,23 @@ class _NIDigitalSSC:
         self, start_label: str, select_digital_function: bool = True, timeout: float = 10
     ):
         """
-        Uses the start_label you specify to burst the pattern on the sites you specify. Waits for the burst to complete, and returns comparison results for each site.
-
-        Digital pins retain their state at the end of a pattern burst until the first vector of the pattern burst, a call to
-        write_static, or a call to apply_levels_and_timing.
+        Uses the start_label you specify to burst the pattern on the sites you specify. Waits for
+        the burst to complete, and returns comparison results for each site. Digital pins retain
+        their state at the end of a pattern burst until the first vector of the pattern burst, a
+        call to write_static, or a call to apply_levels_and_timing.
 
         Args:
-            start_label (str): Pattern name or exported pattern label from which to start bursting the pattern.
-
-            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital method for the pins in the pattern prior to bursting. Defaults to True.
-
-            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error.Defaults to 10.
+            start_label (str): Pattern name or exported pattern label from which to start bursting
+                the pattern.
+            select_digital_function (bool, optional): A Boolean that specifies whether to select the
+                digital method for the pins in the pattern prior to bursting. Defaults to True.
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method
+                to complete. If this method does not complete within this time interval, this method
+                returns an error.Defaults to 10.
 
         Returns:
-            List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site number and value is pass/fail.
+            List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site
+            number and value is pass/fail.
         """
         return list(
             self._session.sites[self._pins]
@@ -699,19 +783,21 @@ class _NIDigitalSSC:
         wait_until_done: bool = True,
     ):
         """
-        Uses the start_label you specify to burst the pattern on the sites you specify. Waits for the burst to complete if wait_until_done is True with a default timeout of 10 seconds.
-
-        Digital pins retain their state at the end of a pattern burst until the first vector of the pattern burst, a call to
-        write_static, or a call to apply_levels_and_timing.
+        Uses the start_label you specify to burst the pattern on the sites you specify. Waits for
+        the burst to complete if wait_until_done is True with a default timeout of 10 seconds.
+        Digital pins retain their state at the end of a pattern burst until the first vector of the
+        pattern burst, a call to write_static, or a call to apply_levels_and_timing.
 
         Args:
-            start_label (str): Pattern name or exported pattern label from which to start bursting the pattern.
-
-            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital method for the pins in the pattern prior to bursting. Defaults to True.
-
-            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error.Defaults to 10.
-
-            wait_until_done (bool, optional): A Boolean that indicates whether to wait until the bursting is complete. Defaults to True.
+            start_label (str): Pattern name or exported pattern label from which to start bursting
+                the pattern.
+            select_digital_function (bool, optional): A Boolean that specifies whether to select the
+                digital method for the pins in the pattern prior to bursting. Defaults to True.
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method
+                to complete. If this method does not complete within this time interval, this method
+                returns an error.Defaults to 10.
+            wait_until_done (bool, optional): A Boolean that indicates whether to wait until the
+                bursting is complete. Defaults to True.
         """
         self._session.sites[self._pins].burst_pattern(
             start_label, select_digital_function, wait_until_done, timeout
@@ -772,8 +858,9 @@ class _NIDigitalTSM:
 
         Args:
             frequency (float): The frequency of the clock generation, in Hz.
-            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital
-            method for the pins specified prior to starting clock generation. Defaults to True.
+            select_digital_function (bool, optional): A Boolean that specifies whether to select the
+                digital method for the pins specified prior to starting clock generation.
+                Defaults to True.
 
         Returns:
             none: when successful otherwise exception will be thrown.
@@ -785,15 +872,17 @@ class _NIDigitalTSM:
         self, frequency: float, duty_cycle: float, time_set: str
     ):
         """
-        Configures the period of a time set, drive format and drive edge placement for all the specified pins.
-        Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing
-        method, or to create time sets programmatically without the use of timing sheets. This method does not
-        modify the timing sheet file or the timing sheet contents that will be used in future calls to
-        apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the period of a time set, drive format and drive edge placement for all the
+        specified pins. Use this method to modify time set values after applying a timing sheet with
+        the apply_levels_and_timing method, or to create time sets programmatically without the use
+        of timing sheets. This method does not modify the timing sheet file or the timing sheet
+        contents that will be used in future calls to apply_levels_and_timing; it only affects the
+        values of the current timing context.
 
         Args:
             frequency (float): Is the inverse of Period for this time set, in Hz.
-            duty_cycle (float): Is the percentage at which the positive or negative edge is placed, 0 to 1.
+            duty_cycle (float): Is the percentage at which the positive or negative edge is placed,
+                0 to 1.
             time_set (str): The specified time set name
         """
         for ssc in self._sscs:
@@ -806,39 +895,42 @@ class _NIDigitalTSM:
         """
         Specifies whether digital pattern instrument channels are controlled by the
         pattern sequencer or PPMU, disconnected, or off.
-
-        +-----------------------------+-------------------------------------------------------------------------+
-        | Defined Values:             |                                                                         |
-        +=============================+=========================================================================+
-        | SelectedFunction.DIGITAL    | The pin is connected to the driver, comparator, and active load
-                                        methods. The PPMU is not sourcing, but can make voltage measurements.
-                                        The state of the digital pin driver when you change the selected_function
-                                        to Digital is determined by the most recent call to the write_static method
-                                        or the last vector of the most recently executed pattern burst,
-                                        whichever happened last. Use the write_static method to control
-                                        the state of the digital pin driver through software. Use the burst_pattern
-                                        method to control the state of the digital pin driver through a pattern.
-                                        Set the **selectDigitalFunction** parameter of the burst_pattern method to
-                                        True to automatically switch the selected_function of the pins in the
-                                        pattern burst to SelectedFunction.DIGITAL. |
-        +-----------------------------+-------------------------------------------------------------------------------+
-        | SelectedFunction.PPMU       | The pin is connected to the PPMU. The driver, comparator, and active
-                                        load are off while this method is selected. Call the ppmu_source
-                                        method to source a voltage or current. The ppmu_source method automatically
-                                        switches the selected_function to the PPMU state and starts sourcing
-                                        from the PPMU. Changing the selected_function to SelectedFunction.DISCONNECT,
-                                        SelectedFunction.OFF, or SelectedFunction.DIGITAL causes
-                                        the PPMU to stop sourcing. If you set the selected_function property
-                                        to PPMU, the PPMU is initially not sourcing. |
-        +-----------------------------+-------------------------------------------------------------------------------+
+        +-----------------------------+------------------------------------------------------------+
+        | Defined Values:             |                                                            |
+        +=============================+============================================================+
+        | SelectedFunction.DIGITAL    | The pin is connected to the driver, comparator, and active
+                                        load methods. The PPMU is not sourcing, but can make voltage
+                                        measurements. The state of the digital pin driver when you
+                                        change the selected_function to Digital is determined by the
+                                        most recent call to the write_static method or the last
+                                        vector of the most recently executed pattern burst,
+                                        whichever happened last. Use the write_static method to
+                                        control the state of the digital pin driver through
+                                        software. Use the burst_pattern method to control the state
+                                        of the digital pin driver through a pattern. Set the
+                                        **selectDigitalFunction** parameter of the burst_pattern
+                                        method to True to automatically switch the selected_function
+                                        of the pins in the pattern burst to
+                                        SelectedFunction.DIGITAL.                                  |
+        +-----------------------------+------------------------------------------------------------+
+        | SelectedFunction.PPMU       | The pin is connected to the PPMU. The driver, comparator,
+                                        and active load are off while this method is selected. Call
+                                        the ppmu_source method to source a voltage or current. The
+                                        ppmu_source method automatically switches the
+                                        selected_function to the PPMU state and starts sourcing
+                                        from the PPMU. Changing the selected_function to
+                                        SelectedFunction.DISCONNECT, SelectedFunction.OFF, or
+                                        SelectedFunction.DIGITAL causes the PPMU to stop sourcing.
+                                        If you set the selected_function property to PPMU, the PPMU
+                                        is initially not sourcing.                                 |
+        +-----------------------------+------------------------------------------------------------+
         | SelectedFunction.OFF        | The pin is electrically connected, and the PPMU and digital
-                                        pin driver are off while this method is selected.                             |
-        +-----------------------------+-------------------------------------------------------------------------------+
-        | SelectedFunction.DISCONNECT | The pin is electrically disconnected from instrument methods.
-                                        Selecting this method causes the PPMU to stop sourcing prior
-                                        to disconnecting the pin.
-        +-----------------------------+-------------------------------------------------------------------------------+
-
+                                        pin driver are off while this method is selected.          |
+        +-----------------------------+------------------------------------------------------------+
+        | SelectedFunction.DISCONNECT | The pin is electrically disconnected from instrument
+                                        methods. Selecting this method causes the PPMU to stop
+                                        sourcing prior to disconnecting the pin.                   |
+        +-----------------------------+------------------------------------------------------------+
 
         Args:
             function (enums.SelectedFunction): selected state to change.
@@ -884,21 +976,27 @@ class _NIDigitalTSM:
         buffer_size_per_site: int = 32000,
     ):
         """
-        Configures which cycles History RAM acquires after the trigger conditions are met. If you configure History RAM to only acquire failed cycles, you must set the pretrigger samples for History RAM to 0.
+        Configures which cycles History RAM acquires after the trigger conditions are met. If you
+        configure History RAM to only acquire failed cycles, you must set the pretrigger samples for
+        History RAM to 0.
         Args:
-            cycles_to_acquire (enums.HistoryRAMCyclesToAcquire, optional): see the below table for details. Defaults to enums.HistoryRAMCyclesToAcquire.FAILED.
-        +----------------------------------+------------------------------------------------------+
-        | Defined Values:                  |                                                      |
-        +==================================+======================================================+
-        | HistoryRAMCyclesToAcquire.FAILED | Only acquires cycles that fail a compare after the
-                                             triggering conditions are met.                       |
-        +----------------------------------+------------------------------------------------------+
-        | HistoryRAMCyclesToAcquire.ALL    | Acquires all cycles after the triggering conditions
-                                             are met.                                             |
-        +----------------------------------+------------------------------------------------------+
-            pretrigger_samples (int, optional): number of pretrigger samples to acquire. Defaults to 0.
-            max_samples_to_acquire_per_site (int, optional): maximum number of samples to acquire. Defaults to 8191.
-            number_of_samples_is_finite (bool, optional): finite or infinite number of samples. Defaults to True.
+            cycles_to_acquire (enums.HistoryRAMCyclesToAcquire, optional): see the below table for
+            details. Defaults to enums.HistoryRAMCyclesToAcquire.FAILED.
+            +----------------------------------+--------------------------------------------------+
+            | Defined Values:                  |                                                  |
+            +==================================+==================================================+
+            | HistoryRAMCyclesToAcquire.FAILED | Only acquires cycles that fail a compare after
+                                                 the triggering conditions are met.               |
+            +----------------------------------+--------------------------------------------------+
+            | HistoryRAMCyclesToAcquire.ALL    | Acquires all cycles after the triggering
+                                                 conditions are met.                              |
+            +----------------------------------+--------------------------------------------------+
+            pretrigger_samples (int, optional): number of pretrigger samples to acquire. Defaults to
+                0.
+            max_samples_to_acquire_per_site (int, optional): maximum number of samples to acquire.
+                Defaults to 8191.
+            number_of_samples_is_finite (bool, optional): finite or infinite number of samples.
+                Defaults to True.
             buffer_size_per_site (int, optional): buffer size per site. Defaults to 32000.
         """
         for ssc in self._sscs:
@@ -919,9 +1017,10 @@ class _NIDigitalTSM:
         vector_offset: int = 0,
     ):
         """
-        Specifies the type of trigger condition on which History RAM starts acquiring pattern information.
+        Specifies the type of trigger condition on which History RAM starts acquiring pattern
+        information.
         Args:
-            triggers_type (enums.HistoryRAMTriggerType): _description_
+            triggers_type (enums.HistoryRAMTriggerType): see the below table for details.
         +-------------------------------------+--------------------------------------------------+
         | Defined Values:                     |                                                  |
         +=====================================+==================================================+
@@ -932,7 +1031,8 @@ class _NIDigitalTSM:
                                                 starting from a specified cycle number.          |
         +-------------------------------------+--------------------------------------------------+
         | HistoryRAMTriggerType.PATTERN_LABEL | Starts acquiring pattern information in History RAM
-                                                starting from a specified pattern label, augmented by vector and cycle offsets.                      |
+                                                starting from a specified pattern label, augmented
+                                                by vector and cycle offsets.                      |
         +-------------------------------------+---------------------------------------------------+
             cycle_number (int, optional): cycle number at which trigger happens. Defaults to 0.
             pattern_label (str, optional): pattern label in which trigger happens. Defaults to "".
@@ -949,7 +1049,8 @@ class _NIDigitalTSM:
         Configures the History RAM trigger and acqusition settings
 
         Args:
-            hram_configuration (HRAMConfiguration, optional): All HRAM settings in a single object. Defaults to HRAMConfiguration().
+            hram_configuration (HRAMConfiguration, optional): All HRAM settings in a single object.
+            Defaults to HRAMConfiguration().
         """
         number_of_samples_is_finite = hram_configuration.finite_samples
         cycles_to_acquire = hram_configuration.cycles_to_acquire
@@ -977,7 +1078,8 @@ class _NIDigitalTSM:
         gets the current HRAM settings in a tuple of lists format
 
         Returns:
-            HRAM_settings(tuple of lists): contains HRAM Cycles to acquire,pretrigger samples, max samples to acquire per site, is number of samples finite, and buffer size per site
+            HRAM_settings(tuple of lists): contains HRAM Cycles to acquire,pretrigger samples, max
+            samples to acquire per site, is number of samples finite, and buffer size per site
         """
         per_instrument_cycles_to_acquire: typing.List[enums.HistoryRAMCyclesToAcquire] = []
         per_instrument_pretrigger_samples: typing.List[int] = []
@@ -1007,7 +1109,8 @@ class _NIDigitalTSM:
 
     def get_hram_trigger_settings(self):
         """
-        Returns the tuple containing HRAM trigger type,cycle number, label, cycle offset and vector offset
+        Returns the tuple containing HRAM trigger type,cycle number, label, cycle offset and vector
+        offset
 
         Returns:
             HRAM_trigger_settings (tuple of lists): HRAM trigger settings
@@ -1040,59 +1143,77 @@ class _NIDigitalTSM:
 
     def stream_hram_results(self):
         """
-        Returns the pattern information acquired for the specified cycles.
-
-        If the pattern is using the edge multiplier feature, cycle numbers represent tester cycles, each of which may consist of multiple DUT cycles. When using pins with mixed edge multipliers, pins may return PinState.PIN_STATE_NOT_ACQUIRED for DUT cycles where those pins do not have edges defined.
-
-        Site number on which to retrieve pattern information must be specified via sites repeated capability.The method returns an error if more than one site is specified.
-
-        Pins for which to retrieve pattern information must be specified via pins repeated capability.If pins are not specified, pin list from the pattern containing the start label is used. Call get_pattern_pin_names with the start label to retrieve the pins associated with the pattern burst:
+        Returns the pattern information acquired for the specified cycles.If the pattern is using
+        the edge multiplier feature, cycle numbers represent tester cycles, each of which may
+        consist of multiple DUT cycles. When using pins with mixed edge multipliers, pins may return
+        PinState.PIN_STATE_NOT_ACQUIRED for DUT cycles where those pins do not have edges defined.
+        Site number on which to retrieve pattern information must be specified via sites repeated
+        capability.The method returns an error if more than one site is specified. Pins for which to
+        retrieve pattern information must be specified via pins repeated capability.If pins are not
+        specified, pin list from the pattern containing the start label is used. Call
+        get_pattern_pin_names with the start label to retrieve the pins associated with the pattern
+        burst:
 
         Note:
-        Before bursting a pattern, you must configure the History RAM trigger and specify which cycles to acquire.
+        Before bursting a pattern, you must configure the History RAM trigger and specify which
+        cycles to acquire.
 
-        history_ram_trigger_type should be used to specify the trigger condition on which History RAM starts acquiring pattern information.
+        history_ram_trigger_type should be used to specify the trigger condition on which History
+        RAM starts acquiring pattern information.
 
         If History RAM trigger is configured as HistoryRAMTriggerType.CYCLE_NUMBER,
-        cycle_number_history_ram_trigger_cycle_number should be used to specify the cycle number on which History RAM starts acquiring pattern information.
+        cycle_number_history_ram_trigger_cycle_number should be used to specify the cycle number on
+        which History RAM starts acquiring pattern information.
 
         If History RAM trigger is configured as HistoryRAMTriggerType.PATTERN_LABEL,
-        pattern_label_history_ram_trigger_label should be used to specify the pattern label from which to start acquiring pattern information.
-        pattern_label_history_ram_trigger_vector_offset should be used to specify the number of vectors following the specified pattern label from which to start acquiring pattern information.
-        pattern_label_history_ram_trigger_cycle_offset should be used to specify the number of cycles following the specified pattern label and vector offset from which to start acquiring pattern information.
+        pattern_label_history_ram_trigger_label should be used to specify the pattern label from
+        which to start acquiring pattern information.
+        pattern_label_history_ram_trigger_vector_offset should be used to specify the number of
+        vectors following the specified pattern label from which to start acquiring pattern
+        information.
+        pattern_label_history_ram_trigger_cycle_offset should be used to specify the number of
+        cycles following the specified pattern label and vector offset from which to start acquiring
+        pattern information.
 
-        For all History RAM trigger conditions, history_ram_pretrigger_samples should be used to specify the number of samples to acquire before the trigger conditions are met. If you configure History RAM to only
+        For all History RAM trigger conditions, history_ram_pretrigger_samples should be used to
+        specify the number of samples to acquire before the trigger conditions are met. If you
+        configure History RAM to only
         acquire failed cycles, you must set history_ram_pretrigger_samples to 0.
 
-        history_ram_cycles_to_acquire should be used to specify which cycles History RAM acquires after the trigger conditions are met.
+        history_ram_cycles_to_acquire should be used to specify which cycles History RAM acquires
+        after the trigger conditions are met.
 
         Returns:
-            history_ram_cycle_information (list of HistoryRAMCycleInformation): Returns a list of class instances with
-                the following information about each pattern cycle:
-
+            per_site_cycle_information (list of HistoryRAMCycleInformation): Returns a list of
+            class instances with the following information about each pattern cycle:
                 -  **pattern_name** (str)  Name of the pattern for the acquired cycle.
                 -  **time_set_name** (str) Time set for the acquired cycle.
-                -  **vector_number** (int) Vector number within the pattern for the acquired cycle. Vector numbers start
+                -  **vector_number** (int) Vector number within the pattern for the acquired cycle.
+                    Vector numbers start
                    at 0 from the beginning of the pattern.
-                -  **cycle_number** (int) Cycle number acquired by this History RAM sample. Cycle numbers start at 0
+                -  **cycle_number** (int) Cycle number acquired by this History RAM sample. Cycle
+                    numbers start at 0
                    from the beginning of the pattern burst.
-                -  **scan_cycle_number** (int) Scan cycle number acquired by this History RAM sample. Scan cycle numbers
-                   start at 0 from the first cycle of the scan vector. Scan cycle numbers are -1 for cycles that do not
-                   have a scan opcode.
-                -  **expected_pin_states** (list of list of enums.PinState) Pin states as expected by the loaded
-                   pattern in the order specified in the pin list. Pins without defined edges in the specified DUT cycle
-                   will have a value of PinState.PIN_STATE_NOT_ACQUIRED.
-                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
-                   Length of the inner list will be equal to the number of pins requested.
-                -  **actual_pin_states** (list of list of enums.PinState) Pin states acquired by History RAM in the
-                   order specified in the pin list. Pins without defined edges in the specified DUT cycle will have a
-                   value of PinState.PIN_STATE_NOT_ACQUIRED.
-                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
-                   Length of the inner list will be equal to the number of pins requested.
-                -  **per_pin_pass_fail** (list of list of bool) Pass fail information for pins in the order specified in
-                   the pin list. Pins without defined edges in the specified DUT cycle will have a value of pass (True).
-                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
-                   Length of the inner list will be equal to the number of pins requested.
+                -  **scan_cycle_number** (int) Scan cycle number acquired by this History RAM
+                    sample. Scan cycle numbers. start at 0 from the first cycle of the scan vector.
+                    Scan cycle numbers are -1 for cycles that do not have a scan opcode.
+                -  **expected_pin_states** (list of lists of enums.PinState) Pin states as expected
+                    by the loaded pattern in the order specified in the pin list. Pins without
+                    defined edges in the specified DUT cycle will have a value of
+                    PinState.PIN_STATE_NOT_ACQUIRED. Length of the outer list will be equal to the
+                    value of edge multiplier for the given vector. Length of the inner list will be
+                    equal to the number of pins requested.
+                -  **actual_pin_states** (list of lists of enums.PinState) Pin states acquired by
+                    History RAM in the order specified in the pin list. Pins without defined edges
+                    in the specified DUT cycle will have a value of PinState.PIN_STATE_NOT_ACQUIRED.
+                   Length of the outer list will be equal to the value of edge multiplier for the
+                   given vector. Length of the inner list will be equal to the number of pins
+                   requested.
+                -  **per_pin_pass_fail** (list of lists of bool) Pass fail information for pins in
+                    the order specified in the pin list. Pins without defined edges in the specified
+                    DUT cycle will have a value of pass (True). Length of the outer list will be
+                    equal to the value of edge multiplier for the given vector. Length of the inner
+                    list will be equal to the number of pins requested.
                 number_of_samples (int): total number of samples in the record
         """
         per_instrument_per_site_array: typing.List[_NIDigitalSSC] = []
@@ -1141,20 +1262,23 @@ class _NIDigitalTSM:
 
     def burst_pattern_pass_fail(self, start_label: str, digital: bool = True, timeout: float = 10):
         """
-        Uses the start_label you specify to burst the pattern on the sites you specify. Waits for the burst to complete, and returns comparison results for each site.
-
-        Digital pins retain their state at the end of a pattern burst until the first vector of the pattern burst, a call to
-        write_static, or a call to apply_levels_and_timing.
+        Uses the start_label you specify to burst the pattern on the sites you specify. Waits for
+        the burst to complete, and returns comparison results for each site.Digital pins retain
+        their state at the end of a pattern burst until the first vector of the pattern burst, a
+        call to write_static, or a call to apply_levels_and_timing.
 
         Args:
-            start_label (str): Pattern name or exported pattern label from which to start bursting the pattern.
-
-            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital method for the pins in the pattern prior to bursting. Defaults to True.
-
-            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error.Defaults to 10.
+            start_label (str): Pattern name or exported pattern label from which to start bursting
+                the pattern.
+            digital (bool, optional): A Boolean that specifies whether to select the digital method
+                for the pins in the pattern prior to bursting. Defaults to True.
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method
+                to complete. If this method does not complete within this time interval, this method
+                returns an error.Defaults to 10.
 
         Returns:
-            List of List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site number and value is pass/fail.
+            List of Lists of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is
+            a site number and value is pass/fail.
         """
         return [s.ps_burst_pattern_pass_fail(start_label, digital, timeout) for s in self._sscs]
 
@@ -1166,18 +1290,21 @@ class _NIDigitalTSM:
         wait_until_done: bool = True,
     ):
         """
-        Uses the start_label you specify to burst the pattern. Waits for the burst to complete if wait_until_done is True with a default timeout of 10 seconds.
-
-        Digital pins retain their state at the end of a pattern burst until the first vector of the pattern burst, a call to write_static, or a call to apply_levels_and_timing.
+        Uses the start_label you specify to burst the pattern. Waits for the burst to complete if
+        wait_until_done is True with a default timeout of 10 seconds. Digital pins retain their
+        state at the end of a pattern burst until the first vector of the pattern burst, a call to
+        write_static, or a call to apply_levels_and_timing.
 
         Args:
-            start_label (str): Pattern name or exported pattern label from which to start bursting the pattern.
-
-            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital method for the pins in the pattern prior to bursting. Defaults to True.
-
-            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error.Defaults to 10.
-
-            wait_until_done (bool, optional): A Boolean that indicates whether to wait until the bursting is complete. Defaults to True.
+            start_label (str): Pattern name or exported pattern label from which to start bursting
+                the pattern.
+            select_digital_function (bool, optional): A Boolean that specifies whether to select the
+                digital method for the pins in the pattern prior to bursting. Defaults to True.
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method
+                to complete. If this method does not complete within this time interval, this method
+                returns an error.Defaults to 10.
+            wait_until_done (bool, optional): A Boolean that indicates whether to wait until the
+                bursting is complete. Defaults to True.
         """
         for ssc in self._sscs:
             ssc.ps_burst_pattern(start_label, select_digital_function, timeout, wait_until_done)
@@ -1187,7 +1314,10 @@ class _NIDigitalTSM:
         Returns the comparison fail count for pins in the repeated capabilities.
 
         Returns:
-            failure_count (list of list of int): Number of failures per instrument. If a site is disabled or not enabled for burst, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
+            failure_count (list of lists of int): Number of failures per instrument. If a site is
+            disabled or not enabled for burst, the method does not return data for that site. You
+            can also use the get_pin_results_pin_information method to obtain a sorted list of
+            returned sites and channels.
         """
         per_instrument_failure_counts = [ssc.cs_get_fail_count() for ssc in self._sscs]
         return per_instrument_failure_counts
@@ -1209,7 +1339,9 @@ class _NIDigitalTSM:
         Waits until the pattern burst has completed or the timeout has expired.
 
         Args:
-            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error. Defaults to 10 seconds.
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method
+            to complete. If this method does not complete within this time interval, this method
+            returns an error. Defaults to 10 seconds.
         """
         for ssc in self._sscs:
             ssc.cs_wait_until_done(timeout)
@@ -1219,22 +1351,33 @@ class _NIDigitalTSM:
     # Pin Levels and Timing #
     def apply_levels_and_timing(self, levels_sheet: str, timing_sheet: str):
         """
-        Applies digital levels and timing values defined in previously loaded levels and timing sheets. When applying a levels sheet, only the levels specified in the sheet are affected. Any levels not specified in the sheet remain unchanged. When applying a timing sheet, all existing time sets are deleted before the new time sets are loaded.
+        Applies digital levels and timing values defined in previously loaded levels and timing
+        sheets. When applying a levels sheet, only the levels specified in the sheet are affected.
+        Any levels not specified in the sheet remain unchanged. When applying a timing sheet, all
+        existing time sets are deleted before the new time sets are loaded.
 
         Args:
-            levels_sheet (str): Name of the levels sheet to apply. Use the name of the sheet or pass the absolute file path you use in the load_specifications_levels_and_timing method. The name of the levels sheet is the file name without the directory and file extension.
+            levels_sheet (str): Name of the levels sheet to apply. Use the name of the sheet or pass
+            the absolute file path you use in the load_specifications_levels_and_timing method. The
+            name of the levels sheet is the file name without the directory and file extension.
 
-            timing_sheet (str): Name of the timing sheet to apply. Use the name of the sheet or pass the absolute file path that you use in the load_specifications_levels_and_timing method. The name of the timing sheet is the file name without the directory and file extension.
+            timing_sheet (str): Name of the timing sheet to apply. Use the name of the sheet or pass
+            the absolute file path that you use in the load_specifications_levels_and_timing method.
+            The name of the timing sheet is the file name without the directory and file extension.
         """
         for ssc in self._sscs:
             ssc._session.sites[ssc._pins].apply_levels_and_timing(levels_sheet, timing_sheet)
 
     def apply_tdr_offsets(self, per_instrument_offsets: typing.List[typing.List[float]]):
         """
-        Applies the correction for propagation delay offsets to a digital pattern instrument. Use this method to apply TDR offsets that are stored from a past measurement or are measured by means other than the tdr method. Also use this method to apply correction for offsets if the **applyOffsets** input of the tdr method was set to False at the time of measurement.
+        Applies the correction for propagation delay offsets to a digital pattern instrument. Use
+        this method to apply TDR offsets that are stored from a past measurement or are measured by
+        means other than the tdr method. Also use this method to apply correction for offsets if the
+        **applyOffsets** input of the tdr method was set to False at the time of measurement.
 
         Args:
-            per_instrument_offsets (typing.List[typing.List[float]]): TDR offsets to apply, in seconds. Specify an offset for each pin or channel.
+            per_instrument_offsets (typing.List[typing.List[float]]): TDR offsets to apply, in
+            seconds. Specify an offset for each pin or channel.
         """
         for ssc, per_instrument_offset in zip(self._sscs, per_instrument_offsets):
             ssc.cs_apply_tdr_offsets(per_instrument_offset)
@@ -1267,14 +1410,22 @@ class _NIDigitalTSM:
     ):
         """
         LevelTypeToSet
-            VIH or VIL - Specifies the voltage that the digital pattern instrument will apply to the input of the DUT when the test instrument drives a logic high (1) or low (0).
-            VOH or VOL - Specifies the output voltage from the DUT above (or below) which the comparator on the digital pattern test instrument interprets a logic high (H) or low (L).
-            VTERM - Specifies the termination voltage the digital pattern instrument applies during non-drive cycles when the termination mode is set to V :sub:`term`. The instrument applies the termination voltage through a 50 Ω parallel termination resistance.
-            IOL or IOH - Specifies the current that the DUT sources (or sinks) to the active load while outputting a voltage above (or below) VCOM.
-            VCOM - Specifies the voltage level at which the active load circuit switches between sourcing current and sinking current.
+            VIH or VIL - Specifies the voltage that the digital pattern instrument will apply to the
+                input of the DUT when the test instrument drives a logic high (1) or low (0).
+            VOH or VOL - Specifies the output voltage from the DUT above (or below) which the
+                comparator on the digital pattern test instrument interprets a logic high (H) or
+                low (L).
+            VTERM - Specifies the termination voltage the digital pattern instrument applies during
+                non-drive cycles when the termination mode is set to V :sub:`term`. The instrument
+                applies the termination voltage through a 50 Ω parallel termination resistance.
+            IOL or IOH - Specifies the current that the DUT sources (or sinks) to the active load
+                while outputting a voltage above (or below) VCOM.
+            VCOM - Specifies the voltage level at which the active load circuit switches between
+                sourcing current and sinking current.
 
         Args:
-            level_type_to_set (LevelTypeToSet): VIH or VIL or VOH or VOL or IOL or IOH or VCOM or VTERM
+            level_type_to_set (LevelTypeToSet): VIH or VIL or VOH or VOL or IOL or IOH or VCOM or
+                VTERM
             per_site_value (typing.List[typing.List[float]]) : values to set per site
         """
         for ssc, settings in zip(self._sscs, per_site_value):
@@ -1301,14 +1452,22 @@ class _NIDigitalTSM:
     def configure_single_level(self, level_type_to_set: LevelTypeToSet, setting: float):
         """
         LevelTypeToSet
-            VIH or VIL - Specifies the voltage that the digital pattern instrument will apply to the input of the DUT when the test instrument drives a logic high (1) or low (0).
-            VOH or VOL - Specifies the output voltage from the DUT above (or below) which the comparator on the digital pattern test instrument interprets a logic high (H) or low (L).
-            VTERM - Specifies the termination voltage the digital pattern instrument applies during non-drive cycles when the termination mode is set to V :sub:`term`. The instrument applies the termination voltage through a 50 Ω parallel termination resistance.
-            IOL or IOH - Specifies the current that the DUT sources (or sinks) to the active load while outputting a voltage above (or below) VCOM.
-            VCOM - Specifies the voltage level at which the active load circuit switches between sourcing current and sinking current.
+            VIH or VIL - Specifies the voltage that the digital pattern instrument will apply to the
+                input of the DUT when the test instrument drives a logic high (1) or low (0).
+            VOH or VOL - Specifies the output voltage from the DUT above (or below) which the
+                comparator on the digital pattern test instrument interprets a logic high (H) or
+                low (L).
+            VTERM - Specifies the termination voltage the digital pattern instrument applies during
+                non-drive cycles when the termination mode is set to V :sub:`term`. The instrument
+                applies the termination voltage through a 50 Ω parallel termination resistance.
+            IOL or IOH - Specifies the current that the DUT sources (or sinks) to the active load
+                while outputting a voltage above (or below) VCOM.
+            VCOM - Specifies the voltage level at which the active load circuit switches between
+                sourcing current and sinking current.
 
         Args:
-            level_type_to_set (LevelTypeToSet): VIH or VIL or VOH or VOL or IOL or IOH or VCOM or VTERM
+            level_type_to_set (LevelTypeToSet): VIH or VIL or VOH or VOL or IOL or IOH or VCOM or
+                VTERM
             setting (float) : value to set
         """
         for ssc in self._sscs:
@@ -1323,13 +1482,33 @@ class _NIDigitalTSM:
         | Defined Values:             |                                                            |
         +=============================+============================================================+
         | TerminationMode.ACTIVE_LOAD | Specifies that, for non-drive pin states (L, H, X, V, M, E)
-                                        ,the active load is connected and the instrument sources or sinks a defined amount of current to load the DUT. The amount of current sourced by the instrument and therefore sunk by the DUT is specified by IOL. The amount of current sunk by the instrument and therefore sourced by the DUT is specified by IOH. The voltage at which the instrument changes between sourcing and sinking is specified by VCOM. |
+                                        ,the active load is connected and the instrument sources or
+                                        sinks a defined amount of current to load the DUT. The
+                                        amount of current sourced by the instrument and therefore
+                                        sunk by the DUT is specified by IOL. The amount of current
+                                        sunk by the instrument and therefore sourced by the DUT is
+                                        specified by IOH. The voltage at which the instrument
+                                        changes between sourcing and sinking is specified by VCOM. |
         +-----------------------------+------------------------------------------------------------+
         | TerminationMode.VTERM       | Specifies that, for non-drive pin states (L, H, X, V, M, E)
-                                        , the pin driver terminates the pin to the configured VTERM voltage through a 50 Ω impedance. VTERM is adjustable to allow for the pin to terminate at a set level. This is useful for instruments that might operate incorrectly if an instrument pin is unterminated and is allowed to float to any voltage level within the instrument voltage range. To address this issue, enable VTERM by configuring the VTERM pin level to the desired voltage and selecting the VTERM termination mode. Setting VTERM to 0 V and selecting the VTERM termination mode has the effect of connecting a 50 Ω termination to ground, which provides an effective 50 Ω impedance for the pin. This can be useful for improving signal integrity of certain DUTs by reducing reflections while the DUT drives the pin.                              |
+                                        , the pin driver terminates the pin to the configured VTERM
+                                        voltage through a 50 Ω impedance. VTERM is adjustable to
+                                        allow for the pin to terminate at a set level. This is
+                                        useful for instruments that might operate incorrectly if an
+                                        instrument pin is unterminated and is allowed to float to
+                                        any voltage level within the instrument voltage range. To
+                                        address this issue, enable VTERM by configuring the VTERM
+                                        pin level to the desired voltage and selecting the VTERM
+                                        termination mode. Setting VTERM to 0 V and selecting the
+                                        VTERM termination mode has the effect of connecting a 50 Ω
+                                        termination to ground, which provides an effective 50 Ω
+                                        impedance for the pin. This can be useful for improving
+                                        signal integrity of certain DUTs by reducing reflections
+                                        while the DUT drives the pin.                              |
         +-----------------------------+------------------------------------------------------------+
         | TerminationMode.HIGH_Z      | Specifies that, for non-drive pin states (L, H, X, V, M, E)
-                                        , the pin driver is put in a high-impedance state and the active load is disabled.                                   |
+                                        , the pin driver is put in a high-impedance state and the
+                                        active load is disabled.                                   |
         +-----------------------------+------------------------------------------------------------+
         """
         for ssc in self._sscs:
@@ -1341,11 +1520,16 @@ class _NIDigitalTSM:
         per_site_per_pin_compare_strobe: typing.List[typing.List[float]],
     ):
         """
-        Configures the strobe edge time for the pins in the context. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the strobe edge time for the pins in the context. Use this method to modify time
+        set values after applying a timing sheet with the apply_levels_and_timing method, or to
+        create time sets programmatically without the use of timing sheets. This method does not
+        modify the timing sheet file or the timing sheet contents that will be used in future calls
+        to apply_levels_and_timing; it only affects the values of the current timing context.
 
         Args:
-            time_set_name (str): The specified time set name.
-            per_site_per_pin_compare_strobe (typing.List[typing.List[float]]): Time when the comparison happens within a vector period.
+            time_set (str): The specified time set name.
+            per_site_per_pin_compare_strobe (typing.List[typing.List[float]]): Time when the
+            comparison happens within a vector period.
         """
         for ssc, compare_strobes in zip(self._sscs, per_site_per_pin_compare_strobe):
             ssc.cs_configure_time_set_compare_edge_per_pin(time_set, compare_strobes)
@@ -1356,12 +1540,17 @@ class _NIDigitalTSM:
         per_site_compare_strobe: typing.List[typing.List[float]],
     ):
         """
-        Configures the strobe edge time for the pins in context. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the strobe edge time for the pins in context. Use this method to modify time set
+        values after applying a timing sheet with the apply_levels_and_timing method, or to create
+        time sets programmatically without the use of timing sheets. This method does not modify the
+        timing sheet file or the timing sheet contents that will be used in future calls to
+        apply_levels_and_timing; it only affects the values of the current timing context.
 
         Args:
-            time_set_name (str): The specified time set name.
+            time_set (str): The specified time set name.
 
-            per_site_compare_strobe (typing.List[typing.List[float]]): Time when the comparison happens within a vector period.
+            per_site_compare_strobe (typing.List[typing.List[float]]): Time when the comparison
+            happens within a vector period.
         """
         for ssc, compare_strobes in zip(self._sscs, per_site_compare_strobe):
             channel_list_array, _, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
@@ -1372,24 +1561,32 @@ class _NIDigitalTSM:
 
     def configure_time_set_compare_edge(self, time_set: str, compare_strobe: float):
         """
-        Configures the strobe edge time for the specified pins. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the strobe edge time for the specified pins. Use this method to modify time set
+        values after applying a timing sheet with the apply_levels_and_timing method, or to create
+        time sets programmatically without the use of timing sheets. This method does not modify the
+        timing sheet file or the timing sheet contents that will be used in future calls to
+        apply_levels_and_timing; it only affects the values of the current timing context.
 
         Args:
             time_set (str): The specified time set name.
-
-            compare_strobe (float in seconds): Time when the comparison happens within a vector period.
+            compare_strobe (float in seconds): Time when the comparison happens within a vector
+                period.
         """
         for ssc in self._sscs:
             ssc.cs_configure_time_set_compare_edge(time_set, compare_strobe)
 
     def configure_time_set_period(self, time_set: str, period: float):
         """
-        Configures the period of a time set. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the period of a time set. Use this method to modify time set values after
+        applying a timing sheet with the apply_levels_and_timing method, or to create time sets
+        programmatically without the use of timing sheets. This method does not modify the timing
+        sheet file or the timing sheet contents that will be used in future calls to
+        apply_levels_and_timing; it only affects the values of the current timing context.
 
         Args:
-            time_set_name (str): The specified time set name.
-
-            period (hightime.timedelta, datetime.timedelta, or float in seconds): Period for this time set, in seconds.
+            time_set (str): The specified time set name.
+            period (hightime.timedelta, datetime.timedelta, or float in seconds): Period for this
+            time set, in seconds.
 
         Returns:
             period (float): configured period for this time set, in seconds
@@ -1415,15 +1612,17 @@ class _NIDigitalTSM:
         Configures voltage levels for the pins in context.
 
         Args:
-            vil (float): Voltage that the instrument will apply to the input of the DUT when the pin driver drives a logic low (0).
-
-            vih (float): Voltage that the instrument will apply to the input of the DUT when the test instrument drives a logic high (1).
-
-            vol (float): Output voltage below which the comparator on the pin driver interprets a logic low (L).
-
-            voh (float): Output voltage above which the comparator on the pin driver interprets a logic high (H).
-
-            vterm (float): Termination voltage the instrument applies during non-drive cycles when the termination mode is set to V\ :sub:`term`. The instrument applies the termination voltage through a 50 ohm parallel termination resistance.
+            vil (float): Voltage that the instrument will apply to the input of the DUT when the pin
+                driver drives a logic low (0).
+            vih (float): Voltage that the instrument will apply to the input of the DUT when the
+                test instrument drives a logic high (1).
+            vol (float): Output voltage below which the comparator on the pin driver interprets a
+                logic low (L).
+            voh (float): Output voltage above which the comparator on the pin driver interprets a
+                logic high (H).
+            vterm (float): Termination voltage the instrument applies during non-drive cycles when
+                the termination mode is set to V\ :sub:`term`. The instrument applies the
+                termination voltage through a 50 ohm parallel termination resistance.
         """
         for ssc in self._sscs:
             ssc._session.channels[ssc._channels].configure_voltage_levels(vil, vih, vol, voh, vterm)
@@ -1433,7 +1632,8 @@ class _NIDigitalTSM:
     # PPMU #
     def ppmu_configure_aperture_time(self, aperture_time: float):
         """
-        Specifies the measurement aperture time for the PPMU. The ppmu_aperture_time_units property sets the units of the PPMU aperture time.
+        Specifies the measurement aperture time for the PPMU. The ppmu_aperture_time_units property
+        sets the units of the PPMU aperture time.
 
         Args:
             aperture_time (float): measurement aperture time in ppmu_aperture_time_units
@@ -1443,7 +1643,9 @@ class _NIDigitalTSM:
 
     def ppmu_configure_current_limit_range(self, current_limit_range: float):
         """
-        Specifies the valid range, in amps, to which the current limit can be set while the PPMU forces voltage to the DUT. This property is applicable only when you set the ppmu_output_function property to DC Voltage.
+        Specifies the valid range, in amps, to which the current limit can be set while the PPMU
+        forces voltage to the DUT. This property is applicable only when you set the
+        ppmu_output_function property to DC Voltage.
 
         Args:
             current_limit_range (float): current limt range in amps
@@ -1454,7 +1656,10 @@ class _NIDigitalTSM:
 
     def ppmu_configure_voltage_limits(self, voltage_limit_high: float, voltage_limit_low: float):
         """
-        Specifies the maximum voltage limit, or high clamp voltage (V :sub:`CH` ) and  the minimum voltage limit, or low clamp voltage (V :sub:`CL` ),in volts, at the pin when the PPMU forces current to the DUT. This property is applicable only when you set the ppmu_output_function property to DC Current.
+        Specifies the maximum voltage limit, or high clamp voltage (V :sub:`CH` ) and  the minimum
+        voltage limit, or low clamp voltage (V :sub:`CL` ),in volts, at the pin when the PPMU forces
+        current to the DUT. This property is applicable only when you set the ppmu_output_function
+        property to DC Current.
 
         Args:
             voltage_limit_high (float): high clamp voltage
@@ -1466,16 +1671,20 @@ class _NIDigitalTSM:
 
     def ppmu_measure(self, measurement_type: enums.PPMUMeasurementType):
         """
-        Instructs the PPMU to measure voltage or current. This method can be called to take a voltage measurement even if the pin method is not set to PPMU.
+        Instructs the PPMU to measure voltage or current. This method can be called to take a
+        voltage measurement even if the pin method is not set to PPMU.
 
         Args:
-            measurement_type (enums.PPMUMeasurementType): Parameter that specifies whether the PPMU measures voltage or current from the DUT.
-
+            measurement_type (enums.PPMUMeasurementType): Parameter that specifies whether the PPMU
+            measures voltage or current from the DUT.
                 -   PPMUMeasurementType.CURRENT: The PPMU measures current from the DUT.
                 -   PPMUMeasurementType.VOLTAGE: The PPMU measures voltage from the DUT.
 
         Returns:
-            measurements (list of float): The returned array of measurements in the order you specify in the repeated capabilities. If a site is disabled, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
+            measurements (list of float): The returned array of measurements in the order you
+            specify in the repeated capabilities. If a site is disabled, the method does not return
+            data for that site. You can also use the get_pin_results_pin_information method to
+            obtain a sorted list of returned sites and channels.
         """
         per_instrument_measurements: typing.List[typing.List[float]] = []
         for ssc in self._sscs:
@@ -1502,11 +1711,13 @@ class _NIDigitalTSM:
         per_site_per_pin_source_voltages: typing.List[typing.List[float]],
     ):
         """
-        Configures the PPMU to outputfunction as Voltage and starts sourcing voltage from the PPMU. configures the current limit range for sourcing voltage.
+        Configures the PPMU to outputfunction as Voltage and starts sourcing voltage from the PPMU.
+        configures the current limit range for sourcing voltage.
 
         Args:
             current_limit_range (float): common current limit for all session channels
-            per_site_per_pin_source_voltages (typing.List[typing.List[float]]): list of source voltage for each site for each pin
+            per_site_per_pin_source_voltages (typing.List[typing.List[float]]): list of source
+            voltage for each site for each pin
         """
         current_limit_range = abs(current_limit_range)
         for ssc, source_voltages in zip(self._sscs, per_site_per_pin_source_voltages):
@@ -1525,11 +1736,13 @@ class _NIDigitalTSM:
         per_site_source_voltages: typing.List[typing.List[float]],
     ):
         """
-        Configures the PPMU to outputfunction as Voltage and starts sourcing voltage from the PPMU. configures the current limit range for sourcing voltage.
+        Configures the PPMU to outputfunction as Voltage and starts sourcing voltage from the PPMU.
+        configures the current limit range for sourcing voltage.
 
         Args:
             current_limit_range (float): common current limit for all session channels
-            per_site_source_voltages (typing.List[typing.List[float]]): list of source voltage for each site
+            per_site_source_voltages (typing.List[typing.List[float]]): list of source voltage for
+            each site
         """
         current_limit_range = abs(current_limit_range)
         for ssc, source_voltages in zip(self._sscs, per_site_source_voltages):
@@ -1554,7 +1767,10 @@ class _NIDigitalTSM:
 
     def ppmu_source(self):
         """
-        Starts sourcing voltage or current from the PPMU. This method automatically selects the PPMU method. Changes to PPMU source settings do not take effect until you call this method. If you modify source settings after you call this method, you must call this method again for changes in the configuration to take effect.
+        Starts sourcing voltage or current from the PPMU. This method automatically selects the PPMU
+        method. Changes to PPMU source settings do not take effect until you call this method. If
+        you modify source settings after you call this method, you must call this method again for
+        changes in the configuration to take effect.
         """
         for ssc in self._sscs:
             ssc.cs_ppmu_source()
@@ -1564,18 +1780,20 @@ class _NIDigitalTSM:
     # Sequencer Flags and Registers #
     def read_sequencer_flag(self, sequencer_flag: enums.SequencerFlag):
         """
-        Reads the state of a pattern sequencer flag. Use pattern sequencer flags to coordinate execution between the pattern sequencer and a runtime test program.
+        Reads the state of a pattern sequencer flag. Use pattern sequencer flags to coordinate
+        execution between the pattern sequencer and a runtime test program.
 
         Args:
             sequencer_flag (enums.SequencerFlag): The pattern sequencer flag you want to read.
 
-                -   SequencerFlag.FLAG0 ("seqflag0"): Reads pattern sequencer flag 0.
-                -   SequencerFlag.FLAG1 ("seqflag1"): Reads pattern sequencer flag 1.
-                -   SequencerFlag.FLAG2 ("seqflag2"): Reads pattern sequencer flag 2.
-                -   SequencerFlag.FLAG3 ("seqflag3"): Reads pattern sequencer flag 3.
+                -   SequencerFlag.FLAG0 ("seq_flag0"): Reads pattern sequencer flag 0.
+                -   SequencerFlag.FLAG1 ("seq_flag1"): Reads pattern sequencer flag 1.
+                -   SequencerFlag.FLAG2 ("seq_flag2"): Reads pattern sequencer flag 2.
+                -   SequencerFlag.FLAG3 ("seq_flag3"): Reads pattern sequencer flag 3.
 
         Returns:
-            values (list of bool): A Boolean that indicates the state of the pattern sequencer flag you specify from different instrument sessions.
+            values (list of bool): A Boolean that indicates the state of the pattern sequencer flag
+            you specify from different instrument sessions.
         """
         per_instrument_state: typing.List[bool] = []
         for ssc in self._sscs:
@@ -1584,7 +1802,10 @@ class _NIDigitalTSM:
 
     def read_sequencer_register(self, sequencer_register: enums.SequencerRegister):
         """
-        Reads the value of a pattern sequencer register. Use pattern sequencer registers to pass numeric values between the pattern sequencer and a runtime test program. For example, you can use this method to read a register modified by the write_reg opcode during a pattern burst.
+        Reads the value of a pattern sequencer register. Use pattern sequencer registers to pass
+        numeric values between the pattern sequencer and a runtime test program. For example, you
+        can use this method to read a register modified by the write_reg opcode during a pattern
+        burst.
 
         Args:
             sequencer_register (enums.SequencerRegister): The sequencer register to read from.
@@ -1607,7 +1828,8 @@ class _NIDigitalTSM:
                 -   SequencerRegister.REGISTER15 ("reg15"): Reads sequencer register 15.
 
         Returns:
-            values (list of int): Value read from the sequencer register from different instrument sessions.
+            values (list of int): Value read from the sequencer register from different instrument
+            sessions.
         """
         per_instrument_register_values: typing.List[int] = []
         for ssc in self._sscs:
@@ -1622,17 +1844,19 @@ class _NIDigitalTSM:
         state: bool = True,
     ):
         """
-        Writes the state of a pattern sequencer flag. Use pattern sequencer flags to coordinate execution between the pattern sequencer and a runtime test program.
+        Writes the state of a pattern sequencer flag. Use pattern sequencer flags to coordinate
+        execution between the pattern sequencer and a runtime test program.
 
         Args:
             sequencer_flag (enums.SequencerFlag): The pattern sequencer flag to write.
 
-                -   SequencerFlag.FLAG0 ("seqflag0"): Writes pattern sequencer flag 0.
-                -   SequencerFlag.FLAG1 ("seqflag1"): Writes pattern sequencer flag 1.
-                -   SequencerFlag.FLAG2 ("seqflag2"): Writes pattern sequencer flag 2.
-                -   SequencerFlag.FLAG3 ("seqflag3"): Writes pattern sequencer flag 3.
+                -   SequencerFlag.FLAG0 ("seq_flag0"): Writes pattern sequencer flag 0.
+                -   SequencerFlag.FLAG1 ("seq_flag1"): Writes pattern sequencer flag 1.
+                -   SequencerFlag.FLAG2 ("seq_flag2"): Writes pattern sequencer flag 2.
+                -   SequencerFlag.FLAG3 ("seq_flag3"): Writes pattern sequencer flag 3.
 
-            state (bool, optional): A Boolean that assigns a state to the pattern sequencer flag you specify.Defaults to True.
+            state (bool, optional): A Boolean that assigns a state to the pattern sequencer flag you
+            specify.Defaults to True.
         """
         for ssc in self._sscs:
             ssc._session.write_sequencer_flag(sequencer_flag, state)
@@ -1643,11 +1867,12 @@ class _NIDigitalTSM:
         value: int = 0,
     ):
         """
-        Writes a value to a pattern sequencer register. Use pattern sequencer registers to pass numeric values between the pattern sequencer and a runtime test program.
+        Writes a value to a pattern sequencer register. Use pattern sequencer registers to pass
+        numeric values between the pattern sequencer and a runtime test program.
 
         Args:
-            sequencer_register (enums.SequencerRegister): The sequencer register you want to write to.
-
+            sequencer_register (enums.SequencerRegister): The sequencer register you want to write
+            to.
                 -   SequencerRegister.REGISTER0 ("reg0"): Writes sequencer register 0.
                 -   SequencerRegister.REGISTER1 ("reg1"): Writes sequencer register 1.
                 -   SequencerRegister.REGISTER2 ("reg2"): Writes sequencer register 2.
@@ -1680,17 +1905,21 @@ class _NIDigitalTSM:
         timeout: float = 10,
     ):
         """
-        Returns dictionary where each key is a site number and value is a collection of digital states representing capture waveform data
+        Returns dictionary where each key is a site number and value is a collection of digital
+        states representing capture waveform data
 
         Args:
-            waveform_name (str): Waveform name you create with the create capture waveform method. Use the waveform_name parameter with capture_start opcode in your pattern.
-
+            waveform_name (str): Waveform name you create with the create capture waveform method.
+                Use the waveform_name parameter with capture_start opcode in your pattern.
             samples_to_read (int): Number of samples to fetch.
-
-            timeout (float, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error. Defaults to 10.
+            timeout (float, optional): Maximum time (in seconds) allowed for this method to
+                complete. If this method does not complete within this time interval, this method
+                returns an error. Defaults to 10.
 
         Returns:
-            per instrument waveform capture ({ int: memoryview of array.array of unsigned int, int: memoryview of array.array of unsigned int, ... }): Dictionary where each key is a site number and value is a collection of digital states representing capture waveform data
+            per instrument waveform capture ({ int: memoryview of array.array of unsigned int, int:
+            memoryview of array.array of unsigned int, ... }): Dictionary where each key is a site
+            number and value is a collection of digital states representing capture waveform data
         """
         per_instrument_capture: typing.List[typing.List[typing.List[int]]] = []
         for ssc in self._sscs:
@@ -1708,13 +1937,17 @@ class _NIDigitalTSM:
         minimum_size: int = 128,
     ):
         """
-        Writes the same waveform data to all sites. Use this write method if you set the data_mapping parameter of the create source waveform method to SourceDataMapping.BROADCAST.
+        Writes the same waveform data to all sites. Use this write method if you set the
+        data_mapping parameter of the create source waveform method to SourceDataMapping.BROADCAST.
 
         Args:
-            waveform_name (str): The name to assign to the waveform. Use the waveform_name  with source_start opcode in your pattern.
+            waveform_name (str): The name to assign to the waveform. Use the waveform_name with
+                source_start opcode in your pattern.
 
-            waveform_data (list of int): 1D array of samples to use as source data to apply to all sites.
-            expand_to_minimum_size (bool, optional): decides to expand the waveform data or not. Defaults to False.
+            waveform_data (list of int): 1D array of samples to use as source data to apply to all
+                sites.
+            expand_to_minimum_size (bool, optional): decides to expand the waveform data or not.
+                Defaults to False.
             minimum_size (int, optional): minimum size to expand the waveform data. Defaults to 128.
         """
         if minimum_size > len(waveform_data) and expand_to_minimum_size:
@@ -1733,13 +1966,20 @@ class _NIDigitalTSM:
         minimum_size: int = 128,
     ):
         """
-        Writes one waveform per site. Use this write method if you set the parameter of the create source waveform method to Site Unique.
+        Writes one waveform per site. Use this write method if you set the parameter of the create
+        source waveform method to Site Unique.
 
         Args:
-            waveform_name (str): The name to assign to the waveform. Use the waveform_name with source_start opcode in your pattern.
-            per_instrument_waveforms (typing.List[typing.List[typing.List[int]]]): list of waveform_data ({ int: basic sequence of unsigned int, int: basic sequence of unsigned int, ... }): Dictionary where each key is a site number and value is a collection of samples to use as source data
-            expand_to_minimum_size (bool, optional): if set to true the array of waveform will be of "minimum_size" parameter with zeros padded as required. Defaults to False.
-            minimum_size (int, optional): specifices the minimum length of each waveform per site. Defaults to 128.
+            waveform_name (str): The name to assign to the waveform. Use the waveform_name with
+                source_start opcode in your pattern.
+            per_instrument_waveforms (typing.List[typing.List[typing.List[int]]]): list of
+                waveform_data ({ int: basic sequence of unsigned int, int: basic sequence of
+                unsigned int, ... }): Dictionary where each key is a site number and value is a
+                collection of samples to use as source data
+            expand_to_minimum_size (bool, optional): if set to true the array of waveform will be of
+                "minimum_size" parameter with zeros padded as required. Defaults to False.
+            minimum_size (int, optional): specifices the minimum length of each waveform per site.
+                Defaults to 128.
         """
         for ssc, per_instrument_waveform in zip(self._sscs, per_instrument_waveforms):
             rows, cols = numpy.shape(per_instrument_waveform)
@@ -1767,11 +2007,11 @@ class _NIDigitalTSM:
         the changes to the pins.
 
         Returns:
-            data (list [list of enums.PinState]): The returned array of pin states read from the channels
-            in the repeated capabilities. Data is returned as per the order you specify in the
-            repeated capabilities. If a site is disabled, the method does not return data for that site.
-            You can also use the get_pin_results_pin_information method to obtain a sorted
-            list of returned sites and channels.
+            data (list [list of enums.PinState]): The returned array of pin states read from the
+            channels in the repeated capabilities. Data is returned as per the order you specify in
+            the repeated capabilities. If a site is disabled, the method does not return data for
+            that site. You can also use the get_pin_results_pin_information method to obtain a
+            sorted list of returned sites and channels.
 
                 -   PinState.L: The comparators read a logic low pin state.
                 -   PinState.H: The comparators read a logic high pin state.
@@ -1783,16 +2023,25 @@ class _NIDigitalTSM:
 
     def write_static(self, state: enums.WriteStaticPinState, auto_select=True):
         """
-        Writes a static state to the specified pins. The selected pins remain in the specified state until the next pattern burst or call to this method. If there are uncommitted changes to levels or the termination mode, this method commits the changes to the pins. This method does not change the selected pin method. If you write a static state to a pin that does not have the Digital method selected, the new static state is stored by the instrument, and affects the state of the pin the next time you change the selected method to Digital.
+        Writes a static state to the specified pins. The selected pins remain in the specified state
+        until the next pattern burst or call to this method. If there are uncommitted changes to
+        levels or the termination mode, this method commits the changes to the pins. This method
+        does not change the selected pin method. If you write a static state to a pin that does not
+        have the Digital method selected, the new static state is stored by the instrument, and
+        affects the state of the pin the next time you change the selected method to Digital.
 
         Args:
-            state (enums.WriteStaticPinState): Parameter that specifies one of the following digital states to assign to each pin per site.
+            state (enums.WriteStaticPinState): Parameter that specifies one of the following digital
+            states to assign to each pin per site.
 
                 -   WriteStaticPinState.ZERO: Specifies to drive low.
                 -   WriteStaticPinState.ONE: Specifies to drive high.
                 -   WriteStaticPinState.X: Specifies to not drive.
 
-            auto_select=True, specifies this function to configure the output function as digital automatically.auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().Without configuring as digital and auto_select as false, this function will not work as expected.
+            auto_select=True, specifies this function to configure the output function as digital
+            automatically.auto_select=False, if the pin is explicitly configured as digital already
+            with the tsm_object.ssc.select_function().Without configuring as digital and auto_select
+            as false, this function will not work as expected.
         """
         for ssc in self._sscs:
             ssc.cs_write_static(state, auto_select)
@@ -1803,15 +2052,25 @@ class _NIDigitalTSM:
         auto_select=True,
     ):
         """
-        Writes a static state to the specified pins per site per pin. The selected pins remain in the specified state until the next pattern burst or call to this method. If there are uncommitted changes to levels or the termination mode, this method commits the changes to the pins. This method does not change the selected pin method. If you write a static state to a pin that does not have the Digital method selected, the new static state is stored by the instrument, and affects the state of the pin the next time you change the selected method to Digital.
+        Writes a static state to the specified pins per site per pin. The selected pins remain in
+        the specified state until the next pattern burst or call to this method. If there are
+        uncommitted changes to levels or the termination mode, this method commits the changes to
+        the pins. This method does not change the selected pin method. If you write a static state
+        to a pin that does not have the Digital method selected, the new static state is stored by
+        the instrument, and affects the state of the pin the next time you change the selected
+        method to Digital.
 
         Args:
-            per_site_per_pin_state (typing.List[typing.List[enums.WriteStaticPinState]]): Parameter that specifies one of the following digital states to assign to each pin per site.
+            per_site_per_pin_state (typing.List[typing.List[enums.WriteStaticPinState]]): Parameter
+            that specifies one of the following digital states to assign to each pin per site.
 
                 -   WriteStaticPinState.ZERO: Specifies to drive low.
                 -   WriteStaticPinState.ONE: Specifies to drive high.
                 -   WriteStaticPinState.X: Specifies to not drive.
-            auto_select=True, specifies this function to configure the output function as digital automatically.auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().Without configuring as digital and auto_select as false, this function will not work as expected.
+            auto_select=True, specifies this function to configure the output function as digital
+            automatically.auto_select=False, if the pin is explicitly configured as digital already
+            with the tsm_object.ssc.select_function().Without configuring as digital and auto_select
+            as false, this function will not work as expected.
         """
         for ssc, states in zip(self._sscs, per_site_per_pin_state):
             channels, _, _ = _channel_list_to_pins(ssc._channels)
@@ -1824,15 +2083,24 @@ class _NIDigitalTSM:
         self, per_site_state: typing.List[typing.List[enums.WriteStaticPinState]], auto_select=True
     ):
         """
-        Writes a static state per site. The selected pins remain in the specified state until the next pattern burst or call to this method. If there are uncommitted changes to levels or the termination mode, this method commits the changes to the pins. This method does not change the selected pin method. If you write a static state to a pin that does not have the Digital method selected, the new static state is stored by the instrument, and affects the state of the pin the next time you change the selected method to Digital.
+        Writes a static state per site. The selected pins remain in the specified state until the
+        next pattern burst or call to this method. If there are uncommitted changes to levels or the
+        termination mode, this method commits the changes to the pins. This method does not change
+        the selected pin method. If you write a static state to a pin that does not have the Digital
+        method selected, the new static state is stored by the instrument, and affects the state of
+        the pin the next time you change the selected method to Digital.
 
         Args:
-            per_site_state (typing.List[typing.List[enums.WriteStaticPinState]]): Parameter that specifies one of the following digital states to assign to each pin per site.
+            per_site_state (typing.List[typing.List[enums.WriteStaticPinState]]): Parameter that
+            specifies one of the following digital states to assign to each pin per site.
 
                 -   WriteStaticPinState.ZERO: Specifies to drive low.
                 -   WriteStaticPinState.ONE: Specifies to drive high.
                 -   WriteStaticPinState.X: Specifies to not drive.
-            auto_select=True, specifies this function to configure the output function as digital automatically.auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().Without configuring as digital and auto_select as false, this function will not work as expected.
+            auto_select=True, specifies this function to configure the output function as digital
+            automatically.auto_select=False, if the pin is explicitly configured as digital already
+            with the tsmobj.ssc.select_function().Without configuring as digital and auto_select as
+            false, this function will not work as expected.
         """
         for ssc, states in zip(self._sscs, per_site_state):
             channel_list_array, _, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
@@ -1846,7 +2114,8 @@ class _NIDigitalTSM:
 
     def clear_start_trigger_signal(self):
         """
-        Disables the Start trigger. Pattern bursting starts immediately after you call the init method or the burst_pattern method.
+        Disables the Start trigger. Pattern bursting starts immediately after you call the init
+        method or the burst_pattern method.
         """
         for ssc in self._sscs:
             ssc.cs_clear_start_trigger_signal()
@@ -1855,10 +2124,18 @@ class _NIDigitalTSM:
         self, source: str, edge: enums.DigitalEdge = enums.DigitalEdge.RISING
     ):
         """
-        Specifies the source terminal for the Start trigger. configures the start_trigger_type property as Digital Edge.
+        Specifies the source terminal for the Start trigger. configures the start_trigger_type
+        property as Digital Edge.
 
         Args:
-            source (str): You can specify source terminals in one of two ways. If the digital pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0. The source terminal can also be a terminal from another device, in which case the NI-Digital Pattern Driver automatically finds a route (if one is available) from that terminal to the input terminal (going through a physical PXI backplane trigger line). For example, you can set the source terminal on Dev1 to be /Dev2/StartTrigger.
+            source (str): You can specify source terminals in one of two ways. If the digital
+            pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the
+            terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened
+            terminal name, PXI_Trig0. The source terminal can also be a terminal from another
+            device, in which case the NI-Digital Pattern Driver automatically finds a route (if one
+            is available) from that terminal to the input terminal (going through a physical PXI
+            backplane trigger line). For example, you can set the source terminal on Dev1 to be
+            /Dev2/StartTrigger.
 
             +-----------------+--------------------+
             | Defined Values: |                    |
@@ -1880,14 +2157,18 @@ class _NIDigitalTSM:
             | PXI_Trig7       | PXI trigger line 7 |
             +-----------------+--------------------+
 
-            edge (enums.DigitalEdge, optional): rising or falling edge. Defaults to enums.DigitalEdge.RISING.
+            edge (enums.DigitalEdge, optional): rising or falling edge. Defaults to
+            enums.DigitalEdge.RISING.
         """
         for ssc in self._sscs:
             ssc.cs_configure_trigger_signal(source, edge)
 
     def export_opcode_trigger_signal(self, signal_id: str, output_terminal: str = ""):
         """
-        Specifies the destination terminal for exporting the Pattern Opcode Event. Terminals can be specified in one of two ways. If the digital pattern instrument is named Dev1 and your terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name, /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0.
+        Specifies the destination terminal for exporting the Pattern Opcode Event. Terminals can be
+        specified in one of two ways. If the digital pattern instrument is named Dev1 and your
+        terminal is PXI_Trig0, you can specify the terminal with the fully qualified terminal name,
+        /Dev1/PXI_Trig0, or with the shortened terminal name, PXI_Trig0.
 
         +-----------------+--------------------+
         | Defined Values: |                    |
@@ -1949,10 +2230,14 @@ class _NIDigitalTSM:
 
     def initiate(self):
         """
-         Starts bursting the pattern configured by start_label, causing the NI-Digital session to be committed. To stop the pattern burst, call abort. If keep alive pattern is bursting when abort is called or upon exiting the context manager, keep alive pattern will not be stopped. To stop the keep alive pattern, call abort_keep_alive.
+         Starts bursting the pattern configured by start_label, causing the NI-Digital session to be
+         committed. To stop the pattern burst, call abort. If keep alive pattern is bursting when
+         abort is called or upon exiting the context manager, keep alive pattern will not be
+         stopped. To stop the keep alive pattern, call abort_keep_alive.
 
         Note:
-        This method will return a Python context manager that will initiate on entering and abort on exit.
+        This method will return a Python context manager that will initiate on entering and abort on
+        exit.
         """
         for ssc in self._sscs:
             ssc._session.initiate()
@@ -1999,7 +2284,7 @@ class _NIDigitalTSM:
         self, sites: typing.List[int], pins: typing.List[str]
     ):
         """
-        computes per insturment to per site per pin lookup table
+        computes per instrument to per site per pin lookup table
 
         Args:
             sites (typing.List[int]): list of site numbers
@@ -2021,7 +2306,7 @@ class _NIDigitalTSM:
         self, sites: typing.List[int], pins: typing.List[str]
     ):
         """
-        coomputes the per site per pin to per instrument lookup table
+        computes the per site per pin to per instrument lookup table
 
         Args:
             sites (typing.List[int]): list of site numbers
@@ -2085,7 +2370,8 @@ class _NIDigitalTSM:
 
     def get_properties(self):
         """
-        Returns list of session properties i.e. Voh, Vol, Vih, Vil, Vterm, frequency_counter_measurement_time in a named tuple format
+        Returns list of session properties i.e. Voh, Vol, Vih, Vil, Vterm,
+        frequency_counter_measurement_time in a named tuple format
 
         Returns:
             list of session_property: list of Named tuple of session property
@@ -2127,7 +2413,7 @@ class TSMDigital:
             list [ list[float]]: measurement frequencies per site per pin
 
         Returns:
-            per_site_per_pin_frequency_measurements: list of list of float
+            per_site_per_pin_frequency_measurements: list of lists of float
         """
         initialized_array = [[0.0 for _ in self.pins] for _ in self.sites]
         per_instrument_to_per_site_per_pin_lut = (
@@ -2146,7 +2432,9 @@ class TSMDigital:
         gets the current HRAM settings and HRAM trigger settings in a tuple of lists format
 
         Returns:
-            HRAMConfiguration(named tuple): contains HRAM Cycles to acquire,pretrigger samples, max samples to acquire per site, is number of samples finite, buffer size per site, trigger type, cycle number, pattern label, cycle offset, vector offset
+            HRAMConfiguration(named tuple): contains HRAM Cycles to acquire,pretrigger samples, max
+            samples to acquire per site, is number of samples finite, buffer size per site, trigger
+            type, cycle number, pattern label, cycle offset, vector offset
         """
         (
             per_instrument_cycles_to_acquire,
@@ -2188,7 +2476,8 @@ class TSMDigital:
         stores the HRAM results from every site into multiple log files
 
         Args:
-            per_site_cycle_information (typing.List[typing.List[HistoryRAMCycleInformation]]): HRAM results
+            per_site_cycle_information (typing.List[typing.List[HistoryRAMCycleInformation]]): HRAM
+                results
             pattern_name (str): pattern name used for bursting
             destination_dir (str): destination folder under which the log files are created.
 
@@ -2274,57 +2563,77 @@ class TSMDigital:
 
     def stream_hram_results(self):
         """
-        Returns the pattern information acquired for the specified cycles.
-
-        If the pattern is using the edge multiplier feature, cycle numbers represent tester cycles, each of which may consist of multiple DUT cycles. When using pins with mixed edge multipliers, pins may return PinState.PIN_STATE_NOT_ACQUIRED for DUT cycles where those pins do not have edges defined.
-
-        Site number on which to retrieve pattern information must be specified via sites repeated capability.The method returns an error if more than one site is specified.
-
-        Pins for which to retrieve pattern information must be specified via pins repeated capability.If pins are not specified, pin list from the pattern containing the start label is used. Call get_pattern_pin_names with the start label to retrieve the pins associated with the pattern burst:
+        Returns the pattern information acquired for the specified cycles.If the pattern is using
+        the edge multiplier feature, cycle numbers represent tester cycles, each of which may
+        consist of multiple DUT cycles. When using pins with mixed edge multipliers, pins may return
+        PinState.PIN_STATE_NOT_ACQUIRED for DUT cycles where those pins do not have edges defined.
+        Site number on which to retrieve pattern information must be specified via sites repeated
+        capability.The method returns an error if more than one site is specified. Pins for which to
+        retrieve pattern information must be specified via pins repeated capability.If pins are not
+        specified, pin list from the pattern containing the start label is used. Call
+        get_pattern_pin_names with the start label to retrieve the pins associated with the pattern
+        burst:
 
         Note:
-        Before bursting a pattern, you must configure the History RAM trigger and specify which cycles to acquire.
+        Before bursting a pattern, you must configure the History RAM trigger and specify which
+        cycles to acquire.
 
-        history_ram_trigger_type should be used to specify the trigger condition on which History RAM starts acquiring pattern information.
+        history_ram_trigger_type should be used to specify the trigger condition on which History
+        RAM starts acquiring pattern information.
 
         If History RAM trigger is configured as HistoryRAMTriggerType.CYCLE_NUMBER,
-        cycle_number_history_ram_trigger_cycle_number should be used to specify the cycle number on which History RAM starts acquiring pattern information.
+        cycle_number_history_ram_trigger_cycle_number should be used to specify the cycle number on
+        which History RAM starts acquiring pattern information.
 
         If History RAM trigger is configured as HistoryRAMTriggerType.PATTERN_LABEL,
-        pattern_label_history_ram_trigger_label should be used to specify the pattern label from which to start acquiring pattern information.
-        pattern_label_history_ram_trigger_vector_offset should be used to specify the number of vectors following the specified pattern label from which to start acquiring pattern information.
-        pattern_label_history_ram_trigger_cycle_offset should be used to specify the number of cycles following the specified pattern label and vector offset from which to start acquiring pattern information.
+        pattern_label_history_ram_trigger_label should be used to specify the pattern label from
+        which to start acquiring pattern information.
+        pattern_label_history_ram_trigger_vector_offset should be used to specify the number of
+        vectors following the specified pattern label from which to start acquiring pattern
+        information.
+        pattern_label_history_ram_trigger_cycle_offset should be used to specify the number of
+        cycles following the specified pattern label and vector offset from which to start acquiring
+        pattern information.
 
-        For all History RAM trigger conditions, history_ram_pretrigger_samples should be used to specify the number of samples to acquire before the trigger conditions are met. If you configure History RAM to only
+        For all History RAM trigger conditions, history_ram_pretrigger_samples should be used to
+        specify the number of samples to acquire before the trigger conditions are met. If you
+        configure History RAM to only
         acquire failed cycles, you must set history_ram_pretrigger_samples to 0.
 
-        history_ram_cycles_to_acquire should be used to specify which cycles History RAM acquires after the trigger conditions are met.
+        history_ram_cycles_to_acquire should be used to specify which cycles History RAM acquires
+        after the trigger conditions are met.
 
         Returns:
-            per_site_cycle_information (list of HistoryRAMCycleInformation): Returns a list of  class instances with the following information about each pattern cycle:
+            per_site_cycle_information (list of HistoryRAMCycleInformation): Returns a list of
+            class instances with the following information about each pattern cycle:
                 -  **pattern_name** (str)  Name of the pattern for the acquired cycle.
                 -  **time_set_name** (str) Time set for the acquired cycle.
-                -  **vector_number** (int) Vector number within the pattern for the acquired cycle. Vector numbers start
+                -  **vector_number** (int) Vector number within the pattern for the acquired cycle.
+                    Vector numbers start
                    at 0 from the beginning of the pattern.
-                -  **cycle_number** (int) Cycle number acquired by this History RAM sample. Cycle numbers start at 0
+                -  **cycle_number** (int) Cycle number acquired by this History RAM sample. Cycle
+                    numbers start at 0
                    from the beginning of the pattern burst.
-                -  **scan_cycle_number** (int) Scan cycle number acquired by this History RAM sample. Scan cycle numbers
-                   start at 0 from the first cycle of the scan vector. Scan cycle numbers are -1 for cycles that do not
-                   have a scan opcode.
-                -  **expected_pin_states** (list of list of enums.PinState) Pin states as expected by the loaded
-                   pattern in the order specified in the pin list. Pins without defined edges in the specified DUT cycle
-                   will have a value of PinState.PIN_STATE_NOT_ACQUIRED.
-                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
-                   Length of the inner list will be equal to the number of pins requested.
-                -  **actual_pin_states** (list of list of enums.PinState) Pin states acquired by History RAM in the
-                   order specified in the pin list. Pins without defined edges in the specified DUT cycle will have a
-                   value of PinState.PIN_STATE_NOT_ACQUIRED.
-                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
-                   Length of the inner list will be equal to the number of pins requested.
-                -  **per_pin_pass_fail** (list of list of bool) Pass fail information for pins in the order specified in
-                   the pin list. Pins without defined edges in the specified DUT cycle will have a value of pass (True).
-                   Length of the outer list will be equal to the value of edge multiplier for the given vector.
-                   Length of the inner list will be equal to the number of pins requested.
+                -  **scan_cycle_number** (int) Scan cycle number acquired by this History RAM
+                    sample. Scan cycle numbers. start at 0 from the first cycle of the scan vector.
+                    Scan cycle numbers are -1 for cycles that do not have a scan opcode.
+                -  **expected_pin_states** (list of lists of enums.PinState) Pin states as expected
+                    by the loaded pattern in the order specified in the pin list. Pins without
+                    defined edges in the specified DUT cycle will have a value of
+                    PinState.PIN_STATE_NOT_ACQUIRED. Length of the outer list will be equal to the
+                    value of edge multiplier for the given vector. Length of the inner list will be
+                    equal to the number of pins requested.
+                -  **actual_pin_states** (list of lists of enums.PinState) Pin states acquired by
+                    History RAM in the order specified in the pin list. Pins without defined edges
+                    in the specified DUT cycle will have a value of PinState.PIN_STATE_NOT_ACQUIRED.
+                   Length of the outer list will be equal to the value of edge multiplier for the
+                   given vector. Length of the inner list will be equal to the number of pins
+                   requested.
+                -  **per_pin_pass_fail** (list of lists of bool) Pass fail information for pins in
+                    the order specified in the pin list. Pins without defined edges in the specified
+                    DUT cycle will have a value of pass (True). Length of the outer list will be
+                    equal to the value of edge multiplier for the given vector. Length of the inner
+                    list will be equal to the number of pins requested.
         """
         (
             per_instrument_per_site_cycle_information,
@@ -2352,20 +2661,25 @@ class TSMDigital:
         timeout: float = 10,
     ):
         """
-        Uses the start_label you specify to burst the pattern on the sites you specify. Waits for the burst to complete, and returns comparison results for each site.
-
-        Digital pins retain their state at the end of a pattern burst until the first vector of the pattern burst, a call to
-        write_static, or a call to apply_levels_and_timing.
+        Uses the start_label you specify to burst the pattern on the sites you specify. Waits for
+        the burst to complete, and returns comparison results for each site.Digital pins retain
+        their state at the end of a pattern burst until the first vector of the pattern burst, a
+        call to write_static, or a call to apply_levels_and_timing.
 
         Args:
-            start_label (str): Pattern name or exported pattern label from which to start bursting the pattern.
+            start_label (str): Pattern name or exported pattern label from which to start bursting
+                the pattern.
 
-            select_digital_function (bool, optional): A Boolean that specifies whether to select the digital method for the pins in the pattern prior to bursting. Defaults to True.
+            select_digital_function (bool, optional): A Boolean that specifies whether to select the
+                digital method for the pins in the pattern prior to bursting. Defaults to True.
 
-            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error.Defaults to 10.
+            timeout (float in seconds, optional): Maximum time (in seconds) allowed for this method
+                to complete. If this method does not complete within this time interval, this method
+                returns an error.Defaults to 10.
 
         Returns:
-            List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site number and value is pass/fail.
+            List of pass_fail ({ int: bool, int: bool, ... }): Dictionary where each key is a site
+                number and value is pass/fail.
         """
         initialized_array = [False for _ in self.sites]
         per_instrument_to_per_site_lut = self.ssc.calculate_per_instrument_to_per_site_lut(
@@ -2384,7 +2698,10 @@ class TSMDigital:
         Returns the comparison fail count for pins in the repeated capabilities.
 
         Returns:
-            failure_count (list of list of int): Number of failures per site per pin. If a site is disabled or not enabled for burst, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
+            failure_count (list of lists of int): Number of failures per site per pin. If a site is
+            disabled or not enabled for burst, the method does not return data for that site. You
+            can also use the get_pin_results_pin_information method to obtain a sorted list of
+            returned sites and channels.
         """
         initialized_array = [[0 for _ in self.pins] for _ in self.sites]
         per_instrument_to_per_site_per_pin_lut = (
@@ -2419,10 +2736,14 @@ class TSMDigital:
         self, per_site_per_pin_tdr_values: typing.List[typing.List[float]]
     ):
         """
-        Applies the correction for propagation delay offsets to a digital pattern instrument. Use this method to apply TDR offsets that are stored from a past measurement or are measured by means other than the tdr method. Also use this method to apply correction for offsets if the **applyOffsets** input of the tdr method was set to False at the time of measurement.
+        Applies the correction for propagation delay offsets to a digital pattern instrument. Use
+        this method to apply TDR offsets that are stored from a past measurement or are measured by
+        means other than the tdr method. Also use this method to apply correction for offsets if the
+        **applyOffsets** input of the tdr method was set to False at the time of measurement.
 
         Args:
-            per_site_per_pin_tdr_values (typing.List[typing.List[float]]): TDR offsets to apply, in seconds. Specify an offset for each pin or channel.
+            per_site_per_pin_tdr_values (typing.List[typing.List[float]]): TDR offsets to apply, in
+            seconds. Specify an offset for each pin or channel.
         """
         (
             per_site_per_pin_to_per_instrument_lut,
@@ -2446,14 +2767,22 @@ class TSMDigital:
     ):
         """
         LevelTypeToSet
-            VIH or VIL - Specifies the voltage that the digital pattern instrument will apply to the input of the DUT when the test instrument drives a logic high (1) or low (0).
-            VOH or VOL - Specifies the output voltage from the DUT above (or below) which the comparator on the digital pattern test instrument interprets a logic high (H) or low (L).
-            VTERM - Specifies the termination voltage the digital pattern instrument applies during non-drive cycles when the termination mode is set to V :sub:`term`. The instrument applies the termination voltage through a 50 Ω parallel termination resistance.
-            IOL or IOH - Specifies the current that the DUT sources (or sinks) to the active load while outputting a voltage above (or below) VCOM.
-            VCOM - Specifies the voltage level at which the active load circuit switches between sourcing current and sinking current.
+            VIH or VIL - Specifies the voltage that the digital pattern instrument will apply to the
+                input of the DUT when the test instrument drives a logic high (1) or low (0).
+            VOH or VOL - Specifies the output voltage from the DUT above (or below) which the
+                comparator on the digital pattern test instrument interprets a logic high (H) or
+                low (L).
+            VTERM - Specifies the termination voltage the digital pattern instrument applies during
+                non-drive cycles when the termination mode is set to V :sub:`term`. The instrument
+                applies the termination voltage through a 50 Ω parallel termination resistance.
+            IOL or IOH - Specifies the current that the DUT sources (or sinks) to the active load
+                while outputting a voltage above (or below) VCOM.
+            VCOM - Specifies the voltage level at which the active load circuit switches between
+                sourcing current and sinking current.
 
         Args:
-            level_type_to_set (LevelTypeToSet): VIH or VIL or VOH or VOL or IOL or IOH or VCOM or VTERM
+            level_type_to_set (LevelTypeToSet): VIH or VIL or VOH or VOL or IOL or IOH or VCOM or
+                VTERM
             per_site_value (typing.List[float]): values to set per site
         """
         (
@@ -2475,11 +2804,16 @@ class TSMDigital:
         per_site_per_pin_compare_strobe: typing.List[typing.List[float]],
     ):
         """
-        Configures the strobe edge time for the pins in the context. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the strobe edge time for the pins in the context. Use this method to modify time
+        set values after applying a timing sheet with the apply_levels_and_timing method, or to
+        create time sets programmatically without the use of timing sheets. This method does not
+        modify the timing sheet file or the timing sheet contents that will be used in future calls
+        to apply_levels_and_timing; it only affects the values of the current timing context.
 
         Args:
-            time_set_name (str): The specified time set name.
-            per_site_per_pin_compare_strobe (typing.List[typing.List[float]]): Time when the comparison happens within a vector period.
+            time_set (str): The specified time set name.
+            per_site_per_pin_compare_strobe (typing.List[typing.List[float]]): Time when the
+                comparison happens within a vector period.
         """
         (
             per_site_per_pin_to_per_instrument_lut,
@@ -2502,12 +2836,17 @@ class TSMDigital:
         self, time_set: str, per_site_compare_strobe: typing.List[float]
     ):
         """
-        Configures the strobe edge time for the pins in context. Use this method to modify time set values after applying a timing sheet with the apply_levels_and_timing method, or to create time sets programmatically without the use of timing sheets. This method does not modify the timing sheet file or the timing sheet contents that will be used in future calls to apply_levels_and_timing; it only affects the values of the current timing context.
+        Configures the strobe edge time for the pins in context. Use this method to modify time set
+        values after applying a timing sheet with the apply_levels_and_timing method, or to create
+        time sets programmatically without the use of timing sheets. This method does not modify the
+        timing sheet file or the timing sheet contents that will be used in future calls to
+        apply_levels_and_timing; it only affects the values of the current timing context.
 
         Args:
-            time_set_name (str): The specified time set name.
+            time_set (str): The specified time set name.
 
-            per_site_compare_strobe (typing.List[float]): Time when the comparison happens within a vector period.
+            per_site_compare_strobe (typing.List[float]): Time when the comparison happens within a
+            vector period.
         """
         (
             per_site_to_per_instrument_lut,
@@ -2527,7 +2866,10 @@ class TSMDigital:
         Instructs the PPMU to measure current.
 
         Returns:
-            per_site_per_pin_measurements (list of float): The returned array of measurements in the order you specify in the repeated capabilities. If a site is disabled, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
+            per_site_per_pin_measurements (list of float): The returned array of measurements in the
+            order you specify in the repeated capabilities. If a site is disabled, the method does
+            not return data for that site. You can also use the get_pin_results_pin_information
+            method to obtain a sorted list of returned sites and channels.
         """
         initialized_array = [[0.0 for _ in self.pins] for _ in self.sites]
         per_instrument_to_per_site_per_pin_lut = (
@@ -2543,10 +2885,14 @@ class TSMDigital:
 
     def ppmu_measure_voltage(self):
         """
-        Instructs the PPMU to measure voltage. This method can be called to take a voltage measurement even if the pin method is not set to PPMU.
+        Instructs the PPMU to measure voltage. This method can be called to take a voltage
+        measurement even if the pin method is not set to PPMU.
 
         Returns:
-            per_site_per_pin_measurements (list of float): The returned array of measurements in the order you specify in the repeated capabilities. If a site is disabled, the method does not return data for that site. You can also use the get_pin_results_pin_information method to obtain a sorted list of returned sites and channels.
+            per_site_per_pin_measurements (list of float): The returned array of measurements in the
+            order you specify in the repeated capabilities. If a site is disabled, the method does
+            not return data for that site. You can also use the get_pin_results_pin_information
+            method to obtain a sorted list of returned sites and channels.
         """
         initialized_array = [[0.0 for _ in self.pins] for _ in self.sites]
         per_instrument_to_per_site_per_pin_lut = (
@@ -2566,11 +2912,13 @@ class TSMDigital:
         per_site_per_pin_source_voltages: typing.List[typing.List[float]],
     ):
         """
-        Configures the PPMU to outputfunction as Voltage and starts sourcing voltage from the PPMU. configures the current limit range for sourcing voltage.
+        Configures the PPMU to output function as Voltage and starts sourcing voltage from the PPMU.
+        configures the current limit range for sourcing voltage.
 
         Args:
             current_limit_range (float): common current limit for all session channels
-            per_site_per_pin_source_voltages (typing.List[typing.List[float]]): list of source voltage for each site for each pin
+            per_site_per_pin_source_voltages (typing.List[typing.List[float]]): list of source
+            voltage for each site for each pin
         """
         (
             per_site_per_pin_to_per_instrument_lut,
@@ -2595,11 +2943,13 @@ class TSMDigital:
         per_site_source_voltages: typing.List[float],
     ):
         """
-        Configures the PPMU to outputfunction as Voltage and starts sourcing voltage from the PPMU. configures the current limit range for sourcing voltage.
+        Configures the PPMU to output function as Voltage and starts sourcing voltage from the PPMU.
+        configures the current limit range for sourcing voltage.
 
         Args:
             current_limit_range (float): common current limit for all session channels
-            per_site_source_voltages (typing.List[typing.List[float]]): list of source voltage for each site
+            per_site_source_voltages (typing.List[typing.List[float]]): list of source voltage for
+            each site
         """
         (
             per_site_to_per_instrument_lut,
@@ -2616,17 +2966,24 @@ class TSMDigital:
 
     def fetch_capture_waveform(self, waveform_name: str, samples_to_read: int, timeout: float = 10):
         """
-        Returns dictionary where each key is a site number and value is a collection of digital states representing capture waveform data
+        Returns dictionary where each key is a site number and value is a collection of digital
+        states representing capture waveform data
 
         Args:
-            waveform_name (str): Waveform name you create with the create capture waveform method. Use the waveform_name parameter with capture_start opcode in your pattern.
+            waveform_name (str): Waveform name you create with the create capture waveform method.
+            Use the waveform_name parameter with capture_start opcode in your pattern.
 
             samples_to_read (int): Number of samples to fetch.
 
-            timeout (float, optional): Maximum time (in seconds) allowed for this method to complete. If this method does not complete within this time interval, this method returns an error. Defaults to 10.
+            timeout (float, optional): Maximum time (in seconds) allowed for this method to
+            complete. If this method does not complete within this time interval, this method
+            returns an error. Defaults to 10.
 
         Returns:
-            per site waveform capture ({ int: memoryview of array.array of unsigned int, int: memoryview of array.array of unsigned int, ... }): Dictionary where each key is a site number and value is a collection of digital states representing capture waveform data
+            per site waveform capture ({ int: memory view of array. array of unsigned int,
+            int: memory view of array. array of unsigned int, ... }): Dictionary where each key is
+            a site number and value is a collection of digital states representing capture waveform
+            data
         """
         initialized_array = [[0 for _ in range(samples_to_read)] for _ in range(len(self.sites))]
         per_instrument_to_per_site_lut = self.ssc.calculate_per_instrument_to_per_site_lut(
@@ -2648,13 +3005,20 @@ class TSMDigital:
         minimum_size: int = 128,
     ):
         """
-        Writes one waveform per site. Use this write method if you set the parameter of the create source waveform method to Site Unique.
+        Writes one waveform per site. Use this method if you set the parameter of the create source
+        waveform method to Site Unique.
 
         Args:
-            waveform_name (str): The name to assign to the waveform. Use the waveform_name with source_start opcode in your pattern.
-            per_site_waveforms (typing.List[typing.List[int]]): list of waveform_data for each site ({ int: basic sequence of unsigned int, int: basic sequence of unsigned int, ... }): Dictionary where each key is a site number and value is a collection of samples to use as source data
-            expand_to_minimum_size (bool, optional): if set to true the array of waveform will be of "minimum_size" parameter with zeros padded as required. Defaults to False.
-            minimum_size (int, optional): specifices the minimum length of each waveform per site. Defaults to 128.
+            waveform_name (str): The name to assign to the waveform. Use the waveform_name with
+            source_start opcode in your pattern.
+            per_site_waveforms (typing.List[typing.List[int]]): list of waveform_data for each site
+            ({ int: basic sequence of unsigned int, int: basic sequence of unsigned int, ... }):
+            Dictionary where each key is a site number and value is a collection of samples to use
+            as source data expand_to_minimum_size (bool, optional): if set to true the array of
+            waveform will be of "minimum_size" parameter with zeros padded as required. Defaults to
+            False.
+            minimum_size (int, optional): specifies the minimum length of each waveform per site.
+            Defaults to 128.
 
         """
         # checked _
@@ -2680,9 +3044,10 @@ class TSMDigital:
 
     def read_static(self, auto_select=True):
         """
-        auto_select=True, specifies this function to configure the output function as digital automatically.
-        auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
-        Without configuring as digital and auto_select as false, this function will not work as expected.
+        auto_select=True, specifies this function to configure the output function as digital
+        automatically.auto_select=False, if the pin is explicitly configured as digital already
+        with the tsm_object.ssc.select_function(). Without configuring as digital and auto_select
+        as false, this function will not work as expected.
         """
         if auto_select:
             self.ssc.select_function(enums.SelectedFunction.DIGITAL)
@@ -2702,9 +3067,10 @@ class TSMDigital:
         auto_select=True,
     ):
         """
-        auto_select=True, specifies this function to configure the output function as digital automatically.
-        auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
-        Without configuring as digital and auto_select as false, this function will not work as expected.
+        auto_select=True, specifies this function to configure the output function as digital
+        automatically.auto_select=False, if the pin is explicitly configured as digital already
+        with the tsm_object.ssc.select_function(). Without configuring as digital and auto_select
+        as false, this function will not work as expected.
         """
         if auto_select:
             self.ssc.select_function(enums.SelectedFunction.DIGITAL)
@@ -2728,9 +3094,10 @@ class TSMDigital:
         self, per_site_state: typing.List[enums.WriteStaticPinState], auto_select=True
     ):
         """
-        auto_select=True, specifies this function to configure the output function as digital automatically.
-        auto_select=False, if the pin is explicitly configured as digital already with the tsmobj.ssc.select_function().
-        Without configuring as digital and auto_select as false, this function will not work as expected.
+        auto_select=True, specifies this function to configure the output function as digital
+        automatically. auto_select=False, if the pin is explicitly configured as digital already
+        with the tsm_object.ssc.select_function(). Without configuring as digital and auto_select
+        as false, this function will not work as expected.
         """
         if auto_select:
             self.ssc.select_function(enums.SelectedFunction.DIGITAL)
@@ -2750,14 +3117,17 @@ class TSMDigital:
 
     def publish(self, data_to_publish: typing.List[typing.Any], published_data_id: str = ""):
         """
-        To publish the data to tsm context so that the same is available in teststand for data validation
+        To publish the data to tsm context so that the same is available in teststand for data
+        validation
 
         Args:
-            data_to_publish (typing.List[typing.Any]): it can be list of results or list of lists containing results. Other formats are not supported
-            published_data_id (str, optional): a unique variable with which the data is available to in the tsm context for fetching it from teststand. Defaults to "".
+            data_to_publish (typing.List[typing.Any]): list of results or list of lists containing
+            results. Other formats are not supported
+            published_data_id (str, optional): a unique variable with which the data is available
+            to in the tsm context for fetching it from teststand. Defaults to "".
 
         Raises:
-            TypeError: _description_
+            TypeError: when there is mismatch in datatype, it raises this exception.
         """
         if len(numpy.shape(data_to_publish)) == 1:
             (
@@ -2815,7 +3185,8 @@ def _apply_lut_per_instrument_to_per_site_per_pin(
     private function to convert the data to the required table lists
 
     Args:
-        initialized_array (typing.List[typing.List[typing.Any]]): List containing the result information
+        initialized_array (typing.List[typing.List[typing.Any]]): List containing the result
+            information
         lut (typing.List[Location2DArray]): Lookup table containing the location information
         results_to_apply_lut_to (typing.List[typing.List[typing.Any]]): result array
 
@@ -2861,8 +3232,10 @@ def _apply_lut_per_site_per_pin_to_per_instrument(
     private function to convert the data to the required table lists
 
     Args:
-        initialized_array (typing.List[typing.List[typing.Any]]): List containing the result information
-        lut (typing.List[typing.List[Location2D]]): Lookup table containing the location information
+        initialized_array (typing.List[typing.List[typing.Any]]): List containing the result
+            information
+        lut (typing.List[typing.List[Location2D]]): Lookup table containing the location
+            information
         results_to_apply_lut_to (typing.List[typing.List[typing.Any]]): result array
 
     Returns:
@@ -2884,7 +3257,8 @@ def _apply_lut_per_site_to_per_instrument(
     private function to convert the data to the required table lists
 
     Args:
-        initialized_array (typing.List[typing.List[typing.Any]]): List containing the result information
+        initialized_array (typing.List[typing.List[typing.Any]]): List containing the result
+        information
         lut (typing.List[Location2D]): Lookup table containing the location information
         results_to_apply_lut_to (typing.List[typing.Any]): result array
 
@@ -2899,14 +3273,16 @@ def _apply_lut_per_site_to_per_instrument(
 
 def _arrange_channels_per_site(channel_list_string: str, site_list_string: str):
     """
-    private function for converting channel list string and site list string to list of channels, sites and site numbers
+    private function for converting channel list string and site list string to list of channels,
+    sites and site numbers
 
     Args:
         channel_list_string (str): comma separated string of channel list
         site_list_string (str): comma separated string of site list
 
     Returns:
-        channel_list_array, site_list_array, site_numbers: tuple of list of channels, sites string and site numbers
+        channel_list_array, site_list_array, site_numbers: tuple of list of channels, sites string
+        and site numbers
     """
     site_numbers, site_list_array = _site_list_to_site_numbers(site_list_string)
     channels, _, sites = _channel_list_to_pins(channel_list_string)
@@ -2925,7 +3301,7 @@ def _site_list_to_site_numbers(site_list: str):
     private function to convert site list string to site numbers and site numbers strings
 
     Args:
-        site_list (str): comma seperated values of sites
+        site_list (str): comma separated values of sites
 
     Returns:
         site_numbers, sites: numbers list of sites adn string list of sites
@@ -2937,10 +3313,10 @@ def _site_list_to_site_numbers(site_list: str):
 
 def _channel_list_to_pins(channel_list: str):
     """
-    private function for converting the channel list to channels, pins and sites .
+    private function for converting the channel list into channels, pins and sites .
 
     Args:
-        channel_list (str): comma seperated list of channels
+        channel_list (str): comma separated list of channels
 
     Returns:
         channels, pins and sites: string list of channels, Pins and sites
@@ -3005,14 +3381,14 @@ def pins_to_sessions(
     turn_pin_groups_to_pins: bool = True,
 ):
     """
-    Get the sessions for the given Pins and return the pinquery object for operating on the Pins.
+    Get the sessions for the given Pins and return the pin query object for operating on the Pins.
 
     Args:
-        tsm (SMContext): tsm context for nidigital
-        pins typing.Union(str | [str]): desired pins for which the TSMDigital object is created.
-            single pin name can be given in string data type.List of strings for multiple pins.
-        sites (typing.List[int], optional): list of desired sites.. Defaults to [].
-        turn_pin_groups_to_pins (bool, optional): converts all the Pin groups to pins.
+        tsm (SMContext): tsm context for nidigital.
+        pins typing.Union[str, typing.List[str]]: desired pins for which the TSMDigital object is
+            created. single pin name in string data type. List of strings for multiple pins.
+        sites (typing.List[int], optional): list of desired sites. Defaults to [].
+        turn_pin_groups_to_pins (bool, optional): converts all the Pin groups into pins.
             Defaults to True.
 
     Returns:
@@ -3040,6 +3416,5 @@ def close_sessions(tsm: SMContext):
     for session in sessions:
         session.reset()
         session.close()
-
 
 # End of TSMContext #

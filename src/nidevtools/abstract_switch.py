@@ -194,6 +194,7 @@ class AbstractSession(typing.NamedTuple):
     """
     Abstract Session class to store pin specific sessions. enable_pins are prefixed with "en_".
     """
+
     enable_pins: typing.List[Session]
 
     def set_sessions(self, tsm: SMContext, switch_name: str = ""):  # CHECK

@@ -145,6 +145,7 @@ class ChannelProperties(typing.NamedTuple):
     """
     for storing several the channel properties in a single object
     """
+
     instrument_name: str
     model: str
     channel: str

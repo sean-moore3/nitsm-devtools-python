@@ -64,6 +64,7 @@ class PinInformation(typing.NamedTuple):
     """
     pin information stores pin name (str), pin_type(object), count (int)
     """
+
     # pin: _Pin
     pin: str
     type: PinType
@@ -74,6 +75,7 @@ class ExpandedPinInformation(typing.NamedTuple):
     """
     pin information stores pin name, pin type object, index (int)
     """
+
     # pin: _Pin
     pin: str
     type: PinType
