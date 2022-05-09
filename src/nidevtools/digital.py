@@ -584,10 +584,10 @@ class _NIDigitalSSC:
                 -   WriteStaticPinState.ONE: Specifies to drive high.
                 -   WriteStaticPinState.X: Specifies to not drive.
 
-            auto_select (bool):True, specifies this function to configure the output function as digital
-            automatically. auto_select=False, if the pin is explicitly configured as digital already
-            with the tsm_object.ssc.select_function(). Without configuring as digital and
-            auto_select as false, this function will not work as expected.
+            auto_select (bool):True, specifies this function to configure the output function as
+                digital automatically. auto_select=False, if the pin is explicitly configured as
+                digital already with the tsm_object.ssc.select_function(). Without configuring as
+                digital and auto_select as false, this function will not work as expected.
         """
         if auto_select:
             self.cs_select_function(enums.SelectedFunction.DIGITAL)
@@ -1919,9 +1919,10 @@ class _NIDigitalTSM:
                 returns an error. Defaults to 10.
 
         Returns:
-            per instrument waveform capture ({ int: memory view of array. array of unsigned int, int:
-            memory view of array. array of unsigned int, ... }): Dictionary where each key is a site
-            number and value is a collection of digital states representing capture waveform data
+            per instrument waveform capture ({ int: memory view of array. array of unsigned int,
+            int:memory view of array. array of unsigned int, ... }): Dictionary where each key is a
+            site number and value is a collection of digital states representing capture waveform
+            data
         """
         per_instrument_capture: typing.List[typing.List[typing.List[int]]] = []
         for ssc in self._sscs:
@@ -2034,16 +2035,15 @@ class _NIDigitalTSM:
 
         Args:
             state (enums.WriteStaticPinState): Parameter that specifies one of the following digital
-            states to assign to each pin per site.
-
+                states to assign to each pin per site.
                 -   WriteStaticPinState.ZERO: Specifies to drive low.
                 -   WriteStaticPinState.ONE: Specifies to drive high.
                 -   WriteStaticPinState.X: Specifies to not drive.
 
-            auto_select=True, specifies this function to configure the output function as digital
-            automatically.auto_select=False, if the pin is explicitly configured as digital already
-            with the tsm_object.ssc.select_function().Without configuring as digital and auto_select
-            as false, this function will not work as expected.
+            auto_select (True): specifies this function to configure the output function as digital
+                automatically.auto_select=False, if the pin is explicitly configured as digital
+                already with the tsm_object.ssc.select_function().Without configuring as digital
+                and auto_select as false, this function will not work as expected.
         """
         for ssc in self._sscs:
             ssc.cs_write_static(state, auto_select)
@@ -2064,15 +2064,14 @@ class _NIDigitalTSM:
 
         Args:
             per_site_per_pin_state (typing.List[typing.List[enums.WriteStaticPinState]]): Parameter
-            that specifies one of the following digital states to assign to each pin per site.
-
+                that specifies one of the following digital states to assign to each pin per site.
                 -   WriteStaticPinState.ZERO: Specifies to drive low.
                 -   WriteStaticPinState.ONE: Specifies to drive high.
                 -   WriteStaticPinState.X: Specifies to not drive.
-            auto_select=True, specifies this function to configure the output function as digital
-            automatically.auto_select=False, if the pin is explicitly configured as digital already
-            with the tsm_object.ssc.select_function().Without configuring as digital and auto_select
-            as false, this function will not work as expected.
+            auto_select (True): specifies this function to configure the output function as digital
+                automatically.auto_select=False, if the pin is explicitly configured as digital
+                already with the tsm_object.ssc.select_function().Without configuring as digital
+                and auto_select as false, this function will not work as expected.
         """
         for ssc, states in zip(self._sscs, per_site_per_pin_state):
             channels, _, _ = _channel_list_to_pins(ssc._channels)
@@ -2094,15 +2093,14 @@ class _NIDigitalTSM:
 
         Args:
             per_site_state (typing.List[typing.List[enums.WriteStaticPinState]]): Parameter that
-            specifies one of the following digital states to assign to each pin per site.
-
+                specifies one of the following digital states to assign to each pin per site.
                 -   WriteStaticPinState.ZERO: Specifies to drive low.
                 -   WriteStaticPinState.ONE: Specifies to drive high.
                 -   WriteStaticPinState.X: Specifies to not drive.
-            auto_select=True, specifies this function to configure the output function as digital
-            automatically.auto_select=False, if the pin is explicitly configured as digital already
-            with the tsm_object.ssc.select_function().Without configuring as digital and auto_select as
-            false, this function will not work as expected.
+            auto_select(True): specifies this function to configure the output function as digital
+                automatically.auto_select=False, if the pin is explicitly configured as digital
+                already with the tsm_object.ssc.select_function().Without configuring as digital
+                and auto_select as false, this function will not work as expected.
         """
         for ssc, states in zip(self._sscs, per_site_state):
             channel_list_array, _, _ = _arrange_channels_per_site(ssc._channels, ssc._pins)
@@ -3012,16 +3010,15 @@ class TSMDigital:
 
         Args:
             waveform_name (str): The name to assign to the waveform. Use the waveform_name with
-            source_start opcode in your pattern.
+                source_start opcode in your pattern.
             per_site_waveforms (typing.List[typing.List[int]]): list of waveform_data for each site
-            ({ int: basic sequence of unsigned int, int: basic sequence of unsigned int, ... }):
-            Dictionary where each key is a site number and value is a collection of samples to use
-            as source data expand_to_minimum_size (bool, optional): if set to true the array of
-            waveform will be of "minimum_size" parameter with zeros padded as required. Defaults to
-            False.
+                ({ int: basic sequence of unsigned int, int: basic sequence of unsigned int, ... }):
+                Dictionary where each key is a site number and value is a collection of samples to
+                use as source data
+            expand_to_minimum_size (bool, optional): if set to true the array of waveform will be
+                of "minimum_size" parameter with zeros padded as required. Defaults to False.
             minimum_size (int, optional): specifies the minimum length of each waveform per site.
-            Defaults to 128.
-
+                Defaults to 128.
         """
         # checked _
         _, cols = numpy.shape(per_site_waveforms)
@@ -3387,7 +3384,7 @@ def pins_to_sessions(
 
     Args:
         tsm (SMContext): tsm context for nidigital.
-        pins typing.Union[str, typing.List[str]]: desired pins for which the TSMDigital object is
+        pins (str, typing.List[str]): desired pins for which the TSMDigital object is
             created. single pin name in string data type. List of strings for multiple pins.
         sites (typing.List[int], optional): list of desired sites. Defaults to [].
         turn_pin_groups_to_pins (bool, optional): converts all the Pin groups into pins.
