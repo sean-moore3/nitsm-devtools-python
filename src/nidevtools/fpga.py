@@ -191,7 +191,7 @@ class _SSCFPGA(typing.NamedTuple):
         This function allows to write a static array of States for the specific single session
 
         Args:
-            static_states: Array of objects class StaticStates to be written on the single session
+            states: Array of objects class StaticStates to be written on the single session
         """
         if isinstance(states, StaticStates):
             states = [states]
@@ -249,7 +249,7 @@ class _SSCFPGA(typing.NamedTuple):
 
     def ss_read_c_states(self):  # TODO CHECK
         """
-        This function reads from FPGA the States of each pin and returns two arreys states and
+        This function reads from FPGA the States of each pin and returns two arrays states and
         commanded_states
         Returns:
             states: Array of current states read from FPGA
@@ -282,7 +282,7 @@ class _SSCFPGA(typing.NamedTuple):
 
     def w_master_lc(self, control_label: str, cluster: I2CMasterLineConfiguration):
         """
-        Write on the regiter name "control_label" the cluster with the line configuration
+        Write on the register name "control_label" the cluster with the line configuration
         Args:
             control_label: Defines the register to be written
             cluster: Includes the data to be written on the register
@@ -438,7 +438,7 @@ class _SSCFPGA(typing.NamedTuple):
         master_go.write(True)
         self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         data = master_data.read()
-        data = data[0 : number_of_bytes + 1]
+        data = data[0:number_of_bytes + 1]
         return data
 
     def i2c_master_write(
@@ -548,7 +548,7 @@ class _SSCFPGA(typing.NamedTuple):
         Args:
             lines_to_read: list of Line location objects.
         Returns:
-            Readings: Array of data readed
+            Readings: Array of data read
         """
         if isinstance(lines_to_read, LineLocation):
             lines_to_read = [lines_to_read]
@@ -786,7 +786,7 @@ def debug_ui_launcher(semiconductor_module_manager: nitsm.codemoduleapi.Semicond
 
 def search_line(line: LineLocation, ch_list: typing.List[LineLocation]):
     """
-    Search the a line that corresponds to the inputs provided and returns -1 in case it is not found
+    Search the line that corresponds to the inputs provided and returns -1 in case it is not found
     Args:
         line: Line location object to be searched in the list of channels
         ch_list: list of channels to perform the search
@@ -829,7 +829,7 @@ def update_line_on_connector(
 
 def line_state_to_out(line: StaticStates, out_data: bool):
     """
-    Calculate the data and enable values given a initial state
+    Calculate the data and enable values given an initial state
     Args:
         line: StaticState that represent the line
         out_data: If line value is 2 it will be returned as the next value of data

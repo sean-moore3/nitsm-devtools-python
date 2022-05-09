@@ -43,7 +43,7 @@ def fgen_tsm_s(tsm, tests_pins):
 class TestFGen:
     """
     The Following APIs/VIs are used in the DUT Power on sequence.
-    So these functions needs to be test first.
+    So these functions needs to be tested first.
     """
 
     def test_initialize_session(self, tsm):

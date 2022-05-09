@@ -6,7 +6,6 @@ import re
 import typing
 from cmath import nan
 from datetime import datetime
-
 import nidcpower
 import nidcpower.enums as enums
 import nidcpower.errors
