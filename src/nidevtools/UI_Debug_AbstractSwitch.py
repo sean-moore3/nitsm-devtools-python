@@ -3,6 +3,7 @@ import time
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
 import threading
+from . import abstract_switch
 
 
 class TimeoutThread(threading.Thread):
@@ -13,7 +14,7 @@ class TimeoutThread(threading.Thread):
     def run(self):
         while self._is_running:
             time.sleep(0.5)
-            print("This is the Timeout Thread running every 500ms")
+            print("TimeOut Event Occurred")
 
     def stop(self):
         self._is_running = False
@@ -22,7 +23,6 @@ class TimeoutThread(threading.Thread):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
         self.timeoutThread = TimeoutThread()
         self.timeoutThread.start()
 

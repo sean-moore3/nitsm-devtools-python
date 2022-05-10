@@ -1,7 +1,7 @@
 from PyQt5 import QtWidgets
 
-import UI_Debug_AbstractSwitch
-import UI_Debug_FPGA
+from nidevtools import UI_Debug_AbstractSwitch
+from nidevtools import UI_Debug_FPGA
 
 if __name__ == "__main__":
     import sys
