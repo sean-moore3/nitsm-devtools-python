@@ -393,7 +393,7 @@ class _NIDCPowerSSC:
 
         Args:
             aperture_time (float, optional): in seconds by default. Defaults to 16.667e-03.
-            aperture_time_units (enum, optional): seconds. Defaults to 
+            aperture_time_units (enum, optional): seconds. Defaults to
                 enums.ApertureTimeUnits.SECONDS.
 
         Returns:
@@ -455,16 +455,14 @@ class _NIDCPowerSSC:
         elif match == "4130":
             self._ch_session.source_delay = source_delay
             self._ch_session.samples_to_average = 3000 * temp
-            # Todo - validate and enable below code
-            # if self._channels_session.channels == "1":
-            # self._channels_session.sense = sense
+            if self._ch_session.channels == "1":
+                self._ch_session.sense = sense
         elif match == "4154":
             self._ch_session.source_delay = source_delay
             self._ch_session.samples_to_average = 300000 * temp
             self._ch_session.sense = sense
-            # Todo - validate and enable below code
-            # if self._channels_session.channels == "0":
-            # self._channels_session.transient_response =transient_response
+            if self._ch_session.channels == "0":
+                self._ch_session.transient_response =transient_response
         elif match == "4132":
             self._ch_session.aperture_time_units = aperture_time_unit
             self._ch_session.aperture_time = aperture_time
@@ -1099,7 +1097,8 @@ class _NIDCPowerSSC:
 
     def cs_configure_export_signal(self, signal: enums.SendSoftwareEdgeTriggerType, terminal):
         """
-        configures the signal to be exported on the specified output terminal
+        configures the signal to be exported on the specified output terminal. when the output
+        terminal is assigned and read back we will get fully qualified name.
 
         Args:
             signal (Signal): signal to be exported
@@ -1108,7 +1107,7 @@ class _NIDCPowerSSC:
         Returns:
             terminal_name (str) : fully qualified output terminal name
         """
-        # when the output terminal is assigned and read back we will get fully qualified name
+    
         if signal == enums.SendSoftwareEdgeTriggerType.START:
             self._ch_session.exported_start_trigger_output_terminal = terminal
             terminal_name = self._ch_session.exported_start_trigger_output_terminal
@@ -1125,8 +1124,7 @@ class _NIDCPowerSSC:
             self._ch_session.exported_pulse_trigger_output_terminal = terminal
             terminal_name = self._ch_session.exported_pulse_trigger_output_terminal
         else:
-            terminal_name = ""
-            pass  # Todo Need to define for other signals.
+            terminal_name = terminal
         return terminal_name
 
     def cs_send_software_edge_trigger(
@@ -2084,7 +2082,7 @@ class _NIDCPowerTSM:
 
     def configure_export_signal(self, signal: enums.SendSoftwareEdgeTriggerType, output_terminal):
         """
-        configures the signal to be exported on the specified output terminal
+        configures the signal to be exported on the specified output terminal.
 
         Args:
             signal (enums.SendSoftwareEdgeTriggerType): signal to be exported
@@ -2093,8 +2091,8 @@ class _NIDCPowerTSM:
         Returns:
             terminal_name (str) : fully qualified output terminal name
         """
-        # TODO option to select pin name to export the signal instead of first in the sessions.
-        terminal_name = ""
+        
+        terminal_name = output_terminal
         for ssc in self._sscs:
             terminal_name = ssc.cs_configure_export_signal(signal, output_terminal)
             break
