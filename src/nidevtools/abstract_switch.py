@@ -15,10 +15,10 @@ import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import nitsm.enums
 import nitsm.pinquerycontexts
-import nidevtools.daqmx
-import nidevtools.digital
-import nidevtools.fpga
-import nidevtools.switch
+from . import daqmx
+from . import digital
+from . import fpga
+from . import switch
 
 instrument_type_id = "Matrix"
 PinsArg = typing.Union[str, typing.Sequence[str]]
@@ -79,14 +79,14 @@ class Session:
             tsm (SMContext): TestStand semiconductor module context
         """
         if self.instrument_type == InstrumentTypes.daqmx:
-            multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(tsm, self.enable_pin)
+            multiple_session = daqmx.pins_to_session_sessions_info(tsm, self.enable_pin)
             for channel in multiple_session.sessions[0].Task.do_channels:
                 channel.do_tristate = False
             multiple_session.sessions[0].Task.stop()
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
             multiple_session.sessions[0].Task.write(bool(self.route_value), True)
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session = nidevtools.digital.pins_to_sessions(tsm, self.enable_pin)
+            multiple_session = digital.pins_to_sessions(tsm, self.enable_pin)
             multiple_session.ssc.select_function(nidigital.enums.SelectedFunction.DIGITAL)
             if self.route_value == "0":
                 data = nidigital.enums.WriteStaticPinState.ZERO
@@ -96,18 +96,18 @@ class Session:
                 data = nidigital.enums.WriteStaticPinState.X
             multiple_session.ssc.write_static(data)
         elif self.instrument_type == InstrumentTypes.fpga:
-            multiple_session = nidevtools.fpga.pins_to_sessions(tsm, [self.enable_pin], [])
+            multiple_session = fpga.pins_to_sessions(tsm, [self.enable_pin], [])
             if self.route_value == "0":
-                data = nidevtools.fpga.StaticStates.Zero
+                data = fpga.StaticStates.Zero
             elif self.route_value == "1":
-                data = nidevtools.fpga.StaticStates.One
+                data = fpga.StaticStates.One
             else:
-                data = nidevtools.fpga.StaticStates.X
+                data = fpga.StaticStates.X
             multiple_session.write_static(data)
         elif self.instrument_type == InstrumentTypes.switch:
-            handler = nidevtools.switch.pin_to_sessions_session_info(tsm, self.enable_pin)
-            handler = nidevtools.switch.MultipleSessions([handler])
-            handler.action_session_info(self.route_value, nidevtools.switch.Action.Connect)
+            handler = switch.pin_to_sessions_session_info(tsm, self.enable_pin)
+            handler = switch.MultipleSessions([handler])
+            handler.action_session_info(self.route_value, switch.Action.Connect)
         else:
             pass
         if "BUCKLX_DAMP" in self.enable_pin:
@@ -121,29 +121,29 @@ class Session:
             tsm (SMContext): TestStand semiconductor module context
         """
         if self.instrument_type == InstrumentTypes.daqmx:
-            multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(
+            multiple_session = daqmx.pins_to_session_sessions_info(
                 tsm, [self.enable_pin]
             )
             for channel in multiple_session.sessions[0].Task.do_channels:
                 channel.do_tristate = True
-            multiple_session: nidevtools.daqmx.MultipleSessions
+            multiple_session: daqmx.MultipleSessions
             multiple_session.sessions[0].Task.stop()
             multiple_session.sessions[0].Task.control(nidaqmx.constants.TaskMode.TASK_COMMIT)
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session_info = nidevtools.digital.pins_to_sessions(tsm, self.enable_pin)
+            multiple_session_info = digital.pins_to_sessions(tsm, self.enable_pin)
             data = nidigital.enums.WriteStaticPinState.X
             multiple_session_info.ssc.write_static(data)
         elif self.instrument_type == InstrumentTypes.fpga:
-            multiple_session_info = nidevtools.fpga.pins_to_sessions(tsm, [self.enable_pin], [])
-            data = [nidevtools.fpga.StaticStates.X]  # *128 todo check
+            multiple_session_info = fpga.pins_to_sessions(tsm, [self.enable_pin], [])
+            data = [fpga.StaticStates.X]  # *128 todo check
             multiple_session_info.write_static(data)
         elif self.instrument_type == InstrumentTypes.switch:
-            data = nidevtools.switch.pin_to_sessions_session_info(tsm, self.enable_pin)
-            data = nidevtools.switch.MultipleSessions([data])
+            data = switch.pin_to_sessions_session_info(tsm, self.enable_pin)
+            data = switch.MultipleSessions([data])
             if self.route_value == "":
-                data.action_session_info(self.route_value, nidevtools.switch.Action.Disconnect_All)
+                data.action_session_info(self.route_value, switch.Action.Disconnect_All)
             else:
-                data.action_session_info(self.route_value, nidevtools.switch.Action.Disconnect)
+                data.action_session_info(self.route_value, switch.Action.Disconnect)
         else:
             pass
 
@@ -158,29 +158,29 @@ class Session:
             self: returns the object itself with updated status
         """
         if self.instrument_type == InstrumentTypes.daqmx:
-            multiple_session = nidevtools.daqmx.pins_to_session_sessions_info(tsm, self.enable_pin)
-            multiple_session: nidevtools.daqmx.MultipleSessions
+            multiple_session = daqmx.pins_to_session_sessions_info(tsm, self.enable_pin)
+            multiple_session: daqmx.MultipleSessions
             data = ""
             for bit in multiple_session.sessions[0].Task.read(1):
                 data += str(bit)
             self.status = data
         elif self.instrument_type == InstrumentTypes.digitalpattern:
-            multiple_session_info = nidevtools.digital.pins_to_sessions(tsm, self.enable_pin)
+            multiple_session_info = digital.pins_to_sessions(tsm, self.enable_pin)
             multiple_session_info.ssc.select_function(nidigital.enums.SelectedFunction.DIGITAL)
             data = multiple_session_info.ssc.read_static()
             status = ["0", "1", "", "L", "H", "X", "M", "V", "D", "E"]
             self.status = status[data[0][0]]
         elif self.instrument_type == InstrumentTypes.fpga:
-            multiple_session_info = nidevtools.fpga.pins_to_sessions(tsm, [self.enable_pin], [])
+            multiple_session_info = fpga.pins_to_sessions(tsm, [self.enable_pin], [])
             data = multiple_session_info.read_static()
             text = "Disconnected"
             if data[0]:
                 text = "Connected"
             self.status = text
         elif self.instrument_type == InstrumentTypes.switch:
-            data = nidevtools.switch.pin_to_sessions_session_info(tsm, self.enable_pin)
-            data = nidevtools.switch.MultipleSessions([data])
-            capability = data.action_session_info(self.route_value, nidevtools.switch.Action.Read)
+            data = switch.pin_to_sessions_session_info(tsm, self.enable_pin)
+            data = switch.MultipleSessions([data])
+            capability = data.action_session_info(self.route_value, switch.Action.Read)
             if capability[0] == niswitch.PathCapability.PATH_EXISTS:
                 self.status = "Connected To: %s" % self.route_value
             else:
@@ -213,9 +213,9 @@ class AbstractSession(typing.NamedTuple):
                 session.instrument_type == InstrumentTypes.switch
                 or session.instrument_type == "_niSwitch"
             ):
-                data = nidevtools.switch.pin_to_sessions_session_info(tsm, session.enable_pin)
-                session_handler = nidevtools.switch.MultipleSessions([data])
-                session_handler.action_session_info(action=nidevtools.switch.Action.Disconnect_All)
+                data = switch.pin_to_sessions_session_info(tsm, session.enable_pin)
+                session_handler = switch.MultipleSessions([data])
+                session_handler.action_session_info(action=switch.Action.Disconnect_All)
         for session in self.enable_pins:
             session.ss_connect(tsm)
 
@@ -585,7 +585,7 @@ def pins_to_task_and_connect(tsm: SMContext, task_name: PinsArg, pins: PinsArg):
         measurements and extract data from a set of measurements.
     """
     pin_list = tsm.filter_pins_by_instrument_type(pins, "abstinst", nitsm.enums.Capability.ALL)
-    multiple_session_info = nidevtools.daqmx.pins_to_session_sessions_info(tsm, task_name)
+    multiple_session_info = daqmx.pins_to_session_sessions_info(tsm, task_name)
     sessions = []
     for pin in pin_list:
         sessions += pins_to_sessions_sessions_info(tsm, pin).enable_pins

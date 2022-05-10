@@ -11,7 +11,7 @@ import nidcpower.enums as enums
 import nidcpower.errors
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
-from . import common as ni_dt_common
+from . import common
 
 
 class _ModelSupport:
@@ -393,7 +393,7 @@ class _NIDCPowerSSC:
 
         Args:
             aperture_time (float, optional): in seconds by default. Defaults to 16.667e-03.
-            aperture_time_units (enum, optional): seconds. Defaults to 
+            aperture_time_units (enum, optional): seconds. Defaults to
                 enums.ApertureTimeUnits.SECONDS.
 
         Returns:
@@ -455,16 +455,14 @@ class _NIDCPowerSSC:
         elif match == "4130":
             self._ch_session.source_delay = source_delay
             self._ch_session.samples_to_average = 3000 * temp
-            # Todo - validate and enable below code
-            # if self._channels_session.channels == "1":
-            # self._channels_session.sense = sense
+            if self._ch_session.channels == "1":
+                self._ch_session.sense = sense
         elif match == "4154":
             self._ch_session.source_delay = source_delay
             self._ch_session.samples_to_average = 300000 * temp
             self._ch_session.sense = sense
-            # Todo - validate and enable below code
-            # if self._channels_session.channels == "0":
-            # self._channels_session.transient_response =transient_response
+            if self._ch_session.channels == "0":
+                self._ch_session.transient_response = transient_response
         elif match == "4132":
             self._ch_session.aperture_time_units = aperture_time_unit
             self._ch_session.aperture_time = aperture_time
@@ -1099,7 +1097,8 @@ class _NIDCPowerSSC:
 
     def cs_configure_export_signal(self, signal: enums.SendSoftwareEdgeTriggerType, terminal):
         """
-        configures the signal to be exported on the specified output terminal
+        configures the signal to be exported on the specified output terminal. when the output
+        terminal is assigned and read back we will get fully qualified name.
 
         Args:
             signal (Signal): signal to be exported
@@ -1108,7 +1107,7 @@ class _NIDCPowerSSC:
         Returns:
             terminal_name (str) : fully qualified output terminal name
         """
-        # when the output terminal is assigned and read back we will get fully qualified name
+    
         if signal == enums.SendSoftwareEdgeTriggerType.START:
             self._ch_session.exported_start_trigger_output_terminal = terminal
             terminal_name = self._ch_session.exported_start_trigger_output_terminal
@@ -1125,8 +1124,7 @@ class _NIDCPowerSSC:
             self._ch_session.exported_pulse_trigger_output_terminal = terminal
             terminal_name = self._ch_session.exported_pulse_trigger_output_terminal
         else:
-            terminal_name = ""
-            pass  # Todo Need to define for other signals.
+            terminal_name = terminal
         return terminal_name
 
     def cs_send_software_edge_trigger(
@@ -2084,7 +2082,7 @@ class _NIDCPowerTSM:
 
     def configure_export_signal(self, signal: enums.SendSoftwareEdgeTriggerType, output_terminal):
         """
-        configures the signal to be exported on the specified output terminal
+        configures the signal to be exported on the specified output terminal.
 
         Args:
             signal (enums.SendSoftwareEdgeTriggerType): signal to be exported
@@ -2093,8 +2091,8 @@ class _NIDCPowerTSM:
         Returns:
             terminal_name (str) : fully qualified output terminal name
         """
-        # TODO option to select pin name to export the signal instead of first in the sessions.
-        terminal_name = ""
+        
+        terminal_name = output_terminal
         for ssc in self._sscs:
             terminal_name = ssc.cs_configure_export_signal(signal, output_terminal)
             break
@@ -2573,7 +2571,7 @@ class _NIDCPowerTSM:
         filtered_ssc = []
         for ssc in self._sscs:
             found = False
-            sites = ni_dt_common.channel_list_to_pins(ssc.cs_channels)[2]
+            sites = common.channel_list_to_pins(ssc.cs_channels)[2]
             for s in sites:
                 found = (s in requested_sites) or found
             if found:
@@ -2592,7 +2590,7 @@ class _NIDCPowerTSM:
         temp1 = []
         temp2 = []
         for ssc in self._sscs:
-            sites_pins, pins, sites = ni_dt_common.channel_list_to_pins(ssc.cs_channels)
+            sites_pins, pins, sites = common.channel_list_to_pins(ssc.cs_channels)
             try:
                 search_pos = int(requested_pins.index(pins[0]))
             except ValueError:
@@ -2620,8 +2618,8 @@ class TSMDCPower(typing.NamedTuple):
     pin_query_context: typing.Any
     ssc: _NIDCPowerTSM
     sites: typing.List[int]
-    pins_info: typing.List[ni_dt_common.PinInformation]
-    pins_expanded: typing.List[ni_dt_common.ExpandedPinInformation]
+    pins_info: typing.List[common.PinInformation]
+    pins_expanded: typing.List[common.ExpandedPinInformation]
 
 
 def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
@@ -2635,22 +2633,22 @@ def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
         TSMDCPower: tsm context with only desired pins
     """
     dc_power_tsm.ssc.filter_pins(desired_pins)
-    all_pins = ni_dt_common.get_pin_names_from_expanded_pin_information(dc_power_tsm.pins_expanded)
+    all_pins = common.get_pin_names_from_expanded_pin_information(dc_power_tsm.pins_expanded)
     i = 0
     pins_expand_new = []
     for d_pin in desired_pins:
         index_d = all_pins.index(d_pin)
         data = dc_power_tsm.pins_expanded[index_d]
-        output = ni_dt_common.PinInformation(data.pin, data.type, 1)
+        output = common.PinInformation(data.pin, data.type, 1)
         data.index = i
         dc_power_tsm.pins_info.append(output)
         if index_d >= 0:
             pins_expand_new.append(data)
         i += 1
-    dut_pins, system_pins = ni_dt_common.get_dut_pins_and_system_pins_from_expanded_pin_list(
+    dut_pins, system_pins = common.get_dut_pins_and_system_pins_from_expanded_pin_list(
         pins_expand_new
     )
-    pins_to_query_ctx = ni_dt_common.get_pin_names_from_expanded_pin_information(
+    pins_to_query_ctx = common.get_pin_names_from_expanded_pin_information(
         dut_pins + system_pins
     )
     dc_power_tsm.pin_query_context.Pins = pins_to_query_ctx
@@ -2697,15 +2695,15 @@ def pins_to_sessions(
     pins_info = []
     pin_query_context, sessions, channels = tsm.pins_to_nidcpower_sessions(pins)
     if fill_pin_site_info:
-        pins_info, pins_expanded = ni_dt_common.expand_pin_groups_and_identify_pin_types(
+        pins_info, pins_expanded = common.expand_pin_groups_and_identify_pin_types(
             tsm, pins
         )  # This is tested and working fine.
     else:
         for pin in pins:
-            a = ni_dt_common.PinInformation  # create instance of class
+            a = common.PinInformation  # create instance of class
             a.pin = pin
             pins_info.append(a)
-    _, pin_lists = ni_dt_common.pin_query_context_to_channel_list(
+    _, pin_lists = common.pin_query_context_to_channel_list(
         pin_query_context, pins_expanded, sites
     )
     sscs = [
