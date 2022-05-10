@@ -101,7 +101,7 @@ class UiFPGADebugWindow(object):
         item.setText("Line State")
 
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
-        self.tableWidget.horizontalHeader().setDefaultSectionSize(180)
+        self.tableWidget.horizontalHeader().setDefaultSectionSize(280)
         self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.verticalHeader().setCascadingSectionResizes(True)
         self.tableWidget.verticalHeader().setDefaultSectionSize(23)
