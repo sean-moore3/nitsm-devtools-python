@@ -2,7 +2,6 @@ import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
-from . import abstract_switch
 import threading
 
 
@@ -188,4 +187,19 @@ class UiAbstractSwitchDebugWindow(object):
         print(matched_strings)
 
     def cb_view_value_changed(self, value_of_cb, arr_of_str=None, ref=None):
-        print("cb_view_value_changed " + value_of_cb)
+        if value_of_cb == "All Pins":
+            pass
+            # todo  call the tsm.filter_pins_by_instrument_type("abstinst") with right arguments
+        if value_of_cb == "Abstract Pins":
+            pass
+            # todo  call the tsm.filter_pins_by_instrument_type("abstinst") with right arguments
+        if value_of_cb == "Scope Pins":
+            pass
+            # todo  call the tsm.filter_pins_by_instrument_type("niScope") with right arguments
+        if value_of_cb == "SMU Pins":
+            pass
+            # todo  call the tsm.filter_pins_by_instrument_type("niDCPower") with right arguments
+        if value_of_cb == "DMM Pins":
+            print("cb_view_value_changed " + value_of_cb)
+            # todo  call the tsm.filter_pins_by_instrument_type("niDMM") with right arguments
+
