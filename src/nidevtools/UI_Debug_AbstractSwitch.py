@@ -2,7 +2,7 @@ import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
-from .. import abstract_switch
+from . import abstract_switch
 import threading
 
 
