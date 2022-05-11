@@ -22,6 +22,7 @@ class LevelTypeToSet(Enum):
     Args:
         typing.enum : voltage level defines the voltage for High or Low and for Input or Output
     """
+
     VIL = 0
     VIH = 1
     VOL = 2
@@ -3415,5 +3416,6 @@ def close_sessions(tsm: SMContext):
     for session in sessions:
         session.reset()
         session.close()
+
 
 # End of TSMContext #

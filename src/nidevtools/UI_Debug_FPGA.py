@@ -79,7 +79,9 @@ class UiFPGADebugWindow(object):
         self.push_button_update_command_state.setGeometry(QtCore.QRect(20, 40, 240, 40))
         self.push_button_update_command_state.setObjectName("push_button_update_command_state")
         self.push_button_update_command_state.setText("Update Command State")
-        self.push_button_update_command_state.clicked.connect(self.update_command_state_button_clicked)
+        self.push_button_update_command_state.clicked.connect(
+            self.update_command_state_button_clicked
+        )
 
         self.tableWidget = QtWidgets.QTableWidget(self.central_widget)
         self.tableWidget.setGeometry(QtCore.QRect(10, 100, 900, 541))

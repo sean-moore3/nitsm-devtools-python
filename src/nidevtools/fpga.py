@@ -438,7 +438,7 @@ class _SSCFPGA(typing.NamedTuple):
         master_go.write(True)
         self.i2c_master_poll_until_ready(i2c_master_in, start_time, timeout)
         data = master_data.read()
-        data = data[0:number_of_bytes + 1]
+        data = data[0 : number_of_bytes + 1]
         return data
 
     def i2c_master_write(

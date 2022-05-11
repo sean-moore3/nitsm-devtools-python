@@ -505,13 +505,9 @@ class _NIDCPowerSSC:
         ]
         actual_aperture_time = self._ch_session.aperture_time_units
         if match in all_supported_models + ["4112", "4113", "4132"]:
-            if (
-                self._ch_session.aperture_time_units
-                == enums.ApertureTimeUnits.POWER_LINE_CYCLES
-            ):
+            if self._ch_session.aperture_time_units == enums.ApertureTimeUnits.POWER_LINE_CYCLES:
                 actual_aperture_time = (
-                    self._ch_session.aperture_time_units
-                    / self._ch_session.power_line_frequency
+                    self._ch_session.aperture_time_units / self._ch_session.power_line_frequency
                 )
 
         if match in ["4110", "4130"]:
@@ -617,9 +613,7 @@ class _NIDCPowerSSC:
         if v_value == 0.0:
             v_value = max(abs(voltage_limit_high), abs(voltage_limit_low))
         self._ch_session.voltage_limit_range = v_value
-        self._ch_session.compliance_limit_symmetry = (
-            nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
-        )
+        self._ch_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
 
     def cs_configure_single_pt_force_current_symmetric_limits(
         self, current_level=0.0, current_level_range=0.0, voltage_limit=0.0, voltage_limit_range=0.0
@@ -646,9 +640,7 @@ class _NIDCPowerSSC:
         if v_value == 0.0:
             v_value = abs(voltage_limit)
         self._ch_session.voltage_limit_range = v_value
-        self._ch_session.compliance_limit_symmetry = (
-            nidcpower.ComplianceLimitSymmetry.SYMMETRIC
-        )
+        self._ch_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.SYMMETRIC
 
     def cs_configure_voltage_limit_range(self, voltage_limit_range=0.0):
         """
@@ -784,9 +776,7 @@ class _NIDCPowerSSC:
         if c_value == 0.0:
             c_value = max(abs(current_limit_high), abs(current_limit_low))
         self._ch_session.current_limit_range = c_value
-        self._ch_session.compliance_limit_symmetry = (
-            nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
-        )
+        self._ch_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.ASYMMETRIC
 
     def cs_configure_single_point_force_dc_voltage_symmetric_limits(
         self, voltage_level=0.0, voltage_level_range=0.0, current_limit=0.0, current_limit_range=0.0
@@ -812,9 +802,7 @@ class _NIDCPowerSSC:
         if c_value == 0.0:
             c_value = abs(current_limit)
         self._ch_session.current_limit_range = c_value
-        self._ch_session.compliance_limit_symmetry = (
-            nidcpower.ComplianceLimitSymmetry.SYMMETRIC
-        )
+        self._ch_session.compliance_limit_symmetry = nidcpower.ComplianceLimitSymmetry.SYMMETRIC
 
     def cs_configure_voltage_level_range(self, voltage_level_range=0.0):
         """
@@ -1103,11 +1091,11 @@ class _NIDCPowerSSC:
         Args:
             signal (Signal): signal to be exported
             terminal (str): output terminal on which the signal is exported.
-      
+
         Returns:
             terminal_name (str) : fully qualified output terminal name
         """
-    
+
         if signal == enums.SendSoftwareEdgeTriggerType.START:
             self._ch_session.exported_start_trigger_output_terminal = terminal
             terminal_name = self._ch_session.exported_start_trigger_output_terminal
@@ -1210,9 +1198,7 @@ class _NIDCPowerSSC:
         self._ch_session.measure_trigger_type = nidcpower.TriggerType.SOFTWARE_EDGE
         self._ch_session.commit()
         num_samples = int(
-            math.ceil(
-                buffer_length / self._ch_session.measure_record_delta_time.total_seconds()
-            )
+            math.ceil(buffer_length / self._ch_session.measure_record_delta_time.total_seconds())
         )
         # coerce num_samples to be between 1 and max value of I32 (2147483647)
         if num_samples < 1:
@@ -1272,14 +1258,10 @@ class _NIDCPowerSSC:
         elif measurement_mode == MeasurementMode.SOFTWARE_TRIGGER:
             fetch_or_measure = not self.measure_multiple_only
         else:
-            fetch_or_measure = (
-                    self._ch_session.measure_when == enums.MeasureWhen.ON_MEASURE_TRIGGER
-            )
+            fetch_or_measure = self._ch_session.measure_when == enums.MeasureWhen.ON_MEASURE_TRIGGER
 
         if fetch_or_measure:
-            self._ch_session.send_software_edge_trigger(
-                enums.SendSoftwareEdgeTriggerType.MEASURE
-            )
+            self._ch_session.send_software_edge_trigger(enums.SendSoftwareEdgeTriggerType.MEASURE)
         return fetch_or_measure
 
     def cs_measure_execute(self, fetch_or_measure: bool):
@@ -2091,7 +2073,7 @@ class _NIDCPowerTSM:
         Returns:
             terminal_name (str) : fully qualified output terminal name
         """
-        
+
         terminal_name = output_terminal
         for ssc in self._sscs:
             terminal_name = ssc.cs_configure_export_signal(signal, output_terminal)
@@ -2170,9 +2152,7 @@ class _NIDCPowerTSM:
                 fetch_samples = fetch_backlog
             else:
                 fetch_samples = int(waveform_length_s / record_dt)
-            samples = ssc._ch_session.fetch_multiple(
-                fetch_samples, timeout=waveform_length_s + 1
-            )
+            samples = ssc._ch_session.fetch_multiple(fetch_samples, timeout=waveform_length_s + 1)
             voltages = []
             currents = []
             in_compliance = []
@@ -2648,9 +2628,7 @@ def filter_pins(dc_power_tsm: TSMDCPower, desired_pins):
     dut_pins, system_pins = common.get_dut_pins_and_system_pins_from_expanded_pin_list(
         pins_expand_new
     )
-    pins_to_query_ctx = common.get_pin_names_from_expanded_pin_information(
-        dut_pins + system_pins
-    )
+    pins_to_query_ctx = common.get_pin_names_from_expanded_pin_information(dut_pins + system_pins)
     dc_power_tsm.pin_query_context.Pins = pins_to_query_ctx
     return dc_power_tsm
 
@@ -2703,9 +2681,7 @@ def pins_to_sessions(
             a = common.PinInformation  # create instance of class
             a.pin = pin
             pins_info.append(a)
-    _, pin_lists = common.pin_query_context_to_channel_list(
-        pin_query_context, pins_expanded, sites
-    )
+    _, pin_lists = common.pin_query_context_to_channel_list(pin_query_context, pins_expanded, sites)
     sscs = [
         _NIDCPowerSSC(session, channel, pin_list)
         for session, channel, pin_list in zip(sessions, channels, pin_lists)

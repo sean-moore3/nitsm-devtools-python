@@ -4,6 +4,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
 import threading
+
 # from . import abstract_switch
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
@@ -51,7 +52,6 @@ class UiAbstractSwitchDebugWindow(object):
         self.line_edit_pin_name_filter = None
         self.line_edit_view = None
         self.line_edit_status = None
-
 
     def setup_ui(self, main_window):
         self.main_window = main_window

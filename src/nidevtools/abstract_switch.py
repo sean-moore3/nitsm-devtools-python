@@ -122,9 +122,7 @@ class Session:
             tsm (SMContext): TestStand semiconductor module context
         """
         if self.instrument_type == InstrumentTypes.daqmx:
-            multiple_session = daqmx.pins_to_session_sessions_info(
-                tsm, [self.enable_pin]
-            )
+            multiple_session = daqmx.pins_to_session_sessions_info(tsm, [self.enable_pin])
             for channel in multiple_session.sessions[0].Task.do_channels:
                 channel.do_tristate = True
             multiple_session: daqmx.MultipleSessions
@@ -355,7 +353,7 @@ def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connect
         like a 2D table.
     """
     if not hasattr(pin_fgv, "connections"):
-        connections = _relay.test_data # Storage variable created.[] for testing
+        connections = _relay.test_data  # Storage variable created.[] for testing
 
     if action == Control.get_connections:
         for connection in connections:
@@ -366,7 +364,7 @@ def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connect
                 condition = False
                 for info in data:
                     if info.instrument_type == InstrumentTypes.daqmx:
-                        if info.route_value=="1" or info.route_value == "True":
+                        if info.route_value == "1" or info.route_value == "True":
                             condition = info.status == "TRUE"
                         else:
                             condition = not info.status == "FALSE"

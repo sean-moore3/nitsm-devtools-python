@@ -56,7 +56,7 @@ def dmm_tsm_s(tsm, tests_pins):
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestDMM:
     def test_set_session(self, tsm):
-        print(tsm. pin_map_file_path)
+        print(tsm.pin_map_file_path)
         queried_sessions = tsm.get_all_nidmm_sessions()
         assert isinstance(queried_sessions, tuple)  # Type verification
         for session in queried_sessions:
@@ -84,12 +84,13 @@ class TestDMM:
         for dmm_tsm in list_dmm_tsm:
             print("\nTest_pin_to_sessions\n", dmm_tsm)
             print(dmm_tsm.sessions)
-            dmm_tsm.configure_measurement(function=nidmm.Function.DC_VOLTS,
-                                          range_raw=1,
-                                          resolution_in_digits=ni_dmm.Resolution.Res_6_05,
-                                          input_resistance=ni_dmm.InputResistance.IR_10_MOhm)
-            dmm_tsm.configure_aperture_time(aperture_time=1,
-                                            units=nidmm.ApertureTimeUnits.SECONDS)
+            dmm_tsm.configure_measurement(
+                function=nidmm.Function.DC_VOLTS,
+                range_raw=1,
+                resolution_in_digits=ni_dmm.Resolution.Res_6_05,
+                input_resistance=ni_dmm.InputResistance.IR_10_MOhm,
+            )
+            dmm_tsm.configure_aperture_time(aperture_time=1, units=nidmm.ApertureTimeUnits.SECONDS)
             try:
                 # dmm_tsm.initiate()
                 data = dmm_tsm.measure()
@@ -127,12 +128,13 @@ def configure(tsm: SMContext, pins: typing.List[str] = ["CH0"]):
         dmm_tsms.append(data)
         sessions += data.sessions
     for dmm_tsm in dmm_tsms:
-        dmm_tsm.configure_measurement(function=nidmm.Function.DC_VOLTS,
-                                      range_raw=10,
-                                      resolution_in_digits=ni_dmm.Resolution.Res_5_05,
-                                      input_resistance=ni_dmm.InputResistance.IR_1_MOhm)
-        dmm_tsm.configure_aperture_time(aperture_time=1,
-                                        units=nidmm.ApertureTimeUnits.SECONDS)
+        dmm_tsm.configure_measurement(
+            function=nidmm.Function.DC_VOLTS,
+            range_raw=10,
+            resolution_in_digits=ni_dmm.Resolution.Res_5_05,
+            input_resistance=ni_dmm.InputResistance.IR_1_MOhm,
+        )
+        dmm_tsm.configure_aperture_time(aperture_time=1, units=nidmm.ApertureTimeUnits.SECONDS)
         try:
             # dmm_tsm.initiate()
             data = dmm_tsm.measure()
