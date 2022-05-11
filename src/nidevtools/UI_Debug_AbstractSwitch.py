@@ -8,16 +8,19 @@ import threading
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 from typing import List
+import _relay
 
 tsm_context: SMContext
 all_items: [str]
-items_to_show: [str] = ["BUCK6_TLOAD_CTRL_DUT", "AIO_5433_VBAT_FGEN_CTRL_DUT", "LDO9_VPROBE_DUT"]
-testItems = [
-            ["BUCK6_TLOAD_CTRL_DUT", "AbstractInstrument", "120", "BUCK_RTRAN_FGEN_CTRL", "FGEN_5433_C1_S09, 0", "Disconnected"],
-            ["BUCK12_TLOAD_CTRL_DUT", "AbstractInstrument", "127", "BUCK_RTRAN_FGEN_CTRL", "FGEN_5433_C1_S09, 0", "Disconnected"],
-            ["AIO_5433_VBAT_FGEN_CTRL_DUT", "AbstractInstrument", "116", "VBAT_FGEN_CTRL", "FGEN_5433_C1_S09, 1", "Disconnected"],
-            ["LDO9_VPROBE_DUT", "AbstractInstrument", "189", "LDO9_VPROBE_5172", "SCOPE_5172_C1_S02, 0", "Disconnected"]
-                     ]
+items_to_show: [str] = []
+
+all_item_names: [str] = []
+
+testItems = _relay.test_data
+for item in _relay.test_data:
+    items_to_show.append(item[0])
+    all_item_names.append(item[0])
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -48,6 +51,7 @@ class UiAbstractSwitchDebugWindow(object):
         self.line_edit_pin_name_filter = None
         self.line_edit_view = None
         self.line_edit_status = None
+
 
     def setup_ui(self, main_window):
         self.main_window = main_window
@@ -132,27 +136,9 @@ class UiAbstractSwitchDebugWindow(object):
 
         self.tableWidget = QtWidgets.QTableWidget(self.central_widget)
         self.tableWidget.setGeometry(QtCore.QRect(10, 100, 1600, 571))
-        self.tableWidget.setRowCount(27)
         self.tableWidget.setColumnCount(6)
         self.tableWidget.setObjectName("tableWidget")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(0, item)
-        item.setText("PIN Name")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(1, item)
-        item.setText("Instrument Name")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(2, item)
-        item.setText("Channel")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(3, item)
-        item.setText("Muxed Instrument")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(4, item)
-        item.setText("Muxed Instrument Resource")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(5, item)
-        item.setText("Status")
+        self.init_table()
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
         self.tableWidget.horizontalHeader().setDefaultSectionSize(280)
         self.tableWidget.verticalHeader().setVisible(False)
@@ -171,12 +157,18 @@ class UiAbstractSwitchDebugWindow(object):
         self.qTimer.start()
 
     def timeout_event(self):
+        self.update_table()
+
+    def update_table(self):
         testItemNames: List[str] = []
         for item in testItems:
             testItemNames.append(item[0])
 
+        self.tableWidget.setRowCount(len(items_to_show))
+
         # items = abstract_switch.pin_fgv(tsm=tsm_context, action=abstract_switch.Control.get_connections)
         k = 0
+
         for item_to_show in items_to_show:
             item = QtWidgets.QTableWidgetItem()
             self.tableWidget.setItem(k, 0, item)
@@ -201,13 +193,42 @@ class UiAbstractSwitchDebugWindow(object):
 
     def pin_name_filter_value_changed(self, typed_str):
         typed_str = typed_str.upper()
-        matched_strings = []
+        items_to_show.clear()
+        self.tableWidget.clear()
+        self.init_table()
         if typed_str != "":
-            for st in all_items:
-                if st.upper().find(typed_str) != -1:
-                    matched_strings.append(st)
+            for item in testItems:
+                if item[0].upper().find(typed_str) != -1:
+                    self.qTimer.stop()
+                    items_to_show.append(item[0])
+                    self.qTimer.start()
+            self.update_table()
 
-        print(matched_strings)
+        else:
+            for item in testItems:
+                items_to_show.append(item[0])
+            self.update_table()
+
+    def init_table(self):
+
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(0, item)
+        item.setText("PIN Name")
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(1, item)
+        item.setText("Instrument Name")
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(2, item)
+        item.setText("Channel")
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(3, item)
+        item.setText("Muxed Instrument")
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(4, item)
+        item.setText("Muxed Instrument Resource")
+        item = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(5, item)
+        item.setText("Status")
 
     def cb_view_value_changed(self, value_of_cb, arr_of_str=None, ref=None):
         if value_of_cb == "All Pins":
@@ -225,6 +246,7 @@ class UiAbstractSwitchDebugWindow(object):
         if value_of_cb == "DMM Pins":
             print("cb_view_value_changed " + value_of_cb)
             # todo  call the tsm.filter_pins_by_instrument_type("niDMM") with right arguments
+
 
 if __name__ == "__main__":
     import sys
