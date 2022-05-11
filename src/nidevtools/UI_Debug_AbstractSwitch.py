@@ -1,34 +1,27 @@
 import time
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
 import threading
-from . import abstract_switch
+# from . import abstract_switch
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
+from typing import List
 
+tsm_context: SMContext
+all_items: [str]
+items_to_show: [str] = ["BUCK6_TLOAD_CTRL_DUT", "AIO_5433_VBAT_FGEN_CTRL_DUT", "LDO9_VPROBE_DUT"]
+testItems = [
+            ["BUCK6_TLOAD_CTRL_DUT", "AbstractInstrument", "120", "BUCK_RTRAN_FGEN_CTRL", "FGEN_5433_C1_S09, 0", "Disconnected"],
+            ["BUCK12_TLOAD_CTRL_DUT", "AbstractInstrument", "127", "BUCK_RTRAN_FGEN_CTRL", "FGEN_5433_C1_S09, 0", "Disconnected"],
+            ["AIO_5433_VBAT_FGEN_CTRL_DUT", "AbstractInstrument", "116", "VBAT_FGEN_CTRL", "FGEN_5433_C1_S09, 1", "Disconnected"],
+            ["LDO9_VPROBE_DUT", "AbstractInstrument", "189", "LDO9_VPROBE_5172", "SCOPE_5172_C1_S02, 0", "Disconnected"]
+                     ]
 
-class TimeoutThread(threading.Thread):
-    def __init__(self):
-        threading.Thread.__init__(self)
-        self._is_running = True
-
-    def run(self):
-        while self._is_running:
-            time.sleep(0.5)
-            print("TimeOut Event Occurred")
-
-    def stop(self):
-        self._is_running = False
-
-
-@nitsm.codemoduleapi.code_module
 class MainWindow(QMainWindow):
-    def __init__(self, tsm: SMContext):
+    def __init__(self):
         super().__init__()
-        self.tsm_context = tsm
-        self.timeoutThread = TimeoutThread()
-        self.timeoutThread.start()
 
     def exit_app(self):
         print("Shortcut pressed")
@@ -36,7 +29,6 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, *args, **kwargs):
         super().closeEvent(*args, **kwargs)
-        self.timeoutThread.stop()
         print("you just closed the pyqt window!!!")
 
 
@@ -61,9 +53,9 @@ class UiAbstractSwitchDebugWindow(object):
         self.main_window = main_window
         self.main_window.setObjectName("Abstract Switch Debug Tool")
         self.main_window.setWindowTitle("Abstract Switch Debug Tool")
-        self.main_window.resize(1200, 694)
-        self.main_window.setMinimumSize(QtCore.QSize(1200, 694))
-        self.main_window.setMaximumSize(QtCore.QSize(1200, 694))
+        self.main_window.resize(1600, 694)
+        self.main_window.setMinimumSize(QtCore.QSize(1600, 694))
+        self.main_window.setMaximumSize(QtCore.QSize(1600, 694))
         self.central_widget = QtWidgets.QWidget(self.main_window)
         self.central_widget.setObjectName("central_widget")
 
@@ -139,7 +131,7 @@ class UiAbstractSwitchDebugWindow(object):
         self.push_button_disable_all.clicked.connect(self.disable_all_button_clicked)
 
         self.tableWidget = QtWidgets.QTableWidget(self.central_widget)
-        self.tableWidget.setGeometry(QtCore.QRect(10, 100, 1150, 571))
+        self.tableWidget.setGeometry(QtCore.QRect(10, 100, 1600, 571))
         self.tableWidget.setRowCount(27)
         self.tableWidget.setColumnCount(6)
         self.tableWidget.setObjectName("tableWidget")
@@ -170,6 +162,33 @@ class UiAbstractSwitchDebugWindow(object):
         self.main_window.setCentralWidget(self.central_widget)
         QtCore.QMetaObject.connectSlotsByName(self.main_window)
 
+        self.qTimer = QTimer()
+        # set interval to 1 s
+        self.qTimer.setInterval(500)  # 1000 ms = 1 s
+        # connect timeout signal to signal handler
+        self.qTimer.timeout.connect(self.timeout_event)
+        # start timer
+        self.qTimer.start()
+
+    def timeout_event(self):
+        testItemNames: List[str] = []
+        for item in testItems:
+            testItemNames.append(item[0])
+
+        # items = abstract_switch.pin_fgv(tsm=tsm_context, action=abstract_switch.Control.get_connections)
+        k = 0
+        for item_to_show in items_to_show:
+            item = QtWidgets.QTableWidgetItem()
+            self.tableWidget.setItem(k, 0, item)
+            item.setText(testItems[testItemNames.index(item_to_show)][0])
+            for i in range(5):
+                text = testItems[testItemNames.index(item_to_show)][i + 1]
+                item = QtWidgets.QTableWidgetItem()
+                self.tableWidget.setItem(k, i + 1, item)
+                item.setText(str(text))
+                print(text)
+            k += 1
+
     def configure_mux_button_clicked(self):
         QMessageBox.about(self.main_window, "Message", "Configure MUX button Clicked")
 
@@ -180,11 +199,11 @@ class UiAbstractSwitchDebugWindow(object):
         # abstract_switch.pin_fgv(ref, action=abstract_switch.Control.disconnect_all)
         QMessageBox.about(self.main_window, "Message", "Disable All button Clicked")
 
-    def pin_name_filter_value_changed(self, typed_str, arr_of_str: [str] = None):
+    def pin_name_filter_value_changed(self, typed_str):
         typed_str = typed_str.upper()
         matched_strings = []
         if typed_str != "":
-            for st in arr_of_str:
+            for st in all_items:
                 if st.upper().find(typed_str) != -1:
                     matched_strings.append(st)
 
@@ -206,3 +225,13 @@ class UiAbstractSwitchDebugWindow(object):
         if value_of_cb == "DMM Pins":
             print("cb_view_value_changed " + value_of_cb)
             # todo  call the tsm.filter_pins_by_instrument_type("niDMM") with right arguments
+
+if __name__ == "__main__":
+    import sys
+
+    app = QtWidgets.QApplication(sys.argv)
+    main_window = MainWindow()
+    ui = UiAbstractSwitchDebugWindow()
+    ui.setup_ui(main_window)
+    main_window.show()
+    sys.exit(app.exec_())

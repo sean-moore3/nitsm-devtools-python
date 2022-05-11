@@ -4,12 +4,12 @@ from PyQt5.QtWidgets import QMessageBox, QMainWindow
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
+tsm_context: SMContext
 
-@nitsm.codemoduleapi.code_module
+
 class MainWindow(QMainWindow):
-    def __init__(self, tsm: SMContext):
+    def __init__(self):
         super().__init__()
-        self.tsm_context = tsm
 
     def exit_app(self):
         print("Shortcut pressed")
@@ -27,10 +27,10 @@ class UiFPGADebugWindow(object):
         self.push_button_update_command_state = None
         self.label_new_state = None
         self.label_update_time = None
-        self.label_status = None
+        self.label_name_filter = None
         self.line_edit_update_time = None
         self.line_edit_new_state = None
-        self.line_edit_status = None
+        self.line_edit_name_filter = None
 
     def setup_ui(self, main_window):
         self.main_window = main_window

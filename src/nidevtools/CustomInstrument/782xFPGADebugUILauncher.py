@@ -12,7 +12,9 @@ from nidevtools import UI_Debug_FPGA
 def run_ui(tsm: SMContext):
     app = QtWidgets.QApplication(sys.argv)
 
-    FPGADebugWindow = UI_Debug_FPGA.MainWindow(tsm)
+    UI_Debug_FPGA.tsm_context = tsm
+
+    FPGADebugWindow = UI_Debug_FPGA.MainWindow()
     ui_fpga_debug_window = UI_Debug_FPGA.UiFPGADebugWindow()
     ui_fpga_debug_window.setup_ui(FPGADebugWindow)
 
