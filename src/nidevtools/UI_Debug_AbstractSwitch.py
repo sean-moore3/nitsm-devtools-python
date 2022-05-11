@@ -6,15 +6,15 @@ from PyQt5.QtWidgets import QMainWindow
 from . import abstract_switch
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
-from typing import List
-import relay
+import typing
+from . import relay
 
 
 class Properties:
     tsm_context: SMContext
-    all_items: [str]
-    items_to_show: [str] = []
-    all_item_names: [str] = []
+    all_items: typing.List[str]
+    items_to_show: typing.List[str] = []
+    all_item_names: typing.List[str] = []
 
 
 testItems = relay.test_data
@@ -162,7 +162,7 @@ class UiAbstractSwitchDebugWindow(object):
         self.update_table()
 
     def update_table(self):
-        testItemNames: List[str] = []
+        testItemNames: typing.List[str] = []
         for item in testItems:
             testItemNames.append(item[0])
 

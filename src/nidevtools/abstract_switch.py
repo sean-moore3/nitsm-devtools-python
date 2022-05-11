@@ -270,13 +270,6 @@ def close_sessions(tsm: SMContext):  # Comment: Nothing to do
     pass
 
 
-# Not used
-"""
-def debug_ui(tsm: SMContext):
-    pass
-"""
-
-
 def disconnect_all(tsm: SMContext):  # CHECK
     """
     Disconnects all abstract switch related pins in the context provided
