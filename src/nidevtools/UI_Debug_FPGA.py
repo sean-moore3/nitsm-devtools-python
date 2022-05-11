@@ -1,10 +1,15 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
 
+import nitsm.codemoduleapi
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
+
+@nitsm.codemoduleapi.code_module
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, tsm: SMContext):
         super().__init__()
+        self.tsm_context = tsm
 
     def exit_app(self):
         print("Shortcut pressed")
@@ -111,7 +116,6 @@ class UiFPGADebugWindow(object):
 
     def update_command_state_button_clicked(self, cluster):
         QMessageBox.about(self.main_window, "Message", "Update Command State button Clicked")
-
 
 
 if __name__ == "__main__":

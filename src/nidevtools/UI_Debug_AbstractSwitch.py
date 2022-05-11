@@ -4,6 +4,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
 import threading
 from . import abstract_switch
+import nitsm.codemoduleapi
+from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 
 class TimeoutThread(threading.Thread):
@@ -20,9 +22,11 @@ class TimeoutThread(threading.Thread):
         self._is_running = False
 
 
+@nitsm.codemoduleapi.code_module
 class MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, tsm: SMContext):
         super().__init__()
+        self.tsm_context = tsm
         self.timeoutThread = TimeoutThread()
         self.timeoutThread.start()
 
@@ -202,4 +206,3 @@ class UiAbstractSwitchDebugWindow(object):
         if value_of_cb == "DMM Pins":
             print("cb_view_value_changed " + value_of_cb)
             # todo  call the tsm.filter_pins_by_instrument_type("niDMM") with right arguments
-
