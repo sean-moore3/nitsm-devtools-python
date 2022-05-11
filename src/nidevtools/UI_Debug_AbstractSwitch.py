@@ -4,18 +4,17 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
 import threading
-
-from . import abstract_switch
+# from . import abstract_switch
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
-import typing
-from . import relay
+from typing import List
+import relay
 
 tsm_context: SMContext
-all_items: typing.List[str]
-items_to_show: typing.List[str] = []
+all_items: [str]
+items_to_show: [str] = []
 
-all_item_names: typing.List[str] = []
+all_item_names: [str] = []
 
 testItems = relay.test_data
 for item in relay.test_data:
@@ -41,7 +40,7 @@ class UiAbstractSwitchDebugWindow(object):
         self.main_window = None
         self.central_widget = None
         self.push_button_configure_mux = None
-        self.push_button_new_mux_state = None
+        self.push_button_new_mux_state: QtWidgets.QPushButton = None
         self.push_button_disable_all = None
         self.label_new_mux_state = None
         self.label_update_time = None
@@ -52,14 +51,16 @@ class UiAbstractSwitchDebugWindow(object):
         self.line_edit_pin_name_filter = None
         self.line_edit_view = None
         self.line_edit_status = None
+        self.new_mux_state = True
+
 
     def setup_ui(self, main_window):
         self.main_window = main_window
         self.main_window.setObjectName("Abstract Switch Debug Tool")
         self.main_window.setWindowTitle("Abstract Switch Debug Tool")
-        self.main_window.resize(1600, 694)
-        self.main_window.setMinimumSize(QtCore.QSize(1600, 694))
-        self.main_window.setMaximumSize(QtCore.QSize(1600, 694))
+        self.main_window.resize(1300, 694)
+        self.main_window.setMinimumSize(QtCore.QSize(1300, 694))
+        self.main_window.setMaximumSize(QtCore.QSize(1300, 694))
         self.central_widget = QtWidgets.QWidget(self.main_window)
         self.central_widget.setObjectName("central_widget")
 
@@ -126,6 +127,7 @@ class UiAbstractSwitchDebugWindow(object):
         self.push_button_new_mux_state.setGeometry(QtCore.QRect(200, 40, 100, 40))
         self.push_button_new_mux_state.setObjectName("push_button_new_mux_state")
         self.push_button_new_mux_state.setText("OK")
+        self.push_button_new_mux_state.setStyleSheet("background-color:  rgb(100,255,0)")
         self.push_button_new_mux_state.clicked.connect(self.new_mux_state_button_clicked)
 
         self.push_button_disable_all = QtWidgets.QPushButton(self.central_widget)
@@ -135,7 +137,7 @@ class UiAbstractSwitchDebugWindow(object):
         self.push_button_disable_all.clicked.connect(self.disable_all_button_clicked)
 
         self.tableWidget = QtWidgets.QTableWidget(self.central_widget)
-        self.tableWidget.setGeometry(QtCore.QRect(10, 100, 1600, 571))
+        self.tableWidget.setGeometry(QtCore.QRect(10, 100, 1300, 571))
         self.tableWidget.setColumnCount(6)
         self.tableWidget.setObjectName("tableWidget")
         self.init_table()
@@ -160,7 +162,7 @@ class UiAbstractSwitchDebugWindow(object):
         self.update_table()
 
     def update_table(self):
-        testItemNames: typing.List[str] = []
+        testItemNames: List[str] = []
         for item in testItems:
             testItemNames.append(item[0])
 
@@ -178,18 +180,24 @@ class UiAbstractSwitchDebugWindow(object):
                 item = QtWidgets.QTableWidgetItem()
                 self.tableWidget.setItem(k, i + 1, item)
                 item.setText(str(text))
-                print(text)
             k += 1
 
     def configure_mux_button_clicked(self):
         QMessageBox.about(self.main_window, "Message", "Configure MUX button Clicked")
 
     def new_mux_state_button_clicked(self):
-        QMessageBox.about(self.main_window, "Message", "New Mux button Clicked")
+        if self.new_mux_state:
+            self.new_mux_state = False
+            self.push_button_new_mux_state.setStyleSheet("background-color: rgb(30,75,0); color: red")
+            self.push_button_new_mux_state.setText("OFF")
+        else:
+            self.new_mux_state = True
+            self.push_button_new_mux_state.setStyleSheet("background-color: rgb(100,255,0); color: black")
+            self.push_button_new_mux_state.setText("ON")
 
     def disable_all_button_clicked(self, ref):
-        # abstract_switch.pin_fgv(ref, action=abstract_switch.Control.disconnect_all)
-        QMessageBox.about(self.main_window, "Message", "Disable All button Clicked")
+        pass
+        # abstract_switch.pin_fgv(tsm_context, action=abstract_switch.Control.disconnect_all)
 
     def pin_name_filter_value_changed(self, typed_str):
         typed_str = typed_str.upper()
@@ -233,19 +241,14 @@ class UiAbstractSwitchDebugWindow(object):
     def cb_view_value_changed(self, value_of_cb, arr_of_str=None, ref=None):
         if value_of_cb == "All Pins":
             pass
-            # todo  call the tsm.filter_pins_by_instrument_type("abstinst") with right arguments
-        if value_of_cb == "Abstract Pins":
-            pass
-            # todo  call the tsm.filter_pins_by_instrument_type("abstinst") with right arguments
-        if value_of_cb == "Scope Pins":
-            pass
-            # todo  call the tsm.filter_pins_by_instrument_type("niScope") with right arguments
-        if value_of_cb == "SMU Pins":
-            pass
-            # todo  call the tsm.filter_pins_by_instrument_type("niDCPower") with right arguments
-        if value_of_cb == "DMM Pins":
-            print("cb_view_value_changed " + value_of_cb)
-            # todo  call the tsm.filter_pins_by_instrument_type("niDMM") with right arguments
+        elif value_of_cb == "Abstract Pins":
+            tsm_context.filter_pins_by_instrument_type(instrument_type_id="abstinst", )
+        elif value_of_cb == "Scope Pins":
+            tsm_context.filter_pins_by_instrument_type(instrument_type_id="niScope")
+        elif value_of_cb == "SMU Pins":
+            tsm_context.filter_pins_by_instrument_type(instrument_type_id="niDCPower")
+        elif value_of_cb == "DMM Pins":
+            tsm_context.filter_pins_by_instrument_type(instrument_type_id="niDMM")
 
 
 if __name__ == "__main__":
