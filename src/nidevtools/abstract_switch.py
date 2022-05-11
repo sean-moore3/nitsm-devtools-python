@@ -19,6 +19,7 @@ from . import daqmx
 from . import digital
 from . import fpga
 from . import switch
+from . import _relay
 
 instrument_type_id = "Matrix"
 PinsArg = typing.Union[str, typing.Sequence[str]]
@@ -354,7 +355,7 @@ def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connect
         like a 2D table.
     """
     if not hasattr(pin_fgv, "connections"):
-        connections = [] # Storage variable created.
+        connections = _relay.test_data # Storage variable created.[] for testing
 
     if action == Control.get_connections:
         for connection in connections:
