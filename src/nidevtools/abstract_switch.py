@@ -341,53 +341,64 @@ def initialize(tsm: SMContext):  # CHECK
 
 def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connections):
     """
-    Pin switch status fgv labview equivalent code
+        Pin switch status fgv labview equivalent code
+
+    Args:
+        tsm (SMContext): teststand semiconductor module reference from Teststand
+        pin (str, optional): Currently unused argument but can be used later. Defaults to "".
+        action (Control, optional): different actions to be performed on data. Defaults to
+            Control.get_connections.
+
+    Returns:
+        Connections(list of Lists of str): list of lists containing per pin name, route, Status etc
+        like a 2D table.
     """
-    connections = []
-    while True:
-        if action == Control.get_connections:
-            for connection in connections:
-                if connection[1] == "AbstractInstrument":
-                    sessions = pins_to_sessions_sessions_info(tsm, connection[0])
-                    data = sessions.read_state(tsm)
-                    conditions = []
-                    condition = False
-                    for info in data:
-                        if info.instrument_type == InstrumentTypes.daqmx:
-                            if info.route_value:
-                                condition = info.status
-                            else:
-                                condition = not info.status
-                        elif info.instrument_type == InstrumentTypes.digitalpattern:
-                            if info.route_value == "1":
-                                condition = info.status == "1"
-                            else:
-                                condition = info.status != "1"
-                        elif info.instrument_type == InstrumentTypes.fpga:
-                            if info.route_value == "1":
-                                condition = info.status == "Connected"
-                            else:
-                                condition = info.status == "Disconnected"
-                        elif info.instrument_type == InstrumentTypes.switch:
-                            condition = info.status in info.route_value
-                        conditions.append(condition)
-                    if len(conditions) == 0:
-                        condition = True
-                    else:
-                        if False in conditions:
-                            condition = False
+    if not hasattr(pin_fgv, "connections"):
+        connections = [] # Storage variable created.
+
+    if action == Control.get_connections:
+        for connection in connections:
+            if connection[1] == "AbstractInstrument":
+                sessions = pins_to_sessions_sessions_info(tsm, connection[0])
+                data = sessions.read_state(tsm)
+                conditions = []
+                condition = False
+                for info in data:
+                    if info.instrument_type == InstrumentTypes.daqmx:
+                        if info.route_value=="1" or info.route_value == "True":
+                            condition = info.status == "TRUE"
                         else:
-                            condition = True
-                    if condition:
-                        connections[5] = "Connected"
+                            condition = not info.status == "FALSE"
+                    elif info.instrument_type == InstrumentTypes.digitalpattern:
+                        if info.route_value == "1":
+                            condition = info.status == "1"
+                        else:
+                            condition = info.status != "1"
+                    elif info.instrument_type == InstrumentTypes.fpga:
+                        if info.route_value == "1":
+                            condition = info.status == "Connected"
+                        else:
+                            condition = info.status == "Disconnected"
+                    elif info.instrument_type == InstrumentTypes.switch:
+                        condition = info.status in info.route_value
+                    conditions.append(condition)
+                if len(conditions) == 0:
+                    condition = True
+                else:
+                    if False in conditions:
+                        condition = False
                     else:
-                        connections[5] = "Disconnected"
-        elif action == Control.disconnect_all:
-            disconnect_all(tsm)
-        elif action == Control.init:
-            pinmap_path = tsm.pin_map_file_path
-            connections += pin_name_to_instrument(pinmap_path)
-        break  # TODO consider removing the while loop which breaks always
+                        condition = True
+                if condition:
+                    connection[5] = "Connected"
+                else:
+                    connection[5] = "Disconnected"
+    elif action == Control.init:
+        pinmap_path = tsm.pin_map_file_path
+        connections = pin_name_to_instrument(pinmap_path)
+    else:
+        disconnect_all(tsm)
+    return connections
 
 
 def get_first_matched_node(tree: Et.ElementTree, key: str):

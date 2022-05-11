@@ -5,7 +5,7 @@ from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
 from PyQt5 import QtWidgets
 
-from src.nidevtools import UI_Debug_FPGA
+from nidevtools import UI_Debug_FPGA
 
 
 @nitsm.codemoduleapi.code_module
