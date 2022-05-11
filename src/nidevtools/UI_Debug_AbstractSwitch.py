@@ -5,20 +5,20 @@ from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
 import threading
 
-# from . import abstract_switch
+from . import abstract_switch
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
-from typing import List
-import _relay
+import typing
+from . import relay
 
 tsm_context: SMContext
-all_items: [str]
-items_to_show: [str] = []
+all_items: typing.List[str]
+items_to_show: typing.List[str] = []
 
-all_item_names: [str] = []
+all_item_names: typing.List[str] = []
 
-testItems = _relay.test_data
-for item in _relay.test_data:
+testItems = relay.test_data
+for item in relay.test_data:
     items_to_show.append(item[0])
     all_item_names.append(item[0])
 
@@ -160,7 +160,7 @@ class UiAbstractSwitchDebugWindow(object):
         self.update_table()
 
     def update_table(self):
-        testItemNames: List[str] = []
+        testItemNames: typing.List[str] = []
         for item in testItems:
             testItemNames.append(item[0])
 
