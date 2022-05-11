@@ -1103,7 +1103,7 @@ class _NIDCPowerSSC:
         Args:
             signal (Signal): signal to be exported
             terminal (str): output terminal on which the signal is exported.
-        
+      
         Returns:
             terminal_name (str) : fully qualified output terminal name
         """
