@@ -1,25 +1,26 @@
 import time
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QTimer
-from PyQt5.QtWidgets import QMessageBox, QMainWindow
-import threading
-# from . import abstract_switch
+from PyQt5.QtWidgets import QMainWindow
+from . import abstract_switch
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 from typing import List
 import relay
 
-tsm_context: SMContext
-all_items: [str]
-items_to_show: [str] = []
 
-all_item_names: [str] = []
+class Properties:
+    tsm_context: SMContext
+    all_items: [str]
+    items_to_show: [str] = []
+    all_item_names: [str] = []
+
 
 testItems = relay.test_data
 for item in relay.test_data:
-    items_to_show.append(item[0])
-    all_item_names.append(item[0])
+    Properties.items_to_show.append(item[0])
+    Properties.all_item_names.append(item[0])
 
 
 class MainWindow(QMainWindow):
@@ -52,7 +53,6 @@ class UiAbstractSwitchDebugWindow(object):
         self.line_edit_view = None
         self.line_edit_status = None
         self.new_mux_state = True
-
 
     def setup_ui(self, main_window):
         self.main_window = main_window
@@ -166,12 +166,12 @@ class UiAbstractSwitchDebugWindow(object):
         for item in testItems:
             testItemNames.append(item[0])
 
-        self.tableWidget.setRowCount(len(items_to_show))
+        self.tableWidget.setRowCount(len(Properties.items_to_show))
 
         # items = abstract_switch.pin_fgv(tsm=tsm_context, action=abstract_switch.Control.get_connections)
         k = 0
 
-        for item_to_show in items_to_show:
+        for item_to_show in Properties.items_to_show:
             item = QtWidgets.QTableWidgetItem()
             self.tableWidget.setItem(k, 0, item)
             item.setText(testItems[testItemNames.index(item_to_show)][0])
@@ -183,7 +183,16 @@ class UiAbstractSwitchDebugWindow(object):
             k += 1
 
     def configure_mux_button_clicked(self):
-        QMessageBox.about(self.main_window, "Message", "Configure MUX button Clicked")
+        selected = self.tableWidget.selectedItems()
+        if selected:
+            sessions = []
+            for selectedItem in selected:
+                sessions += abstract_switch.pins_to_sessions_sessions_info(Properties.tsm_context, Properties.items_to_show[selectedItem.row()])
+            multi_session = abstract_switch.AbstractSession(sessions)
+            if self.new_mux_state:
+                multi_session.connect_sessions_info(Properties.tsm_context)
+            else:
+                multi_session.disconnect_sessions_info(Properties.tsm_context)
 
     def new_mux_state_button_clicked(self):
         if self.new_mux_state:
@@ -201,20 +210,20 @@ class UiAbstractSwitchDebugWindow(object):
 
     def pin_name_filter_value_changed(self, typed_str):
         typed_str = typed_str.upper()
-        items_to_show.clear()
+        Properties.items_to_show.clear()
         self.tableWidget.clear()
         self.init_table()
         if typed_str != "":
             for item in testItems:
                 if item[0].upper().find(typed_str) != -1:
                     self.qTimer.stop()
-                    items_to_show.append(item[0])
+                    Properties.items_to_show.append(item[0])
                     self.qTimer.start()
             self.update_table()
 
         else:
             for item in testItems:
-                items_to_show.append(item[0])
+                Properties.items_to_show.append(item[0])
             self.update_table()
 
     def init_table(self):
@@ -242,13 +251,13 @@ class UiAbstractSwitchDebugWindow(object):
         if value_of_cb == "All Pins":
             pass
         elif value_of_cb == "Abstract Pins":
-            tsm_context.filter_pins_by_instrument_type(instrument_type_id="abstinst", )
+            Properties.tsm_context.filter_pins_by_instrument_type(instrument_type_id="abstinst", )
         elif value_of_cb == "Scope Pins":
-            tsm_context.filter_pins_by_instrument_type(instrument_type_id="niScope")
+            Properties.tsm_context.filter_pins_by_instrument_type(instrument_type_id="niScope")
         elif value_of_cb == "SMU Pins":
-            tsm_context.filter_pins_by_instrument_type(instrument_type_id="niDCPower")
+            Properties.tsm_context.filter_pins_by_instrument_type(instrument_type_id="niDCPower")
         elif value_of_cb == "DMM Pins":
-            tsm_context.filter_pins_by_instrument_type(instrument_type_id="niDMM")
+            Properties.tsm_context.filter_pins_by_instrument_type(instrument_type_id="niDMM")
 
 
 if __name__ == "__main__":
