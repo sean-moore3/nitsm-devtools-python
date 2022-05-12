@@ -33,7 +33,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, *args, **kwargs):
         super().closeEvent(*args, **kwargs)
-        print("you just closed the pyqt window!!!")
+        print("Abstract Swtich Debug UI window closed!!!")
 
 
 class UiAbstractSwitchDebugWindow(object):
