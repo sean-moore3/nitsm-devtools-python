@@ -1,10 +1,25 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
+from typing import List
 
-import nitsm.codemoduleapi
-from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
-tsm_context: SMContext
+class Session:
+    pass
+
+
+class SSC:
+    session: Session
+    channel_group_id: str
+    channels: str = ""
+    channel_list: str
+
+
+class _782x_Debug:
+    ssc: List[SSC] = [SSC()]
+
+
+fpga_ref: _782x_Debug = _782x_Debug()
 
 
 class MainWindow(QMainWindow):
@@ -22,6 +37,7 @@ class MainWindow(QMainWindow):
 
 class UiFPGADebugWindow(object):
     def __init__(self):
+        self.cb_new_state: QtWidgets.QComboBox = None
         self.main_window = None
         self.central_widget = None
         self.push_button_update_command_state = None
@@ -29,8 +45,8 @@ class UiFPGADebugWindow(object):
         self.label_update_time = None
         self.label_name_filter = None
         self.line_edit_update_time = None
-        self.line_edit_new_state = None
         self.line_edit_name_filter = None
+        self.tableWidget: QtWidgets.QTableWidget = None
 
     def setup_ui(self, main_window):
         self.main_window = main_window
@@ -61,9 +77,10 @@ class UiFPGADebugWindow(object):
         self.label_name_filter.setObjectName("label_name_filter")
         self.label_name_filter.setText("Name Filter")
 
-        self.line_edit_new_state = QtWidgets.QLineEdit(self.central_widget)
-        self.line_edit_new_state.setGeometry(QtCore.QRect(280, 40, 160, 40))
-        self.line_edit_new_state.setObjectName("line_edit_new_state")
+        self.cb_new_state = QtWidgets.QComboBox(self.central_widget)
+        self.cb_new_state.setGeometry(QtCore.QRect(280, 40, 160, 40))
+        self.cb_new_state.setObjectName("cb_view")
+        self.cb_new_state.addItems(["0", "1", "X"])
 
         self.line_edit_update_time = QtWidgets.QLineEdit(self.central_widget)
         self.line_edit_update_time.setEnabled(False)
@@ -88,12 +105,52 @@ class UiFPGADebugWindow(object):
         self.tableWidget.setRowCount(25)
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(4)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(0, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(1, item)
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setVerticalHeaderItem(2, item)
+        self.init_table()
+        self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
+        self.tableWidget.horizontalHeader().setDefaultSectionSize(280)
+        self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.verticalHeader().setCascadingSectionResizes(True)
+        self.tableWidget.verticalHeader().setDefaultSectionSize(23)
+
+        self.main_window.setCentralWidget(self.central_widget)
+        QtCore.QMetaObject.connectSlotsByName(self.main_window)
+
+        self.qTimer = QTimer()
+        self.qTimer.setInterval(250)  # 1000 ms = 1 s
+        # connect timeout signal to signal handler
+        self.qTimer.timeout.connect(self.timeout_event)
+        # start timer
+        self.qTimer.start()
+
+    def update_command_state_button_clicked(self, cluster):
+        i = 0
+        output_site_numbers: str = ""
+        for ssc in fpga_ref.ssc:
+            for site_number in digital_site_list_to_site_numbers(ssc.channels):
+                i += 1
+                selectedRows: List[int] = []
+                for selectedItem in self.tableWidget.selectedItems():
+                    try:
+                        selectedRows.index(selectedItem.row())
+                    except:
+                        selectedRows.append(selectedItem.row())
+                try:
+                    if selectedRows.index(i) >= 0:
+                        output_site_numbers += site_number + ","
+                except:
+                    pass
+
+            output_site_numbers = output_site_numbers[:-1]
+            output_site_numbers = output_site_numbers.strip()
+            ssc.channels = output_site_numbers
+        print(selectedRows)
+        fpga_write_static(fpga_ref, str(self.cb_new_state.currentText()))
+
+    def timeout_event(self):
+        print("Timeout Event")
+
+    def init_table(self):
+
         item = QtWidgets.QTableWidgetItem()
         self.tableWidget.setHorizontalHeaderItem(0, item)
         item.setText("TSM Channel Name")
@@ -107,17 +164,13 @@ class UiFPGADebugWindow(object):
         self.tableWidget.setHorizontalHeaderItem(3, item)
         item.setText("Line State")
 
-        self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
-        self.tableWidget.horizontalHeader().setDefaultSectionSize(280)
-        self.tableWidget.verticalHeader().setVisible(False)
-        self.tableWidget.verticalHeader().setCascadingSectionResizes(True)
-        self.tableWidget.verticalHeader().setDefaultSectionSize(23)
 
-        self.main_window.setCentralWidget(self.central_widget)
-        QtCore.QMetaObject.connectSlotsByName(self.main_window)
+def digital_site_list_to_site_numbers(site_list):
+    return ["List[str]","List[str]","List[str]","List[str]","List[str]"]
 
-    def update_command_state_button_clicked(self, cluster):
-        QMessageBox.about(self.main_window, "Message", "Update Command State button Clicked")
+
+def fpga_write_static(debug: _782x_Debug, state):
+    pass
 
 
 if __name__ == "__main__":

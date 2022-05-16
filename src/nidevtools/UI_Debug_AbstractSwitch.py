@@ -151,7 +151,6 @@ class UiAbstractSwitchDebugWindow(object):
         QtCore.QMetaObject.connectSlotsByName(self.main_window)
 
         self.qTimer = QTimer()
-        # set interval to 1 s
         self.qTimer.setInterval(500)  # 1000 ms = 1 s
         # connect timeout signal to signal handler
         self.qTimer.timeout.connect(self.timeout_event)
