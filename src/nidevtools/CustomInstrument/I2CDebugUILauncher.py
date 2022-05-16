@@ -1,5 +1,6 @@
+import time
+
 def rundummyCode(tsm):
     print("Launched the I2CDebugUI")
-    print(tsm)
-
+    time.sleep(0.5)
 
