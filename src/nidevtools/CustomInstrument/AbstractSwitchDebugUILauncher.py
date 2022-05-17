@@ -8,11 +8,13 @@ from PyQt5 import QtWidgets
 from nidevtools import UI_Debug_AbstractSwitch
 
 
-@nitsm.codemoduleapi.code_module
-def run_ui(tsm: SMContext):
-    app = QtWidgets.QApplication(sys.argv)
+# @nitsm.codemoduleapi.code_module
+# def run_ui(tsm: SMContext):
 
-    UI_Debug_AbstractSwitch.tsm_context = tsm
+
+def run_ui():
+    app = QtWidgets.QApplication(sys.argv)
+    # UI_Debug_AbstractSwitch.tsm_context = tsm
     # AbstractSwitchDebugWindow = UI_Debug_AbstractSwitch.MainWindow(tsm)
     AbstractSwitchDebugWindow = UI_Debug_AbstractSwitch.MainWindow()
     ui_abstract_switch_debug_window = UI_Debug_AbstractSwitch.UiAbstractSwitchDebugWindow()
