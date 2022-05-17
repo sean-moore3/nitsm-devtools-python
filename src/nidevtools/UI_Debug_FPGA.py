@@ -1,25 +1,14 @@
+import sys
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
 from typing import List
+import digital
+import fpga
 
 
-class Session:
-    pass
-
-
-class SSC:
-    session: Session
-    channel_group_id: str
-    channels: str = ""
-    channel_list: str
-
-
-class _782x_Debug:
-    ssc: List[SSC] = [SSC()]
-
-
-fpga_ref: _782x_Debug = _782x_Debug()
+fpga_ref = fpga.TSMFPGA()
 
 
 class MainWindow(QMainWindow):
@@ -45,7 +34,7 @@ class UiFPGADebugWindow(object):
         self.label_update_time = None
         self.label_name_filter = None
         self.line_edit_update_time = None
-        self.line_edit_name_filter = None
+        self.line_edit_name_filter: QtWidgets.QLineEdit = None
         self.tableWidget: QtWidgets.QTableWidget = None
 
     def setup_ui(self, main_window):
@@ -116,17 +105,15 @@ class UiFPGADebugWindow(object):
         QtCore.QMetaObject.connectSlotsByName(self.main_window)
 
         self.qTimer = QTimer()
-        self.qTimer.setInterval(250)  # 1000 ms = 1 s
-        # connect timeout signal to signal handler
+        self.qTimer.setInterval(250)
         self.qTimer.timeout.connect(self.timeout_event)
-        # start timer
         self.qTimer.start()
 
     def update_command_state_button_clicked(self, cluster):
         i = 0
         output_site_numbers: str = ""
-        for ssc in fpga_ref.ssc:
-            for site_number in digital_site_list_to_site_numbers(ssc.channels):
+        for ssc in fpga_ref.SSC:
+            for site_number in digital._site_list_to_site_numbers(ssc.Channels):
                 i += 1
                 selectedRows: List[int] = []
                 for selectedItem in self.tableWidget.selectedItems():
@@ -144,9 +131,46 @@ class UiFPGADebugWindow(object):
             output_site_numbers = output_site_numbers.strip()
             ssc.channels = output_site_numbers
         print(selectedRows)
-        fpga_write_static(fpga_ref, str(self.cb_new_state.currentText()))
+        fpga_ref.write_static_array(str(self.cb_new_state.currentText()))
+        self.timeout_event()
 
     def timeout_event(self):
+        typed_str = self.line_edit_name_filter.text()
+        typed_str = typed_str.upper()
+        typed_str = typed_str.strip()
+        if typed_str != "":
+            for ssc in fpga_ref.SSC:
+                arr_of_site_numbers = digital._site_list_to_site_numbers(ssc.Channels)
+                arr_of_pins = digital._channel_list_to_pins(ssc.ChannelList)
+                output_pins = ""
+                output_site_numbers = ""
+                for pin in arr_of_pins:
+                    if pin.upper().find(typed_str) != -1:
+                        output_pins += pin + ","
+                        output_site_numbers += arr_of_site_numbers[arr_of_pins.index(pin)] + ","
+
+                output_pins = output_pins[:-1]
+                output_pins = output_pins.strip()
+                output_site_numbers = output_site_numbers[:-1]
+                output_site_numbers = output_site_numbers.strip()
+                ssc.ChannelList = output_pins
+                ssc.Channels = output_site_numbers
+
+        fpga_ref.read_commanded_line_states()
+        self.tableWidget.setRowCount(fpga_ref.read_static())
+        for elem in fpga_ref.read_static():
+            if elem:
+                item = QtWidgets.QTableWidgetItem()
+                self.tableWidget.setItem(fpga_ref.read_static().index(elem),3, item)
+                item.setText(str(1))
+            else:
+                item = QtWidgets.QTableWidgetItem()
+                self.tableWidget.setItem(fpga_ref.read_static().index(elem), 3, item)
+                item.setText(str(0))
+            item = QtWidgets.QTableWidgetItem()
+            self.tableWidget.setItem(fpga_ref.read_static().index(elem), 3, item)
+            item.setText(str(0))
+
         print("Timeout Event")
 
     def init_table(self):
@@ -165,20 +189,14 @@ class UiFPGADebugWindow(object):
         item.setText("Line State")
 
 
-def digital_site_list_to_site_numbers(site_list):
-    return ["List[str]","List[str]","List[str]","List[str]","List[str]"]
 
-
-def fpga_write_static(debug: _782x_Debug, state):
-    pass
+def run_ui():
+    app = QtWidgets.QApplication(sys.argv)
+    fpga_window = MainWindow()
+    fpga_debug_window = UiFPGADebugWindow()
+    fpga_debug_window.setup_ui(fpga_window)
+    fpga_window.show()
 
 
 if __name__ == "__main__":
-    import sys
-
-    app = QtWidgets.QApplication(sys.argv)
-    main_window = MainWindow()
-    ui = UiFPGADebugWindow()
-    ui.setup_ui(main_window)
-    main_window.show()
-    sys.exit(app.exec_())
+    run_ui()

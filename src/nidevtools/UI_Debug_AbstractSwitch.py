@@ -194,8 +194,9 @@ class UiAbstractSwitchDebugWindow(object):
         # abstract_switch.pin_fgv(tsm_context, action=abstract_switch.Control.disconnect_all)
         pass
 
-    def pin_name_filter_value_changed(self, typed_str):
+    def pin_name_filter_value_changed(self, typed_str: str):
         typed_str = typed_str.upper()
+        typed_str = typed_str.strip()
         Properties.items_to_show.clear()
         self.tableWidget.clear()
         self.init_table()
