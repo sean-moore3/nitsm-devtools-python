@@ -8,7 +8,6 @@ from typing import List
 # import digital
 # import fpga
 
-
 # fpga_ref = fpga.TSMFPGA()
 
 
@@ -111,10 +110,68 @@ class UiFPGADebugWindow(object):
         self.qTimer.start()
 
     def update_command_state_button_clicked(self, cluster):
-        pass
+        # i = 0
+        # output_site_numbers: str = ""
+        # for ssc in fpga_ref.SSC:
+        #     for site_number in digital._site_list_to_site_numbers(ssc.Channels):
+        #         i += 1
+        #         selectedRows: List[int] = []
+        #         for selectedItem in self.tableWidget.selectedItems():
+        #             try:
+        #                 selectedRows.index(selectedItem.row())
+        #             except:
+        #                 selectedRows.append(selectedItem.row())
+        #         try:
+        #             if selectedRows.index(i) >= 0:
+        #                 output_site_numbers += site_number + ","
+        #         except:
+        #             pass
+        #
+        #     output_site_numbers = output_site_numbers[:-1]
+        #     output_site_numbers = output_site_numbers.strip()
+        #     ssc.channels = output_site_numbers
+        # print(selectedRows)
+        # fpga_ref.write_static_array(str(self.cb_new_state.currentText()))
+        self.timeout_event()
 
     def timeout_event(self):
-        pass
+        # typed_str = self.line_edit_name_filter.text()
+        # typed_str = typed_str.upper()
+        # typed_str = typed_str.strip()
+        # if typed_str != "":
+        #     for ssc in fpga_ref.SSC:
+        #         arr_of_site_numbers = digital._site_list_to_site_numbers(ssc.Channels)
+        #         arr_of_pins = digital._channel_list_to_pins(ssc.ChannelList)
+        #         output_pins = ""
+        #         output_site_numbers = ""
+        #         for pin in arr_of_pins:
+        #             if pin.upper().find(typed_str) != -1:
+        #                 output_pins += pin + ","
+        #                 output_site_numbers += arr_of_site_numbers[arr_of_pins.index(pin)] + ","
+        #
+        #         output_pins = output_pins[:-1]
+        #         output_pins = output_pins.strip()
+        #         output_site_numbers = output_site_numbers[:-1]
+        #         output_site_numbers = output_site_numbers.strip()
+        #         ssc.ChannelList = output_pins
+        #         ssc.Channels = output_site_numbers
+        #
+        # fpga_ref.read_commanded_line_states()
+        # self.tableWidget.setRowCount(fpga_ref.read_static())
+        # for elem in fpga_ref.read_static():
+        #     if elem:
+        #         item = QtWidgets.QTableWidgetItem()
+        #         self.tableWidget.setItem(fpga_ref.read_static().index(elem), 3, item)
+        #         item.setText(str(1))
+        #     else:
+        #         item = QtWidgets.QTableWidgetItem()
+        #         self.tableWidget.setItem(fpga_ref.read_static().index(elem), 3, item)
+        #         item.setText(str(0))
+        #     item = QtWidgets.QTableWidgetItem()
+        #     self.tableWidget.setItem(fpga_ref.read_static().index(elem), 3, item)
+        #     item.setText(str(0))
+
+        print("Timeout Event")
 
     def init_table(self):
 
@@ -142,8 +199,12 @@ def run_ui():
 
 
 def load_ui_in_new_thread():
+
     th = threading.Thread(target=run_ui)
-    th.start()
+    try:
+        th.start()
+    except:
+        pass
 
 
 if __name__ == "__main__":

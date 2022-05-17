@@ -259,7 +259,10 @@ def run_ui():
 
 def load_ui_in_new_thread():
     th = threading.Thread(target=run_ui)
-    th.start()
+    try:
+        th.start()
+    except:
+        pass
 
 if __name__ == "__main__":
     run_ui()
