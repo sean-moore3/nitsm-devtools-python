@@ -1,3 +1,5 @@
+import threading
+
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMainWindow
@@ -255,6 +257,9 @@ def run_ui():
     abs_window.show()
     sys.exit(app.exec_())
 
+def load_ui_in_new_thread():
+    th = threading.Thread(target=run_ui)
+    th.start()
 
 if __name__ == "__main__":
     run_ui()
