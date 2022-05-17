@@ -120,7 +120,6 @@ class UiFPGADebugWindow(object):
         QMessageBox.about(self.main_window, "Message", "Update Command State button Clicked")
 
 
-@nitsm.codemoduleapi.code_module
 def run_ui():
     app = QtWidgets.QApplication(sys.argv)
     fpga_window = MainWindow()
