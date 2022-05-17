@@ -1,8 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
-
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
+import sys
 
 tsm_context: SMContext
 
@@ -120,12 +120,15 @@ class UiFPGADebugWindow(object):
         QMessageBox.about(self.main_window, "Message", "Update Command State button Clicked")
 
 
-if __name__ == "__main__":
-    import sys
-
+@nitsm.codemoduleapi.code_module
+def run_ui():
     app = QtWidgets.QApplication(sys.argv)
-    main_window = MainWindow()
-    ui = UiFPGADebugWindow()
-    ui.setup_ui(main_window)
-    main_window.show()
+    fpga_window = MainWindow()
+    fpga_debug_window = UiFPGADebugWindow()
+    fpga_debug_window.setup_ui(fpga_window)
+    fpga_window.show()
     sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    run_ui()

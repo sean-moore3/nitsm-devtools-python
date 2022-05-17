@@ -1,5 +1,3 @@
-import time
-
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMainWindow
@@ -8,6 +6,8 @@ import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import typing
 from . import relay
+import sys
+import time
 
 
 class Properties:
@@ -260,12 +260,15 @@ class UiAbstractSwitchDebugWindow(object):
             Properties.tsm_context.filter_pins_by_instrument_type(instrument_type_id="niDMM")
 
 
-if __name__ == "__main__":
-    import sys
-
+def run_ui():
     app = QtWidgets.QApplication(sys.argv)
-    main_window = MainWindow()
-    ui = UiAbstractSwitchDebugWindow()
-    ui.setup_ui(main_window)
-    main_window.show()
+    abs_window = MainWindow()
+    abs_debug_window = UiAbstractSwitchDebugWindow()
+    abs_debug_window.setup_ui(abs_window)
+    abs_window.show()
     sys.exit(app.exec_())
+
+
+if __name__ == "__main__":
+    run_ui()
+
