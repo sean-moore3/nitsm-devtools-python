@@ -1,11 +1,11 @@
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMainWindow
-from . import abstract_switch
+from nidevtools import abstract_switch
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import typing
-from . import relay
+from nidevtools import relay
 import sys
 import time
 
