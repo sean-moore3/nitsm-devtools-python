@@ -20,6 +20,7 @@ class Properties:
     all_item_names: typing.List[str] = []
 
 
+abs_ui_launched = False
 testItems = relay.test_data
 for item in relay.test_data:
     Properties.items_to_show.append(item[0])
@@ -37,6 +38,8 @@ class MainWindow(QMainWindow):
     def closeEvent(self, *args, **kwargs):
         super().closeEvent(*args, **kwargs)
         print("Abstract Swtich Debug UI window closed!!!")
+        global abs_ui_launched
+        abs_ui_launched = False
 
 
 class UiAbstractSwitchDebugWindow(object):
@@ -260,9 +263,11 @@ def run_ui():
 
 
 def load_ui_in_new_thread():
-    if not hasattr(load_ui_in_new_thread, "th"):
-        load_ui_in_new_thread.th = threading.Thread(target=run_ui)
-        load_ui_in_new_thread.th.start()
+    global abs_ui_launched
+    if not abs_ui_launched:
+        th = threading.Thread(target=run_ui)
+        th.start()
+        abs_ui_launched = True
 
 
 if __name__ == "__main__":
