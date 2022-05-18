@@ -260,8 +260,9 @@ def run_ui():
 
 
 def load_ui_in_new_thread():
-    th = threading.Thread(target=run_ui)
-    th.start()
+    if not hasattr(load_ui_in_new_thread, "th"):
+        load_ui_in_new_thread.th = threading.Thread(target=run_ui)
+        load_ui_in_new_thread.th.start()
 
 
 if __name__ == "__main__":
