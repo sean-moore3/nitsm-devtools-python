@@ -10,6 +10,7 @@ import typing
 from nidevtools import relay
 import sys
 import time
+import threading
 
 
 class Properties:
@@ -43,7 +44,7 @@ class UiAbstractSwitchDebugWindow(object):
         self.main_window = None
         self.central_widget = None
         self.push_button_configure_mux = None
-        self.push_bt_new_state: QtWidgets.QPushButton = None
+        self.push_bt_new_state: QtWidgets.QPushButton
         self.push_bt_disable_all = None
         self.label_new_state = None
         self.label_update_time = None
@@ -257,12 +258,11 @@ def run_ui():
     abs_window.show()
     sys.exit(app.exec_())
 
+
 def load_ui_in_new_thread():
     th = threading.Thread(target=run_ui)
-    try:
-        th.start()
-    except:
-        pass
+    th.start()
+
 
 if __name__ == "__main__":
     run_ui()
