@@ -9,7 +9,7 @@ from typing import List
 # import fpga
 
 # fpga_ref = fpga.TSMFPGA()
-
+fpga_ui_launched = False
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -22,6 +22,8 @@ class MainWindow(QMainWindow):
     def closeEvent(self, *args, **kwargs):
         super().closeEvent(*args, **kwargs)
         print("you just closed the UI window!!!")
+        global fpga_ui_launched
+        fpga_ui_launched = False
 
 
 class UiFPGADebugWindow(object):
@@ -199,12 +201,11 @@ def run_ui():
 
 
 def load_ui_in_new_thread():
-
-    th = threading.Thread(target=run_ui)
-    try:
+    global fpga_ui_launched
+    if not fpga_ui_launched:
+        th = threading.Thread(target=run_ui)
         th.start()
-    except:
-        pass
+        fpga_ui_launched = True
 
 
 if __name__ == "__main__":
