@@ -270,6 +270,7 @@ def close_sessions(tsm: SMContext):  # Comment: Nothing to do
     pass
 
 
+@nitsm.codemoduleapi.code_module
 def disconnect_all(tsm: SMContext):  # CHECK
     """
     Disconnects all abstract switch related pins in the context provided
@@ -286,6 +287,7 @@ def disconnect_all(tsm: SMContext):  # CHECK
     multi_session.disconnect_sessions_info(tsm)
 
 
+@nitsm.codemoduleapi.code_module
 def disconnect_pin(tsm: SMContext, pin: str):
     """
     Disconnects the pin provided on the TSM context, the pin provided should be part of the pinmap
@@ -294,6 +296,7 @@ def disconnect_pin(tsm: SMContext, pin: str):
     sessions.disconnect_sessions_info(tsm)
 
 
+@nitsm.codemoduleapi.code_module
 def initialize(tsm: SMContext):  # CHECK
     """
     Initialize the TSM context with all the Abstract switch sessions. Based on the instrument type
@@ -331,6 +334,7 @@ def initialize(tsm: SMContext):  # CHECK
         )
 
 
+@nitsm.codemoduleapi.code_module
 def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connections):
     """
         Pin switch status fgv labview equivalent code
@@ -493,6 +497,7 @@ def pin_name_to_instrument(pinmap_path: str = ""):
     return subarray1 + subarray2
 
 
+@nitsm.codemoduleapi.code_module
 def enable_pins_to_sessions(tsm: SMContext, enable_pins: typing.List[str]):
     """
     Receives enable pins list and return a Multi-session object with the sessions corresponding to
@@ -512,6 +517,7 @@ def enable_pins_to_sessions(tsm: SMContext, enable_pins: typing.List[str]):
     return AbstractSession(array)
 
 
+@nitsm.codemoduleapi.code_module
 def get_all_instruments_names(tsm: SMContext):
     """
     Gets a list of all instrument names set on TSM context for Abstract switch
@@ -520,6 +526,7 @@ def get_all_instruments_names(tsm: SMContext):
     return switch_names
 
 
+@nitsm.codemoduleapi.code_module
 def get_all_sessions(tsm: SMContext):  # CHECK
     """
     Gets a list of Abstract Switch references corresponding to the set Abstract sessions on TSM
