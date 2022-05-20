@@ -160,7 +160,7 @@ digital_project_files_as = {
 @pytest.fixture
 def standalone_tsm(_published_data_reader_factory):
     # tsm_context = nitsm.codemoduleapi.SemiconductorModuleContext(_published_data_reader_factory[0])
-    tsm_context = StandaloneSMC(_published_data_reader_factory[0], file_paths=digital_project_files_as)
+    tsm_context = StandaloneSMC(_published_data_reader_factory[0], file_paths=digital_project_files)
     return tsm_context
 
 
@@ -203,7 +203,8 @@ def tests_pins(request):
         pins_selected = [input_dut_pins]
     elif file_name == "test_switch.py":
         # for function generator driver i.e. niswitch testing
-        input_dut_pins = ["Pin1", "Pin2", "Pin3", "Pin4", "Pin5", "Pin6", "Pin7", "Pin8", "Pin9"]
+        input_dut_pins = ["SWT_DO_Pin1", "SWT_DO_Pin2", "SWT_DO_Pin3", "SWT_DO_Pin4", "SWT_DO_Pin5",
+                          "SWT_DO_Pin6", "SWT_DO_Pin7", "SWT_DO_Pin8", "SWT_DO_Pin9"]
         pins_selected = input_dut_pins
     elif file_name == "test_fpga.py":
         # for function generator driver i.e. nifpga testing
@@ -211,7 +212,7 @@ def tests_pins(request):
         pins_selected = [input_dut_pins]
     elif file_name == "test_dmm.py":
         # for function generator driver i.e. nifpga testing
-        input_dut_pins = ["CH0"]
+        input_dut_pins = ["DMM_VI_CH0"]
         pins_selected = [input_dut_pins]
     else:
         pins_selected = ["dummy", "pins", "to_fail"]
