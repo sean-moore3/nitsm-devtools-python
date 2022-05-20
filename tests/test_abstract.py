@@ -77,11 +77,19 @@ class TestAbstract:
 
     def test_pin_name_to_instrument(self, tsm):
         # ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')
+        pinmap_filepath = tsm.pin_map_file_path
+        print(pinmap_filepath)
+        print("INIT")
+        table = ni_abstract.pin_name_to_instrument(pinmap_filepath)
+        print(table)
+
+    def test_fgv(self, tsm):
+        # ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')
         print(tsm.pin_map_file_path)
         print("INIT")
         ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.init)
         print("GET CONNECTIONS")
-        ni_abstract.pin_fgv(tsm, "En_Daq", ni_abstract.Control.get_connections)
+        ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.get_connections)
         print("DISCONNECT ALL")
         ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.disconnect_all)
 
