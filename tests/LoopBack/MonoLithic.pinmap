@@ -4,6 +4,19 @@
 		<!--- - - - Chassis 1 - - - - -->
 		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Group1" />
 		<NIFGenInstrument name="FGN1" numberOfChannels="1" />
+		<NIDmmInstrument name="DMM1" />
+		<Instrument name="SWT1" instrumentTypeId="_niSwitch">
+			<Channel id="0" />
+			<Channel id="1" />
+			<Channel id="2" />
+			<Channel id="3" />
+			<Channel id="4" />
+			<Channel id="5" />
+			<Channel id="6" />
+			<Channel id="7" />
+			<Channel id="8" />
+			<Channel id="9" />
+		</Instrument>
 		<NIScopeInstrument name="OSC1" numberOfChannels="8" group="Scope" />
 		<NIScopeInstrument name="OSC2" numberOfChannels="8" group="Scope" />
 		<NIScopeInstrument name="OSC3" numberOfChannels="4" group="Scope" />
@@ -49,6 +62,17 @@
 	</Instruments>
 	<Pins>
 		<DUTPin name="FGN_SI_SGL_In" />
+		<DUTPin name="DMM_VI_CH0" />
+		<DUTPin name="SWT_DO_Pin0" />
+		<DUTPin name="SWT_DO_Pin1" />
+		<DUTPin name="SWT_DO_Pin2" />
+		<DUTPin name="SWT_DO_Pin3" />
+		<DUTPin name="SWT_DO_Pin4" />
+		<DUTPin name="SWT_DO_Pin5" />
+		<DUTPin name="SWT_DO_Pin6" />
+		<DUTPin name="SWT_DO_Pin7" />
+		<DUTPin name="SWT_DO_Pin8" />
+		<DUTPin name="SWT_DO_Pin9" />		
 		<DUTPin name="DPI_DI_IN_1" />
 		<DUTPin name="DPI_DI_IN_2" />
 		<DUTPin name="DPI_DI_IN_3" />
@@ -133,6 +157,18 @@
 		<PinGroup name="FGN_PG_Signal">
 			<PinReference pin="FGN_SI_SGL_In" />
 		</PinGroup>
+		<PinGroup name="AllSwitch">
+			<PinReference pin="SWT_DO_Pin0" />
+			<PinReference pin="SWT_DO_Pin1" />
+			<PinReference pin="SWT_DO_Pin2" />
+			<PinReference pin="SWT_DO_Pin9" />
+			<PinReference pin="SWT_DO_Pin8" />
+			<PinReference pin="SWT_DO_Pin7" />
+			<PinReference pin="SWT_DO_Pin6" />
+			<PinReference pin="SWT_DO_Pin5" />
+			<PinReference pin="SWT_DO_Pin4" />
+			<PinReference pin="SWT_DO_Pin3" />
+		</PinGroup>
 		<PinGroup name="Inputs">
 			<PinReference pin="DPI_DI_IN_1" />
 			<PinReference pin="DPI_DI_IN_2" />
@@ -200,6 +236,17 @@
 	</Sites>
 	<Connections>
 		<Connection pin="FGN_SI_SGL_In" siteNumber="0" instrument="FGN1" channel="0" />
+		<Connection pin="DMM_VI_CH0" siteNumber="0" instrument="DMM1" channel="0" />
+		<Connection pin="SWT_DO_Pin0" siteNumber="0" instrument="SWT1" channel="0" />
+		<Connection pin="SWT_DO_Pin1" siteNumber="0" instrument="SWT1" channel="1" />
+		<Connection pin="SWT_DO_Pin2" siteNumber="0" instrument="SWT1" channel="2" />
+		<Connection pin="SWT_DO_Pin3" siteNumber="0" instrument="SWT1" channel="3" />
+		<Connection pin="SWT_DO_Pin4" siteNumber="0" instrument="SWT1" channel="4" />
+		<Connection pin="SWT_DO_Pin5" siteNumber="0" instrument="SWT1" channel="5" />
+		<Connection pin="SWT_DO_Pin6" siteNumber="0" instrument="SWT1" channel="6" />
+		<Connection pin="SWT_DO_Pin7" siteNumber="0" instrument="SWT1" channel="7" />
+		<Connection pin="SWT_DO_Pin8" siteNumber="0" instrument="SWT1" channel="8" />
+		<Connection pin="SWT_DO_Pin9" siteNumber="0" instrument="SWT1" channel="9" />
 		<Connection pin="DPI_DI_IN_1" siteNumber="0" instrument="DPI1" channel="1" />
 		<Connection pin="DPI_DI_IN_2" siteNumber="0" instrument="DPI1" channel="3" />
 		<Connection pin="DPI_DI_IN_3" siteNumber="0" instrument="DPI1" channel="5" />
