@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.5">
 	<Instruments>
-		<Multiplexer multiplexerTypeId="Matrix" name="MUX1" />
+		<Multiplexer multiplexerTypeId="Matrix" name="Masterconnect" />
 		<NIDAQmxTask name="DAQ1" taskType="DigitalOutput" channelList="DAQ1/port0/line2" />
 		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Digital" />
 		<Instrument name="RIO1" instrumentTypeId="782xFPGA">
@@ -81,14 +81,14 @@
 		<Connection pin="En_Dpi_DO1" siteNumber="0" instrument="DPI1" channel="0" />
 		<Connection pin="En_Swt_DO1" siteNumber="0" instrument="SWT1" channel="0" />
 		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
-			<MultiplexedDUTPinRoute pin="DUT_SGL_1" siteNumber="0" multiplexer="MUX1" routeName="En_Fpga_DO1=0" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_2" siteNumber="0" multiplexer="MUX1" routeName="En_Fpga_DO1=1" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_3" siteNumber="0" multiplexer="MUX1" routeName="En_Daq_DO1=0" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_4" siteNumber="0" multiplexer="MUX1" routeName="En_Daq_DO1=1" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_5" siteNumber="0" multiplexer="MUX1" routeName="En_Dpi_DO1=0" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_6" siteNumber="0" multiplexer="MUX1" routeName="En_Dpi_DO1=1" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_7" siteNumber="0" multiplexer="MUX1" routeName="En_Swt_DO1=0" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_8" siteNumber="0" multiplexer="MUX1" routeName="En_Swt_DO1=1" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_1" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=0" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_2" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=1" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_3" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq_DO1=0" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_4" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq_DO1=1" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_5" siteNumber="0" multiplexer="Masterconnect" routeName="En_Dpi_DO1=0" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_6" siteNumber="0" multiplexer="Masterconnect" routeName="En_Dpi_DO1=1" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_7" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=0" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_8" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=1" />
 		</MultiplexedConnection>
 	</Connections>
 </PinMap>

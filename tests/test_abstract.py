@@ -14,8 +14,7 @@ SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driv
 pin_file_names = ["AbstInst.pinmap", "C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap"]
 # Change index below to change the pin map to use
 pin_file_name = pin_file_names[0]
-message = "With" + pin_file_name + "Pinmap"
-print(message)
+
 OPTIONS = {}  # empty options to run on real hardware.
 if SIMULATE:
     OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "6368"}}
@@ -31,10 +30,9 @@ def tsm(standalone_tsm):
     ni_daqmx.set_task(standalone_tsm)
     ni_fpga.initialize_sessions(standalone_tsm)
     ni_switch.initialize_sessions(standalone_tsm)
-    #    ni_dt_digital.initialize_sessions(standalone_tsm)
-    print("INIT DONE")
+    ni_dt_digital.initialize_sessions(standalone_tsm)
     yield standalone_tsm
-    #    ni_dt_digital.close_sessions(standalone_tsm)
+    ni_dt_digital.close_sessions(standalone_tsm)
     ni_switch.close_sessions(standalone_tsm)
     ni_fpga.close_sessions(standalone_tsm)
     ni_daqmx.clear_task(standalone_tsm)
@@ -52,7 +50,7 @@ class TestAbstract:
         """
         ni_abstract.initialize(tsm)
         assert 4 == len(ni_abstract.get_all_sessions(tsm).enable_pins)
-        assert ni_abstract.get_all_instruments_names(tsm)[0] == "MUX1"
+        assert ni_abstract.get_all_instruments_names(tsm)[0] == "Masterconnect"
         ni_abstract.close_sessions(tsm)
 
     # def test_check_debug(self):
@@ -77,8 +75,7 @@ class TestAbstract:
 
     def test_pin_name_to_instrument(self, tsm):
         pinmap_filepath = tsm.pin_map_file_path
-        print(pinmap_filepath)
-        print("INIT")
+        print("pinmap_filepath", pinmap_filepath)
         table = ni_abstract.pin_name_to_instrument(pinmap_filepath)
         print(table)
 
