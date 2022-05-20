@@ -4,7 +4,6 @@ import nitsm.codemoduleapi
 import nidevtools.abstract_switch as ni_abstract
 import nidevtools.daqmx as ni_daqmx
 import nidevtools.fpga as ni_fpga
-
 import nidevtools.digital as ni_dt_digital
 import nidevtools.switch as ni_switch
 
@@ -56,8 +55,8 @@ class TestAbstract:
         assert ni_abstract.get_all_instruments_names(tsm)[0] == "Masterconnect"
         ni_abstract.close_sessions(tsm)
 
-    def test_check_debug(self):
-        ni_abstract.check_debug_ui_tool("")  # TODO add path
+    # def test_check_debug(self):
+    #     ni_abstract.check_debug_ui_tool("")  # TODO add path
 
     def test_pins_to_session_sessions_info(self, tsm):
         ni_abstract.initialize(tsm)
@@ -82,7 +81,7 @@ class TestAbstract:
         print("INIT")
         ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.init)
         print("GET CONNECTIONS")
-        ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.get_connections)
+        ni_abstract.pin_fgv(tsm, "En_Daq", ni_abstract.Control.get_connections)
         print("DISCONNECT ALL")
         ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.disconnect_all)
 

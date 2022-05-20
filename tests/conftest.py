@@ -160,7 +160,7 @@ digital_project_files_as = {
 @pytest.fixture
 def standalone_tsm(_published_data_reader_factory):
     # tsm_context = nitsm.codemoduleapi.SemiconductorModuleContext(_published_data_reader_factory[0])
-    tsm_context = StandaloneSMC(_published_data_reader_factory[0], file_paths=digital_project_files)
+    tsm_context = StandaloneSMC(_published_data_reader_factory[0], file_paths=digital_project_files_as)
     return tsm_context
 
 

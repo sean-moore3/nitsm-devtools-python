@@ -238,7 +238,7 @@ class AbstractSession(typing.NamedTuple):
 
 def check_debug_ui_tool(
     path_in: str,
-    path_teststand="C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2019 (64-bit)",
+    path_teststand="C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2020 (64-bit)",
 ):
     """
     checks the debug UI tool connected or not
