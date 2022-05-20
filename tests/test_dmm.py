@@ -11,7 +11,7 @@ from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 # "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["DMM.pinmap", "Rainbow.pinmap"]
+pin_file_names = ["MonoLithic.pinmap", "Rainbow.pinmap"]
 # Change index below to change the pin map to use
 pin_file_name = pin_file_names[0]
 
@@ -114,13 +114,13 @@ def close_sessions(tsm: SMContext):
 @nitsm.codemoduleapi.code_module
 def pins_to_sessions(
     tsm: SMContext,
-    pins: typing.List[str] = ["CH0"],
+    pins: typing.List[str] = ["DMM_VI_CH0"],
 ):
     return ni_dmm.pins_to_sessions(tsm, pins)
 
 
 @nitsm.codemoduleapi.code_module
-def configure(tsm: SMContext, pins: typing.List[str] = ["CH0"]):
+def configure(tsm: SMContext, pins: typing.List[str] = ["DMM_VI_CH0"]):
     dmm_tsms = []
     sessions = []
     for test_pin in pins:
