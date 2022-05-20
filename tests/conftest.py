@@ -112,9 +112,6 @@ def _published_data_reader_factory(request):
     published_data_reader_factory = win32com.client.Dispatch(
         "NationalInstruments.TestStand.SemiconductorModule.Restricted.PublishedDataReaderFactory"
     )
-    print()
-    print(pin_map_path)
-    print()
     return published_data_reader_factory.NewSemiconductorModuleContext(pin_map_path)
 
 
@@ -127,9 +124,7 @@ data_dir = os.path.join(os.path.dirname(__file__), "LoopBack")
 specification1 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C_Electrical.specs")
 specification2 = os.path.join(os.path.join(data_dir, "Specifications"), "I2C_Time.specs")
 level1 = os.path.join(os.path.join(data_dir, "Levels"), "I2C_Levels.digilevels")
-level2 = os.path.join(os.path.join(data_dir, "Levels"), "I2C_Levels.digilevels_as")
 timing1 = os.path.join(os.path.join(data_dir, "Timing"), "I2C_Timing.digitiming")
-timing2 = os.path.join(os.path.join(data_dir, "Timing"), "I2C_Timing.digitiming_as")
 pattern1 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write_Loop.digipat")
 pattern2 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Read_Loop.digipat")
 pattern3 = os.path.join(os.path.join(data_dir, "Patterns"), "I2C_Write.digipat")
@@ -142,15 +137,6 @@ digital_project_files = {
     "specifications": [specification1, specification2],
     "levels": [level1],
     "timing": [timing1],
-    "pattern": [pattern1, pattern2, pattern3, pattern4],
-    "capture_waveforms": [cap_wfm],
-    "source_waveforms": [src_wfm1, src_wfm2, src_wfm3],
-}
-
-digital_project_files_as = {
-    "specifications": [specification1, specification2],
-    "levels": [level2],
-    "timing": [timing2],
     "pattern": [pattern1, pattern2, pattern3, pattern4],
     "capture_waveforms": [cap_wfm],
     "source_waveforms": [src_wfm1, src_wfm2, src_wfm3],
