@@ -482,7 +482,6 @@ def pin_name_to_instrument(pinmap_path: str = ""):
             else:
                 r += 1
         if element[1] == "AbstractInstrument":
-            print(subarray22)
             out1 = subarray22[r][2]
         else:
             out1 = ""

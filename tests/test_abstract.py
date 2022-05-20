@@ -52,7 +52,7 @@ class TestAbstract:
         """
         ni_abstract.initialize(tsm)
         assert 4 == len(ni_abstract.get_all_sessions(tsm).enable_pins)
-        assert ni_abstract.get_all_instruments_names(tsm)[0] == "Masterconnect"
+        assert ni_abstract.get_all_instruments_names(tsm)[0] == "MUX1"
         ni_abstract.close_sessions(tsm)
 
     # def test_check_debug(self):
@@ -60,7 +60,7 @@ class TestAbstract:
 
     def test_pins_to_session_sessions_info(self, tsm):
         ni_abstract.initialize(tsm)
-        pins = ["EN_FPGA"]
+        pins = ["En_Fpga_DO1"]
         enabled = ni_abstract.enable_pins_to_sessions(tsm, pins)
         assert enabled.enable_pins[0].enable_pin == pins[0]
         enabled.connect_sessions_info(tsm)
@@ -68,15 +68,14 @@ class TestAbstract:
         t.stop()
         enabled.disconnect_sessions_info(tsm)
         # ni_abstract.disconnect_all(tsm)
-        abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm, "BuckSGL_1_DUT")
+        abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm, "DUT_SGL_1")
         print(abst_session)
         enabled.read_state(tsm)
-        ni_abstract.pins_to_task_and_connect(tsm, ["En_Daq"], ["BuckSGL_3_DUT", "BuckSGL_4_DUT"])
+        ni_abstract.pins_to_task_and_connect(tsm, ["En_Daq_DO1"], ["DUT_SGL_3", "DUT_SGL_4"])
         # ni_abstract.disconnect_all(tsm)
-        ni_abstract.disconnect_pin(tsm, "BuckSGL_1_DUT")
+        ni_abstract.disconnect_pin(tsm, "DUT_SGL_1")
 
     def test_pin_name_to_instrument(self, tsm):
-        # ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')
         pinmap_filepath = tsm.pin_map_file_path
         print(pinmap_filepath)
         print("INIT")
