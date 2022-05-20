@@ -105,9 +105,9 @@ class TestDaqmx:
         samp_cha = 1000
         samp_rate = 500
         for daqmx_tsm in list_daqmx_tsm:
-            daqmx_tsm.timing(samp_cha, samp_rate)
+            daqmx_tsm.timing1(samp_cha, samp_rate)
             for session in daqmx_tsm.sessions:
-                assert samp_rate == session.Task.timing.samp_clk_rate
+                assert samp_rate == session.Task.timing1.samp_clk_rate
         # print("\nTest Trigger Configuration\n")
         # source = "APFI0"
         # for daqmx_tsm in list_daqmx_tsm:
@@ -157,7 +157,7 @@ class TestDaqmx:
         )
         daq_sessions_all.stop_task()
         daq_sessions_all.timing()
-        daq_sessions_out.timing()
+        daq_sessions_out.timing1()
         # for s in daq_sessions_2.sessions:
         #    print(s.Task.triggers.reference_trigger.analog_edge_src)
         # daq_sessions_2.reference_digital_edge("PXI_Trig0", constant.Slope.FALLING, 10)
@@ -180,8 +180,8 @@ class TestDaqmx:
         daq_pins_out_dsa = ["TestOut2"]
         daq_sessions_out_dsa = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins_out_dsa)
         daq_sessions_in_dsa = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins_in_dsa)
-        daq_sessions_out_dsa.timing(sampling_rate_hz=1250)  # DSA Channel
-        daq_sessions_in_dsa.timing(sampling_rate_hz=10000)  # DSA Channel
+        daq_sessions_out_dsa.timing1(sampling_rate_hz=1250)  # DSA Channel
+        daq_sessions_in_dsa.timing1(sampling_rate_hz=10000)  # DSA Channel
         output = 2.0  # configure output in NI-MAX
         error = 0.05  # 16 bits with range 20 for both input and output
         daq_sessions_in_dsa.start_task()
@@ -279,7 +279,7 @@ def scenario1(tsm: SMContext):
     )
     daq_sessions_all.stop_task()
     daq_sessions_all.timing()
-    daq_sessions_out.timing()
+    daq_sessions_out.timing1()
     output = 2.0
     daq_sessions_out.write_data([output, output])
     daq_sessions_all.start_task()
@@ -296,8 +296,8 @@ def scenario2(tsm: SMContext):
     daq_pins_out_dsa = ["TestOut2"]
     daq_sessions_out_dsa = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins_out_dsa)
     daq_sessions_in_dsa = ni_daqmx.pins_to_session_sessions_info(tsm, daq_pins_in_dsa)
-    daq_sessions_out_dsa.timing(sampling_rate_hz=1250)  # DSA Channel
-    daq_sessions_in_dsa.timing(sampling_rate_hz=10000)  # DSA Channel
+    daq_sessions_out_dsa.timing1(sampling_rate_hz=1250)  # DSA Channel
+    daq_sessions_in_dsa.timing1(sampling_rate_hz=10000)  # DSA Channel
     expected = 2.0  # configure expected in NI-MAX
     daq_sessions_in_dsa.start_task()
     daq_sessions_out_dsa.write_data([expected, expected])
