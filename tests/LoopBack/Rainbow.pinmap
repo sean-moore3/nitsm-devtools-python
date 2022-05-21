@@ -68,11 +68,13 @@
 	</Pins>
 	<PinGroups>
 		<PinGroup name="DPI_PG_Inputs">
+			<PinReference pin="DPI_PM_VDD" />
 			<PinReference pin="DPI_DI_SDA" />
 			<PinReference pin="DPI_DI_SCL" />
 			<PinReference pin="En_Dpi_DI1" />
 		</PinGroup>
 		<PinGroup name="DPI_PG_Outputs">
+			<PinReference pin="DPI_SR_VDD" />
 			<PinReference pin="DPI_DO_SCL" />
 			<PinReference pin="DPI_DO_SDA" />
 			<PinReference pin="En_Dpi_DO1" />
