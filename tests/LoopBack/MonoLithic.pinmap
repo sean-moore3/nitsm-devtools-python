@@ -89,14 +89,14 @@
 		<DUTPin name="SMU_VI_ANA3" />
 		<DUTPin name="SMU_VI_ANA4" />
 		<DUTPin name="SMU_VI_ANA5" />
-		<DUTPin name="DPI_PM_VDD" />
-		<DUTPin name="DPI_SR_VDD" />
 		<DUTPin name="DPI_DO_SCL" />
 		<DUTPin name="DPI_DO_SDA" />
 		<DUTPin name="DPI_DI_SCL" />
 		<DUTPin name="DPI_DI_SDA" />		
-		<DUTPin name="En_Dpi_DO1" />
-		<DUTPin name="En_Dpi_DI1" />
+		<SystemPin name="DPI_SR_VDD" />
+		<SystemPin name="DPI_PM_VDD" />
+		<SystemPin name="En_Dpi_DO1" />
+		<SystemPin name="En_Dpi_DI1" />
 		<DUTPin name="En_Daq_DO1" />
 		<DUTPin name="En_Fpga_DO1" />
 		<DUTPin name="En_Swt_DO1" />
@@ -373,10 +373,10 @@
 		<Connection channel="DAQ2/port1/line5" instrument="DAQ2_P1_5" pin="En_DIO_5V0_6368_4464_MUX2_A1" siteNumber="0" />
 		<Connection channel="DAQ2/port1/line6" instrument="DAQ2_P1_6" pin="En_DIO_5V0_6368_4464_MUX2_A2" siteNumber="0" />
 		<Connection channel="DAQ2/port1/line7" instrument="DAQ2_P1_7" pin="En_DIO_5V0_6368_4464_MUX_EN" siteNumber="0" />
-		<Connection pin="DPI_SR_VDD" siteNumber="0" instrument="DPI1" channel="0" />
-		<Connection pin="DPI_PM_VDD" siteNumber="0" instrument="DPI1" channel="1" />
-		<Connection pin="En_Dpi_DO1" siteNumber="0" instrument="DPI1" channel="2" />
-		<Connection pin="En_Dpi_DI1" siteNumber="0" instrument="DPI1" channel="3" />
+		<SystemConnection pin="DPI_SR_VDD" instrument="DPI1" channel="0" />
+		<SystemConnection pin="DPI_PM_VDD" instrument="DPI1" channel="1" />
+		<SystemConnection pin="En_Dpi_DO1" instrument="DPI1" channel="2" />
+		<SystemConnection pin="En_Dpi_DI1" instrument="DPI1" channel="3" />
 		<Connection pin="DPI_DO_SCL" siteNumber="0" instrument="DPI1" channel="4" />
 		<Connection pin="DPI_DI_SCL" siteNumber="0" instrument="DPI1" channel="5" />
 		<Connection pin="DPI_DI_SDA" siteNumber="0" instrument="DPI1" channel="6" />
