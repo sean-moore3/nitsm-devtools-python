@@ -14,8 +14,6 @@
 		<NIDCPowerInstrument name="SMU2" numberOfChannels="4">
 			<ChannelGroup name="CommonDCPowerChannelGroup2" />
 		</NIDCPowerInstrument>
-		<NIDAQmxTask channelList="DAQ3/ai0,DAQ3/ai1" name="DAQ3_AI" taskType="AnalogInputDSA" />
-		<NIDAQmxTask name="DAQ3_AO" taskType="AnalogOutputDSA" channelList="DAQ3/ao0,DAQ3/ao1" />
 		<NIDAQmxTask channelList="DAQ1/ai0,DAQ1/ai1,DAQ1/ai2,DAQ1/ai3,DAQ1/ai4,DAQ1/ai5,DAQ1/ai6,DAQ1/ai7,DAQ1/ai8,DAQ1/ai9,DAQ1/ai10,DAQ1/ai11,DAQ1/ai12,DAQ1/ai13,DAQ1/ai14,DAQ1/ai15" name="DAQ1_AI" taskType="AnalogInput" />
 		<NIDAQmxTask channelList="DAQ2/ai0,DAQ2/ai1,DAQ2/ai2,DAQ2/ai3,DAQ2/ai4,DAQ2/ai5,DAQ2/ai6,DAQ2/ai7,DAQ2/ai8,DAQ2/ai9,DAQ2/ai10,DAQ2/ai11,DAQ2/ai12,DAQ2/ai13,DAQ2/ai14,DAQ2/ai15" name="DAQ2_AI" taskType="AnalogInput" />
 		<NIDAQmxTask channelList="DAQ2/ao0,DAQ2/ao1" name="DAQ2_AO" taskType="AnalogOutput" />
@@ -45,6 +43,8 @@
 		<NIDAQmxTask channelList="DAQ2/port1/line5" name="DAQ2_P1_5" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ2/port1/line6" name="DAQ2_P1_6" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ2/port1/line7" name="DAQ2_P1_7" taskType="DigitalOutput" />
+		<NIDAQmxTask channelList="DAQ3/ai0,DAQ3/ai1" name="DAQ3_AI" taskType="AnalogInputDSA" />
+		<NIDAQmxTask name="DAQ3_AO" taskType="AnalogOutputDSA" channelList="DAQ3/ao0,DAQ3/ao1" />
 		<Instrument name="RIO1" instrumentTypeId="782xFPGA">
 			<ChannelGroup id="DIO">
 				<Channel id="0" />
