@@ -17,9 +17,9 @@ import nidevtools.digital as dt_dpi
 
 # To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
-pin_file_names = ["Rainbow.pinmap", "MonoLithic.pinmap"]
+pin_file_names = ["MonoLithic.pinmap", "Rainbow.pinmap"]
 # Change index below to change the pinmap to use
-pin_file_name = pin_file_names[0]
+pin_file_name = pin_file_names[1]
 OPTIONS = {}  # empty dict options to run on real hardware.
 if SIMULATE_HARDWARE:
     OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
