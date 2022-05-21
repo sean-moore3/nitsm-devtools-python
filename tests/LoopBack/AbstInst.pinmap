@@ -1,7 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PinMap xmlns="http://www.ni.com/TestStand/SemiconductorModule/PinMap.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="1.5">
 	<Instruments>
-		<Multiplexer multiplexerTypeId="Matrix" name="Masterconnect" />
 		<NIDAQmxTask name="DAQ1" taskType="DigitalOutput" channelList="DAQ1/port0/line2" />
 		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Digital" />
 		<Instrument name="RIO1" instrumentTypeId="782xFPGA">
@@ -15,6 +14,7 @@
 		<Instrument instrumentTypeId="abstinst" name="AbstractInstrument">
 			<Channel id="0" />
 		</Instrument>
+		<Multiplexer multiplexerTypeId="Matrix" name="Masterconnect" />
 	</Instruments>
 	<Pins>
 		<DUTPin name="En_Daq_DO1" />

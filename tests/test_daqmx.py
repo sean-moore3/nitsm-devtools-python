@@ -8,7 +8,7 @@ import nitsm
 import pytest
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
-# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
+# To simulate hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
 pin_file_names = ["MonoLithic.pinmap", "Rainbow.pinmap"]

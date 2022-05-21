@@ -5,18 +5,6 @@
 		<NIDigitalPatternInstrument name="DPI1" numberOfChannels="32" group="Group1" />
 		<NIFGenInstrument name="FGN1" numberOfChannels="1" />
 		<NIDmmInstrument name="DMM1" />
-		<Instrument name="SWT1" instrumentTypeId="_niSwitch">
-			<Channel id="0" />
-			<Channel id="1" />
-			<Channel id="2" />
-			<Channel id="3" />
-			<Channel id="4" />
-			<Channel id="5" />
-			<Channel id="6" />
-			<Channel id="7" />
-			<Channel id="8" />
-			<Channel id="9" />
-		</Instrument>
 		<NIScopeInstrument name="OSC1" numberOfChannels="8" group="Scope" />
 		<NIScopeInstrument name="OSC2" numberOfChannels="8" group="Scope" />
 		<NIScopeInstrument name="OSC3" numberOfChannels="4" group="Scope" />
@@ -31,6 +19,7 @@
 		<NIDAQmxTask channelList="DAQ1/ai0,DAQ1/ai1,DAQ1/ai2,DAQ1/ai3,DAQ1/ai4,DAQ1/ai5,DAQ1/ai6,DAQ1/ai7,DAQ1/ai8,DAQ1/ai9,DAQ1/ai10,DAQ1/ai11,DAQ1/ai12,DAQ1/ai13,DAQ1/ai14,DAQ1/ai15" name="DAQ1_AI" taskType="AnalogInput" />
 		<NIDAQmxTask channelList="DAQ2/ai0,DAQ2/ai1,DAQ2/ai2,DAQ2/ai3,DAQ2/ai4,DAQ2/ai5,DAQ2/ai6,DAQ2/ai7,DAQ2/ai8,DAQ2/ai9,DAQ2/ai10,DAQ2/ai11,DAQ2/ai12,DAQ2/ai13,DAQ2/ai14,DAQ2/ai15" name="DAQ2_AI" taskType="AnalogInput" />
 		<NIDAQmxTask channelList="DAQ2/ao0,DAQ2/ao1" name="DAQ2_AO" taskType="AnalogOutput" />
+		<NIDAQmxTask channelList="DAQ1/port0/line0" name="DAQ1_P0_0" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ1/port0/line2" name="DAQ1_P0_2" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ1/port0/line3" name="DAQ1_P0_3" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ1/port0/line4" name="DAQ1_P0_4" taskType="DigitalOutput" />
@@ -56,14 +45,31 @@
 		<NIDAQmxTask channelList="DAQ2/port1/line5" name="DAQ2_P1_5" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ2/port1/line6" name="DAQ2_P1_6" taskType="DigitalOutput" />
 		<NIDAQmxTask channelList="DAQ2/port1/line7" name="DAQ2_P1_7" taskType="DigitalOutput" />
+		<Instrument name="RIO1" instrumentTypeId="782xFPGA">
+			<ChannelGroup id="DIO">
+				<Channel id="0" />
+			</ChannelGroup>
+		</Instrument>
+		<Instrument name="SWT1" instrumentTypeId="_niSwitch">
+			<Channel id="0" />
+			<Channel id="1" />
+			<Channel id="2" />
+			<Channel id="3" />
+			<Channel id="4" />
+			<Channel id="5" />
+			<Channel id="6" />
+			<Channel id="7" />
+			<Channel id="8" />
+			<Channel id="9" />
+		</Instrument>
 		<Instrument name="AbstractInstrument" instrumentTypeId="abstinst">
 			<Channel id="0" />
 		</Instrument>
+		<Multiplexer multiplexerTypeId="Matrix" name="Masterconnect" />
 	</Instruments>
 	<Pins>
 		<DUTPin name="FGN_SI_SGL_In" />
 		<DUTPin name="DMM_VI_CH0" />
-		<DUTPin name="SWT_DO_Pin0" />
 		<DUTPin name="SWT_DO_Pin1" />
 		<DUTPin name="SWT_DO_Pin2" />
 		<DUTPin name="SWT_DO_Pin3" />
@@ -72,13 +78,7 @@
 		<DUTPin name="SWT_DO_Pin6" />
 		<DUTPin name="SWT_DO_Pin7" />
 		<DUTPin name="SWT_DO_Pin8" />
-		<DUTPin name="SWT_DO_Pin9" />		
-		<DUTPin name="DPI_DI_IN_1" />
-		<DUTPin name="DPI_DI_IN_2" />
-		<DUTPin name="DPI_DI_IN_3" />
-		<DUTPin name="DPI_DO_OUT_1" />
-		<DUTPin name="DPI_DO_OUT_2" />
-		<DUTPin name="DPI_DO_OUT_3" />
+		<DUTPin name="SWT_DO_Pin9" />
 		<DUTPin name="OSC_xA_ANA1" />
 		<DUTPin name="OSC_xA_ANA2" />
 		<DUTPin name="OSC_xA_ANA3" />
@@ -89,6 +89,25 @@
 		<DUTPin name="SMU_VI_ANA3" />
 		<DUTPin name="SMU_VI_ANA4" />
 		<DUTPin name="SMU_VI_ANA5" />
+		<DUTPin name="DPI_PM_VDD" />
+		<DUTPin name="DPI_SR_VDD" />
+		<DUTPin name="DPI_DO_SCL" />
+		<DUTPin name="DPI_DO_SDA" />
+		<DUTPin name="DPI_DI_SCL" />
+		<DUTPin name="DPI_DI_SDA" />		
+		<DUTPin name="En_Dpi_DO1" />
+		<DUTPin name="En_Dpi_DI1" />
+		<DUTPin name="En_Daq_DO1" />
+		<DUTPin name="En_Fpga_DO1" />
+		<DUTPin name="En_Swt_DO1" />
+		<DUTPin name="DUT_SGL_1" />
+		<DUTPin name="DUT_SGL_2" />
+		<DUTPin name="DUT_SGL_3" />
+		<DUTPin name="DUT_SGL_4" />
+		<DUTPin name="DUT_SGL_5" />
+		<DUTPin name="DUT_SGL_6" />
+		<DUTPin name="DUT_SGL_7" />
+		<DUTPin name="DUT_SGL_8" />
 		<DUTPin name="En_DIO_5V0_6368_VDD_LDO2_RLY_EN" />
 		<DUTPin name="En_DIO_5V0_6368_VDD_LDO15_RLY_EN" />
 		<DUTPin name="En_DIO_5V0_6368_BUCK0_RLY_EN" />
@@ -158,7 +177,7 @@
 			<PinReference pin="FGN_SI_SGL_In" />
 		</PinGroup>
 		<PinGroup name="AllSwitch">
-			<PinReference pin="SWT_DO_Pin0" />
+			<PinReference pin="En_Swt_DO1" />
 			<PinReference pin="SWT_DO_Pin1" />
 			<PinReference pin="SWT_DO_Pin2" />
 			<PinReference pin="SWT_DO_Pin9" />
@@ -170,14 +189,14 @@
 			<PinReference pin="SWT_DO_Pin3" />
 		</PinGroup>
 		<PinGroup name="Inputs">
-			<PinReference pin="DPI_DI_IN_1" />
-			<PinReference pin="DPI_DI_IN_2" />
-			<PinReference pin="DPI_DI_IN_3" />
+			<PinReference pin="DPI_PM_VDD" />
+			<PinReference pin="En_Dpi_DI1" />
+			<PinReference pin="DPI_DI_SCL" />
 		</PinGroup>
 		<PinGroup name="Outputs">
-			<PinReference pin="DPI_DO_OUT_1" />
-			<PinReference pin="DPI_DO_OUT_2" />
-			<PinReference pin="DPI_DO_OUT_3" />
+			<PinReference pin="DPI_SR_VDD" />
+			<PinReference pin="En_Dpi_DO1" />
+			<PinReference pin="DPI_DO_SCL" />
 		</PinGroup>
 		<PinGroup name="Inputs_OSC_ANA">
 			<PinReference pin="OSC_xA_ANA1" />
@@ -230,6 +249,39 @@
 			<PinReference pin="VPROBE1_4464" />
 			<PinReference pin="VPROBE2_4464" />
 		</PinGroup>
+		<PinGroup name="PG_SGL_1">
+			<PinReference pin="DUT_SGL_1" />
+			<PinReference pin="En_Fpga_DO1" />
+		</PinGroup>
+		<PinGroup name="PG_SGL_2">
+			<PinReference pin="DUT_SGL_2" />
+			<PinReference pin="En_Fpga_DO1" />
+		</PinGroup>
+		<PinGroup name="PG_SGL_3">
+			<PinReference pin="DUT_SGL_3" />
+			<PinReference pin="En_Daq_DO1" />
+		</PinGroup>
+		<PinGroup name="PG_SGL_4">
+			<PinReference pin="DUT_SGL_4" />
+			<PinReference pin="En_Daq_DO1" />
+		</PinGroup>
+		<PinGroup name="PG_SGL_5">
+			<PinReference pin="DUT_SGL_5" />
+			<PinReference pin="En_Dpi_DO1" />
+		</PinGroup>
+		<PinGroup name="PG_SGL_6">
+			<PinReference pin="DUT_SGL_6" />
+			<PinReference pin="En_Dpi_DO1" />
+		</PinGroup>
+		<PinGroup name="PG_SGL_7">
+			<PinReference pin="DUT_SGL_7" />
+			<PinReference pin="En_Swt_DO1" />
+		</PinGroup>
+		<PinGroup name="PG_SGL_8">
+			<PinReference pin="DUT_SGL_8" />
+			<PinReference pin="En_Swt_DO1" />
+		</PinGroup>
+
 	</PinGroups>
 	<Sites>
 		<Site siteNumber="0" />
@@ -237,7 +289,7 @@
 	<Connections>
 		<Connection pin="FGN_SI_SGL_In" siteNumber="0" instrument="FGN1" channel="0" />
 		<Connection pin="DMM_VI_CH0" siteNumber="0" instrument="DMM1" channel="0" />
-		<Connection pin="SWT_DO_Pin0" siteNumber="0" instrument="SWT1" channel="0" />
+		<Connection pin="En_Swt_DO1" siteNumber="0" instrument="SWT1" channel="0" />
 		<Connection pin="SWT_DO_Pin1" siteNumber="0" instrument="SWT1" channel="1" />
 		<Connection pin="SWT_DO_Pin2" siteNumber="0" instrument="SWT1" channel="2" />
 		<Connection pin="SWT_DO_Pin3" siteNumber="0" instrument="SWT1" channel="3" />
@@ -247,12 +299,6 @@
 		<Connection pin="SWT_DO_Pin7" siteNumber="0" instrument="SWT1" channel="7" />
 		<Connection pin="SWT_DO_Pin8" siteNumber="0" instrument="SWT1" channel="8" />
 		<Connection pin="SWT_DO_Pin9" siteNumber="0" instrument="SWT1" channel="9" />
-		<Connection pin="DPI_DI_IN_1" siteNumber="0" instrument="DPI1" channel="1" />
-		<Connection pin="DPI_DI_IN_2" siteNumber="0" instrument="DPI1" channel="3" />
-		<Connection pin="DPI_DI_IN_3" siteNumber="0" instrument="DPI1" channel="5" />
-		<Connection pin="DPI_DO_OUT_1" siteNumber="0" instrument="DPI1" channel="0" />
-		<Connection pin="DPI_DO_OUT_2" siteNumber="0" instrument="DPI1" channel="2" />
-		<Connection pin="DPI_DO_OUT_3" siteNumber="0" instrument="DPI1" channel="4" />
 		<Connection pin="OSC_xA_ANA1" siteNumber="0" instrument="OSC1" channel="0" />
 		<Connection pin="OSC_xA_ANA2" siteNumber="0" instrument="OSC1" channel="1" />
 		<Connection pin="OSC_xA_ANA3" siteNumber="0" instrument="OSC2" channel="0" />
@@ -301,6 +347,7 @@
 		<Connection channel="DAQ2/ai13" instrument="DAQ2_AI" pin="GPIO9_DAQ" siteNumber="0" />
 		<Connection channel="DAQ2/ai14" instrument="DAQ2_AI" pin="GPIO16_DAQ" siteNumber="0" />
 		<Connection channel="DAQ2/ai15" instrument="DAQ2_AI" pin="GPIO19_DAQ" siteNumber="0" />
+		<Connection pin="En_Daq_DO1" siteNumber="0" instrument="DAQ1_P0_0" channel="DAQ1/port0/line0" />
 		<Connection channel="DAQ1/port0/line2" instrument="DAQ1_P0_2" pin="En_DIO_5V0_6368_VDD_LDO2_RLY_EN" siteNumber="0" />
 		<Connection channel="DAQ1/port0/line3" instrument="DAQ1_P0_3" pin="En_DIO_5V0_6368_VDD_LDO15_RLY_EN" siteNumber="0" />
 		<Connection channel="DAQ1/port0/line4" instrument="DAQ1_P0_4" pin="En_DIO_5V0_6368_BUCK0_RLY_EN" siteNumber="0" />
@@ -326,5 +373,25 @@
 		<Connection channel="DAQ2/port1/line5" instrument="DAQ2_P1_5" pin="En_DIO_5V0_6368_4464_MUX2_A1" siteNumber="0" />
 		<Connection channel="DAQ2/port1/line6" instrument="DAQ2_P1_6" pin="En_DIO_5V0_6368_4464_MUX2_A2" siteNumber="0" />
 		<Connection channel="DAQ2/port1/line7" instrument="DAQ2_P1_7" pin="En_DIO_5V0_6368_4464_MUX_EN" siteNumber="0" />
+		<Connection pin="DPI_SR_VDD" siteNumber="0" instrument="DPI1" channel="0" />
+		<Connection pin="DPI_PM_VDD" siteNumber="0" instrument="DPI1" channel="1" />
+		<Connection pin="En_Dpi_DO1" siteNumber="0" instrument="DPI1" channel="2" />
+		<Connection pin="En_Dpi_DI1" siteNumber="0" instrument="DPI1" channel="3" />
+		<Connection pin="DPI_DO_SCL" siteNumber="0" instrument="DPI1" channel="4" />
+		<Connection pin="DPI_DI_SCL" siteNumber="0" instrument="DPI1" channel="5" />
+		<Connection pin="DPI_DI_SDA" siteNumber="0" instrument="DPI1" channel="6" />
+		<Connection pin="DPI_DO_SDA" siteNumber="0" instrument="DPI1" channel="7" />
+		<Connection pin="En_Fpga_DO1" siteNumber="0" instrument="RIO1" channel="0" />
+		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
+			<MultiplexedDUTPinRoute pin="DUT_SGL_1" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=0" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_2" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=1" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_3" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq_DO1=0" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_4" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq_DO1=1" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_5" siteNumber="0" multiplexer="Masterconnect" routeName="En_Dpi_DO1=0" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_6" siteNumber="0" multiplexer="Masterconnect" routeName="En_Dpi_DO1=1" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_7" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=0" />
+			<MultiplexedDUTPinRoute pin="DUT_SGL_8" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=1" />
+		</MultiplexedConnection>
+		
 	</Connections>
 </PinMap>

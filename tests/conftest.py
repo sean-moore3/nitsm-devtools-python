@@ -169,7 +169,7 @@ def tests_pins(request):
         input_dut_pins = ["DPI_DO_SCL", "DPI_DO_SDA"]
         output_dut_pins = ["DPI_DI_SCL", "DPI_DI_SDA"]
         all_dut_pins = input_dut_pins + output_dut_pins
-        dpi_system_pins = ["DPI_PM_VDD", "DPI_PM_VDDIO"]
+        dpi_system_pins = ["DPI_PM_VDD", "En_Dpi_DO1"]
         pins_selected = [input_dut_pins, output_dut_pins, all_dut_pins]
     elif file_name == "test_scope.py":
         # for scope driver i.e. niscope testing
@@ -189,7 +189,7 @@ def tests_pins(request):
         pins_selected = [input_dut_pins]
     elif file_name == "test_switch.py":
         # for function generator driver i.e. niswitch testing
-        input_dut_pins = ["SWT_DO_Pin1", "SWT_DO_Pin2", "SWT_DO_Pin3", "SWT_DO_Pin4", "SWT_DO_Pin5",
+        input_dut_pins = ["En_Swt_DO1", "SWT_DO_Pin2", "SWT_DO_Pin3", "SWT_DO_Pin4", "SWT_DO_Pin5",
                           "SWT_DO_Pin6", "SWT_DO_Pin7", "SWT_DO_Pin8", "SWT_DO_Pin9"]
         pins_selected = input_dut_pins
     elif file_name == "test_fpga.py":
