@@ -10,8 +10,7 @@ SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driv
 pin_file_names = ["MonoLithic.pinmap", "Rainbow.pinmap"]
 # Change index below to change the pin map to use
 pin_file_name = pin_file_names[0]
-message = "With" + pin_file_name + "Pinmap"
-print(message)
+
 OPTIONS = {}  # empty options to run on real hardware.
 if SIMULATE:
     OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "6368"}}
