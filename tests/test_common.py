@@ -11,7 +11,7 @@ print(input_data)
 print(output_data)
 pattern = r"/\\"
 a = re.split(r"[/\\]", input_data)
-# print(a)
+print(a)
 
 data = []
 for pin_count in range(10):
@@ -21,7 +21,4 @@ for pin_count in range(10):
     data.append(pins_array)
 
 print(data)
-tsm = "tsm"
 
-absobj = ni_dt_abs.pins_to_sessions_sessions_info(tsm, "ldo23")
-absobj.connect_sessions_info(tsm)
