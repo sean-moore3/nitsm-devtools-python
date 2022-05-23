@@ -310,6 +310,9 @@
 		<NIFGenInstrument name="FGN6" numberOfChannels="1" />
 		<NIFGenInstrument name="FGN7" numberOfChannels="1" />
 		<NIFGenInstrument name="FGN8" numberOfChannels="1" />
+		<Instrument name="SWT1" instrumentTypeId="_niSwitch">
+			<Channel id="0" />
+		</Instrument>
 	</Instruments>
 	<Pins>
 		<DUTPin name="DPI_DO_SCL" />
@@ -318,8 +321,8 @@
 		<DUTPin name="DPI_DO_SDA" />
 		<SystemPin name="DPI_SR_VDD" />
 		<SystemPin name="DPI_PM_VDD" />
-		<SystemPin name="En_DPI_DO1" />
 		<SystemPin name="DPI_DI_En1" />
+		<SystemPin name="En_DPI_DO1" />
 		<SystemPin name="SMU_VI_VCC" />
 		<DUTPin name="SMU_VI_V_In" />
 		<DUTPin name="SMU_VI_V_Out" />

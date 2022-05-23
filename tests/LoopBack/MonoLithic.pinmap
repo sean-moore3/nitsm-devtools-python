@@ -354,8 +354,8 @@
 		<DUTPin name="DPI_DI_SDA" />
 		<SystemPin name="DPI_SR_VDD" />
 		<SystemPin name="DPI_PM_VDD" />
-		<SystemPin name="En_DPI_DO1" />
 		<SystemPin name="DPI_DI_En1" />
+		<SystemPin name="En_DPI_DO1" />
 		<DUTPin name="En_DAQ_DO1" />
 		<DUTPin name="En_RIO_DO1" />
 		<DUTPin name="En_SWT_DO1" />

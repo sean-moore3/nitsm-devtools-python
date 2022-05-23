@@ -17,10 +17,6 @@
 		<Multiplexer multiplexerTypeId="Matrix" name="Masterconnect" />
 	</Instruments>
 	<Pins>
-		<DUTPin name="En_DAQ_DO1" />
-		<DUTPin name="En_DPI_DO1" />
-		<DUTPin name="En_RIO_DO1" />
-		<DUTPin name="En_SWT_DO1" />
 		<DUTPin name="DUT_SGL_1" />
 		<DUTPin name="DUT_SGL_2" />
 		<DUTPin name="DUT_SGL_3" />
@@ -34,6 +30,10 @@
 		<DUTPin name="DPI_DO_SDA" />
 		<DUTPin name="DPI_DI_SDA" />
 		<SystemPin name="DPI_DI_En1" />
+		<DUTPin name="En_DPI_DO1" />
+		<DUTPin name="En_DAQ_DO1" />
+		<DUTPin name="En_RIO_DO1" />
+		<DUTPin name="En_SWT_DO1" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="PG_SGL_1">
@@ -85,9 +85,10 @@
 		<Connection pin="DPI_DI_SDA" siteNumber="0" instrument="DPI1" channel="5" />
 		<Connection pin="DPI_DO_SCL" siteNumber="0" instrument="DPI1" channel="2" />
 		<Connection pin="DPI_DO_SDA" siteNumber="0" instrument="DPI1" channel="4" />
+		<SystemConnection pin="DPI_DI_En1" instrument="DPI1" channel="1" />
+		<Connection pin="En_DPI_DO1" siteNumber="0" instrument="DPI1" channel="0" />
 		<Connection pin="En_RIO_DO1" siteNumber="0" instrument="RIO1" channel="0" />
 		<Connection pin="En_DAQ_DO1" siteNumber="0" instrument="DAQ1" channel="DAQ1/port0/line2" />
-		<Connection pin="En_DPI_DO1" siteNumber="0" instrument="DPI1" channel="0" />
 		<Connection pin="En_SWT_DO1" siteNumber="0" instrument="SWT1" channel="0" />
 		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
 			<MultiplexedDUTPinRoute pin="DUT_SGL_1" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=0" />
@@ -99,6 +100,5 @@
 			<MultiplexedDUTPinRoute pin="DUT_SGL_7" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=0" />
 			<MultiplexedDUTPinRoute pin="DUT_SGL_8" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=1" />
 		</MultiplexedConnection>
-		<SystemConnection pin="DPI_DI_En1" instrument="DPI1" channel="1" />
 	</Connections>
 </PinMap>
