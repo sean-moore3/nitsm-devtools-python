@@ -329,6 +329,22 @@
 		<DUTPin name="DAQ_AI_SGL2" />
 		<SystemPin name="FGN_SI_RefSGL" />
 		<DUTPin name="FGN_SI_SGL_In" />
+		<DUTPin name="RIO_DI_Pin0" />
+		<DUTPin name="RIO_DI_Pin1" />
+		<DUTPin name="RIO_DI_Pin2" />
+		<DUTPin name="RIO_DI_Pin3" />
+		<DUTPin name="RIO_DI_Pin4" />
+		<DUTPin name="RIO_DI_Pin5" />
+		<DUTPin name="RIO_DI_Pin6" />
+		<DUTPin name="RIO_DI_Pin7" />
+		<DUTPin name="RIO_DO_Pin0" />
+		<DUTPin name="RIO_DO_Pin1" />
+		<DUTPin name="RIO_DO_Pin2" />
+		<DUTPin name="RIO_DO_Pin3" />
+		<DUTPin name="RIO_DO_Pin4" />
+		<DUTPin name="RIO_DO_Pin5" />
+		<DUTPin name="RIO_DO_Pin6" />
+		<DUTPin name="RIO_DO_Pin7" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="DPI_PG_Inputs">
@@ -370,6 +386,30 @@
 		</PinGroup>
 		<PinGroup name="FGN_PG_Signal">
 			<PinReference pin="FGN_SI_RefSGL" />
+		</PinGroup>
+		<PinGroup name="RIO_PG_DI">
+			<PinReference pin="RIO_DI_Pin0" />
+			<PinReference pin="RIO_DI_Pin1" />
+			<PinReference pin="RIO_DI_Pin2" />
+			<PinReference pin="RIO_DI_Pin3" />
+			<PinReference pin="RIO_DI_Pin4" />
+			<PinReference pin="RIO_DI_Pin5" />
+			<PinReference pin="RIO_DI_Pin6" />
+			<PinReference pin="RIO_DI_Pin7" />
+		</PinGroup>
+		<PinGroup name="RIO_PG_DO">
+			<PinReference pin="RIO_DO_Pin0" />
+			<PinReference pin="RIO_DO_Pin1" />
+			<PinReference pin="RIO_DO_Pin2" />
+			<PinReference pin="RIO_DO_Pin3" />
+			<PinReference pin="RIO_DO_Pin4" />
+			<PinReference pin="RIO_DO_Pin5" />
+			<PinReference pin="RIO_DO_Pin6" />
+			<PinReference pin="RIO_DO_Pin7" />
+		</PinGroup>
+		<PinGroup name="RIO_Pins">
+			<PinReference pin="RIO_PG_DI" />
+			<PinReference pin="RIO_PG_DO" />
 		</PinGroup>
 	</PinGroups>
 	<Sites>
@@ -464,6 +504,118 @@
 		<Connection pin="FGN_SI_SGL_In" siteNumber="4" instrument="FGN5" channel="0" />
 		<Connection pin="FGN_SI_SGL_In" siteNumber="5" instrument="FGN6" channel="0" />
 		<Connection pin="FGN_SI_SGL_In" siteNumber="6" instrument="FGN7" channel="0" />
+		<Connection pin="RIO_DI_Pin0" siteNumber="0" instrument="RIO1" channel="0" />
+		<Connection pin="RIO_DI_Pin0" siteNumber="1" instrument="RIO1" channel="8" />
+		<Connection pin="RIO_DI_Pin0" siteNumber="2" instrument="RIO1" channel="16" />
+		<Connection pin="RIO_DI_Pin0" siteNumber="3" instrument="RIO1" channel="24" />
+		<Connection pin="RIO_DI_Pin0" siteNumber="4" instrument="RIO1" channel="32" />
+		<Connection pin="RIO_DI_Pin0" siteNumber="5" instrument="RIO1" channel="40" />
+		<Connection pin="RIO_DI_Pin0" siteNumber="6" instrument="RIO1" channel="48" />
+		<Connection pin="RIO_DI_Pin1" siteNumber="0" instrument="RIO1" channel="1" />
+		<Connection pin="RIO_DI_Pin1" siteNumber="1" instrument="RIO1" channel="9" />
+		<Connection pin="RIO_DI_Pin1" siteNumber="2" instrument="RIO1" channel="17" />
+		<Connection pin="RIO_DI_Pin1" siteNumber="3" instrument="RIO1" channel="25" />
+		<Connection pin="RIO_DI_Pin1" siteNumber="4" instrument="RIO1" channel="33" />
+		<Connection pin="RIO_DI_Pin1" siteNumber="5" instrument="RIO1" channel="41" />
+		<Connection pin="RIO_DI_Pin1" siteNumber="6" instrument="RIO1" channel="49" />
+		<Connection pin="RIO_DI_Pin2" siteNumber="0" instrument="RIO1" channel="2" />
+		<Connection pin="RIO_DI_Pin2" siteNumber="1" instrument="RIO1" channel="10" />
+		<Connection pin="RIO_DI_Pin2" siteNumber="2" instrument="RIO1" channel="18" />
+		<Connection pin="RIO_DI_Pin2" siteNumber="3" instrument="RIO1" channel="26" />
+		<Connection pin="RIO_DI_Pin2" siteNumber="4" instrument="RIO1" channel="34" />
+		<Connection pin="RIO_DI_Pin2" siteNumber="5" instrument="RIO1" channel="42" />
+		<Connection pin="RIO_DI_Pin2" siteNumber="6" instrument="RIO1" channel="50" />
+		<Connection pin="RIO_DI_Pin3" siteNumber="6" instrument="RIO1" channel="51" />
+		<Connection pin="RIO_DI_Pin3" siteNumber="5" instrument="RIO1" channel="43" />
+		<Connection pin="RIO_DI_Pin3" siteNumber="4" instrument="RIO1" channel="35" />
+		<Connection pin="RIO_DI_Pin3" siteNumber="3" instrument="RIO1" channel="27" />
+		<Connection pin="RIO_DI_Pin3" siteNumber="2" instrument="RIO1" channel="19" />
+		<Connection pin="RIO_DI_Pin3" siteNumber="1" instrument="RIO1" channel="11" />
+		<Connection pin="RIO_DI_Pin3" siteNumber="0" instrument="RIO1" channel="3" />
+		<Connection pin="RIO_DI_Pin4" siteNumber="6" instrument="RIO1" channel="52" />
+		<Connection pin="RIO_DI_Pin4" siteNumber="5" instrument="RIO1" channel="44" />
+		<Connection pin="RIO_DI_Pin4" siteNumber="4" instrument="RIO1" channel="36" />
+		<Connection pin="RIO_DI_Pin4" siteNumber="3" instrument="RIO1" channel="28" />
+		<Connection pin="RIO_DI_Pin4" siteNumber="2" instrument="RIO1" channel="20" />
+		<Connection pin="RIO_DI_Pin4" siteNumber="1" instrument="RIO1" channel="12" />
+		<Connection pin="RIO_DI_Pin4" siteNumber="0" instrument="RIO1" channel="4" />
+		<Connection pin="RIO_DI_Pin5" siteNumber="6" instrument="RIO1" channel="53" />
+		<Connection pin="RIO_DI_Pin5" siteNumber="5" instrument="RIO1" channel="45" />
+		<Connection pin="RIO_DI_Pin5" siteNumber="4" instrument="RIO1" channel="37" />
+		<Connection pin="RIO_DI_Pin5" siteNumber="3" instrument="RIO1" channel="29" />
+		<Connection pin="RIO_DI_Pin5" siteNumber="2" instrument="RIO1" channel="21" />
+		<Connection pin="RIO_DI_Pin5" siteNumber="1" instrument="RIO1" channel="13" />
+		<Connection pin="RIO_DI_Pin5" siteNumber="0" instrument="RIO1" channel="5" />
+		<Connection pin="RIO_DI_Pin6" siteNumber="6" instrument="RIO1" channel="54" />
+		<Connection pin="RIO_DI_Pin6" siteNumber="5" instrument="RIO1" channel="46" />
+		<Connection pin="RIO_DI_Pin6" siteNumber="4" instrument="RIO1" channel="38" />
+		<Connection pin="RIO_DI_Pin6" siteNumber="3" instrument="RIO1" channel="30" />
+		<Connection pin="RIO_DI_Pin6" siteNumber="2" instrument="RIO1" channel="22" />
+		<Connection pin="RIO_DI_Pin6" siteNumber="1" instrument="RIO1" channel="14" />
+		<Connection pin="RIO_DI_Pin6" siteNumber="0" instrument="RIO1" channel="6" />
+		<Connection pin="RIO_DI_Pin7" siteNumber="6" instrument="RIO1" channel="55" />
+		<Connection pin="RIO_DI_Pin7" siteNumber="5" instrument="RIO1" channel="47" />
+		<Connection pin="RIO_DI_Pin7" siteNumber="4" instrument="RIO1" channel="39" />
+		<Connection pin="RIO_DI_Pin7" siteNumber="3" instrument="RIO1" channel="31" />
+		<Connection pin="RIO_DI_Pin7" siteNumber="2" instrument="RIO1" channel="23" />
+		<Connection pin="RIO_DI_Pin7" siteNumber="1" instrument="RIO1" channel="15" />
+		<Connection pin="RIO_DI_Pin7" siteNumber="0" instrument="RIO1" channel="7" />
+		<Connection pin="RIO_DO_Pin0" siteNumber="6" instrument="RIO1" channel="112" />
+		<Connection pin="RIO_DO_Pin0" siteNumber="5" instrument="RIO1" channel="104" />
+		<Connection pin="RIO_DO_Pin0" siteNumber="4" instrument="RIO1" channel="96" />
+		<Connection pin="RIO_DO_Pin0" siteNumber="3" instrument="RIO1" channel="88" />
+		<Connection pin="RIO_DO_Pin0" siteNumber="2" instrument="RIO1" channel="80" />
+		<Connection pin="RIO_DO_Pin0" siteNumber="1" instrument="RIO1" channel="72" />
+		<Connection pin="RIO_DO_Pin0" siteNumber="0" instrument="RIO1" channel="64" />
+		<Connection pin="RIO_DO_Pin1" siteNumber="6" instrument="RIO1" channel="113" />
+		<Connection pin="RIO_DO_Pin1" siteNumber="5" instrument="RIO1" channel="105" />
+		<Connection pin="RIO_DO_Pin1" siteNumber="4" instrument="RIO1" channel="97" />
+		<Connection pin="RIO_DO_Pin1" siteNumber="3" instrument="RIO1" channel="89" />
+		<Connection pin="RIO_DO_Pin1" siteNumber="2" instrument="RIO1" channel="81" />
+		<Connection pin="RIO_DO_Pin1" siteNumber="1" instrument="RIO1" channel="73" />
+		<Connection pin="RIO_DO_Pin1" siteNumber="0" instrument="RIO1" channel="65" />
+		<Connection pin="RIO_DO_Pin2" siteNumber="6" instrument="RIO1" channel="114" />
+		<Connection pin="RIO_DO_Pin2" siteNumber="5" instrument="RIO1" channel="106" />
+		<Connection pin="RIO_DO_Pin2" siteNumber="4" instrument="RIO1" channel="98" />
+		<Connection pin="RIO_DO_Pin2" siteNumber="3" instrument="RIO1" channel="90" />
+		<Connection pin="RIO_DO_Pin2" siteNumber="2" instrument="RIO1" channel="82" />
+		<Connection pin="RIO_DO_Pin2" siteNumber="1" instrument="RIO1" channel="74" />
+		<Connection pin="RIO_DO_Pin2" siteNumber="0" instrument="RIO1" channel="66" />
+		<Connection pin="RIO_DO_Pin3" siteNumber="6" instrument="RIO1" channel="115" />
+		<Connection pin="RIO_DO_Pin3" siteNumber="5" instrument="RIO1" channel="107" />
+		<Connection pin="RIO_DO_Pin3" siteNumber="4" instrument="RIO1" channel="99" />
+		<Connection pin="RIO_DO_Pin3" siteNumber="3" instrument="RIO1" channel="91" />
+		<Connection pin="RIO_DO_Pin3" siteNumber="2" instrument="RIO1" channel="83" />
+		<Connection pin="RIO_DO_Pin3" siteNumber="1" instrument="RIO1" channel="75" />
+		<Connection pin="RIO_DO_Pin3" siteNumber="0" instrument="RIO1" channel="67" />
+		<Connection pin="RIO_DO_Pin4" siteNumber="6" instrument="RIO1" channel="116" />
+		<Connection pin="RIO_DO_Pin4" siteNumber="5" instrument="RIO1" channel="108" />
+		<Connection pin="RIO_DO_Pin4" siteNumber="4" instrument="RIO1" channel="100" />
+		<Connection pin="RIO_DO_Pin4" siteNumber="3" instrument="RIO1" channel="92" />
+		<Connection pin="RIO_DO_Pin4" siteNumber="2" instrument="RIO1" channel="84" />
+		<Connection pin="RIO_DO_Pin4" siteNumber="1" instrument="RIO1" channel="76" />
+		<Connection pin="RIO_DO_Pin4" siteNumber="0" instrument="RIO1" channel="68" />
+		<Connection pin="RIO_DO_Pin5" siteNumber="6" instrument="RIO1" channel="117" />
+		<Connection pin="RIO_DO_Pin5" siteNumber="5" instrument="RIO1" channel="109" />
+		<Connection pin="RIO_DO_Pin5" siteNumber="4" instrument="RIO1" channel="101" />
+		<Connection pin="RIO_DO_Pin5" siteNumber="3" instrument="RIO1" channel="93" />
+		<Connection pin="RIO_DO_Pin5" siteNumber="2" instrument="RIO1" channel="85" />
+		<Connection pin="RIO_DO_Pin5" siteNumber="1" instrument="RIO1" channel="77" />
+		<Connection pin="RIO_DO_Pin5" siteNumber="0" instrument="RIO1" channel="69" />
+		<Connection pin="RIO_DO_Pin6" siteNumber="6" instrument="RIO1" channel="118" />
+		<Connection pin="RIO_DO_Pin6" siteNumber="5" instrument="RIO1" channel="110" />
+		<Connection pin="RIO_DO_Pin6" siteNumber="4" instrument="RIO1" channel="102" />
+		<Connection pin="RIO_DO_Pin6" siteNumber="3" instrument="RIO1" channel="94" />
+		<Connection pin="RIO_DO_Pin6" siteNumber="2" instrument="RIO1" channel="86" />
+		<Connection pin="RIO_DO_Pin6" siteNumber="1" instrument="RIO1" channel="78" />
+		<Connection pin="RIO_DO_Pin6" siteNumber="0" instrument="RIO1" channel="70" />
+		<Connection pin="RIO_DO_Pin7" siteNumber="6" instrument="RIO1" channel="119" />
+		<Connection pin="RIO_DO_Pin7" siteNumber="5" instrument="RIO1" channel="111" />
+		<Connection pin="RIO_DO_Pin7" siteNumber="4" instrument="RIO1" channel="103" />
+		<Connection pin="RIO_DO_Pin7" siteNumber="3" instrument="RIO1" channel="95" />
+		<Connection pin="RIO_DO_Pin7" siteNumber="2" instrument="RIO1" channel="87" />
+		<Connection pin="RIO_DO_Pin7" siteNumber="1" instrument="RIO1" channel="79" />
+		<Connection pin="RIO_DO_Pin7" siteNumber="0" instrument="RIO1" channel="71" />
 		<SystemConnection pin="FGN_SI_RefSGL" instrument="FGN8" channel="0" />
 	</Connections>
 </PinMap>

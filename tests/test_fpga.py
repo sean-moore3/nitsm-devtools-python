@@ -9,7 +9,7 @@ import nidevtools.fpga as ni_fpga
 # To simulate hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["MonoLithic.pinmap", "FPGA.pinmap"]
+pin_file_names = ["MonoLithic.pinmap", "Rainbow.pinmap"]
 # Change index below to change the pin map to use
 pin_file_name = pin_file_names[1]
 
