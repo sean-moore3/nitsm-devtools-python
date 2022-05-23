@@ -15,7 +15,7 @@ import pytest
 
 import nidevtools.digital as dt_dpi
 
-# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
+# To simulate hardware create a dummy file "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 pin_file_names = ["MonoLithic.pinmap", "Rainbow.pinmap"]
 # Change index below to change the pinmap to use
