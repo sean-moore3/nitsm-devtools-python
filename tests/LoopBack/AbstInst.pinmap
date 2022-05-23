@@ -17,10 +17,10 @@
 		<Multiplexer multiplexerTypeId="Matrix" name="Masterconnect" />
 	</Instruments>
 	<Pins>
-		<DUTPin name="En_Daq_DO1" />
-		<DUTPin name="En_Dpi_DO1" />
-		<DUTPin name="En_Fpga_DO1" />
-		<DUTPin name="En_Swt_DO1" />
+		<DUTPin name="En_DAQ_DO1" />
+		<DUTPin name="En_DPI_DO1" />
+		<DUTPin name="En_RIO_DO1" />
+		<DUTPin name="En_SWT_DO1" />
 		<DUTPin name="DUT_SGL_1" />
 		<DUTPin name="DUT_SGL_2" />
 		<DUTPin name="DUT_SGL_3" />
@@ -33,53 +33,62 @@
 		<DUTPin name="DPI_DI_SCL" />
 		<DUTPin name="DPI_DO_SDA" />
 		<DUTPin name="DPI_DI_SDA" />
+		<SystemPin name="DPI_DI_En1" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="PG_SGL_1">
 			<PinReference pin="DUT_SGL_1" />
-			<PinReference pin="En_Fpga_DO1" />
+			<PinReference pin="En_RIO_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_2">
 			<PinReference pin="DUT_SGL_2" />
-			<PinReference pin="En_Fpga_DO1" />
+			<PinReference pin="En_RIO_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_3">
 			<PinReference pin="DUT_SGL_3" />
-			<PinReference pin="En_Daq_DO1" />
+			<PinReference pin="En_DAQ_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_4">
 			<PinReference pin="DUT_SGL_4" />
-			<PinReference pin="En_Daq_DO1" />
+			<PinReference pin="En_DAQ_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_5">
 			<PinReference pin="DUT_SGL_5" />
-			<PinReference pin="En_Dpi_DO1" />
+			<PinReference pin="En_DPI_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_6">
 			<PinReference pin="DUT_SGL_6" />
-			<PinReference pin="En_Dpi_DO1" />
+			<PinReference pin="En_DPI_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_7">
 			<PinReference pin="DUT_SGL_7" />
-			<PinReference pin="En_Swt_DO1" />
+			<PinReference pin="En_SWT_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_8">
 			<PinReference pin="DUT_SGL_8" />
-			<PinReference pin="En_Swt_DO1" />
+			<PinReference pin="En_SWT_DO1" />
+		</PinGroup>
+		<PinGroup name="DPI_PG_All">
+			<PinReference pin="DPI_DI_SDA" />
+			<PinReference pin="DPI_DO_SDA" />
+			<PinReference pin="DPI_DI_SCL" />
+			<PinReference pin="DPI_DO_SCL" />
+			<PinReference pin="En_DPI_DO1" />
+			<PinReference pin="DPI_DI_En1" />
 		</PinGroup>
 	</PinGroups>
 	<Sites>
 		<Site siteNumber="0" />
 	</Sites>
 	<Connections>
-		<Connection pin="DPI_DI_SCL" siteNumber="0" instrument="DPI1" channel="2" />
-		<Connection pin="DPI_DI_SDA" siteNumber="0" instrument="DPI1" channel="4" />
-		<Connection pin="DPI_DO_SCL" siteNumber="0" instrument="DPI1" channel="1" />
-		<Connection pin="DPI_DO_SDA" siteNumber="0" instrument="DPI1" channel="3" />
-		<Connection pin="En_Fpga_DO1" siteNumber="0" instrument="RIO1" channel="0" />
-		<Connection pin="En_Daq_DO1" siteNumber="0" instrument="DAQ1" channel="DAQ1/port0/line2" />
-		<Connection pin="En_Dpi_DO1" siteNumber="0" instrument="DPI1" channel="0" />
-		<Connection pin="En_Swt_DO1" siteNumber="0" instrument="SWT1" channel="0" />
+		<Connection pin="DPI_DI_SCL" siteNumber="0" instrument="DPI1" channel="3" />
+		<Connection pin="DPI_DI_SDA" siteNumber="0" instrument="DPI1" channel="5" />
+		<Connection pin="DPI_DO_SCL" siteNumber="0" instrument="DPI1" channel="2" />
+		<Connection pin="DPI_DO_SDA" siteNumber="0" instrument="DPI1" channel="4" />
+		<Connection pin="En_RIO_DO1" siteNumber="0" instrument="RIO1" channel="0" />
+		<Connection pin="En_DAQ_DO1" siteNumber="0" instrument="DAQ1" channel="DAQ1/port0/line2" />
+		<Connection pin="En_DPI_DO1" siteNumber="0" instrument="DPI1" channel="0" />
+		<Connection pin="En_SWT_DO1" siteNumber="0" instrument="SWT1" channel="0" />
 		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
 			<MultiplexedDUTPinRoute pin="DUT_SGL_1" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=0" />
 			<MultiplexedDUTPinRoute pin="DUT_SGL_2" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=1" />
@@ -90,5 +99,6 @@
 			<MultiplexedDUTPinRoute pin="DUT_SGL_7" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=0" />
 			<MultiplexedDUTPinRoute pin="DUT_SGL_8" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=1" />
 		</MultiplexedConnection>
+		<SystemConnection pin="DPI_DI_En1" instrument="DPI1" channel="1" />
 	</Connections>
 </PinMap>

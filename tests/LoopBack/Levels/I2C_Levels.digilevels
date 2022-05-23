@@ -46,7 +46,7 @@
         <Vterm>0</Vterm>
         <TerminationMode>HighZ</TerminationMode>
       </DigitalPinLevelSet>
-      <DigitalPinLevelSet pin="En_Dpi_DO1">
+      <DigitalPinLevelSet pin="En_DPI_DO1">
         <Vil>DC.Vil</Vil>
         <Vih>DC.Vih</Vih>
         <Vol>DC.Vol</Vol>
@@ -57,7 +57,7 @@
         <TerminationMode>ActiveLoad</TerminationMode>
         <Comment>Enable pin electrical parameters</Comment>
       </DigitalPinLevelSet>
-      <DigitalPinLevelSet pin="En_Dpi_DI1">
+      <DigitalPinLevelSet pin="DPI_DI_En1">
         <Vil>DC.Vil</Vil>
         <Vih>DC.Vih</Vih>
         <Vol>DC.Vol</Vol>

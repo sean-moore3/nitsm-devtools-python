@@ -56,7 +56,7 @@
       <TimeSet name="Start">
         <Period>t.SCL</Period>
         <PinEdges>
-          <PinEdge pin="En_Dpi_DO1">
+          <PinEdge pin="En_DPI_DO1">
             <ReturnToLow>
               <On>0</On>
               <Data>0</Data>
@@ -100,7 +100,7 @@
       <TimeSet name="Busy">
         <Period>t.SCL</Period>
         <PinEdges>
-          <PinEdge pin="En_Dpi_DO1">
+          <PinEdge pin="En_DPI_DO1">
             <ReturnToLow>
               <On>0</On>
               <Data>t.SU_DAT</Data>
@@ -143,7 +143,7 @@
       <TimeSet name="Stop">
         <Period>t.SCL + t.BUF</Period>
         <PinEdges>
-          <PinEdge pin="En_Dpi_DO1">
+          <PinEdge pin="En_DPI_DO1">
             <DriveNonReturn>
               <On>0</On>
               <Data>t.LOW</Data>

@@ -351,14 +351,14 @@
 		<DUTPin name="DPI_DO_SCL" />
 		<DUTPin name="DPI_DO_SDA" />
 		<DUTPin name="DPI_DI_SCL" />
-		<DUTPin name="DPI_DI_SDA" />		
+		<DUTPin name="DPI_DI_SDA" />
 		<SystemPin name="DPI_SR_VDD" />
 		<SystemPin name="DPI_PM_VDD" />
-		<SystemPin name="En_Dpi_DO1" />
-		<SystemPin name="En_Dpi_DI1" />
-		<DUTPin name="En_Daq_DO1" />
-		<DUTPin name="En_Fpga_DO1" />
-		<DUTPin name="En_Swt_DO1" />
+		<SystemPin name="En_DPI_DO1" />
+		<SystemPin name="DPI_DI_En1" />
+		<DUTPin name="En_DAQ_DO1" />
+		<DUTPin name="En_RIO_DO1" />
+		<DUTPin name="En_SWT_DO1" />
 		<DUTPin name="DUT_SGL_1" />
 		<DUTPin name="DUT_SGL_2" />
 		<DUTPin name="DUT_SGL_3" />
@@ -560,7 +560,7 @@
 			<PinReference pin="FGN_SI_SGL_In" />
 		</PinGroup>
 		<PinGroup name="AllSwitch">
-			<PinReference pin="En_Swt_DO1" />
+			<PinReference pin="En_SWT_DO1" />
 			<PinReference pin="SWT_DO_Pin1" />
 			<PinReference pin="SWT_DO_Pin2" />
 			<PinReference pin="SWT_DO_Pin9" />
@@ -578,7 +578,7 @@
 		</PinGroup>
 		<PinGroup name="DPI_PG_Outputs">
 			<PinReference pin="DPI_SR_VDD" />
-			<PinReference pin="En_Dpi_DO1" />
+			<PinReference pin="En_DPI_DO1" />
 			<PinReference pin="DPI_DO_SCL" />
 			<PinReference pin="DPI_DO_SDA" />
 		</PinGroup>
@@ -639,38 +639,38 @@
 		</PinGroup>
 		<PinGroup name="PG_SGL_1">
 			<PinReference pin="DUT_SGL_1" />
-			<PinReference pin="En_Fpga_DO1" />
+			<PinReference pin="En_RIO_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_2">
 			<PinReference pin="DUT_SGL_2" />
-			<PinReference pin="En_Fpga_DO1" />
+			<PinReference pin="En_RIO_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_3">
 			<PinReference pin="DUT_SGL_3" />
-			<PinReference pin="En_Daq_DO1" />
+			<PinReference pin="En_DAQ_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_4">
 			<PinReference pin="DUT_SGL_4" />
-			<PinReference pin="En_Daq_DO1" />
+			<PinReference pin="En_DAQ_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_5">
 			<PinReference pin="DUT_SGL_5" />
-			<PinReference pin="En_Dpi_DO1" />
+			<PinReference pin="En_DPI_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_6">
 			<PinReference pin="DUT_SGL_6" />
-			<PinReference pin="En_Dpi_DO1" />
+			<PinReference pin="En_DPI_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_7">
 			<PinReference pin="DUT_SGL_7" />
-			<PinReference pin="En_Swt_DO1" />
+			<PinReference pin="En_SWT_DO1" />
 		</PinGroup>
 		<PinGroup name="PG_SGL_8">
 			<PinReference pin="DUT_SGL_8" />
-			<PinReference pin="En_Swt_DO1" />
+			<PinReference pin="En_SWT_DO1" />
 		</PinGroup>
 		<PinGroup name="RIO_Pins">
-			<PinReference pin="En_Fpga_DO1" />
+			<PinReference pin="En_RIO_DO1" />
 			<PinReference pin="LINT_RST" />
 			<PinReference pin="TLOAD_BUCK0_EN" />
 			<PinReference pin="En_BUCKLX_DAMP3_PWR_EN" />
@@ -803,7 +803,7 @@
 	<Connections>
 		<Connection pin="FGN_SI_SGL_In" siteNumber="0" instrument="FGN1" channel="0" />
 		<Connection pin="DMM_VI_CH0" siteNumber="0" instrument="DMM1" channel="0" />
-		<Connection pin="En_Swt_DO1" siteNumber="0" instrument="SWT1" channel="0" />
+		<Connection pin="En_SWT_DO1" siteNumber="0" instrument="SWT1" channel="0" />
 		<Connection pin="SWT_DO_Pin1" siteNumber="0" instrument="SWT1" channel="1" />
 		<Connection pin="SWT_DO_Pin2" siteNumber="0" instrument="SWT1" channel="2" />
 		<Connection pin="SWT_DO_Pin3" siteNumber="0" instrument="SWT1" channel="3" />
@@ -861,7 +861,7 @@
 		<Connection channel="DAQ1/ai13" instrument="DAQ1_AI" pin="GPIO9_DAQ" siteNumber="0" />
 		<Connection channel="DAQ1/ai14" instrument="DAQ1_AI" pin="GPIO16_DAQ" siteNumber="0" />
 		<Connection channel="DAQ1/ai15" instrument="DAQ1_AI" pin="GPIO19_DAQ" siteNumber="0" />
-		<Connection pin="En_Daq_DO1" siteNumber="0" instrument="DAQ2_P0_0" channel="DAQ2/port0/line0" />
+		<Connection pin="En_DAQ_DO1" siteNumber="0" instrument="DAQ2_P0_0" channel="DAQ2/port0/line0" />
 		<Connection channel="DAQ2/port0/line2" instrument="DAQ2_P0_2" pin="En_DIO_5V0_6368_VDD_LDO2_RLY_EN" siteNumber="0" />
 		<Connection channel="DAQ2/port0/line3" instrument="DAQ2_P0_3" pin="En_DIO_5V0_6368_VDD_LDO15_RLY_EN" siteNumber="0" />
 		<Connection channel="DAQ2/port0/line4" instrument="DAQ2_P0_4" pin="En_DIO_5V0_6368_BUCK0_RLY_EN" siteNumber="0" />
@@ -889,8 +889,8 @@
 		<Connection channel="DAQ1/port1/line7" instrument="DAQ1_P1_7" pin="En_DIO_5V0_6368_4464_MUX_EN" siteNumber="0" />
 		<SystemConnection pin="DPI_SR_VDD" instrument="DPI1" channel="0" />
 		<SystemConnection pin="DPI_PM_VDD" instrument="DPI1" channel="1" />
-		<SystemConnection pin="En_Dpi_DO1" instrument="DPI1" channel="2" />
-		<SystemConnection pin="En_Dpi_DI1" instrument="DPI1" channel="3" />
+		<SystemConnection pin="En_DPI_DO1" instrument="DPI1" channel="2" />
+		<SystemConnection pin="DPI_DI_En1" instrument="DPI1" channel="3" />
 		<Connection pin="DPI_DO_SCL" siteNumber="0" instrument="DPI1" channel="4" />
 		<Connection pin="DPI_DI_SCL" siteNumber="0" instrument="DPI1" channel="5" />
 		<Connection pin="DPI_DI_SDA" siteNumber="0" instrument="DPI1" channel="6" />
@@ -905,7 +905,7 @@
 			<MultiplexedDUTPinRoute pin="DUT_SGL_7" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=0" />
 			<MultiplexedDUTPinRoute pin="DUT_SGL_8" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=1" />
 		</MultiplexedConnection>
-		<Connection channel="0" instrument="RIO1" pin="En_Fpga_DO1" siteNumber="0" />
+		<Connection channel="0" instrument="RIO1" pin="En_RIO_DO1" siteNumber="0" />
 		<Connection channel="1" instrument="RIO1" pin="LINT_RST" siteNumber="0" />
 		<Connection channel="2" instrument="RIO1" pin="TLOAD_BUCK0_EN" siteNumber="0" />
 		<Connection channel="3" instrument="RIO1" pin="En_BUCKLX_DAMP3_PWR_EN" siteNumber="0" />
@@ -1029,6 +1029,6 @@
 		<Connection channel="125" instrument="RIO1" pin="En_RTRAN_DAMP2_PWR_EN" siteNumber="0" />
 		<Connection channel="126" instrument="RIO1" pin="RTRAN_DET2_L" siteNumber="0" />
 		<Connection channel="127" instrument="RIO1" pin="En_MUX_SNKSW_EN" siteNumber="0" />
-		<Connection pin="SGL1" siteNumber="0" instrument="RIO2" channel="0" />		
+		<Connection pin="SGL1" siteNumber="0" instrument="RIO2" channel="0" />
 	</Connections>
 </PinMap>
