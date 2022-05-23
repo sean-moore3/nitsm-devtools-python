@@ -267,7 +267,7 @@
 		</Instrument>
 	</Instruments>
 	<Pins>
-		<DUTPin name="DIB_CONN_DETECT4_L" />
+		<DUTPin name="En_Fpga_DO1" />
 		<DUTPin name="LINT_RST" />
 		<DUTPin name="TLOAD_BUCK0_EN" />
 		<DUTPin name="En_BUCKLX_DAMP3_PWR_EN" />
@@ -395,7 +395,7 @@
 	</Pins>
 	<PinGroups>
 		<PinGroup name="RIO_Pins">
-			<PinReference pin="DIB_CONN_DETECT4_L" />
+			<PinReference pin="En_Fpga_DO1" />
 			<PinReference pin="LINT_RST" />
 			<PinReference pin="TLOAD_BUCK0_EN" />
 			<PinReference pin="En_BUCKLX_DAMP3_PWR_EN" />
@@ -526,7 +526,7 @@
 		<Site siteNumber="0" />
 	</Sites>
 	<Connections>
-		<Connection channel="0" instrument="RIO1" pin="DIB_CONN_DETECT4_L" siteNumber="0" />
+		<Connection channel="0" instrument="RIO1" pin="En_Fpga_DO1" siteNumber="0" />
 		<Connection channel="1" instrument="RIO1" pin="LINT_RST" siteNumber="0" />
 		<Connection channel="2" instrument="RIO1" pin="TLOAD_BUCK0_EN" siteNumber="0" />
 		<Connection channel="3" instrument="RIO1" pin="En_BUCKLX_DAMP3_PWR_EN" siteNumber="0" />
