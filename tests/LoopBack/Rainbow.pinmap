@@ -345,6 +345,8 @@
 		<DUTPin name="RIO_DO_Pin5" />
 		<DUTPin name="RIO_DO_Pin6" />
 		<DUTPin name="RIO_DO_Pin7" />
+		<SystemPin name="RIO_SI_RefSGL" />
+		<SystemPin name="RIO_SO_RefSGL" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="DPI_PG_Inputs">
@@ -396,6 +398,7 @@
 			<PinReference pin="RIO_DI_Pin5" />
 			<PinReference pin="RIO_DI_Pin6" />
 			<PinReference pin="RIO_DI_Pin7" />
+			<PinReference pin="RIO_SI_RefSGL" />
 		</PinGroup>
 		<PinGroup name="RIO_PG_DO">
 			<PinReference pin="RIO_DO_Pin0" />
@@ -406,6 +409,7 @@
 			<PinReference pin="RIO_DO_Pin5" />
 			<PinReference pin="RIO_DO_Pin6" />
 			<PinReference pin="RIO_DO_Pin7" />
+			<PinReference pin="RIO_SO_RefSGL" />
 		</PinGroup>
 		<PinGroup name="RIO_Pins">
 			<PinReference pin="RIO_PG_DI" />
@@ -617,5 +621,7 @@
 		<Connection pin="RIO_DO_Pin7" siteNumber="1" instrument="RIO1" channel="79" />
 		<Connection pin="RIO_DO_Pin7" siteNumber="0" instrument="RIO1" channel="71" />
 		<SystemConnection pin="FGN_SI_RefSGL" instrument="FGN8" channel="0" />
+		<SystemConnection pin="RIO_SI_RefSGL" instrument="RIO2" channel="0" />
+		<SystemConnection pin="RIO_SO_RefSGL" instrument="RIO2" channel="64" />
 	</Connections>
 </PinMap>
