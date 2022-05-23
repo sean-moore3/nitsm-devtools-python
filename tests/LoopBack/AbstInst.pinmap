@@ -68,7 +68,7 @@
 			<PinReference pin="DUT_SGL_8" />
 			<PinReference pin="En_SWT_DO1" />
 		</PinGroup>
-		<PinGroup name="DPI_PG_All">
+		<PinGroup name="DPI_PG_AllPins">
 			<PinReference pin="DPI_DI_SDA" />
 			<PinReference pin="DPI_DO_SDA" />
 			<PinReference pin="DPI_DI_SCL" />
