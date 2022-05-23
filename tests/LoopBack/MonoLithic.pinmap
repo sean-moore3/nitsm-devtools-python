@@ -895,7 +895,6 @@
 		<Connection pin="DPI_DI_SCL" siteNumber="0" instrument="DPI1" channel="5" />
 		<Connection pin="DPI_DI_SDA" siteNumber="0" instrument="DPI1" channel="6" />
 		<Connection pin="DPI_DO_SDA" siteNumber="0" instrument="DPI1" channel="7" />
-		<Connection pin="En_Fpga_DO1" siteNumber="0" instrument="RIO1" channel="0" />
 		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
 			<MultiplexedDUTPinRoute pin="DUT_SGL_1" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=0" />
 			<MultiplexedDUTPinRoute pin="DUT_SGL_2" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=1" />
@@ -906,6 +905,7 @@
 			<MultiplexedDUTPinRoute pin="DUT_SGL_7" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=0" />
 			<MultiplexedDUTPinRoute pin="DUT_SGL_8" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=1" />
 		</MultiplexedConnection>
+		<Connection channel="0" instrument="RIO1" pin="En_Fpga_DO1" siteNumber="0" />
 		<Connection channel="1" instrument="RIO1" pin="LINT_RST" siteNumber="0" />
 		<Connection channel="2" instrument="RIO1" pin="TLOAD_BUCK0_EN" siteNumber="0" />
 		<Connection channel="3" instrument="RIO1" pin="En_BUCKLX_DAMP3_PWR_EN" siteNumber="0" />
