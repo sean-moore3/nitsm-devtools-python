@@ -11,9 +11,9 @@ import nidevtools.switch as ni_switch
 # To simulate hardware create a dummy file named "Simulate.driver" in the current folder.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["AbstInst.pinmap", "C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap"]
+pin_file_names = ["Rainbow.pinmap", "MonoLithic.pinmap", "AbstInst.pinmap", "C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap"]
 # Change index below to change the pin map to use
-pin_file_name = pin_file_names[0]
+pin_file_name = pin_file_names[1]
 
 OPTIONS = {}  # empty options to run on real hardware.
 if SIMULATE:
@@ -58,7 +58,7 @@ class TestAbstract:
 
     def test_pins_to_session_sessions_info(self, tsm):
         ni_abstract.initialize(tsm)
-        pins = ["En_Fpga_DO1"]
+        pins = ["En_RIO_DO1"]
         enabled = ni_abstract.enable_pins_to_sessions(tsm, pins)
         assert enabled.enable_pins[0].enable_pin == pins[0]
         enabled.connect_sessions_info(tsm)
@@ -69,7 +69,7 @@ class TestAbstract:
         abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm, "DUT_SGL_1")
         print(abst_session)
         enabled.read_state(tsm)
-        ni_abstract.pins_to_task_and_connect(tsm, ["En_Daq_DO1"], ["DUT_SGL_3", "DUT_SGL_4"])
+        ni_abstract.pins_to_task_and_connect(tsm, ["En_DAQ_DO1"], ["DUT_SGL_3", "DUT_SGL_4"])
         # ni_abstract.disconnect_all(tsm)
         ni_abstract.disconnect_pin(tsm, "DUT_SGL_1")
 
