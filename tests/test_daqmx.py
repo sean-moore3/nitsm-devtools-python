@@ -32,7 +32,7 @@ def tsm(standalone_tsm):
     This TSM context uses standalone_tsm context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
-    ni_daqmx.set_task(standalone_tsm)
+    ni_daqmx.set_task(standalone_tsm, OPTIONS)
     yield standalone_tsm
     ni_daqmx.clear_task(standalone_tsm)
 

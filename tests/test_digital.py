@@ -33,7 +33,7 @@ def tsm(standalone_tsm):
     The fixture provides the digital project files necessary for initialization of sessions
     in a dictionary format.
     """
-    print("\nTest is running on Simulated driver?", SIMULATE_HARDWARE)
+    print("\nSimulated driver?", SIMULATE_HARDWARE)
     dt_dpi.initialize_sessions(standalone_tsm, options=OPTIONS)
     yield standalone_tsm
     dt_dpi.close_sessions(standalone_tsm)

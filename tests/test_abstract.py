@@ -13,12 +13,13 @@ SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driv
 
 pin_file_names = ["Rainbow.pinmap", "MonoLithic.pinmap", "AbstInst.pinmap", "C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap"]
 # Change index below to change the pin map to use
-pin_file_name = pin_file_names[1]
+pin_file_name = pin_file_names[0]
 
-OPTIONS = {}  # empty options to run on real hardware.
+OPTIONS_DAQ = {}  # empty options to run on real hardware.
+OPTIONS_DPI = {}  # empty dict options to run on real hardware.
 if SIMULATE:
-    OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "6368"}}
-
+    OPTIONS_DAQ = {"Simulate": True, "DriverSetup": {"Model": "6368"}}
+    OPTIONS_DPI = {"Simulate": True, "driver_setup": {"Model": "6571"}}
 
 @pytest.fixture
 def tsm(standalone_tsm):
@@ -27,10 +28,10 @@ def tsm(standalone_tsm):
     This TSM context uses standalone_tsm context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
-    ni_daqmx.set_task(standalone_tsm)
+    ni_daqmx.set_task(standalone_tsm, OPTIONS_DAQ)
     ni_fpga.initialize_sessions(standalone_tsm)
     ni_switch.initialize_sessions(standalone_tsm)
-    ni_dt_digital.initialize_sessions(standalone_tsm)
+    ni_dt_digital.initialize_sessions(standalone_tsm, options=OPTIONS_DPI)
     yield standalone_tsm
     ni_dt_digital.close_sessions(standalone_tsm)
     ni_switch.close_sessions(standalone_tsm)

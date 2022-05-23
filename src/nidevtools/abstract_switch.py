@@ -305,7 +305,6 @@ def initialize(tsm: SMContext):  # CHECK
         tsm: TSM context where the sessions will be initialized
     """
     switch_names = tsm.get_all_switch_names(instrument_type_id)
-    print(switch_names)
     if len(switch_names) == 1:
         dut_pins, sys_pins = tsm.get_pin_names()
         en_pins = []
