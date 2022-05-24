@@ -15,10 +15,10 @@ import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import nitsm.enums
 import nitsm.pinquerycontexts
-import daqmx
-import digital
-import fpga
-import switch
+from . import daqmx
+from . import digital
+from . import fpga
+from . import switch
 
 instrument_type_id = "Matrix"
 PinsArg = typing.Union[str, typing.Sequence[str]]
@@ -609,6 +609,3 @@ def pins_to_task_and_connect(tsm: SMContext, task_name: PinsArg, pins: PinsArg):
     if len(sessions) != 0:
         multi_session.connect_sessions_info(tsm)
     return multiple_session_info
-
-pin_file_names = ["AbstInst.pinmap", "MonoLithic.pinmap", "Rainbow.pinmap", "Baku_uSTS.pinmap"]
-print(pin_name_to_instrument("C:\\Users\\Admin\\Desktop\\nidevtools\\nitsm-devtools-python\\tests\\LoopBack\\" + pin_file_names[2]))
