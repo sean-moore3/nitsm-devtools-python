@@ -32,7 +32,7 @@ def tsm(standalone_tsm):
     This TSM context uses standalone_tsm context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
-    ni_daqmx.set_task(standalone_tsm, OPTIONS)
+    ni_daqmx.set_task(standalone_tsm)  # OPTIONS
     yield standalone_tsm
     ni_daqmx.clear_task(standalone_tsm)
 
@@ -49,8 +49,7 @@ def daqmx_tsm_s(tsm, tests_pins):
         daqmx_tsms.append(data)
         sessions += data.sessions
     print(sessions)
-    test = (tsm, daqmx_tsms)
-    yield test
+    yield daqmx_tsms
 
 
 @pytest.mark.pin_map(pin_file_name)
@@ -66,11 +65,9 @@ class TestDaqmx:
             assert len(queried_tasks) != 0  # not void
             assert len(queried_tasks) == 2  # Matching quantity
 
-    def test_pin_to_sessions_info(self, daqmx_tsm_s):
-        tsm = daqmx_tsm_s[0]
-        list_daqmx_tsm = daqmx_tsm_s[1]
-        print(list_daqmx_tsm)
-        for daqmx_tsm in list_daqmx_tsm:
+    def test_pin_to_sessions_info(self, tsm, daqmx_tsm_s):
+        print(daqmx_tsm_s)
+        for daqmx_tsm in daqmx_tsm_s:
             print("\nTest_pin_to_sessions\n", daqmx_tsm)
             print(daqmx_tsm.sessions)
             assert isinstance(daqmx_tsm, ni_daqmx.MultipleSessions)
@@ -95,16 +92,15 @@ class TestDaqmx:
             assert isinstance(element, nidaqmx.Task)
 
     def test_properties(self, daqmx_tsm_s):
-        list_daqmx_tsm = daqmx_tsm_s[1]
         print("\nTest Start/Stop All\n")
-        for daqmx_tsm in list_daqmx_tsm:
+        for daqmx_tsm in daqmx_tsm_s:
             daqmx_tsm.start_task()
             daqmx_tsm.read_waveform(samples_per_channel=1)
             daqmx_tsm.stop_task()
         print("\nTest Timing Configuration\n")
         samp_cha = 1000
         samp_rate = 500
-        for daqmx_tsm in list_daqmx_tsm:
+        for daqmx_tsm in daqmx_tsm_s:
             daqmx_tsm.timing(samp_cha, samp_rate)
             for session in daqmx_tsm.sessions:
                 assert samp_rate == session.Task.timing.samp_clk_rate
@@ -120,10 +116,10 @@ class TestDaqmx:
         #     for session in daqmx_tsm.sessions:
         #         assert source in session.Task.triggers.reference_trigger.dig_edge_src
         print("\nTest Configure Read Channels\n")
-        for daqmx_tsm in list_daqmx_tsm:
+        for daqmx_tsm in daqmx_tsm_s:
             daqmx_tsm.configure_channels()
         print("\nTest Read\n")
-        for daqmx_tsm in list_daqmx_tsm:
+        for daqmx_tsm in daqmx_tsm_s:
             print("\nTest Read Single Channel\n")
             daqmx_tsm.start_task()
             data = daqmx_tsm.read_waveform(samples_per_channel=8)
@@ -137,7 +133,7 @@ class TestDaqmx:
             assert isinstance(data, list)
             daqmx_tsm.stop_task()
         print("\nVerify Properties\n")
-        for daqmx_tsm in list_daqmx_tsm:
+        for daqmx_tsm in daqmx_tsm_s:
             data = daqmx_tsm.get_task_properties()
             assert isinstance(data, typing.List)
             for task_property in data:

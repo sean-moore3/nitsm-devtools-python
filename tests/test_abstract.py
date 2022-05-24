@@ -21,6 +21,7 @@ if SIMULATE:
     OPTIONS_DAQ = {"Simulate": True, "DriverSetup": {"Model": "6368"}}
     OPTIONS_DPI = {"Simulate": True, "driver_setup": {"Model": "6571"}}
 
+
 @pytest.fixture
 def tsm(standalone_tsm):
     """
@@ -50,7 +51,7 @@ class TestAbstract:
             tsm (_type_): _description_
         """
         ni_abstract.initialize(tsm)
-        assert 4 == len(ni_abstract.get_all_sessions(tsm).enable_pins)
+        assert len(ni_abstract.get_all_sessions(tsm).enable_pins) == 4
         assert ni_abstract.get_all_instruments_names(tsm)[0] == "Masterconnect"
         ni_abstract.close_sessions(tsm)
 
@@ -81,7 +82,6 @@ class TestAbstract:
         print(table)
 
     def test_fgv(self, tsm):
-        # ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')
         print(tsm.pin_map_file_path)
         print("INIT")
         data = ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.init)
@@ -98,12 +98,12 @@ class TestAbstract:
 def ts_open_session(tsm):
     ni_daqmx.set_task(tsm)
     ni_fpga.initialize_sessions(tsm)
-    # ni_dt_digital.tsm_initialize_sessions(tsm)
+    ni_dt_digital.initialize_sessions(tsm)
 
 
 @nitsm.codemoduleapi.code_module
 def ts_close_session(tsm):
-    # ni_dt_digital.tsm_close_sessions(tsm)
+    ni_dt_digital.close_sessions(tsm)
     ni_fpga.close_sessions(tsm)
     ni_daqmx.clear_task(tsm)
 
@@ -111,7 +111,7 @@ def ts_close_session(tsm):
 @nitsm.codemoduleapi.code_module
 def ts_initialize_and_close(tsm):
     ni_abstract.initialize(tsm)
-    assert 4 == len(ni_abstract.get_all_sessions(tsm).enable_pins)
+    assert len(ni_abstract.get_all_sessions(tsm).enable_pins) == 4
     assert ni_abstract.get_all_instruments_names(tsm)[0] == "Masterconnect"
     ni_abstract.close_sessions(tsm)
 
