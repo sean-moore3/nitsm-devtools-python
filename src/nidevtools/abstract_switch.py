@@ -15,10 +15,10 @@ import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import nitsm.enums
 import nitsm.pinquerycontexts
-from . import daqmx
-from . import digital
-from . import fpga
-from . import switch
+import daqmx
+import digital
+import fpga
+import switch
 
 instrument_type_id = "Matrix"
 PinsArg = typing.Union[str, typing.Sequence[str]]
@@ -45,12 +45,12 @@ class InstrumentTypes:
 
 class Session:
     def __init__(
-        self,
-        enable_pin: str,
-        instrument_type: typing.Union[InstrumentTypes, str],
-        route_value: str,
-        site: int,
-        status: str,
+            self,
+            enable_pin: str,
+            instrument_type: typing.Union[InstrumentTypes, str],
+            route_value: str,
+            site: int,
+            status: str,
     ):
         """
         Constructor method for switch session class. This class stores enable pin details.
@@ -208,8 +208,8 @@ class AbstractSession(typing.NamedTuple):
         for session in self.enable_pins:
 
             if (
-                session.instrument_type == InstrumentTypes.switch
-                or session.instrument_type == "_niSwitch"
+                    session.instrument_type == InstrumentTypes.switch
+                    or session.instrument_type == "_niSwitch"
             ):
                 data = switch.pin_to_sessions_session_info(tsm, session.enable_pin)
                 session_handler = switch.MultipleSessions([data])
@@ -236,8 +236,8 @@ class AbstractSession(typing.NamedTuple):
 
 
 def check_debug_ui_tool(
-    path_in: str,
-    path_teststand="C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2020 (64-bit)",
+        path_in: str,
+        path_teststand="C:\\Users\\Public\\Documents\\National Instruments\\TestStand 2020 (64-bit)",
 ):
     """
     checks the debug UI tool connected or not
@@ -441,16 +441,17 @@ def pin_name_to_instrument(pinmap_path: str = ""):
     Args:
         pinmap_path: Location of the pinmap to use
     """
-    tree = Et.parse(pinmap_path)
-    connections = get_first_matched_node(tree, "Connections")
-    pin_groups = get_first_matched_node(tree, "PinGroups")
-    connection = get_all_matched_nodes(connections, "Connection")
-    multiplexed_connection = get_all_matched_nodes(connections, "MultiplexedConnection")
-    pin_group = get_all_matched_nodes(pin_groups, "PinGroup")
-    subarray1 = []
-    subarray2 = []
+    tree = Et.parse(pinmap_path)  # reading the whole xml
+    connections = get_first_matched_node(tree, "Connections")  # getting all in the Connections tag
+    pin_groups = get_first_matched_node(tree, "PinGroups")  # getting all in the PinGroups
+    connection = get_all_matched_nodes(connections, "Connection")  # getting all Connection tags
+    multiplexed_connection = get_all_matched_nodes(connections, "MultiplexedConnection")  # getting all MultiplexedConnection tags
+    pin_group = get_all_matched_nodes(pin_groups, "PinGroup")  # getting all PinGroup tags
+    connections_list = []
+    multiplexed_connection_pin_group_list = []
+    # Iterating through all items with Connection tag
     for element in connection:
-        var1 = [
+        conn = [
             element.attrib["pin"],
             element.attrib["instrument"],
             element.attrib["channel"],
@@ -458,42 +459,48 @@ def pin_name_to_instrument(pinmap_path: str = ""):
             "",
             "",
         ]
-        subarray1.append(var1)
-    subarray21 = []
+        connections_list.append(conn)
+    multiplexed_connections_list = []
+    # Iterating through all items with MultiplexedConnection tag
     for element in multiplexed_connection:
+        # Getting all MultiplexedDUTPinRoute tags
         dut_route = get_all_matched_nodes(element, "MultiplexedDUTPinRoute")
-        subarray21 = []
-        for j in dut_route:
-            subarray21.append(
-                [j.attrib["pin"], element.attrib["instrument"], element.attrib["channel"]]
+        multiplexed_connections_list = []
+        # Iterating through all items with MultiplexedDUTPinRoute tag
+        for e in dut_route:
+            multiplexed_connections_list.append(
+                [e.attrib["pin"], element.attrib["instrument"], element.attrib["channel"]]
             )
-    subarray22 = []
+    pin_group_list = []
     for element in pin_group:
         reference = get_all_matched_nodes(element, "PinReference")
-        subarray22_e = [element.attrib["name"] + "_DUT"]
+        pin_ref_arr = [element.attrib["name"] + "_DUT"]
         for j in reference:
-            subarray22_e.append(j.attrib["pin"])
-        subarray22.append(subarray22_e)
-    for element in subarray21:
+            pin_ref_arr.append(j.attrib["pin"])
+        pin_group_list.append(pin_ref_arr)
+    # Iterating through all items with MultiplexedDUTPinRoute tag
+    for element in multiplexed_connections_list:
         r = 0
-        for j in subarray22:
+        for j in pin_group_list:
             if j[0] == element[0]:
                 break
             else:
                 r += 1
         if element[1] == "AbstractInstrument":
-            out1 = subarray22[r][2]
+            out1 = pin_group_list[r][2]
         else:
             out1 = ""
         r = 0
-        for j in subarray1:
+        for j in connections_list:
             if j[0] == out1:
                 break
             else:
                 r += 1
-        out2 = "%s, %s" % (subarray1[r][1], subarray1[r][2])
-        subarray2.append(element + [out1] + [out2] + ["Disconnected"])
-    return subarray1 + subarray2
+        print(r)
+        print(len(connections_list))
+        out2 = "%s, %s" % (connections_list[r-1][1], connections_list[r-1][2])
+        multiplexed_connection_pin_group_list.append(element + [out1] + [out2] + ["Disconnected"])
+    return connections_list + multiplexed_connection_pin_group_list
 
 
 @nitsm.codemoduleapi.code_module
@@ -602,3 +609,6 @@ def pins_to_task_and_connect(tsm: SMContext, task_name: PinsArg, pins: PinsArg):
     if len(sessions) != 0:
         multi_session.connect_sessions_info(tsm)
     return multiple_session_info
+
+pin_file_names = ["AbstInst.pinmap", "MonoLithic.pinmap", "Rainbow.pinmap", "Baku_uSTS.pinmap"]
+print(pin_name_to_instrument("C:\\Users\\Admin\\Desktop\\nidevtools\\nitsm-devtools-python\\tests\\LoopBack\\" + pin_file_names[2]))
