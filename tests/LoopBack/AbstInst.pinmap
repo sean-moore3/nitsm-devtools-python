@@ -8,9 +8,6 @@
 				<Channel id="0" />
 			</ChannelGroup>
 		</Instrument>
-		<Instrument name="SWT1" instrumentTypeId="_niSwitch">
-			<Channel id="0" />
-		</Instrument>
 		<Instrument instrumentTypeId="abstinst" name="AbstractInstrument">
 			<Channel id="0" />
 		</Instrument>
@@ -31,13 +28,13 @@
 		<DUTPin name="DPI_DI_SDA" />
 		<SystemPin name="DPI_DI_En1" />
 		<DUTPin name="En_DPI_DO1" />
+		<DUTPin name="En_DPI_DO2" />
 		<DUTPin name="En_DAQ_DO1" />
 		<DUTPin name="En_RIO_DO1" />
-		<DUTPin name="En_SWT_DO1" />
-		<DUTPin name="DPI_DI_11" />		
-		<DUTPin name="DPI_DI_12" />		
-		<DUTPin name="DPI_DI_13" />		
-		<DUTPin name="DPI_DI_14" />		
+		<DUTPin name="DPI_DI_11" />
+		<DUTPin name="DPI_DI_12" />
+		<DUTPin name="DPI_DI_13" />
+		<DUTPin name="DPI_DI_14" />
 	</Pins>
 	<PinGroups>
 		<PinGroup name="SGL_1">
@@ -77,6 +74,8 @@
 			<PinReference pin="DPI_DO_SDA" />
 			<PinReference pin="DPI_DI_SCL" />
 			<PinReference pin="DPI_DO_SCL" />
+			<PinReference pin="En_DPI_DO2" />
+			<PinReference pin="En_DPI_DO1" />
 		</PinGroup>
 	</PinGroups>
 	<Sites>
@@ -91,7 +90,7 @@
 		<Connection pin="En_DPI_DO1" siteNumber="0" instrument="DPI1" channel="0" />
 		<Connection pin="En_RIO_DO1" siteNumber="0" instrument="RIO1" channel="0" />
 		<Connection pin="En_DAQ_DO1" siteNumber="0" instrument="DAQ1" channel="DAQ1/port0/line2" />
-		<Connection pin="En_SWT_DO1" siteNumber="0" instrument="SWT1" channel="0" />
+		<Connection pin="En_DPI_DO2" siteNumber="0" instrument="DPI1" channel="10" />
 		<Connection pin="DPI_DI_11" siteNumber="0" instrument="DPI1" channel="11" />
 		<Connection pin="DPI_DI_12" siteNumber="0" instrument="DPI1" channel="12" />
 		<Connection pin="DPI_DI_13" siteNumber="0" instrument="DPI1" channel="13" />

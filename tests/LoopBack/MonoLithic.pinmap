@@ -896,14 +896,14 @@
 		<Connection pin="DPI_DI_SDA" siteNumber="0" instrument="DPI1" channel="6" />
 		<Connection pin="DPI_DO_SDA" siteNumber="0" instrument="DPI1" channel="7" />
 		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
-			<MultiplexedDUTPinRoute pin="SGL_1_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=0" />
-			<MultiplexedDUTPinRoute pin="SGL_2_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=1" />
-			<MultiplexedDUTPinRoute pin="SGL_3_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq_DO1=0" />
-			<MultiplexedDUTPinRoute pin="SGL_4_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq_DO1=1" />
-			<MultiplexedDUTPinRoute pin="SGL_5_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Dpi_DO1=0" />
-			<MultiplexedDUTPinRoute pin="SGL_6_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Dpi_DO1=1" />
-			<MultiplexedDUTPinRoute pin="SGL_7_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=0" />
-			<MultiplexedDUTPinRoute pin="SGL_8_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=1" />
+			<MultiplexedDUTPinRoute pin="SGL_1_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_RIO_DO1=0" />
+			<MultiplexedDUTPinRoute pin="SGL_2_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_RIO_DO1=1" />
+			<MultiplexedDUTPinRoute pin="SGL_3_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DAQ_DO1=0" />
+			<MultiplexedDUTPinRoute pin="SGL_4_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DAQ_DO1=1" />
+			<MultiplexedDUTPinRoute pin="SGL_5_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO1=0" />
+			<MultiplexedDUTPinRoute pin="SGL_6_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO1=1" />
+			<MultiplexedDUTPinRoute pin="SGL_7_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_SWT_DO1=0" />
+			<MultiplexedDUTPinRoute pin="SGL_8_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_SWT_DO1=1" />
 		</MultiplexedConnection>
 		<Connection channel="0" instrument="RIO1" pin="En_RIO_DO1" siteNumber="0" />
 		<Connection channel="1" instrument="RIO1" pin="LINT_RST" siteNumber="0" />
