@@ -167,7 +167,7 @@ class Session:
             multiple_session_info.ssc.select_function(nidigital.enums.SelectedFunction.DIGITAL)
             data = multiple_session_info.ssc.read_static()
             status = ["0", "1", "", "L", "H", "X", "M", "V", "D", "E"]
-            self.status = status[data[0][0]]
+            self.status = status[data[0][0].value]
         elif self.instrument_type == InstrumentTypes.fpga:
             multiple_session_info = fpga.pins_to_sessions(tsm, [self.enable_pin], [])
             data = multiple_session_info.read_static()
