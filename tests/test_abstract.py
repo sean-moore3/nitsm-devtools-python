@@ -84,11 +84,14 @@ class TestAbstract:
         # ni_abstract.pin_name_to_instrument(pinmap_path='C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap')
         print(tsm.pin_map_file_path)
         print("INIT")
-        ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.init)
+        data = ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.init)
+        print(data)
         print("GET CONNECTIONS")
-        ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.get_connections)
+        data = ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.get_connections)
+        print(data)
         print("DISCONNECT ALL")
-        ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.disconnect_all)
+        data = ni_abstract.pin_fgv(tsm, "", ni_abstract.Control.disconnect_all)
+        print(data)
 
 
 @nitsm.codemoduleapi.code_module

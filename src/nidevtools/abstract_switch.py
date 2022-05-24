@@ -19,7 +19,6 @@ from . import daqmx
 from . import digital
 from . import fpga
 from . import switch
-from . import relay
 
 instrument_type_id = "Matrix"
 PinsArg = typing.Union[str, typing.Sequence[str]]
@@ -351,10 +350,10 @@ def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connect
         like a 2D table.
     """
     if not hasattr(pin_fgv, "connections"):
-        connections = relay.test_data  # Storage variable created.[] for testing
+        pin_fgv.connections = []  # Storage variable created.[] for testing
 
     if action == Control.get_connections:
-        for connection in connections:
+        for connection in pin_fgv.connections:
             if connection[1] == "AbstractInstrument":
                 sessions = pins_to_sessions_sessions_info(tsm, connection[0])
                 data = sessions.read_state(tsm)
@@ -392,10 +391,10 @@ def pin_fgv(tsm: SMContext, pin: str = "", action: Control = Control.get_connect
                     connection[5] = "Disconnected"
     elif action == Control.init:
         pinmap_path = tsm.pin_map_file_path
-        connections = pin_name_to_instrument(pinmap_path)
+        pin_fgv.connections = pin_name_to_instrument(pinmap_path)
     else:
         disconnect_all(tsm)
-    return connections
+    return pin_fgv.connections
 
 
 def get_first_matched_node(tree: Et.ElementTree, key: str):
