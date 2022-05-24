@@ -11,9 +11,9 @@ import nidevtools.switch as ni_switch
 # To simulate hardware create a dummy file named "Simulate.driver" in the current folder.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["Rainbow.pinmap", "MonoLithic.pinmap", "AbstInst.pinmap", "C:\\Users\\ni\\Desktop\\Baku_uSTS.pinmap"]
+pin_file_names = ["Rainbow.pinmap", "MonoLithic.pinmap", "AbstInst.pinmap", "Baku_uSTS.pinmap"]
 # Change index below to change the pin map to use
-pin_file_name = pin_file_names[0]
+pin_file_name = pin_file_names[2]
 
 OPTIONS_DAQ = {}  # empty options to run on real hardware.
 OPTIONS_DPI = {}  # empty dict options to run on real hardware.
@@ -28,7 +28,7 @@ def tsm(standalone_tsm):
     This TSM context uses standalone_tsm context fixture created by the conftest.py
     """
     print("\nSimulated driver?", SIMULATE)
-    ni_daqmx.set_task(standalone_tsm, OPTIONS_DAQ)
+    ni_daqmx.set_task(standalone_tsm) #OPTIONS_DAQ
     ni_fpga.initialize_sessions(standalone_tsm)
     ni_switch.initialize_sessions(standalone_tsm)
     ni_dt_digital.initialize_sessions(standalone_tsm, options=OPTIONS_DPI)
@@ -67,12 +67,12 @@ class TestAbstract:
         t.stop()
         enabled.disconnect_sessions_info(tsm)
         # ni_abstract.disconnect_all(tsm)
-        abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm, "DUT_SGL_1")
+        abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm, "SGL_1_DUT")
         print(abst_session)
         enabled.read_state(tsm)
-        ni_abstract.pins_to_task_and_connect(tsm, ["En_DAQ_DO1"], ["DUT_SGL_3", "DUT_SGL_4"])
+        ni_abstract.pins_to_task_and_connect(tsm, ["En_DAQ_DO1"], ["SGL_3_DUT", "SGL_4_DUT"])
         # ni_abstract.disconnect_all(tsm)
-        ni_abstract.disconnect_pin(tsm, "DUT_SGL_1")
+        ni_abstract.disconnect_pin(tsm, "SGL_1_DUT")
 
     def test_pin_name_to_instrument(self, tsm):
         pinmap_filepath = tsm.pin_map_file_path
@@ -129,12 +129,12 @@ def ts_pins_to_session_sessions_info(tsm):
     t.stop()
     enabled.disconnect_sessions_info(tsm)
     ni_abstract.disconnect_all(tsm)
-    abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm, "BuckSGL_1")
+    abst_session = ni_abstract.pins_to_sessions_sessions_info(tsm, "SGL_1_DUT")
     print(abst_session)
     enabled.read_state(tsm)
-    ni_abstract.pins_to_task_and_connect(tsm, ["En_Daq"], ["BuckSGL_3", "BuckSGL_4"])
+    ni_abstract.pins_to_task_and_connect(tsm, ["En_Daq"], ["SGL_3_DUT", "SGL_4_DUT"])
     ni_abstract.disconnect_all(tsm)
-    ni_abstract.disconnect_pin(tsm, "BuckSGL_1")
+    ni_abstract.disconnect_pin(tsm, "SGL_1_DUT")
 
 
 @nitsm.codemoduleapi.code_module

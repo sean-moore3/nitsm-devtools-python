@@ -17,14 +17,14 @@
 		<Multiplexer multiplexerTypeId="Matrix" name="Masterconnect" />
 	</Instruments>
 	<Pins>
-		<DUTPin name="DUT_SGL_1" />
-		<DUTPin name="DUT_SGL_2" />
-		<DUTPin name="DUT_SGL_3" />
-		<DUTPin name="DUT_SGL_4" />
-		<DUTPin name="DUT_SGL_5" />
-		<DUTPin name="DUT_SGL_6" />
-		<DUTPin name="DUT_SGL_7" />
-		<DUTPin name="DUT_SGL_8" />
+		<DUTPin name="SGL_1_DUT" />
+		<DUTPin name="SGL_2_DUT" />
+		<DUTPin name="SGL_3_DUT" />
+		<DUTPin name="SGL_4_DUT" />
+		<DUTPin name="SGL_5_DUT" />
+		<DUTPin name="SGL_6_DUT" />
+		<DUTPin name="SGL_7_DUT" />
+		<DUTPin name="SGL_8_DUT" />
 		<DUTPin name="DPI_DO_SCL" />
 		<DUTPin name="DPI_DI_SCL" />
 		<DUTPin name="DPI_DO_SDA" />
@@ -36,36 +36,36 @@
 		<DUTPin name="En_SWT_DO1" />
 	</Pins>
 	<PinGroups>
-		<PinGroup name="PG_SGL_1">
-			<PinReference pin="DUT_SGL_1" />
+		<PinGroup name="SGL_1">
+			<PinReference pin="SGL_1_DUT" />
 			<PinReference pin="En_RIO_DO1" />
 		</PinGroup>
-		<PinGroup name="PG_SGL_2">
-			<PinReference pin="DUT_SGL_2" />
+		<PinGroup name="SGL_2">
+			<PinReference pin="SGL_2_DUT" />
 			<PinReference pin="En_RIO_DO1" />
 		</PinGroup>
-		<PinGroup name="PG_SGL_3">
-			<PinReference pin="DUT_SGL_3" />
+		<PinGroup name="SGL_3">
+			<PinReference pin="SGL_3_DUT" />
 			<PinReference pin="En_DAQ_DO1" />
 		</PinGroup>
-		<PinGroup name="PG_SGL_4">
-			<PinReference pin="DUT_SGL_4" />
+		<PinGroup name="SGL_4">
+			<PinReference pin="SGL_4_DUT" />
 			<PinReference pin="En_DAQ_DO1" />
 		</PinGroup>
-		<PinGroup name="PG_SGL_5">
-			<PinReference pin="DUT_SGL_5" />
+		<PinGroup name="SGL_5">
+			<PinReference pin="SGL_5_DUT" />
 			<PinReference pin="En_DPI_DO1" />
 		</PinGroup>
-		<PinGroup name="PG_SGL_6">
-			<PinReference pin="DUT_SGL_6" />
+		<PinGroup name="SGL_6">
+			<PinReference pin="SGL_6_DUT" />
 			<PinReference pin="En_DPI_DO1" />
 		</PinGroup>
-		<PinGroup name="PG_SGL_7">
-			<PinReference pin="DUT_SGL_7" />
+		<PinGroup name="SGL_7">
+			<PinReference pin="SGL_7_DUT" />
 			<PinReference pin="En_SWT_DO1" />
 		</PinGroup>
-		<PinGroup name="PG_SGL_8">
-			<PinReference pin="DUT_SGL_8" />
+		<PinGroup name="SGL_8">
+			<PinReference pin="SGL_8_DUT" />
 			<PinReference pin="En_SWT_DO1" />
 		</PinGroup>
 		<PinGroup name="DPI_PG_AllPins">
@@ -73,8 +73,6 @@
 			<PinReference pin="DPI_DO_SDA" />
 			<PinReference pin="DPI_DI_SCL" />
 			<PinReference pin="DPI_DO_SCL" />
-			<PinReference pin="En_DPI_DO1" />
-			<PinReference pin="DPI_DI_En1" />
 		</PinGroup>
 	</PinGroups>
 	<Sites>
@@ -91,14 +89,14 @@
 		<Connection pin="En_DAQ_DO1" siteNumber="0" instrument="DAQ1" channel="DAQ1/port0/line2" />
 		<Connection pin="En_SWT_DO1" siteNumber="0" instrument="SWT1" channel="0" />
 		<MultiplexedConnection instrument="AbstractInstrument" channel="0">
-			<MultiplexedDUTPinRoute pin="DUT_SGL_1" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=0" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_2" siteNumber="0" multiplexer="Masterconnect" routeName="En_Fpga_DO1=1" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_3" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq_DO1=0" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_4" siteNumber="0" multiplexer="Masterconnect" routeName="En_Daq_DO1=1" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_5" siteNumber="0" multiplexer="Masterconnect" routeName="En_Dpi_DO1=0" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_6" siteNumber="0" multiplexer="Masterconnect" routeName="En_Dpi_DO1=1" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_7" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=0" />
-			<MultiplexedDUTPinRoute pin="DUT_SGL_8" siteNumber="0" multiplexer="Masterconnect" routeName="En_Swt_DO1=1" />
+			<MultiplexedDUTPinRoute pin="SGL_1_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_RIO_DO1=0" />
+			<MultiplexedDUTPinRoute pin="SGL_2_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_RIO_DO1=1" />
+			<MultiplexedDUTPinRoute pin="SGL_3_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DAQ_DO1=0" />
+			<MultiplexedDUTPinRoute pin="SGL_4_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DAQ_DO1=1" />
+			<MultiplexedDUTPinRoute pin="SGL_5_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO1=0" />
+			<MultiplexedDUTPinRoute pin="SGL_6_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO1=1" />
+			<MultiplexedDUTPinRoute pin="SGL_7_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_SWT_DO1=0" />
+			<MultiplexedDUTPinRoute pin="SGL_8_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_SWT_DO1=1" />
 		</MultiplexedConnection>
 	</Connections>
 </PinMap>
