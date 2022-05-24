@@ -58,9 +58,9 @@ class UiI2CDebugWindow(object):
 
     def setup_ui(self, main_window):
         main_window.setObjectName("MainWindow")
-        main_window.resize(521, 302)
-        main_window.setMinimumSize(521, 302)
-        main_window.setMaximumSize(521, 302)
+        main_window.resize(600, 302)
+        main_window.setMinimumSize(600, 302)
+        main_window.setMaximumSize(600, 302)
         main_window.setWindowTitle("I2C Debug UI")
 
         self.central_widget = QtWidgets.QWidget(main_window)
@@ -68,7 +68,7 @@ class UiI2CDebugWindow(object):
         self.central_widget.setWindowTitle("I2C Debug UI")
 
         self.tab_widget = QtWidgets.QTabWidget(self.central_widget)
-        self.tab_widget.setGeometry(QtCore.QRect(230, 30, 281, 101))
+        self.tab_widget.setGeometry(QtCore.QRect(300, 30, 281, 101))
         self.tab_widget.setObjectName("tab_widget")
 
         self.tab_damp = QtWidgets.QWidget()
@@ -87,13 +87,13 @@ class UiI2CDebugWindow(object):
         self.tab_tload.setObjectName("tab_tload")
 
         self.label_number_of_bytes = QtWidgets.QLabel(self.central_widget)
-        self.label_number_of_bytes.setGeometry(QtCore.QRect(130, 130, 101, 31))
+        self.label_number_of_bytes.setGeometry(QtCore.QRect(120, 130, 180, 31))
         self.label_number_of_bytes.setAlignment(QtCore.Qt.AlignCenter)
         self.label_number_of_bytes.setObjectName("label_number_of_bytes")
         self.label_number_of_bytes.setText("Number of Bytes")
 
         self.label_data = QtWidgets.QLabel(self.central_widget)
-        self.label_data.setGeometry(QtCore.QRect(130, 190, 101, 31))
+        self.label_data.setGeometry(QtCore.QRect(160, 190, 101, 31))
         self.label_data.setAlignment(QtCore.Qt.AlignCenter)
         self.label_data.setObjectName("label_data")
         self.label_data.setText("Data")
@@ -105,13 +105,13 @@ class UiI2CDebugWindow(object):
         self.label_i2c_master.setText("I2C Master")
 
         self.label_slave_address = QtWidgets.QLabel(self.central_widget)
-        self.label_slave_address.setGeometry(QtCore.QRect(120, 10, 101, 31))
+        self.label_slave_address.setGeometry(QtCore.QRect(140, 10, 150, 31))
         self.label_slave_address.setAlignment(QtCore.Qt.AlignCenter)
         self.label_slave_address.setObjectName("label_slave_address")
         self.label_slave_address.setText("Slave Address")
 
         self.label_exec_time = QtWidgets.QLabel(self.central_widget)
-        self.label_exec_time.setGeometry(QtCore.QRect(120, 70, 101, 31))
+        self.label_exec_time.setGeometry(QtCore.QRect(160, 70, 101, 31))
         self.label_exec_time.setAlignment(QtCore.Qt.AlignCenter)
         self.label_exec_time.setObjectName("label_exec_time")
         self.label_exec_time.setText("Exec Time")
@@ -123,13 +123,13 @@ class UiI2CDebugWindow(object):
         self.label_status.setText("Status")
 
         self.label_register = QtWidgets.QLabel(self.central_widget)
-        self.label_register.setGeometry(QtCore.QRect(230, 0, 101, 31))
+        self.label_register.setGeometry(QtCore.QRect(300, 0, 101, 31))
         self.label_register.setAlignment(QtCore.Qt.AlignCenter)
         self.label_register.setObjectName("label_register")
         self.label_register.setText("Register")
 
         self.label_i2c_read_data = QtWidgets.QLabel(self.central_widget)
-        self.label_i2c_read_data.setGeometry(QtCore.QRect(250, 130, 101, 31))
+        self.label_i2c_read_data.setGeometry(QtCore.QRect(350, 130, 160, 31))
         self.label_i2c_read_data.setAlignment(QtCore.Qt.AlignCenter)
         self.label_i2c_read_data.setObjectName("label_i2c_read_data")
         self.label_i2c_read_data.setText("I2C Read Data")
@@ -179,11 +179,11 @@ class UiI2CDebugWindow(object):
         self.line_edit_tload.setObjectName("line_edit_tload")
 
         self.line_edit_slave_address = QtWidgets.QLineEdit(self.central_widget)
-        self.line_edit_slave_address.setGeometry(QtCore.QRect(120, 40, 101, 31))
+        self.line_edit_slave_address.setGeometry(QtCore.QRect(160, 40, 101, 31))
         self.line_edit_slave_address.setObjectName("line_edit_slave_address")
 
         self.line_edit_exec_time = QtWidgets.QLineEdit(self.central_widget)
-        self.line_edit_exec_time.setGeometry(QtCore.QRect(120, 100, 101, 31))
+        self.line_edit_exec_time.setGeometry(QtCore.QRect(160, 100, 101, 31))
         self.line_edit_exec_time.setObjectName("line_edit_exec_time")
 
         self.line_edit_status = QtWidgets.QLineEdit(self.central_widget)
@@ -191,11 +191,11 @@ class UiI2CDebugWindow(object):
         self.line_edit_status.setObjectName("line_edit_status")
 
         self.line_edit_number_of_bytes = QtWidgets.QLineEdit(self.central_widget)
-        self.line_edit_number_of_bytes.setGeometry(QtCore.QRect(130, 160, 101, 31))
+        self.line_edit_number_of_bytes.setGeometry(QtCore.QRect(160, 160, 101, 31))
         self.line_edit_number_of_bytes.setObjectName("line_edit_number_of_bytes")
 
         self.line_edit_data = QtWidgets.QLineEdit(self.central_widget)
-        self.line_edit_data.setGeometry(QtCore.QRect(130, 220, 101, 31))
+        self.line_edit_data.setGeometry(QtCore.QRect(160, 220, 101, 31))
         self.line_edit_data.setObjectName("line_edit_data")
 
         self.push_button_read = QtWidgets.QPushButton(self.central_widget)
@@ -209,7 +209,7 @@ class UiI2CDebugWindow(object):
         self.push_button_write.setText("WRITE")
 
         self.list_view_read_data = QtWidgets.QListView(self.central_widget)
-        self.list_view_read_data.setGeometry(QtCore.QRect(250, 160, 101, 91))
+        self.list_view_read_data.setGeometry(QtCore.QRect(380, 160, 101, 91))
         self.list_view_read_data.setObjectName("list_view_read_data")
 
         self.tab_widget.addTab(self.tab_damp, "DAMP")
