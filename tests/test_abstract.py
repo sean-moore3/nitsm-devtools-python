@@ -13,7 +13,7 @@ SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driv
 
 pin_file_names = ["Rainbow.pinmap", "MonoLithic.pinmap", "AbstInst.pinmap", "Baku_uSTS.pinmap"]
 # Change index below to change the pin map to use
-pin_file_name = pin_file_names[2]
+pin_file_name = pin_file_names[1]
 
 OPTIONS_DAQ = {}  # empty options to run on real hardware.
 OPTIONS_DPI = {}  # empty dict options to run on real hardware.

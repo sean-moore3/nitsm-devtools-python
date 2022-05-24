@@ -14,36 +14,36 @@
 		<NIDCPowerInstrument name="SMU2" numberOfChannels="4">
 			<ChannelGroup name="CommonDCPowerChannelGroup2" />
 		</NIDCPowerInstrument>
-		<NIDAQmxTask channelList="DAQ1/ai0,DAQ1/ai1,DAQ1/ai2,DAQ1/ai3,DAQ1/ai4,DAQ1/ai5,DAQ1/ai6,DAQ1/ai7,DAQ1/ai8,DAQ1/ai9,DAQ1/ai10,DAQ1/ai11,DAQ1/ai12,DAQ1/ai13,DAQ1/ai14,DAQ1/ai15" name="DAQ1_AI" taskType="AnalogInput" />
-		<NIDAQmxTask channelList="DAQ2/ai0,DAQ2/ai1,DAQ2/ai2,DAQ2/ai3,DAQ2/ai4,DAQ2/ai5,DAQ2/ai6,DAQ2/ai7,DAQ2/ai8,DAQ2/ai9,DAQ2/ai10,DAQ2/ai11,DAQ2/ai12,DAQ2/ai13,DAQ2/ai14,DAQ2/ai15" name="DAQ2_AI" taskType="AnalogInput" />
-		<NIDAQmxTask channelList="DAQ1/ao0,DAQ1/ao1" name="DAQ1_AO" taskType="AnalogOutput" />
-		<NIDAQmxTask channelList="DAQ1/port0/line2" name="DAQ1_P0_2" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port0/line3" name="DAQ1_P0_3" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port0/line4" name="DAQ1_P0_4" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port0/line9" name="DAQ1_P0_9" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port1/line0" name="DAQ1_P1_0" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port1/line1" name="DAQ1_P1_1" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port1/line2" name="DAQ1_P1_2" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port1/line3" name="DAQ1_P1_3" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port1/line4" name="DAQ1_P1_4" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port1/line5" name="DAQ1_P1_5" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port1/line6" name="DAQ1_P1_6" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port1/line7" name="DAQ1_P1_7" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port0/line14" name="DAQ1_P0_14" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ1/port0/line15" name="DAQ1_P0_15" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port0/line0" name="DAQ2_P0_0" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port0/line2" name="DAQ2_P0_2" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port0/line3" name="DAQ2_P0_3" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port0/line4" name="DAQ2_P0_4" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port0/line5" name="DAQ2_P0_5" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port0/line8" name="DAQ2_P0_8" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port0/line9" name="DAQ2_P0_9" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port0/line14" name="DAQ2_P0_14" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port0/line15" name="DAQ2_P0_15" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port0/line16" name="DAQ2_P0_16" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port0/line17" name="DAQ2_P0_17" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ2/port1/line3" name="DAQ2_P1_3" taskType="DigitalOutput" />
-		<NIDAQmxTask channelList="DAQ3/ai0,DAQ3/ai1" name="DAQ3_AI" taskType="AnalogInputDSA" />
+		<NIDAQmxTask name="DAQ1_AI" taskType="AnalogInput" channelList="DAQ1/ai0,DAQ1/ai1,DAQ1/ai2,DAQ1/ai3,DAQ1/ai4,DAQ1/ai5,DAQ1/ai6,DAQ1/ai7,DAQ1/ai8,DAQ1/ai9,DAQ1/ai10,DAQ1/ai11,DAQ1/ai12,DAQ1/ai13,DAQ1/ai14,DAQ1/ai15" />
+		<NIDAQmxTask name="DAQ2_AI" taskType="AnalogInput" channelList="DAQ2/ai0,DAQ2/ai1,DAQ2/ai2,DAQ2/ai3,DAQ2/ai4,DAQ2/ai5,DAQ2/ai6,DAQ2/ai7,DAQ2/ai8,DAQ2/ai9,DAQ2/ai10,DAQ2/ai11,DAQ2/ai12,DAQ2/ai13,DAQ2/ai14,DAQ2/ai15" />
+		<NIDAQmxTask name="DAQ1_AO" taskType="AnalogOutput" channelList="DAQ1/ao0,DAQ1/ao1" />
+		<NIDAQmxTask name="DAQ1_P0_2" taskType="DigitalOutput" channelList="DAQ1/port0/line2" />
+		<NIDAQmxTask name="DAQ1_P0_3" taskType="DigitalOutput" channelList="DAQ1/port0/line3" />
+		<NIDAQmxTask name="DAQ1_P0_4" taskType="DigitalOutput" channelList="DAQ1/port0/line4" />
+		<NIDAQmxTask name="DAQ1_P0_9" taskType="DigitalOutput" channelList="DAQ1/port0/line9" />
+		<NIDAQmxTask name="DAQ1_P0_14" taskType="DigitalOutput" channelList="DAQ1/port0/line14" />
+		<NIDAQmxTask name="DAQ1_P0_15" taskType="DigitalOutput" channelList="DAQ1/port0/line15" />
+		<NIDAQmxTask name="DAQ1_P1_0" taskType="DigitalOutput" channelList="DAQ1/port1/line0" />
+		<NIDAQmxTask name="DAQ1_P1_1" taskType="DigitalOutput" channelList="DAQ1/port1/line1" />
+		<NIDAQmxTask name="DAQ1_P1_2" taskType="DigitalOutput" channelList="DAQ1/port1/line2" />
+		<NIDAQmxTask name="DAQ1_P1_3" taskType="DigitalOutput" channelList="DAQ1/port1/line3" />
+		<NIDAQmxTask name="DAQ1_P1_4" taskType="DigitalOutput" channelList="DAQ1/port1/line4" />
+		<NIDAQmxTask name="DAQ1_P1_5" taskType="DigitalOutput" channelList="DAQ1/port1/line5" />
+		<NIDAQmxTask name="DAQ1_P1_6" taskType="DigitalOutput" channelList="DAQ1/port1/line6" />
+		<NIDAQmxTask name="DAQ1_P1_7" taskType="DigitalOutput" channelList="DAQ1/port1/line7" />
+		<NIDAQmxTask name="DAQ2_P0_0" taskType="DigitalOutput" channelList="DAQ2/port0/line0" />
+		<NIDAQmxTask name="DAQ2_P0_2" taskType="DigitalOutput" channelList="DAQ2/port0/line2" />
+		<NIDAQmxTask name="DAQ2_P0_3" taskType="DigitalOutput" channelList="DAQ2/port0/line3" />
+		<NIDAQmxTask name="DAQ2_P0_4" taskType="DigitalOutput" channelList="DAQ2/port0/line4" />
+		<NIDAQmxTask name="DAQ2_P0_5" taskType="DigitalOutput" channelList="DAQ2/port0/line5" />
+		<NIDAQmxTask name="DAQ2_P0_8" taskType="DigitalOutput" channelList="DAQ2/port0/line8" />
+		<NIDAQmxTask name="DAQ2_P0_9" taskType="DigitalOutput" channelList="DAQ2/port0/line9" />
+		<NIDAQmxTask name="DAQ2_P0_14" taskType="DigitalOutput" channelList="DAQ2/port0/line14" />
+		<NIDAQmxTask name="DAQ2_P0_15" taskType="DigitalOutput" channelList="DAQ2/port0/line15" />
+		<NIDAQmxTask name="DAQ2_P0_16" taskType="DigitalOutput" channelList="DAQ2/port0/line16" />
+		<NIDAQmxTask name="DAQ2_P0_17" taskType="DigitalOutput" channelList="DAQ2/port0/line17" />
+		<NIDAQmxTask name="DAQ2_P1_3" taskType="DigitalOutput" channelList="DAQ2/port1/line3" />
+		<NIDAQmxTask name="DAQ3_AI" taskType="AnalogInputDSA" channelList="DAQ3/ai0,DAQ3/ai1" />
 		<NIDAQmxTask name="DAQ3_AO" taskType="AnalogOutputDSA" channelList="DAQ3/ao0,DAQ3/ao1" />
 		<Instrument name="SWT1" instrumentTypeId="_niSwitch">
 			<Channel id="0" />
@@ -60,8 +60,8 @@
 		<Instrument name="AbstractInstrument" instrumentTypeId="abstinst">
 			<Channel id="0" />
 		</Instrument>
-		<Multiplexer multiplexerTypeId="Matrix" name="Masterconnect" />
-		<Instrument instrumentTypeId="782xFPGA" name="RIO1">
+		<Multiplexer name="Masterconnect" multiplexerTypeId="Matrix" />
+		<Instrument name="RIO1" instrumentTypeId="782xFPGA">
 			<ChannelGroup id="DIO">
 				<Channel id="0" />
 				<Channel id="1" />
