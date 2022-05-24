@@ -33,7 +33,9 @@ def tsm(standalone_tsm):
     ni_fpga.initialize_sessions(standalone_tsm)
     ni_switch.initialize_sessions(standalone_tsm)
     ni_dt_digital.initialize_sessions(standalone_tsm, options=OPTIONS_DPI)
+    ni_abstract.initialize(standalone_tsm)
     yield standalone_tsm
+    ni_abstract.close_sessions(standalone_tsm)
     ni_dt_digital.close_sessions(standalone_tsm)
     ni_switch.close_sessions(standalone_tsm)
     ni_fpga.close_sessions(standalone_tsm)
