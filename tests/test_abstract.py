@@ -51,7 +51,7 @@ class TestAbstract:
             tsm (_type_): _description_
         """
         ni_abstract.initialize(tsm)
-        assert len(ni_abstract.get_all_sessions(tsm).enable_pins) == 4
+        assert len(ni_abstract.get_all_sessions(tsm).enable_pins) >= 4
         assert ni_abstract.get_all_instruments_names(tsm)[0] == "Masterconnect"
         ni_abstract.close_sessions(tsm)
 
