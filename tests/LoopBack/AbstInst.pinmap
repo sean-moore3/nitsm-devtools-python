@@ -102,8 +102,8 @@
 			<MultiplexedDUTPinRoute pin="SGL_4_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DAQ_DO1=1" />
 			<MultiplexedDUTPinRoute pin="SGL_5_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO1=0" />
 			<MultiplexedDUTPinRoute pin="SGL_6_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO1=1" />
-			<MultiplexedDUTPinRoute pin="SGL_7_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_SWT_DO1=0" />
-			<MultiplexedDUTPinRoute pin="SGL_8_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_SWT_DO1=1" />
+			<MultiplexedDUTPinRoute pin="SGL_7_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO2=0" />
+			<MultiplexedDUTPinRoute pin="SGL_8_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO2=1" />
 		</MultiplexedConnection>
 	</Connections>
 </PinMap>

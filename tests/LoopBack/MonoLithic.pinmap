@@ -352,13 +352,16 @@
 		<DUTPin name="DPI_DO_SDA" />
 		<DUTPin name="DPI_DI_SCL" />
 		<DUTPin name="DPI_DI_SDA" />
-		<SystemPin name="DPI_SR_VDD" />
+		<SystemPin name="En_DPI_DO2" />
 		<SystemPin name="DPI_PM_VDD" />
 		<SystemPin name="DPI_DI_En1" />
 		<SystemPin name="En_DPI_DO1" />
+		<DUTPin name="DPI_DI_11" />
+		<DUTPin name="DPI_DI_12" />
+		<DUTPin name="DPI_DI_13" />
+		<DUTPin name="DPI_DI_14" />
 		<DUTPin name="En_DAQ_DO1" />
 		<DUTPin name="En_RIO_DO1" />
-		<DUTPin name="En_SWT_DO1" />
 		<DUTPin name="SGL_1_DUT" />
 		<DUTPin name="SGL_2_DUT" />
 		<DUTPin name="SGL_3_DUT" />
@@ -560,7 +563,6 @@
 			<PinReference pin="FGN_SI_SGL_In" />
 		</PinGroup>
 		<PinGroup name="AllSwitch">
-			<PinReference pin="En_SWT_DO1" />
 			<PinReference pin="SWT_DO_Pin1" />
 			<PinReference pin="SWT_DO_Pin2" />
 			<PinReference pin="SWT_DO_Pin9" />
@@ -575,9 +577,13 @@
 			<PinReference pin="DPI_PM_VDD" />
 			<PinReference pin="DPI_DI_SCL" />
 			<PinReference pin="DPI_DI_SDA" />
+			<PinReference pin="DPI_DI_11" />
+			<PinReference pin="DPI_DI_12" />
+			<PinReference pin="DPI_DI_13" />
+			<PinReference pin="DPI_DI_14" />
 		</PinGroup>
 		<PinGroup name="DPI_PG_Outputs">
-			<PinReference pin="DPI_SR_VDD" />
+			<PinReference pin="En_DPI_DO2" />
 			<PinReference pin="En_DPI_DO1" />
 			<PinReference pin="DPI_DO_SCL" />
 			<PinReference pin="DPI_DO_SDA" />
@@ -639,35 +645,35 @@
 		</PinGroup>
 		<PinGroup name="SGL_1">
 			<PinReference pin="SGL_1_DUT" />
-			<PinReference pin="En_RIO_DO1" />
+			<PinReference pin="DPI_DI_11" />
 		</PinGroup>
 		<PinGroup name="SGL_2">
 			<PinReference pin="SGL_2_DUT" />
-			<PinReference pin="En_RIO_DO1" />
+			<PinReference pin="DPI_DI_11" />
 		</PinGroup>
 		<PinGroup name="SGL_3">
 			<PinReference pin="SGL_3_DUT" />
-			<PinReference pin="En_DAQ_DO1" />
+			<PinReference pin="DPI_DI_12" />
 		</PinGroup>
 		<PinGroup name="SGL_4">
 			<PinReference pin="SGL_4_DUT" />
-			<PinReference pin="En_DAQ_DO1" />
+			<PinReference pin="DPI_DI_12" />
 		</PinGroup>
 		<PinGroup name="SGL_5">
 			<PinReference pin="SGL_5_DUT" />
-			<PinReference pin="En_DPI_DO1" />
+			<PinReference pin="DPI_DI_13" />
 		</PinGroup>
 		<PinGroup name="SGL_6">
 			<PinReference pin="SGL_6_DUT" />
-			<PinReference pin="En_DPI_DO1" />
+			<PinReference pin="DPI_DI_13" />
 		</PinGroup>
 		<PinGroup name="SGL_7">
 			<PinReference pin="SGL_7_DUT" />
-			<PinReference pin="En_SWT_DO1" />
+			<PinReference pin="DPI_DI_14" />
 		</PinGroup>
 		<PinGroup name="SGL_8">
 			<PinReference pin="SGL_8_DUT" />
-			<PinReference pin="En_SWT_DO1" />
+			<PinReference pin="DPI_DI_14" />
 		</PinGroup>
 		<PinGroup name="RIO_Pins">
 			<PinReference pin="En_RIO_DO1" />
@@ -803,7 +809,6 @@
 	<Connections>
 		<Connection pin="FGN_SI_SGL_In" siteNumber="0" instrument="FGN1" channel="0" />
 		<Connection pin="DMM_VI_CH0" siteNumber="0" instrument="DMM1" channel="0" />
-		<Connection pin="En_SWT_DO1" siteNumber="0" instrument="SWT1" channel="0" />
 		<Connection pin="SWT_DO_Pin1" siteNumber="0" instrument="SWT1" channel="1" />
 		<Connection pin="SWT_DO_Pin2" siteNumber="0" instrument="SWT1" channel="2" />
 		<Connection pin="SWT_DO_Pin3" siteNumber="0" instrument="SWT1" channel="3" />
@@ -887,7 +892,7 @@
 		<Connection channel="DAQ1/port1/line5" instrument="DAQ1_P1_5" pin="DAQ_DO_4464_MUX2_A1" siteNumber="0" />
 		<Connection channel="DAQ1/port1/line6" instrument="DAQ1_P1_6" pin="DAQ_DO_4464_MUX2_A2" siteNumber="0" />
 		<Connection channel="DAQ1/port1/line7" instrument="DAQ1_P1_7" pin="DAQ_DO_4464_MUX_EN" siteNumber="0" />
-		<SystemConnection pin="DPI_SR_VDD" instrument="DPI1" channel="0" />
+		<SystemConnection pin="En_DPI_DO2" instrument="DPI1" channel="0" />
 		<SystemConnection pin="DPI_PM_VDD" instrument="DPI1" channel="1" />
 		<SystemConnection pin="En_DPI_DO1" instrument="DPI1" channel="2" />
 		<SystemConnection pin="DPI_DI_En1" instrument="DPI1" channel="3" />
@@ -902,8 +907,8 @@
 			<MultiplexedDUTPinRoute pin="SGL_4_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DAQ_DO1=1" />
 			<MultiplexedDUTPinRoute pin="SGL_5_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO1=0" />
 			<MultiplexedDUTPinRoute pin="SGL_6_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO1=1" />
-			<MultiplexedDUTPinRoute pin="SGL_7_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_SWT_DO1=0" />
-			<MultiplexedDUTPinRoute pin="SGL_8_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_SWT_DO1=1" />
+			<MultiplexedDUTPinRoute pin="SGL_7_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO2=0" />
+			<MultiplexedDUTPinRoute pin="SGL_8_DUT" siteNumber="0" multiplexer="Masterconnect" routeName="En_DPI_DO2=1" />
 		</MultiplexedConnection>
 		<Connection channel="0" instrument="RIO1" pin="En_RIO_DO1" siteNumber="0" />
 		<Connection channel="1" instrument="RIO1" pin="LINT_RST" siteNumber="0" />
@@ -1024,6 +1029,10 @@
 		<Connection channel="120" instrument="RIO1" pin="TLOAD_BUCK7_EN" siteNumber="0" />
 		<Connection channel="121" instrument="RIO1" pin="En_BUCKLX_DAMP2_PWR_EN" siteNumber="0" />
 		<Connection channel="122" instrument="RIO1" pin="BUCK_LX_DET2_L" siteNumber="0" />
+		<Connection pin="DPI_DI_11" siteNumber="0" instrument="DPI1" channel="11" />
+		<Connection pin="DPI_DI_12" siteNumber="0" instrument="DPI1" channel="12" />
+		<Connection pin="DPI_DI_13" siteNumber="0" instrument="DPI1" channel="13" />
+		<Connection pin="DPI_DI_14" siteNumber="0" instrument="DPI1" channel="14" />
 		<Connection channel="123" instrument="RIO1" pin="TLOAD_BUCK11_EN" siteNumber="0" />
 		<Connection channel="124" instrument="RIO1" pin="TLOAD_LDO14_EN" siteNumber="0" />
 		<Connection channel="125" instrument="RIO1" pin="En_RTRAN_DAMP2_PWR_EN" siteNumber="0" />

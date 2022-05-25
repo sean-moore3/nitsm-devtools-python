@@ -75,7 +75,8 @@ class Session(typing.NamedTuple):
         elif action == Action.Disconnect:
             self.Session.disconnect(self.Channel, route_value)
         elif action == Action.Read:
-            data.append(self.Session.can_connect(self.Channel, route_value))
+            midpoint = self.Session.can_connect(self.Channel, route_value)
+            data.append(midpoint)
         return data
 
 
@@ -114,6 +115,7 @@ class MultipleSessions:
         """
         read_path_capability = []
         for session in self.sessions:
+            # print(type(session))
             data = session.info(route_value, action, timeout)
             read_path_capability += data
         return read_path_capability
