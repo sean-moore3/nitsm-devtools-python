@@ -14,8 +14,8 @@ import time
 import threading
 
 
-class Properties:
-    tsm_context: SMContext
+class Property:
+    tsm: SMContext
     all_items: typing.List[str]
     items_to_show: typing.List[str] = []
     all_item_names: typing.List[str] = []
@@ -24,13 +24,13 @@ class Properties:
 abs_ui_launched = False
 
 try:
-    tsm = ni_open_close.tsm_global
-    testItems = abstract_switch.pin_fgv(tsm,"",abstract_switch.Control.init)
+    Property.tsm = ni_open_close.tsm_global
+    testItems = abstract_switch.pin_fgv(Property.tsm, "", abstract_switch.Control.init)
 except:
     testItems = relay.test_data
 for item in testItems:
-    Properties.items_to_show.append(item[0])
-    Properties.all_item_names.append(item[0])
+    Property.items_to_show.append(item[0])
+    Property.all_item_names.append(item[0])
 
 
 class MainWindow(QMainWindow):
@@ -68,7 +68,6 @@ class UiAbstractSwitchDebugWindow(object):
         self.cb_view = None
         self.tableWidget = None
         self.qTimer = None
-
 
     def setup_ui(self, main_window):
         self.main_window = main_window
@@ -161,23 +160,23 @@ class UiAbstractSwitchDebugWindow(object):
 
     def update_table(self):
         testItemNames: typing.List[str] = []
-        for item in testItems:
-            testItemNames.append(item[0])
+        for item_temp in testItems:
+            testItemNames.append(item_temp[0])
 
-        self.tableWidget.setRowCount(len(Properties.items_to_show))
+        self.tableWidget.setRowCount(len(Property.items_to_show))
 
-        # items = abstract_switch.pin_fgv(tsm=tsm_context, action=abstract_switch.Control.get_connections)
+        # items = abstract_switch.pin_fgv(Property.tsm, "", abstract_switch.Control.get_connections)
         k = 0
 
-        for item_to_show in Properties.items_to_show:
-            item = QtWidgets.QTableWidgetItem()
-            self.tableWidget.setItem(k, 0, item)
-            item.setText(testItems[testItemNames.index(item_to_show)][0])
+        for item_to_show in Property.items_to_show:
+            item_temp = QtWidgets.QTableWidgetItem()
+            self.tableWidget.setItem(k, 0, item_temp)
+            item_temp.setText(testItems[testItemNames.index(item_to_show)][0])
             for i in range(5):
                 text = testItems[testItemNames.index(item_to_show)][i + 1]
-                item = QtWidgets.QTableWidgetItem()
-                self.tableWidget.setItem(k, i + 1, item)
-                item.setText(str(text))
+                item_temp = QtWidgets.QTableWidgetItem()
+                self.tableWidget.setItem(k, i + 1, item_temp)
+                item_temp.setText(str(text))
             k += 1
 
     def configure_mux_button_clicked(self):
@@ -185,12 +184,12 @@ class UiAbstractSwitchDebugWindow(object):
         if selected:
             sessions = []
             for selectedItem in selected:
-                sessions += abstract_switch.pins_to_sessions_sessions_info(Properties.tsm_context, Properties.items_to_show[selectedItem.row()])
+                sessions += abstract_switch.pins_to_sessions_sessions_info(Property.tsm, Property.items_to_show[selectedItem.row()])
             multi_session = abstract_switch.AbstractSession(sessions)
             if self.new_mux_state:
-                multi_session.connect_sessions_info(Properties.tsm_context)
+                multi_session.connect_sessions_info(Property.tsm)
             else:
-                multi_session.disconnect_sessions_info(Properties.tsm_context)
+                multi_session.disconnect_sessions_info(Property.tsm)
 
     def new_mux_state_button_clicked(self):
         if self.new_mux_state:
@@ -209,54 +208,53 @@ class UiAbstractSwitchDebugWindow(object):
     def pin_name_filter_value_changed(self, typed_str: str):
         typed_str = typed_str.upper()
         typed_str = typed_str.strip()
-        Properties.items_to_show.clear()
+        Property.items_to_show.clear()
         self.tableWidget.clear()
         self.init_table()
         if typed_str != "":
-            for item in testItems:
-                if item[0].upper().find(typed_str) != -1:
+            for testItem in testItems:
+                if testItem[0].upper().find(typed_str) != -1:
                     self.qTimer.stop()
-                    Properties.items_to_show.append(item[0])
+                    Property.items_to_show.append(testItem[0])
                     self.qTimer.start()
             self.update_table()
 
         else:
-            for item in testItems:
-                Properties.items_to_show.append(item[0])
+            for testItem in testItems:
+                Property.items_to_show.append(testItem[0])
             self.update_table()
 
     def init_table(self):
-
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(0, item)
-        item.setText("PIN Name")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(1, item)
-        item.setText("Instrument Name")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(2, item)
-        item.setText("Channel")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(3, item)
-        item.setText("Muxed Instrument")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(4, item)
-        item.setText("Muxed Instrument Resource")
-        item = QtWidgets.QTableWidgetItem()
-        self.tableWidget.setHorizontalHeaderItem(5, item)
-        item.setText("Status")
+        item_temp = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(0, item_temp)
+        item_temp.setText("PIN Name")
+        item_temp = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(1, item_temp)
+        item_temp.setText("Instrument Name")
+        item_temp = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(2, item_temp)
+        item_temp.setText("Channel")
+        item_temp = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(3, item_temp)
+        item_temp.setText("Muxed Instrument")
+        item_temp = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(4, item_temp)
+        item_temp.setText("Muxed Instrument Resource")
+        item_temp = QtWidgets.QTableWidgetItem()
+        self.tableWidget.setHorizontalHeaderItem(5, item_temp)
+        item_temp.setText("Status")
 
     def cb_view_value_changed(self, value_of_cb, arr_of_str=None, ref=None):
         if value_of_cb == "All Pins":
             pass
         elif value_of_cb == "Abstract Pins":
-            Properties.tsm_context.filter_pins_by_instrument_type(instrument_type_id="abstinst", )
+            Property.tsm.filter_pins_by_instrument_type(instrument_type_id="abstinst", )
         elif value_of_cb == "Scope Pins":
-            Properties.tsm_context.filter_pins_by_instrument_type(instrument_type_id="niScope")
+            Property.tsm.filter_pins_by_instrument_type(instrument_type_id="niScope")
         elif value_of_cb == "SMU Pins":
-            Properties.tsm_context.filter_pins_by_instrument_type(instrument_type_id="niDCPower")
+            Property.tsm.filter_pins_by_instrument_type(instrument_type_id="niDCPower")
         elif value_of_cb == "DMM Pins":
-            Properties.tsm_context.filter_pins_by_instrument_type(instrument_type_id="niDMM")
+            Property.tsm.filter_pins_by_instrument_type(instrument_type_id="niDMM")
 
 
 def run_ui():
