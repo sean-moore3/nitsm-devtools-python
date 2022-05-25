@@ -4,6 +4,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMainWindow
 from nidevtools import abstract_switch
+from nidevtools import all_open_close as ni_open_close
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import typing
@@ -21,8 +22,13 @@ class Properties:
 
 
 abs_ui_launched = False
-testItems = relay.test_data
-for item in relay.test_data:
+
+try:
+    tsm = ni_open_close.tsm_global
+    testItems = abstract_switch.pin_fgv(tsm,"",abstract_switch.Control.init)
+except:
+    testItems = relay.test_data
+for item in testItems:
     Properties.items_to_show.append(item[0])
     Properties.all_item_names.append(item[0])
 

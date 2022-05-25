@@ -177,7 +177,8 @@ class Session:
             self.status = text
         elif self.instrument_type == InstrumentTypes.switch:
             data = switch.pin_to_sessions_session_info(tsm, self.enable_pin)
-            data = switch.MultipleSessions([data])
+            print("T", data)
+            #data = switch.MultipleSessions([data])
             capability = data.action_session_info(self.route_value, switch.Action.Read)
             if capability[0] == niswitch.PathCapability.PATH_EXISTS:
                 self.status = "Connected To: %s" % self.route_value

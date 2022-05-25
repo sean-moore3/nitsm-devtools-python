@@ -5,7 +5,7 @@ from . import digital
 from . import dmm
 from . import fgen
 from . import fpga
-from . import relay
+# from . import relay
 from . import scope
 from . import switch
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
