@@ -4,6 +4,7 @@ This is nidmm wrapper for use with STS test codes
 import typing
 
 import nidmm
+import nidmm.enums as enums
 import nitsm.pinquerycontexts
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
