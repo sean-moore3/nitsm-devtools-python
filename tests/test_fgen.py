@@ -6,12 +6,12 @@ import nifgen
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import nidevtools.fgen as ni_dt_fgen
 
-# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
+# To simulate hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["Rainbow.pinmap", "MonoLithic.pinmap"]
+pin_file_names = ["MonoLithic.pinmap", "Rainbow.pinmap"]
 # Change index below to change the pinmap to use
-pin_file_name = pin_file_names[1]
+pin_file_name = pin_file_names[0]
 OPTIONS = {}
 if SIMULATE:
     OPTIONS = {"Simulate": True, "DriverSetup": {"Model": "5451", "BoardType": "PXIe"}}
@@ -43,7 +43,7 @@ def fgen_tsm_s(tsm, tests_pins):
 class TestFGen:
     """
     The Following APIs/VIs are used in the DUT Power on sequence.
-    So these functions needs to be test first.
+    So these functions needs to be tested first.
     """
 
     def test_initialize_session(self, tsm):

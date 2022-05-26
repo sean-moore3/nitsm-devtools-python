@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<SourceFile Checksum="0A3E679019746F3826A5B9311FAB2B3C" xmlns="http://www.ni.com/PlatformFramework">
+<SourceFile Checksum="ECD4C4B57DD8B16BB1D0C1408A6A01C5" xmlns="http://www.ni.com/PlatformFramework">
 	<SourceModelFeatureSet>
 		<ParsableNamespace AssemblyFileVersion="5.3.2.50247" FeatureSetName="Digital Pattern Editor" Name="http://www.ni.com/PatternBasedDigital" OldestCompatibleVersion="4.5.0.0" Version="5.3.1.49152" />
 		<ParsableNamespace AssemblyFileVersion="5.3.2.50247" FeatureSetName="Editor" Name="http://www.ni.com/PlatformFramework" OldestCompatibleVersion="5.2.0.49153" Version="5.2.0.49153" />
@@ -36,12 +36,9 @@
 			<FileReference Id="294" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}DutBringupDefinition" Name="I2C_Bringup\.dutbringup" StoragePath="Misc\I2C_Bringup.dutbringup" />
 			<FileReference Id="295" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}RegisterMapDefinition" Name="I2C_Reg\.digireg" StoragePath="Misc\I2C_Reg.digireg" />
 			<SourceFileReference Id="296" ModelDefinitionType="{http://www.ni.com/PatternBasedDigital}SystemViewDefinition" Name="I2C_SystemView\.digisysview" StoragePath="Misc\I2C_SystemView.digisysview" />
-			<FileReference Id="316" ModelDefinitionType="PinMap" Name="Rainbow\.pinmap" StoragePath="Rainbow.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
-			<FileReference Id="319" ModelDefinitionType="PinMap" Name="MonoLithic\.pinmap" StoragePath="MonoLithic.pinmap" />
+			<FileReference Id="316" ModelDefinitionType="PinMap" Name="Rainbow\.pinmap" StoragePath="Rainbow.pinmap" p4:IsActive="False" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
+			<FileReference Id="319" ModelDefinitionType="PinMap" Name="MonoLithic\.pinmap" StoragePath="MonoLithic.pinmap" p4:IsActive="True" xmlns:p4="http://www.ni.com/PatternBasedDigital" />
 			<FileReference Id="320" ModelDefinitionType="PinMap" Name="YinYang\.pinmap" StoragePath="YinYang.pinmap" />
-			<FileReference Id="323" ModelDefinitionType="PinMap" Name="AbstInst\.pinmap" StoragePath="AbstInst.pinmap" />
-			<FileReference Id="326" ModelDefinitionType="PinMap" Name="Switch\.pinmap" StoragePath="Switch.pinmap" />
-			<FileReference Id="327" ModelDefinitionType="PinMap" Name="FPGA\.pinmap" StoragePath="FPGA.pinmap" />
 			<FileReference Id="330" ModelDefinitionType="PinMap" Name="Baku_uSTS\.pinmap" StoragePath="..\..\..\..\Users\ni\Desktop\Baku_uSTS.pinmap" />
 		</NameScopingEnvoy>
 		<EmbeddedDefinitionReference Id="7" ModelDefinitionType="DigitalPatternEditor.ProjectPropertiesDefinition" Name="ProjectProperties">

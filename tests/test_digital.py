@@ -15,11 +15,11 @@ import pytest
 
 import nidevtools.digital as dt_dpi
 
-# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
+# To simulate hardware create a dummy file "Simulate.driver" to flag SIMULATE_HARDWARE boolean.
 SIMULATE_HARDWARE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
-pin_file_names = ["Rainbow.pinmap", "MonoLithic.pinmap"]
+pin_file_names = ["MonoLithic.pinmap", "Rainbow.pinmap"]
 # Change index below to change the pinmap to use
-pin_file_name = pin_file_names[0]
+pin_file_name = pin_file_names[1]
 OPTIONS = {}  # empty dict options to run on real hardware.
 if SIMULATE_HARDWARE:
     OPTIONS = {"Simulate": True, "driver_setup": {"Model": "6571"}}
@@ -33,7 +33,7 @@ def tsm(standalone_tsm):
     The fixture provides the digital project files necessary for initialization of sessions
     in a dictionary format.
     """
-    print("\nTest is running on Simulated driver?", SIMULATE_HARDWARE)
+    print("\nSimulated driver?", SIMULATE_HARDWARE)
     dt_dpi.initialize_sessions(standalone_tsm, options=OPTIONS)
     yield standalone_tsm
     dt_dpi.close_sessions(standalone_tsm)
@@ -302,11 +302,11 @@ def clock_generation(tsm: SMContext, pins: typing.List[str]):
     dpi_tsm.ssc.modify_time_set_for_clock_generation(frequency, 0.5, "time_set")
     dpi_tsm.ssc.clock_generator_generate_clock(frequency)
     for ssc in dpi_tsm.ssc.sessions_sites_channels:
-        assert ssc._channels_session.clock_generator_is_running
-        assert round(ssc._channels_session.clock_generator_frequency) == frequency
+        assert ssc._ch_session.clock_generator_is_running
+        assert round(ssc._ch_session.clock_generator_frequency) == frequency
     dpi_tsm.ssc.clock_generator_abort()
     for ssc in dpi_tsm.ssc.sessions_sites_channels:
-        assert not ssc._channels_session.clock_generator_is_running
+        assert not ssc._ch_session.clock_generator_is_running
 
 
 @nitsm.codemoduleapi.code_module
@@ -450,15 +450,15 @@ def pin_levels_and_timing(tsm: SMContext, pins: typing.List[str]):
     configured_period = dpi_tsm.ssc.configure_time_set_period("time_set", 40e-6)
     assert math.isclose(configured_period, 40e-6, abs_tol=5e-6)
     for ssc in dpi_tsm.ssc.sessions_sites_channels:
-        assert math.isclose(ssc._channels_session.active_load_ioh, -0.0015, abs_tol=5e-6)
-        assert math.isclose(ssc._channels_session.active_load_iol, 0.0015, abs_tol=5e-6)
-        assert math.isclose(ssc._channels_session.active_load_vcom, 0.0015, abs_tol=5e-6)
-        assert math.isclose(ssc._channels_session.vih, 0.0015, abs_tol=5e-6)
-        assert math.isclose(ssc._channels_session.vil, 0.0015, abs_tol=5e-6)
-        assert math.isclose(ssc._channels_session.voh, 0.0015, abs_tol=5e-6)
-        assert math.isclose(ssc._channels_session.vol, 0.0015, abs_tol=5e-6)
-        assert math.isclose(ssc._channels_session.vterm, 0.0015, abs_tol=5e-6)
-        assert ssc._channels_session.tdr_offset.femtoseconds == 1000000
+        assert math.isclose(ssc._ch_session.active_load_ioh, -0.0015, abs_tol=5e-6)
+        assert math.isclose(ssc._ch_session.active_load_iol, 0.0015, abs_tol=5e-6)
+        assert math.isclose(ssc._ch_session.active_load_vcom, 0.0015, abs_tol=5e-6)
+        assert math.isclose(ssc._ch_session.vih, 0.0015, abs_tol=5e-6)
+        assert math.isclose(ssc._ch_session.vil, 0.0015, abs_tol=5e-6)
+        assert math.isclose(ssc._ch_session.voh, 0.0015, abs_tol=5e-6)
+        assert math.isclose(ssc._ch_session.vol, 0.0015, abs_tol=5e-6)
+        assert math.isclose(ssc._ch_session.vterm, 0.0015, abs_tol=5e-6)
+        assert ssc._ch_session.tdr_offset.femtoseconds == 1000000
 
 
 @nitsm.codemoduleapi.code_module

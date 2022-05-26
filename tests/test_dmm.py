@@ -7,10 +7,11 @@ import nitsm
 import pytest
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 
-# To run the code on simulated hardware create a dummy file named "Simulate.driver" to flag SIMULATE boolean.
+# To run the code on simulated hardware create a dummy file named
+# "Simulate.driver" to flag SIMULATE boolean.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["DMM.pinmap", "Rainbow.pinmap"]
+pin_file_names = ["MonoLithic.pinmap", "Rainbow.pinmap"]
 # Change index below to change the pin map to use
 pin_file_name = pin_file_names[0]
 
@@ -55,7 +56,7 @@ def dmm_tsm_s(tsm, tests_pins):
 @pytest.mark.filterwarnings("ignore::DeprecationWarning")
 class TestDMM:
     def test_set_session(self, tsm):
-        print(tsm. pin_map_file_path)
+        print(tsm.pin_map_file_path)
         queried_sessions = tsm.get_all_nidmm_sessions()
         assert isinstance(queried_sessions, tuple)  # Type verification
         for session in queried_sessions:
@@ -76,19 +77,20 @@ class TestDMM:
             assert isinstance(dmm_tsm.sessions, typing.Sequence)
             assert len(dmm_tsm.sessions) == len(tsm.site_numbers)
 
-    def test_init_close_session(self, dmm_tsm_s):
+    def test_configure(self, dmm_tsm_s):
         tsm = dmm_tsm_s[0]
         list_dmm_tsm = dmm_tsm_s[1]
         print(list_dmm_tsm)
         for dmm_tsm in list_dmm_tsm:
             print("\nTest_pin_to_sessions\n", dmm_tsm)
             print(dmm_tsm.sessions)
-            dmm_tsm.configure_measurement(function=nidmm.Function.DC_VOLTS,
-                                          range_raw=10,
-                                          resolution_in_digits=ni_dmm.Resolution.Res_5_05,
-                                          input_resistance=ni_dmm.InputResistance.IR_1_MOhm)
-            dmm_tsm.configure_aperture_time(aperture_time=1,
-                                            units=nidmm.ApertureTimeUnits.SECONDS)
+            dmm_tsm.configure_measurement(
+                function=nidmm.Function.DC_VOLTS,
+                range_raw=1,
+                resolution_in_digits=ni_dmm.Resolution.Res_6_05,
+                input_resistance=ni_dmm.InputResistance.IR_10_MOhm,
+            )
+            dmm_tsm.configure_aperture_time(aperture_time=1, units=nidmm.ApertureTimeUnits.SECONDS)
             try:
                 # dmm_tsm.initiate()
                 data = dmm_tsm.measure()
@@ -97,3 +99,47 @@ class TestDMM:
                 print(e)
             finally:
                 dmm_tsm.abort()
+
+
+@nitsm.codemoduleapi.code_module
+def open_sessions(tsm: SMContext):
+    ni_dmm.initialize_session(tsm)
+
+
+@nitsm.codemoduleapi.code_module
+def close_sessions(tsm: SMContext):
+    ni_dmm.close_session(tsm)
+
+
+@nitsm.codemoduleapi.code_module
+def pins_to_sessions(
+    tsm: SMContext,
+    pins: typing.List[str] = ["DMM_VI_CH0"],
+):
+    return ni_dmm.pins_to_sessions(tsm, pins)
+
+
+@nitsm.codemoduleapi.code_module
+def configure(tsm: SMContext, pins: typing.List[str] = ["DMM_VI_CH0"]):
+    dmm_tsms = []
+    sessions = []
+    for test_pin in pins:
+        data = ni_dmm.pins_to_sessions(tsm, test_pin)
+        dmm_tsms.append(data)
+        sessions += data.sessions
+    for dmm_tsm in dmm_tsms:
+        dmm_tsm.configure_measurement(
+            function=nidmm.Function.DC_VOLTS,
+            range_raw=10,
+            resolution_in_digits=ni_dmm.Resolution.Res_5_05,
+            input_resistance=ni_dmm.InputResistance.IR_1_MOhm,
+        )
+        dmm_tsm.configure_aperture_time(aperture_time=1, units=nidmm.ApertureTimeUnits.SECONDS)
+        try:
+            # dmm_tsm.initiate()
+            data = dmm_tsm.measure()
+            print("Data", data)
+        except Exception as e:
+            print(e)
+        finally:
+            dmm_tsm.abort()

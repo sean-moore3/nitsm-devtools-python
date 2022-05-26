@@ -46,6 +46,28 @@
         <Vterm>0</Vterm>
         <TerminationMode>HighZ</TerminationMode>
       </DigitalPinLevelSet>
+      <DigitalPinLevelSet pin="En_DPI_DO1">
+        <Vil>DC.Vil</Vil>
+        <Vih>DC.Vih</Vih>
+        <Vol>DC.Vol</Vol>
+        <Voh>DC.Voh</Voh>
+        <Iol>DC.Iol</Iol>
+        <Ioh>DC.Ioh</Ioh>
+        <Vcom>DC.VDDIO</Vcom>
+        <TerminationMode>ActiveLoad</TerminationMode>
+        <Comment>Enable pin electrical parameters</Comment>
+      </DigitalPinLevelSet>
+      <DigitalPinLevelSet pin="DPI_DI_En1">
+        <Vil>DC.Vil</Vil>
+        <Vih>DC.Vih</Vih>
+        <Vol>DC.Vol</Vol>
+        <Voh>DC.Voh</Voh>
+        <Iol>DC.Iol</Iol>
+        <Ioh>DC.Ioh</Ioh>
+        <Vcom>DC.VDDIO</Vcom>
+        <TerminationMode>ActiveLoad</TerminationMode>
+        <Comment>Enable pin electrical parameters</Comment>
+      </DigitalPinLevelSet>
     </DigitalPinLevelSets>
     <PpmuPinLevelSets>
       <PpmuPinLevelSet pin="DPI_SR_VDD">
@@ -53,20 +75,10 @@
         <IRange>32 mA</IRange>
         <Comment>DUT's power supply pin electrical parameters</Comment>
       </PpmuPinLevelSet>
-      <PpmuPinLevelSet pin="DPI_SR_VDDIO">
-        <Vf>DC.VDDIO</Vf>
-        <IRange>32 mA</IRange>
-        <Comment>DUT's digital interface power supply pin electrical parameters</Comment>
-      </PpmuPinLevelSet>
       <PpmuPinLevelSet pin="DPI_PM_VDD">
         <Vf>DC.VDD</Vf>
         <IRange>32 mA</IRange>
         <Comment>DUT's power supply pin electrical parameters</Comment>
-      </PpmuPinLevelSet>
-      <PpmuPinLevelSet pin="DPI_PM_VDDIO">
-        <Vf>DC.VDDIO</Vf>
-        <IRange>32 mA</IRange>
-        <Comment>DUT's digital interface power supply pin electrical parameters</Comment>
       </PpmuPinLevelSet>
     </PpmuPinLevelSets>
   </PinLevelsSheet>
