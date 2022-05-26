@@ -3,8 +3,8 @@ import threading
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QMainWindow
-from nidevtools import abstract_switch
-from nidevtools import all_open_close as ni_open_close
+from nidevtools import abstract_switch as abs
+from nidevtools import all_open_close as ni_oc
 import nitsm.codemoduleapi
 from nitsm.codemoduleapi import SemiconductorModuleContext as SMContext
 import typing
@@ -24,13 +24,13 @@ class Property:
 abs_ui_launched = False
 
 try:
-    Property.tsm = ni_open_close.tsm_global
-    testItems = abstract_switch.pin_fgv(Property.tsm, "", abstract_switch.Control.init)
+    Property.tsm = ni_oc.tsm_global
+    testItems = abs.pin_fgv(Property.tsm, "", abs.Control.init)
 except:
-    testItems = relay.test_data
-for item in testItems:
-    Property.items_to_show.append(item[0])
-    Property.all_item_names.append(item[0])
+    testItems = []
+for test_item in testItems:
+    Property.items_to_show.append(test_item[0])
+    Property.all_item_names.append(test_item[0])
 
 
 class MainWindow(QMainWindow):
@@ -38,12 +38,10 @@ class MainWindow(QMainWindow):
         super().__init__()
 
     def exit_app(self):
-        print("Shortcut pressed")
         self.close()
 
     def closeEvent(self, *args, **kwargs):
         super().closeEvent(*args, **kwargs)
-        print("Abstract Swtich Debug UI window closed!!!")
         global abs_ui_launched
         abs_ui_launched = False
 
@@ -159,24 +157,26 @@ class UiAbstractSwitchDebugWindow(object):
         self.update_table()
 
     def update_table(self):
-        testItemNames: typing.List[str] = []
-        for item_temp in testItems:
-            testItemNames.append(item_temp[0])
+        test_item_names: typing.List[str] = []
+        for item in testItems:
+            test_item_names.append(item[0])
 
         self.tableWidget.setRowCount(len(Property.items_to_show))
-
-        # items = abstract_switch.pin_fgv(Property.tsm, "", abstract_switch.Control.get_connections)
+        try:
+            items = abs.pin_fgv(Property.tsm, "", abs.Control.get_connections)
+        except:
+            items = []
         k = 0
 
         for item_to_show in Property.items_to_show:
-            item_temp = QtWidgets.QTableWidgetItem()
-            self.tableWidget.setItem(k, 0, item_temp)
-            item_temp.setText(testItems[testItemNames.index(item_to_show)][0])
+            item = QtWidgets.QTableWidgetItem()
+            self.tableWidget.setItem(k, 0, item)
+            item.setText(testItems[test_item_names.index(item_to_show)][0])
             for i in range(5):
-                text = testItems[testItemNames.index(item_to_show)][i + 1]
-                item_temp = QtWidgets.QTableWidgetItem()
-                self.tableWidget.setItem(k, i + 1, item_temp)
-                item_temp.setText(str(text))
+                text = testItems[test_item_names.index(item_to_show)][i + 1]
+                item = QtWidgets.QTableWidgetItem()
+                self.tableWidget.setItem(k, i + 1, item)
+                item.setText(str(text))
             k += 1
 
     def configure_mux_button_clicked(self):
@@ -184,8 +184,8 @@ class UiAbstractSwitchDebugWindow(object):
         if selected:
             sessions = []
             for selectedItem in selected:
-                sessions += abstract_switch.pins_to_sessions_sessions_info(Property.tsm, Property.items_to_show[selectedItem.row()])
-            multi_session = abstract_switch.AbstractSession(sessions)
+                sessions += abs.pins_to_sessions_sessions_info(Property.tsm, Property.items_to_show[selectedItem.row()])
+            multi_session = abs.AbstractSession(sessions)
             if self.new_mux_state:
                 multi_session.connect_sessions_info(Property.tsm)
             else:
