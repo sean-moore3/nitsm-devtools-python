@@ -352,10 +352,10 @@
 		<DUTPin name="DPI_DO_SDA" />
 		<DUTPin name="DPI_DI_SCL" />
 		<DUTPin name="DPI_DI_SDA" />
+		<SystemPin name="En_DPI_DO1" />
 		<SystemPin name="En_DPI_DO2" />
 		<SystemPin name="DPI_PM_VDD" />
 		<SystemPin name="DPI_DI_En1" />
-		<SystemPin name="En_DPI_DO1" />
 		<DUTPin name="DPI_DI_11" />
 		<DUTPin name="DPI_DI_12" />
 		<DUTPin name="DPI_DI_13" />
@@ -562,7 +562,7 @@
 		<PinGroup name="FGN_PG_Signal">
 			<PinReference pin="FGN_SI_SGL_In" />
 		</PinGroup>
-		<PinGroup name="AllSwitch">
+		<PinGroup name="SWT_PG_All">
 			<PinReference pin="SWT_DO_Pin1" />
 			<PinReference pin="SWT_DO_Pin2" />
 			<PinReference pin="SWT_DO_Pin9" />
@@ -588,15 +588,15 @@
 			<PinReference pin="DPI_DO_SCL" />
 			<PinReference pin="DPI_DO_SDA" />
 		</PinGroup>
-		<PinGroup name="Inputs_OSC_ANA">
-			<PinReference pin="OSC_xA_ANA1" />
-			<PinReference pin="OSC_xA_ANA2" />
-		</PinGroup>
 		<PinGroup name="DPI_PG_AllPins">
 			<PinReference pin="DPI_PG_Outputs" />
 			<PinReference pin="DPI_PG_Inputs" />
 		</PinGroup>
-		<PinGroup name="Inputs_SMU_ANA">
+		<PinGroup name="OSC_PG_Inputs">
+			<PinReference pin="OSC_xA_ANA1" />
+			<PinReference pin="OSC_xA_ANA2" />
+		</PinGroup>
+		<PinGroup name="SMU_PG_Inputs">
 			<PinReference pin="SMU_VI_ANA1" />
 		</PinGroup>
 		<PinGroup name="DAQ_Pins1">

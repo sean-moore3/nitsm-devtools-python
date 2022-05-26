@@ -12,7 +12,7 @@ import nidevtools.all_open_close as ni_open_close
 # To simulate hardware create a dummy file named "Simulate.driver" in the current folder.
 SIMULATE = os.path.exists(os.path.join(os.path.dirname(__file__), "Simulate.driver"))
 
-pin_file_names = ["AbstInst.pinmap", "MonoLithic.pinmap", "Rainbow.pinmap", "Baku_uSTS.pinmap"]
+pin_file_names = ["MonoLithic.pinmap", "Rainbow.pinmap", "Baku_uSTS.pinmap"]
 # Change index below to change the pin map to use
 pin_file_name = pin_file_names[0]
 
